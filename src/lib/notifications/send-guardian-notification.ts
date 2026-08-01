@@ -44,7 +44,7 @@ export async function notifyBookingCreated(params: BookingNotificationParams) {
 
     try {
       await resend.emails.send({
-        from: 'DersoLab <onboarding@resend.dev>',
+        from: 'DersoLab <bildirim@dersolab.com>',
         to: recipient.email,
         subject: 'Ders planlandi - DersoLab',
         html: `<p>Merhaba ${recipient.name},</p>
@@ -88,7 +88,7 @@ export async function notifyBookingCancelled(params: {
 
     try {
       await resend.emails.send({
-        from: 'DersoLab <onboarding@resend.dev>',
+        from: 'DersoLab <bildirim@dersolab.com>',
         to: recipient.email,
         subject: 'Ders iptal edildi - DersoLab',
         html: `<p>Merhaba ${recipient.name},</p>
@@ -117,7 +117,7 @@ export async function notifyLessonCompleted(params: {
     })
     try {
       await resend.emails.send({
-        from: 'DersoLab <onboarding@resend.dev>', to: recipient.email,
+        from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
         subject: 'Ders tamamlandi - DersoLab',
         html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihindeki ders tamamlandi.</p>`,
       })
@@ -142,7 +142,7 @@ export async function notifyHomeworkAssigned(params: {
     })
     try {
       await resend.emails.send({
-        from: 'DersoLab <onboarding@resend.dev>', to: recipient.email,
+        from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
         subject: 'Yeni odev verildi - DersoLab',
         html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> odevi verildi. Son tarih: ${dueDateText}.</p>`,
       })
@@ -163,7 +163,7 @@ export async function notifyHomeworkCompleted(params: { studentId: string; homew
     })
     try {
       await resend.emails.send({
-        from: 'DersoLab <onboarding@resend.dev>', to: recipient.email,
+        from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
         subject: 'Odev onaylandi - DersoLab',
         html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> odevi egitmen tarafindan incelendi ve onaylandi.</p>`,
       })
@@ -185,7 +185,7 @@ export async function notifyHomeworkSubmitted(params: { homeworkId: string; inst
 
   try {
     await resend.emails.send({
-      from: 'DersoLab <onboarding@resend.dev>', to: instructor.email,
+      from: 'DersoLab <bildirim@dersolab.com>', to: instructor.email,
       subject: 'Odev incelemeni bekliyor - DersoLab',
       html: `<p>Merhaba ${instructor.name},</p><p><strong>${params.title}</strong> odevi icin ogrencin bir gonderim yapti.</p>`,
     })
@@ -207,6 +207,6 @@ export async function notifyInstructorApprovalStatus(params: {
     : `Merhaba ${instructor.name}, profilin incelendi. ${params.note ?? 'Bazi duzenlemeler gerekiyor, lutfen bizimle iletisime gec.'}`
 
   try {
-    await resend.emails.send({ from: 'DersoLab <onboarding@resend.dev>', to: instructor.email, subject, html: `<p>${body}</p>` })
+    await resend.emails.send({ from: 'DersoLab <bildirim@dersolab.com>', to: instructor.email, subject, html: `<p>${body}</p>` })
   } catch (err) { console.error('Onay bildirimi gonderilemedi:', err) }
 }
