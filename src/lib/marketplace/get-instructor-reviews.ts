@@ -10,12 +10,7 @@ export interface InstructorReview {
 
 export async function getInstructorReviews(instructorId: string): Promise<InstructorReview[]> {
   const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from('review_details')
-    .select('id, rating, comment, created_at, student_display_name')
-    .eq('instructor_id', instructorId)
-    .order('created_at', { ascending: false })
+  const { data, error } = await supabase.rpc('get_reviews_for_instructor', { p_instructor_id: instructorId })
 
   if (error) throw error
 

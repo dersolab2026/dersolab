@@ -1,11 +1,24 @@
 import { createClient } from '@/lib/supabase/server'
-import type { InstructorProfile } from '@/types'
+import type { InstructorProfile, EducationEntry } from '@/types'
 
 interface GetInstructorsParams {
   subject?: string
 }
 
-function toInstructorProfile(row: any): InstructorProfile {
+interface InstructorProfileRow {
+  id: string
+  name: string
+  avatar_url: string | null
+  bio: string | null
+  subjects: string[]
+  lesson_price: number
+  intro_video_url: string | null
+  calendar_connected: boolean
+  average_rating: number
+  review_count: number
+}
+
+function toInstructorProfile(row: InstructorProfileRow): InstructorProfile {
   return {
     userId: row.id,
     name: row.name,
@@ -15,40 +28,28 @@ function toInstructorProfile(row: any): InstructorProfile {
     lessonPrice: row.lesson_price,
     introVideoUrl: row.intro_video_url,
     isCalendarConnected: row.calendar_connected,
-    averageRating: Number(row.average_rating ?? 0),
-    reviewCount: Number(row.review_count ?? 0),
+    averageRating: row.average_rating,
+    reviewCount: row.review_count,
   }
 }
 
-const INSTRUCTOR_PROFILE_COLUMNS =
-  'id, name, avatar_url, bio, subjects, lesson_price, intro_video_url, calendar_connected, average_rating, review_count'
-
 export async function getInstructors(params: GetInstructorsParams = {}): Promise<InstructorProfile[]> {
   const supabase = await createClient()
-  let query = supabase.from('instructor_profiles').select(INSTRUCTOR_PROFILE_COLUMNS)
+  const { data, error } = await supabase.rpc('get_instructor_profiles', { p_subject: params.subject ?? null })
 
-  if (params.subject) {
-    query = query.contains('subjects', [params.subject])
-  }
-
-  const { data, error } = await query
   if (error) throw error
   return (data ?? []).map(toInstructorProfile)
 }
 
 export async function getInstructorById(instructorId: string): Promise<InstructorProfile | null> {
   const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('instructor_profiles')
-    .select(INSTRUCTOR_PROFILE_COLUMNS)
-    .eq('id', instructorId)
-    .single()
+  const { data, error } = await supabase.rpc('get_instructor_profile_by_id', { p_id: instructorId })
 
-  if (error || !data) return null
-  return toInstructorProfile(data)
+  if (error || !data || data.length === 0) return null
+  return toInstructorProfile(data[0])
 }
 
-export async function getInstructorEducation(instructorId: string) {
+export async function getInstructorEducation(instructorId: string): Promise<EducationEntry[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('instructor_education')
