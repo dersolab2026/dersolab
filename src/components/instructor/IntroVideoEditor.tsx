@@ -2,12 +2,11 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Loader2, Upload } from 'lucide-react'
 import { updateIntroVideo } from '@/actions/instructor-profile'
 import { uploadIntroVideo } from '@/lib/storage/upload-intro-video'
 import { parseVideoUrl } from '@/lib/video/parse-video-url'
+import { PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
 
 interface IntroVideoEditorProps {
   initialUrl: string | null
@@ -66,40 +65,46 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
   return (
     <div className="space-y-3">
       <div className="flex gap-2">
-        <Input
+        <input
           placeholder="https://youtube.com/watch?v=..."
           value={url}
           onChange={(e) => setUrl(e.target.value)}
+          className={`${PIXEL_INPUT} py-2`}
         />
-        <Button size="sm" onClick={handleSaveLink} disabled={isPending}>
+        <button onClick={handleSaveLink} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm shrink-0`}>
           {isPending && !isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
-        </Button>
+        </button>
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground">veya</span>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs font-semibold text-[#1B2430]/60">veya</span>
         <input ref={inputRef} type="file" accept="video/mp4,video/quicktime,video/webm" className="hidden" onChange={handleFileChange} />
-        <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()} disabled={isUploading} className="gap-2">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={isUploading}
+          className={`${PIXEL_BUTTON_SECONDARY} gap-2 px-3 py-1.5 text-sm`}
+        >
           {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
           {isUploading ? 'Yükleniyor...' : 'Video Dosyası Yükle'}
-        </Button>
-        <span className="text-xs text-muted-foreground">en fazla 200 MB</span>
+        </button>
+        <span className="text-xs font-semibold text-[#1B2430]/60">en fazla 200 MB</span>
       </div>
 
       {url.trim() && !embedPreview && !isDirectFile && (
-        <p className="text-sm text-destructive">Bu link tanınmadı — YouTube/Vimeo linki ya da dosya yükle</p>
+        <p className="text-sm font-semibold text-red-600">Bu link tanınmadı — YouTube/Vimeo linki ya da dosya yükle</p>
       )}
 
       {embedPreview && (
-        <div className="aspect-video w-full max-w-md overflow-hidden rounded-md border">
+        <div className="aspect-video w-full max-w-md overflow-hidden rounded-xl border-4 border-[#1B2430]">
           <iframe src={embedPreview.embedUrl} className="h-full w-full" allowFullScreen />
         </div>
       )}
       {isDirectFile && (
-        <video src={url} controls className="aspect-video w-full max-w-md rounded-md border" />
+        <video src={url} controls className="aspect-video w-full max-w-md rounded-xl border-4 border-[#1B2430]" />
       )}
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
     </div>
   )
 }

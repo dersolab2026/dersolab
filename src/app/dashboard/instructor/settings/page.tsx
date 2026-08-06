@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ConnectGoogleCalendarButton } from '@/components/instructor/ConnectGoogleCalendarButton'
+import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 
 interface InstructorSettingsPageProps {
   searchParams: Promise<{ calendar_connected?: string; calendar_error?: string }>
@@ -15,15 +16,10 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
   const { data: instructorRow } = await supabase.from('instructors').select('calendar_connected').eq('user_id', user.id).single()
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Ayarlar</h1>
-        <p className="text-muted-foreground">Google Takvim bağlantını buradan yönet.</p>
-      </div>
-
-      {calendar_connected && <p className="text-sm text-green-600">Google Takvimin başarıyla bağlandı.</p>}
+    <DashboardPageShell title="Ayarlar" description="Google Takvim bağlantını buradan yönet.">
+      {calendar_connected && <p className="text-sm font-semibold text-[#6FA89E]">Google Takvimin başarıyla bağlandı.</p>}
       {calendar_error === 'missing_refresh_token' && (
-        <p className="text-sm text-destructive">
+        <p className="text-sm font-semibold text-red-600">
           Google bu hesap için gerekli izni döndürmedi. Lütfen{' '}
           <a
             href="https://myaccount.google.com/permissions"
@@ -37,10 +33,10 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
         </p>
       )}
       {calendar_error && calendar_error !== 'missing_refresh_token' && (
-        <p className="text-sm text-destructive">Bağlantı sırasında bir sorun oluştu, tekrar dener misin?</p>
+        <p className="text-sm font-semibold text-red-600">Bağlantı sırasında bir sorun oluştu, tekrar dener misin?</p>
       )}
 
       <ConnectGoogleCalendarButton isConnected={instructorRow?.calendar_connected ?? false} />
-    </div>
+    </DashboardPageShell>
   )
 }

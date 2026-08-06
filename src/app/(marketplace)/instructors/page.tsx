@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
 import { InstructorCard } from '@/components/marketplace/InstructorCard'
 import { getInstructors } from '@/lib/marketplace/get-instructors'
 import { LESSON_SUBJECTS } from '@/lib/constants'
@@ -13,30 +12,52 @@ export default async function InstructorsPage({ searchParams }: InstructorsPageP
   const instructors = await getInstructors({ subject })
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Eğitmenler</h1>
-        <p className="text-muted-foreground">LGS ve YKS için branşına göre eğitmen bul.</p>
-      </div>
+    <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
+      <div
+        className="absolute inset-0 z-0 opacity-40 pointer-events-none"
+        style={{
+          backgroundImage: 'linear-gradient(45deg, #6FA89E 25%, transparent 25%), linear-gradient(-45deg, #6FA89E 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #6FA89E 75%), linear-gradient(-45deg, transparent 75%, #6FA89E 75%)',
+          backgroundSize: '40px 40px', backgroundPosition: '0 0, 0 20px, 20px -20px, -20px 0px'
+        }}
+      />
 
-      <div className="flex flex-wrap gap-2">
-        <Link href="/instructors">
-          <Badge variant={!subject ? 'default' : 'outline'}>Tümü</Badge>
-        </Link>
-        {LESSON_SUBJECTS.map((s) => (
-          <Link key={s} href={`/instructors?subject=${encodeURIComponent(s)}`}>
-            <Badge variant={subject === s ? 'default' : 'outline'}>{s}</Badge>
-          </Link>
-        ))}
-      </div>
-
-      {instructors.length === 0 ? (
-        <p className="text-muted-foreground">Bu branşta henüz eğitmen bulunmuyor.</p>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {instructors.map((instructor) => <InstructorCard key={instructor.userId} instructor={instructor} />)}
+      <div className="relative z-10 mx-auto max-w-5xl space-y-6 p-5 py-10">
+        <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
+          <h1 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430] leading-snug">
+            Eğitmenler
+          </h1>
         </div>
-      )}
+
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/instructors"
+            className={`px-4 py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
+              !subject ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]' : 'bg-white text-[#1B2430]'
+            }`}
+          >
+            Tümü
+          </Link>
+          {LESSON_SUBJECTS.map((s) => (
+            <Link
+              key={s}
+              href={`/instructors?subject=${encodeURIComponent(s)}`}
+              className={`px-4 py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
+                subject === s ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]' : 'bg-white text-[#1B2430]'
+              }`}
+            >
+              {s}
+            </Link>
+          ))}
+        </div>
+
+        {instructors.length === 0 ? (
+          <p className="font-sans font-semibold text-[#1B2430]">Bu branşta henüz eğitmen bulunmuyor.</p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {instructors.map((instructor) => <InstructorCard key={instructor.userId} instructor={instructor} />)}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

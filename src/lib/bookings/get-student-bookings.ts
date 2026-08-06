@@ -12,7 +12,6 @@ export interface StudentBookingItem {
   status: 'scheduled' | 'completed' | 'cancelled' | 'no_show'
   meetLink: string | null
   creditRefunded: boolean | null
-  hasReview: boolean
 }
 
 export async function getBookingsForViewer(viewerId: string, viewerRole: string): Promise<StudentBookingItem[]> {
@@ -38,13 +37,9 @@ export async function getBookingsForViewer(viewerId: string, viewerRole: string)
   const admin = createAdminClient()
   const involvedUserIds = [...new Set(bookings.flatMap((b: any) => [b.student_id, b.instructor_id]))]
 
-  const [{ data: users }, { data: reviews }] = await Promise.all([
-    admin.from('users').select('id, name').in('id', involvedUserIds),
-    supabase.from('reviews').select('booking_id').in('booking_id', bookings.map((b: any) => b.id)),
-  ])
+  const { data: users } = await admin.from('users').select('id, name').in('id', involvedUserIds)
 
   const nameById = new Map((users ?? []).map((u: any) => [u.id, u.name]))
-  const reviewedBookingIds = new Set((reviews ?? []).map((r: any) => r.booking_id))
 
   return bookings.map((b: any) => ({
     id: b.id,
@@ -57,6 +52,5 @@ export async function getBookingsForViewer(viewerId: string, viewerRole: string)
     status: b.status,
     meetLink: b.meet_link,
     creditRefunded: b.credit_refunded,
-    hasReview: reviewedBookingIds.has(b.id),
   }))
 }

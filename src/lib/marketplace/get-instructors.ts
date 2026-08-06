@@ -14,8 +14,6 @@ interface InstructorProfileRow {
   lesson_price: number
   intro_video_url: string | null
   calendar_connected: boolean
-  average_rating: number
-  review_count: number
 }
 
 function toInstructorProfile(row: InstructorProfileRow): InstructorProfile {
@@ -28,8 +26,6 @@ function toInstructorProfile(row: InstructorProfileRow): InstructorProfile {
     lessonPrice: row.lesson_price,
     introVideoUrl: row.intro_video_url,
     isCalendarConnected: row.calendar_connected,
-    averageRating: row.average_rating,
-    reviewCount: row.review_count,
   }
 }
 

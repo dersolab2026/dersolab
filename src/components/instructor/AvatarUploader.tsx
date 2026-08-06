@@ -3,9 +3,9 @@
 import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import { Loader2, Camera } from 'lucide-react'
 import { uploadAvatar } from '@/lib/storage/upload-avatar'
+import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface AvatarUploaderProps {
   userId: string
@@ -40,17 +40,22 @@ export function AvatarUploader({ userId, currentAvatarUrl, name }: AvatarUploade
 
   return (
     <div className="flex items-center gap-4">
-      <Avatar className="h-20 w-20">
+      <Avatar className="h-20 w-20 border-2 border-[#1B2430]">
         <AvatarImage src={previewUrl ?? undefined} alt={name} />
-        <AvatarFallback>{initials}</AvatarFallback>
+        <AvatarFallback className="bg-white text-[#1B2430] font-bold">{initials}</AvatarFallback>
       </Avatar>
       <div className="space-y-1">
         <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileChange} />
-        <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()} disabled={isPending} className="gap-2">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={isPending}
+          className={`${PIXEL_BUTTON_SECONDARY} gap-2 px-3 py-1.5 text-sm`}
+        >
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
           Fotoğraf Değiştir
-        </Button>
-        {error && <p className="text-xs text-destructive">{error}</p>}
+        </button>
+        {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
       </div>
     </div>
   )

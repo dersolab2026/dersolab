@@ -5,7 +5,8 @@ import { getGuardianStudents } from '@/lib/marketplace/get-guardian-students'
 import { PackagesForStudent } from '@/components/marketplace/PackagesForStudent'
 import { PurchasePackageButton } from '@/components/marketplace/PurchasePackageButton'
 import { AddChildDialog } from '@/components/family/AddChildDialog'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
+import { PIXEL_CARD } from '@/lib/theme'
 
 interface StudentPackagesPageProps {
   searchParams: Promise<{ success?: string; canceled?: string }>
@@ -21,37 +22,33 @@ export default async function StudentPackagesPage({ searchParams }: StudentPacka
   const packages = await getActivePackages()
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 py-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Ders Paketleri</h1>
-          <p className="text-muted-foreground">Kredi satın alıp dilediğin eğitmenle ders planla.</p>
-        </div>
-        {userRow?.role === 'parent' && <AddChildDialog />}
-      </div>
+    <DashboardPageShell
+      title="Ders Paketleri"
+      description="Kredi satın alıp dilediğin eğitmenle ders planla."
+      headerExtra={userRow?.role === 'parent' ? <AddChildDialog /> : undefined}
+    >
+      {success && <p className="font-semibold text-[#6FA89E]">Ödeme alındı, krediler hesabına eklendi.</p>}
+      {canceled && <p className="font-semibold text-[#1B2430]/70">Ödeme tamamlanmadı.</p>}
 
-      {success && <p className="text-sm text-green-600">Ödeme alındı, krediler hesabına eklendi.</p>}
-      {canceled && <p className="text-sm text-muted-foreground">Ödeme tamamlanmadı.</p>}
+      <div className={`${PIXEL_CARD} p-4`}>
+        <p className="text-sm font-semibold text-[#1B2430]/70">1 ders kredisi, 40 dakikalık bir derse karşılık gelir.</p>
+      </div>
 
       {userRow?.role === 'parent' ? (
         <PackagesForStudent packages={packages} students={await getGuardianStudents(user.id)} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {packages.map((pkg) => (
-            <Card key={pkg.id}>
-              <CardHeader>
-                <CardTitle>{pkg.title}</CardTitle>
-                <p className="text-2xl font-semibold">{pkg.price.toLocaleString('tr-TR')} ₺</p>
-                <p className="text-sm text-muted-foreground">{pkg.creditAmount} ders kredisi</p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {pkg.description && <p className="text-sm text-muted-foreground">{pkg.description}</p>}
-                <PurchasePackageButton packageId={pkg.id} studentId={user.id} />
-              </CardContent>
-            </Card>
+            <div key={pkg.id} className={`${PIXEL_CARD} p-5 space-y-2`}>
+              <p className="font-bold text-[#1B2430]">{pkg.title}</p>
+              <p className="text-2xl font-bold text-[#1B2430]">{pkg.price.toLocaleString('tr-TR')} ₺</p>
+              <p className="text-sm font-semibold text-[#6FA89E]">{pkg.creditAmount} ders kredisi</p>
+              {pkg.description && <p className="text-sm font-semibold text-[#1B2430]/70">{pkg.description}</p>}
+              <PurchasePackageButton packageId={pkg.id} studentId={user.id} />
+            </div>
           ))}
         </div>
       )}
-    </div>
+    </DashboardPageShell>
   )
 }

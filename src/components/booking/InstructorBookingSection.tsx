@@ -2,11 +2,10 @@
 
 import { useState, useTransition } from 'react'
 import { BookingCalendar } from '@/components/calendar/BookingCalendar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
 import { createBooking } from '@/actions/bookings'
 import type { TimeSlot } from '@/types'
+import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
 
 interface InstructorBookingSectionProps {
   instructorId: string
@@ -37,21 +36,19 @@ export function InstructorBookingSection({ instructorId, studentId }: Instructor
       <BookingCalendar instructorId={instructorId} onSelectSlot={setSelectedSlot} />
 
       {selectedSlot && (
-        <Card>
-          <CardContent className="flex items-center justify-between py-4">
-            <p className="text-sm">
-              Seçilen saat:{' '}
-              <strong>{new Date(selectedSlot.start).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })}</strong>
-            </p>
-            <Button onClick={handleConfirm} disabled={isPending}>
-              {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Rezervasyonu Onayla'}
-            </Button>
-          </CardContent>
-        </Card>
+        <div className={`${PIXEL_CARD} p-4 flex flex-wrap items-center justify-between gap-3`}>
+          <p className="text-sm font-semibold text-[#1B2430]">
+            Seçilen saat:{' '}
+            <strong>{new Date(selectedSlot.start).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })}</strong>
+          </p>
+          <button type="button" onClick={handleConfirm} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Rezervasyonu Onayla'}
+          </button>
+        </div>
       )}
 
       {result && (
-        <p className={result.success ? 'text-sm text-green-600' : 'text-sm text-destructive'}>{result.message}</p>
+        <p className={`text-sm font-semibold ${result.success ? 'text-[#6FA89E]' : 'text-red-600'}`}>{result.message}</p>
       )}
     </div>
   )

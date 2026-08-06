@@ -1,14 +1,17 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { AuthShell } from '@/components/auth/AuthShell'
 import { registerUser } from '@/actions/auth'
 
 type Role = 'student' | 'parent' | 'instructor'
+
+const ROLE_LABELS: Record<Role, string> = {
+  parent: 'Veli',
+  student: 'Öğrenci',
+  instructor: 'Eğitmen',
+}
 
 export function RegisterForm() {
   const [name, setName] = useState('')
@@ -34,58 +37,100 @@ export function RegisterForm() {
 
   if (success) {
     return (
-      <Card className="mx-auto mt-16 max-w-sm">
-        <CardContent className="py-8 text-center">
-          <p className="font-medium">Kaydın alındı</p>
-          <p className="mt-1 text-sm text-muted-foreground">E-postana gönderdiğimiz onay linkine tıklayınca giriş yapabilirsin.</p>
-        </CardContent>
-      </Card>
+      <AuthShell subtitle="Kaydın alındı!">
+        <p className="text-center text-[#1B2430]">
+          E-postana gönderdiğimiz onay linkine tıklayınca giriş yapabilirsin.
+        </p>
+        <Link
+          href="/login"
+          className="mt-6 block w-full py-4 bg-[#DD7B3A] text-[#F4F1E8] font-bold text-lg rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all text-center"
+        >
+          Giriş Yap
+        </Link>
+      </AuthShell>
     )
   }
 
   return (
-    <Card className="mx-auto mt-16 max-w-sm">
-      <CardHeader><CardTitle>Kayıt Ol</CardTitle></CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label>Hesap Türü</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {(['parent', 'student', 'instructor'] as const).map((r) => (
-                <Button key={r} type="button" variant={role === r ? 'default' : 'outline'} size="sm" onClick={() => setRole(r)}>
-                  {r === 'student' ? 'Öğrenci' : r === 'parent' ? 'Veli' : 'Eğitmen'}
-                </Button>
-              ))}
-            </div>
-            {role === 'student' && (
-              <p className="text-xs text-muted-foreground">
-                LGS öğrencisiysen, önce bir veli "Veli" seçeneğiyle kayıt olmalı ve seni eklemeli.
-              </p>
-            )}
+    <AuthShell>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div>
+          <label className="block text-[#1B2430] font-bold mb-2">Hesap Türü</label>
+          <div className="grid grid-cols-3 gap-2">
+            {(['parent', 'student', 'instructor'] as const).map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRole(r)}
+                className={`py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
+                  role === r
+                    ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]'
+                    : 'bg-white text-[#1B2430]'
+                }`}
+              >
+                {ROLE_LABELS[r]}
+              </button>
+            ))}
           </div>
+          {role === 'student' && (
+            <p className="mt-2 text-xs text-[#1B2430]">
+              LGS öğrencisiysen, önce bir veli &quot;Veli&quot; seçeneğiyle kayıt olmalı ve seni eklemeli.
+            </p>
+          )}
+        </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="name">Ad Soyad</Label>
-            <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="email">E-posta</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="password">Şifre</Label>
-            <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
+        <div>
+          <label className="block text-[#1B2430] font-bold mb-2">Ad Soyad</label>
+          <input
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+          />
+        </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kayıt Ol'}
-          </Button>
-          <p className="text-center text-sm text-muted-foreground">
-            Zaten hesabın var mı? <a href="/login" className="underline">Giriş yap</a>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+        <div>
+          <label className="block text-[#1B2430] font-bold mb-2">E-posta</label>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+            placeholder="ornek@email.com"
+          />
+        </div>
+
+        <div>
+          <label className="block text-[#1B2430] font-bold mb-2">Şifre</label>
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+            placeholder="••••••••"
+          />
+        </div>
+
+        {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="mt-2 w-full py-4 bg-[#DD7B3A] text-[#F4F1E8] font-bold text-lg rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all disabled:opacity-60"
+        >
+          {isPending ? 'Kaydediliyor...' : 'Kaydol'}
+        </button>
+      </form>
+
+      <div className="mt-6 text-center">
+        <span className="text-[#1B2430]">Zaten hesabın var mı? </span>
+        <Link href="/login" className="text-[#DD7B3A] font-bold hover:underline">
+          Giriş Yap
+        </Link>
+      </div>
+    </AuthShell>
   )
 }

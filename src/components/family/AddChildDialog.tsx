@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, UserPlus } from 'lucide-react'
 import { addChildStudent } from '@/actions/family'
+import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 export function AddChildDialog() {
   const router = useRouter()
@@ -33,10 +34,10 @@ export function AddChildDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <button type="button" className={`${PIXEL_BUTTON_SECONDARY} gap-2 px-3 py-1.5 text-sm`}>
           <UserPlus className="h-4 w-4" />
           Öğrenci Ekle
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>Öğrenci Profili Ekle</DialogTitle></DialogHeader>

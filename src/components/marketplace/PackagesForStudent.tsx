@@ -1,11 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PurchasePackageButton } from '@/components/marketplace/PurchasePackageButton'
 import type { PackageItem } from '@/lib/marketplace/get-packages'
 import type { GuardianStudent } from '@/lib/marketplace/get-guardian-students'
+import { PIXEL_CARD, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface PackagesForStudentProps {
   packages: PackageItem[]
@@ -19,21 +18,28 @@ export function PackagesForStudent({ packages, students }: PackagesForStudentPro
 
   if (students.length === 0) {
     return (
-      <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-        Paket satın alabilmen için önce "Öğrenci Ekle" ile bir öğrenci profili oluşturman gerekiyor.
-      </p>
+      <div className={`${PIXEL_CARD} p-4`}>
+        <p className="font-semibold text-[#1B2430]">
+          Paket satın alabilmen için önce &quot;Öğrenci Ekle&quot; ile bir öğrenci profili oluşturman gerekiyor.
+        </p>
+      </div>
     )
   }
 
   if (!selectedStudentId) {
     return (
       <div className="space-y-3">
-        <p className="text-sm font-medium">Hangi öğrenci için paket alıyorsun?</p>
+        <p className="font-bold text-[#1B2430]">Hangi öğrenci için paket alıyorsun?</p>
         <div className="flex flex-wrap gap-2">
           {students.map((student) => (
-            <Button key={student.studentId} variant="outline" onClick={() => setSelectedStudentId(student.studentId)}>
+            <button
+              key={student.studentId}
+              type="button"
+              onClick={() => setSelectedStudentId(student.studentId)}
+              className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm`}
+            >
               {student.name}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
@@ -45,24 +51,20 @@ export function PackagesForStudent({ packages, students }: PackagesForStudentPro
   return (
     <div className="space-y-4">
       {students.length > 1 && (
-        <p className="text-sm text-muted-foreground">
+        <p className="font-semibold text-[#1B2430]">
           <strong>{selectedStudent?.name}</strong> için paket alınıyor —{' '}
-          <button onClick={() => setSelectedStudentId(null)} className="underline">değiştir</button>
+          <button onClick={() => setSelectedStudentId(null)} className="underline text-[#DD7B3A] font-bold">değiştir</button>
         </p>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         {packages.map((pkg) => (
-          <Card key={pkg.id}>
-            <CardHeader>
-              <CardTitle>{pkg.title}</CardTitle>
-              <p className="text-2xl font-semibold">{pkg.price.toLocaleString('tr-TR')} ₺</p>
-              <p className="text-sm text-muted-foreground">{pkg.creditAmount} ders kredisi</p>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {pkg.description && <p className="text-sm text-muted-foreground">{pkg.description}</p>}
-              <PurchasePackageButton packageId={pkg.id} studentId={selectedStudentId} />
-            </CardContent>
-          </Card>
+          <div key={pkg.id} className={`${PIXEL_CARD} p-5 space-y-2`}>
+            <p className="font-bold text-[#1B2430]">{pkg.title}</p>
+            <p className="text-2xl font-bold text-[#1B2430]">{pkg.price.toLocaleString('tr-TR')} ₺</p>
+            <p className="text-sm font-semibold text-[#6FA89E]">{pkg.creditAmount} ders kredisi</p>
+            {pkg.description && <p className="text-sm font-semibold text-[#1B2430]/70">{pkg.description}</p>}
+            <PurchasePackageButton packageId={pkg.id} studentId={selectedStudentId} />
+          </div>
         ))}
       </div>
     </div>

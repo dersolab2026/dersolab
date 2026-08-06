@@ -1,10 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AuthShell } from '@/components/auth/AuthShell'
 import { updatePassword } from '@/actions/auth'
 
 export default function ResetPasswordPage() {
@@ -24,18 +21,31 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <Card className="mx-auto mt-16 max-w-sm">
-      <CardHeader><CardTitle>Yeni Şifre Belirle</CardTitle></CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="password">Yeni Şifre</Label>
-            <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={isPending}>Şifreyi Güncelle</Button>
-        </form>
-      </CardContent>
-    </Card>
+    <AuthShell subtitle="Yeni Şifre Belirle">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div>
+          <label className="block text-[#1B2430] font-bold mb-2">Yeni Şifre</label>
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+            placeholder="••••••••"
+          />
+        </div>
+
+        {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="mt-2 w-full py-4 bg-[#DD7B3A] text-[#F4F1E8] font-bold text-lg rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all disabled:opacity-60"
+        >
+          {isPending ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
+        </button>
+      </form>
+    </AuthShell>
   )
 }

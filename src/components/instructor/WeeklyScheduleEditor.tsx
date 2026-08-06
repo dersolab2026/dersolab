@@ -2,13 +2,10 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Plus, X, Loader2 } from 'lucide-react'
 import { addAvailabilityRule, removeAvailabilityRule } from '@/actions/availability'
 import type { AvailabilityRule } from '@/types'
+import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
 
 const DAY_NAMES: Record<number, string> = {
   0: 'Pazar', 1: 'Pazartesi', 2: 'Salı', 3: 'Çarşamba', 4: 'Perşembe', 5: 'Cuma', 6: 'Cumartesi',
@@ -60,28 +57,29 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
 
   return (
     <div className="space-y-4">
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
 
       {DISPLAY_ORDER.map((day) => (
-        <Card key={day}>
-          <CardHeader className="flex flex-row items-center justify-between py-3">
-            <CardTitle className="text-base">{DAY_NAMES[day]}</CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
+        <div key={day} className={`${PIXEL_CARD} p-4 space-y-3`}>
+          <div className="flex items-center justify-between">
+            <p className="font-bold text-[#1B2430]">{DAY_NAMES[day]}</p>
+            <button
+              type="button"
               onClick={() => setOpenDayForm(openDayForm === day ? null : day)}
+              className={`${PIXEL_BUTTON_SECONDARY} gap-1 px-3 py-1 text-xs`}
             >
-              <Plus className="mr-1 h-4 w-4" />
+              <Plus className="h-3.5 w-3.5" />
               Saat Ekle
-            </Button>
-          </CardHeader>
-          <CardContent className="flex flex-wrap items-center gap-2">
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
             {rulesByDay[day].length === 0 && openDayForm !== day && (
-              <p className="text-sm text-muted-foreground">Bu gün için tanımlı saat yok</p>
+              <p className="text-sm font-semibold text-[#1B2430]/60">Bu gün için tanımlı saat yok</p>
             )}
 
             {rulesByDay[day].map((rule) => (
-              <Badge key={rule.id} variant="secondary" className="gap-2 py-1.5">
+              <span key={rule.id} className={`${PIXEL_BADGE} gap-2 py-1.5 flex items-center`}>
                 {rule.startTime} - {rule.endTime}
                 <button
                   onClick={() => handleRemove(rule.id)}
@@ -90,31 +88,36 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
                 >
                   <X className="h-3 w-3" />
                 </button>
-              </Badge>
+              </span>
             ))}
+          </div>
 
-            {openDayForm === day && (
-              <div className="flex items-center gap-2">
-                <Input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="w-28"
-                />
-                <span className="text-muted-foreground">-</span>
-                <Input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="w-28"
-                />
-                <Button size="sm" onClick={() => handleAdd(day)} disabled={isPending}>
-                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          {openDayForm === day && (
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className={`${PIXEL_INPUT} w-32 py-1.5`}
+              />
+              <span className="font-bold text-[#1B2430]">-</span>
+              <input
+                type="time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className={`${PIXEL_INPUT} w-32 py-1.5`}
+              />
+              <button
+                type="button"
+                onClick={() => handleAdd(day)}
+                disabled={isPending}
+                className={`${PIXEL_BUTTON_PRIMARY} px-3 py-1.5 text-sm`}
+              >
+                {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
+              </button>
+            </div>
+          )}
+        </div>
       ))}
     </div>
   )

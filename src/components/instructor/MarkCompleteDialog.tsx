@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 import { markBookingCompleted } from '@/actions/bookings'
+import { PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
 
 interface MarkCompleteDialogProps {
   bookingId: string
@@ -32,10 +33,10 @@ export function MarkCompleteDialog({ bookingId }: MarkCompleteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="gap-2">
+        <button type="button" className={`${PIXEL_BUTTON_PRIMARY} gap-2 px-3 py-1.5 text-sm`}>
           <CheckCircle2 className="h-4 w-4" />
           Tamamlandı Olarak İşaretle
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>Dersi tamamlandı olarak işaretle</DialogTitle></DialogHeader>

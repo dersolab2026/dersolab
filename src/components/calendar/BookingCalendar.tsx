@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { Calendar } from '@/components/ui/calendar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
 import type { TimeSlot } from '@/types'
+import { PIXEL_CARD, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface BookingCalendarProps {
   instructorId: string
@@ -62,66 +61,61 @@ export function BookingCalendar({ instructorId, onSelectSlot }: BookingCalendarP
 
   return (
     <div className="grid gap-6 md:grid-cols-[auto_1fr]">
-      <Card>
-        <CardContent className="p-2">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={(date) => {
-              if (!date) return
-              setSelectedDate(date)
-              setSelectedSlot(null)
-              onSelectSlot(null)
-            }}
-            disabled={{ before: new Date() }}
-          />
-        </CardContent>
-      </Card>
+      <div className={`${PIXEL_CARD} p-2`}>
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={(date) => {
+            if (!date) return
+            setSelectedDate(date)
+            setSelectedSlot(null)
+            onSelectSlot(null)
+          }}
+          disabled={{ before: new Date() }}
+        />
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            {selectedDate.toLocaleDateString('tr-TR', {
-              day: 'numeric',
-              month: 'long',
-              weekday: 'long',
-            })}{' '}
-            için müsait saatler
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Yükleniyor...
-            </div>
-          )}
+      <div className={`${PIXEL_CARD} p-5`}>
+        <p className="font-bold text-[#1B2430] mb-3">
+          {selectedDate.toLocaleDateString('tr-TR', {
+            day: 'numeric',
+            month: 'long',
+            weekday: 'long',
+          })}{' '}
+          için müsait saatler
+        </p>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
-
-          {!isLoading && !error && slotsForSelectedDay.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              Bu tarihte müsait saat bulunmuyor.
-            </p>
-          )}
-
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-            {slotsForSelectedDay.map((slot) => (
-              <Button
-                key={slot.start}
-                variant={selectedSlot?.start === slot.start ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handleSlotClick(slot)}
-              >
-                {new Date(slot.start).toLocaleTimeString('tr-TR', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </Button>
-            ))}
+        {isLoading && (
+          <div className="flex items-center gap-2 font-semibold text-[#1B2430]/70">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Yükleniyor...
           </div>
-        </CardContent>
-      </Card>
+        )}
+
+        {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+
+        {!isLoading && !error && slotsForSelectedDay.length === 0 && (
+          <p className="text-sm font-semibold text-[#1B2430]/70">
+            Bu tarihte müsait saat bulunmuyor.
+          </p>
+        )}
+
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {slotsForSelectedDay.map((slot) => (
+            <button
+              key={slot.start}
+              type="button"
+              onClick={() => handleSlotClick(slot)}
+              className={`${selectedSlot?.start === slot.start ? PIXEL_BADGE_ACTIVE : PIXEL_BUTTON_SECONDARY} px-2 py-1.5 text-sm`}
+            >
+              {new Date(slot.start).toLocaleTimeString('tr-TR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

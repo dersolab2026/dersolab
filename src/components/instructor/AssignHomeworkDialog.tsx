@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Loader2, BookPlus } from 'lucide-react'
 import { assignHomework } from '@/actions/homework'
+import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface AssignHomeworkDialogProps {
   studentId: string
@@ -61,10 +62,10 @@ export function AssignHomeworkDialog({ studentId, bookingId, triggerLabel = 'Öd
   return (
     <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) resetForm() }}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <button type="button" className={`${PIXEL_BUTTON_SECONDARY} gap-2 px-3 py-1.5 text-sm`}>
           <BookPlus className="h-4 w-4" />
           {triggerLabel}
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

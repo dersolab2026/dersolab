@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import { Check } from 'lucide-react'
+import { PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface ConnectGoogleCalendarButtonProps {
   isConnected: boolean
@@ -10,16 +10,16 @@ interface ConnectGoogleCalendarButtonProps {
 export function ConnectGoogleCalendarButton({ isConnected }: ConnectGoogleCalendarButtonProps) {
   if (isConnected) {
     return (
-      <Button variant="outline" disabled className="gap-2">
+      <span className={`${PIXEL_BUTTON_SECONDARY} gap-2 px-4 py-2 opacity-70`}>
         <Check className="h-4 w-4" />
         Google Takvimi bağlı
-      </Button>
+      </span>
     )
   }
 
   return (
-    <Button asChild>
-      <a href="/api/google/authorize">Google Takvimini Bağla</a>
-    </Button>
+    <a href="/api/google/authorize" className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2`}>
+      Google Takvimini Bağla
+    </a>
   )
 }

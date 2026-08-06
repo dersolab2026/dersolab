@@ -22,8 +22,6 @@ export interface InstructorProfile {
   lessonPrice: number
   introVideoUrl: string | null
   isCalendarConnected: boolean
-  averageRating: number
-  reviewCount: number
 }
 
 export interface TimeSlot {

@@ -1,11 +1,10 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { updateInstructorSubjects } from '@/actions/instructor-profile'
-import { LESSON_SUBJECTS } from '@/lib/constants'
+import { INSTRUCTOR_SUBJECT_OPTIONS } from '@/lib/constants'
+import { PIXEL_BADGE, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
 
 interface SubjectsEditorProps {
   initialSubjects: string[]
@@ -31,21 +30,21 @@ export function SubjectsEditor({ initialSubjects }: SubjectsEditorProps) {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
-        {LESSON_SUBJECTS.map((subject) => (
-          <Badge
+        {INSTRUCTOR_SUBJECT_OPTIONS.map((subject) => (
+          <button
             key={subject}
-            variant={selected.includes(subject) ? 'default' : 'outline'}
-            className="cursor-pointer"
+            type="button"
             onClick={() => toggle(subject)}
+            className={`${selected.includes(subject) ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE} cursor-pointer px-3 py-1`}
           >
             {subject}
-          </Badge>
+          </button>
         ))}
       </div>
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button size="sm" onClick={handleSave} disabled={isPending}>
+      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      <button type="button" onClick={handleSave} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-1.5 text-sm`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
-      </Button>
+      </button>
     </div>
   )
 }

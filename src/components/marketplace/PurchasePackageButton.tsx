@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { createCheckoutSession } from '@/actions/packages'
+import { PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
 
 interface PurchasePackageButtonProps {
   packageId: string
@@ -28,10 +28,10 @@ export function PurchasePackageButton({ packageId, studentId }: PurchasePackageB
 
   return (
     <div className="space-y-2">
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button onClick={handlePurchase} disabled={isPending} className="w-full">
+      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      <button type="button" onClick={handlePurchase} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} w-full py-2.5`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Satın Al'}
-      </Button>
+      </button>
     </div>
   )
 }

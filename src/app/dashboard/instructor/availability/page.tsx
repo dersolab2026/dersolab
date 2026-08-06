@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getInstructorSchedule } from '@/lib/availability/get-instructor-schedule'
 import { WeeklyScheduleEditor } from '@/components/instructor/WeeklyScheduleEditor'
+import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 
 export default async function InstructorAvailabilityPage() {
   const supabase = await createClient()
@@ -11,12 +12,8 @@ export default async function InstructorAvailabilityPage() {
   const rules = await getInstructorSchedule(user.id)
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Müsaitlik Takvimi</h1>
-        <p className="text-muted-foreground">Öğrencilerin rezervasyon yapabileceği haftalık saatlerini belirle.</p>
-      </div>
+    <DashboardPageShell title="Müsaitlik Takvimi" description="Öğrencilerin rezervasyon yapabileceği haftalık saatlerini belirle.">
       <WeeklyScheduleEditor initialRules={rules} />
-    </div>
+    </DashboardPageShell>
   )
 }

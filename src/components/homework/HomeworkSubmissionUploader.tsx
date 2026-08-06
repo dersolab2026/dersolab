@@ -1,10 +1,10 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { Button } from '@/components/ui/button'
 import { Loader2, Upload, CheckCircle2 } from 'lucide-react'
 import { uploadHomeworkSubmission } from '@/lib/storage/upload-homework-submission'
 import { notifyHomeworkSubmitted } from '@/actions/homework'
+import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface HomeworkSubmissionUploaderProps {
   homeworkId: string
@@ -46,12 +46,17 @@ export function HomeworkSubmissionUploader({ homeworkId, onUploaded }: HomeworkS
         className="hidden"
         onChange={handleFileChange}
       />
-      <Button variant="outline" onClick={() => inputRef.current?.click()} disabled={isPending} className="gap-2">
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={isPending}
+        className={`${PIXEL_BUTTON_SECONDARY} gap-2 px-3 py-1.5 text-sm`}
+      >
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : success ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Upload className="h-4 w-4" />}
         {isPending ? 'Yükleniyor...' : success ? 'Yüklendi' : 'Fotoğraf / Video Yükle'}
-      </Button>
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <p className="text-xs text-muted-foreground">JPG, PNG, WEBP, MP4 veya MOV — en fazla 25 MB</p>
+      </button>
+      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      <p className="text-xs font-semibold text-[#1B2430]/60">JPG, PNG, WEBP, MP4 veya MOV — en fazla 25 MB</p>
     </div>
   )
 }

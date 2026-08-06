@@ -5,8 +5,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
 import { cancelBookingAsStudent } from '@/actions/bookings'
+import { PIXEL_BUTTON_DANGER } from '@/lib/theme'
 
 interface CancelBookingButtonProps {
   bookingId: string
@@ -33,7 +33,7 @@ export function CancelBookingButton({ bookingId, startTime }: CancelBookingButto
       {error && <p className="text-sm text-destructive">{error}</p>}
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="outline" size="sm">İptal Et</Button>
+          <button type="button" className={`${PIXEL_BUTTON_DANGER} px-3 py-1.5 text-sm`}>İptal Et</button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>

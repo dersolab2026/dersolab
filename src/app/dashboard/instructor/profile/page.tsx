@@ -4,6 +4,8 @@ import { AvatarUploader } from '@/components/instructor/AvatarUploader'
 import { SubjectsEditor } from '@/components/instructor/SubjectsEditor'
 import { EducationEditor } from '@/components/instructor/EducationEditor'
 import { IntroVideoEditor } from '@/components/instructor/IntroVideoEditor'
+import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
+import { PIXEL_CARD } from '@/lib/theme'
 import type { EducationEntry } from '@/types'
 
 export default async function InstructorProfilePage() {
@@ -25,24 +27,22 @@ export default async function InstructorProfilePage() {
   }))
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 py-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Profilim</h1>
-        <p className="text-muted-foreground">Öğrencilerin marketplace'te göreceği bilgiler.</p>
+    <DashboardPageShell title="Profilim" description="Öğrencilerin marketplace'te göreceği bilgiler.">
+      <div className={`${PIXEL_CARD} p-5`}>
+        <AvatarUploader userId={user.id} currentAvatarUrl={userRow?.avatar_url ?? null} name={userRow?.name ?? ''} />
       </div>
-      <AvatarUploader userId={user.id} currentAvatarUrl={userRow?.avatar_url ?? null} name={userRow?.name ?? ''} />
-      <div>
-        <h2 className="mb-2 font-medium">Branşlar</h2>
+      <div className={`${PIXEL_CARD} p-5`}>
+        <h2 className="mb-3 font-bold text-[#1B2430]">Branşlar</h2>
         <SubjectsEditor initialSubjects={instructorRow?.subjects ?? []} />
       </div>
-      <div>
-        <h2 className="mb-2 font-medium">Eğitim Bilgileri</h2>
+      <div className={`${PIXEL_CARD} p-5`}>
+        <h2 className="mb-3 font-bold text-[#1B2430]">Eğitim Bilgileri</h2>
         <EducationEditor initialEntries={education} />
       </div>
-      <div>
-        <h2 className="mb-2 font-medium">Tanıtım Videosu</h2>
+      <div className={`${PIXEL_CARD} p-5`}>
+        <h2 className="mb-3 font-bold text-[#1B2430]">Tanıtım Videosu</h2>
         <IntroVideoEditor initialUrl={instructorRow?.intro_video_url ?? null} userId={user.id} />
       </div>
-    </div>
+    </DashboardPageShell>
   )
 }

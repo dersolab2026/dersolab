@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getInstructorBookings } from '@/lib/bookings/get-instructor-bookings'
 import { InstructorBookingListItem } from '@/components/instructor/InstructorBookingListItem'
+import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
+import { PIXEL_CARD } from '@/lib/theme'
 
 export default async function InstructorDashboardPage() {
   const supabase = await createClient()
@@ -18,41 +20,48 @@ export default async function InstructorDashboardPage() {
   const past = bookings.filter((b) => b.status !== 'scheduled')
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 py-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Derslerim</h1>
-        <p className="text-muted-foreground">Rezervasyonlarını buradan yönetebilirsin.</p>
-      </div>
-
+    <DashboardPageShell title="Derslerim" description="Rezervasyonlarını buradan yönetebilirsin.">
       {instructorRow?.approval_status === 'pending' && (
-        <p className="rounded-md border border-amber-400 bg-amber-50 p-3 text-sm text-amber-800">
-          Profilin henüz onay bekliyor, onaylanana kadar öğrenciler seni göremez.
-        </p>
+        <div className={`${PIXEL_CARD} p-3`}>
+          <p className="text-sm font-semibold text-[#1B2430]">Profilin henüz onay bekliyor, onaylanana kadar öğrenciler seni göremez.</p>
+        </div>
       )}
       {instructorRow?.approval_status === 'approved' && !instructorRow.calendar_connected && (
-        <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
-          Öğrenciler rezervasyon yapabilsin diye önce{' '}
-          <Link href="/dashboard/instructor/settings" className="underline">Google Takvimini bağlaman</Link> gerekiyor.
-        </p>
+        <div className={`${PIXEL_CARD} p-3`}>
+          <p className="text-sm font-semibold text-[#1B2430]">
+            Öğrenciler rezervasyon yapabilsin diye önce{' '}
+            <Link href="/dashboard/instructor/settings" className="underline text-[#DD7B3A]">Google Takvimini bağlaman</Link> gerekiyor.
+          </p>
+        </div>
       )}
 
       {needsAction.length > 0 && (
         <div className="space-y-3">
-          <h2 className="font-medium">Onay Bekleyen Dersler</h2>
-          <p className="text-sm text-muted-foreground">Saati geçmiş, tamamlandı olarak işaretlemen gerekiyor.</p>
-          {needsAction.map((b) => <InstructorBookingListItem key={b.id} booking={b} />)}
+          <h2 className="font-bold text-[#1B2430]">Onay Bekleyen Dersler</h2>
+          <p className="text-sm font-semibold text-[#1B2430]/70">Saati geçmiş, tamamlandı olarak işaretlemen gerekiyor.</p>
+          <div className="space-y-3">
+            {needsAction.map((b) => <InstructorBookingListItem key={b.id} booking={b} />)}
+          </div>
         </div>
       )}
 
       <div className="space-y-3">
-        <h2 className="font-medium">Yaklaşan Dersler</h2>
-        {upcoming.length === 0 ? <p className="text-sm text-muted-foreground">Planlanmış ders yok.</p> : upcoming.map((b) => <InstructorBookingListItem key={b.id} booking={b} />)}
+        <h2 className="font-bold text-[#1B2430]">Yaklaşan Dersler</h2>
+        {upcoming.length === 0 ? (
+          <p className="text-sm font-semibold text-[#1B2430]/70">Planlanmış ders yok.</p>
+        ) : (
+          <div className="space-y-3">{upcoming.map((b) => <InstructorBookingListItem key={b.id} booking={b} />)}</div>
+        )}
       </div>
 
       <div className="space-y-3">
-        <h2 className="font-medium">Geçmiş Dersler</h2>
-        {past.length === 0 ? <p className="text-sm text-muted-foreground">Henüz geçmiş ders yok.</p> : past.map((b) => <InstructorBookingListItem key={b.id} booking={b} />)}
+        <h2 className="font-bold text-[#1B2430]">Geçmiş Dersler</h2>
+        {past.length === 0 ? (
+          <p className="text-sm font-semibold text-[#1B2430]/70">Henüz geçmiş ders yok.</p>
+        ) : (
+          <div className="space-y-3">{past.map((b) => <InstructorBookingListItem key={b.id} booking={b} />)}</div>
+        )}
       </div>
-    </div>
+    </DashboardPageShell>
   )
 }

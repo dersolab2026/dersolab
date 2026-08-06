@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getHomeworkForStudent } from '@/lib/homework/get-homework-list'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { HomeworkSubmissionUploader } from '@/components/homework/HomeworkSubmissionUploader'
+import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
+import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BADGE_ACTIVE } from '@/lib/theme'
 
 export default async function StudentHomeworkPage() {
   const supabase = await createClient()
@@ -20,34 +20,31 @@ export default async function StudentHomeworkPage() {
   const homeworkList = await getHomeworkForStudent(studentIds)
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Ödevlerim</h1>
-        <p className="text-muted-foreground">Eğitmenlerin verdiği ödevler ve teslim durumları.</p>
-      </div>
-
+    <DashboardPageShell title="Ödevlerim" description="Eğitmenlerin verdiği ödevler ve teslim durumları.">
       {homeworkList.length === 0 ? (
-        <p className="text-muted-foreground">Henüz ödev verilmedi.</p>
+        <p className="font-semibold text-[#1B2430]">Henüz ödev verilmedi.</p>
       ) : (
-        homeworkList.map((hw) => (
-          <Card key={hw.id}>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between text-base">
-                {hw.title}
-                <Badge variant={hw.status === 'completed' ? 'secondary' : hw.status === 'submitted' ? 'default' : 'outline'}>
+        <div className="space-y-4">
+          {homeworkList.map((hw) => (
+            <div key={hw.id} className={`${PIXEL_CARD} p-5 space-y-2`}>
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-bold text-[#1B2430]">{hw.title}</p>
+                <span className={hw.status === 'completed' ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE}>
                   {hw.status === 'completed' ? 'Onaylandı' : hw.status === 'submitted' ? 'Teslim Edildi' : 'Bekliyor'}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">{hw.instructorName}</p>
-              {hw.description && <p className="text-sm">{hw.description}</p>}
-              {hw.dueDate && <p className="text-xs text-muted-foreground">Son tarih: {new Date(hw.dueDate).toLocaleDateString('tr-TR', { dateStyle: 'long' })}</p>}
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-[#1B2430]/70">{hw.instructorName}</p>
+              {hw.description && <p className="text-sm font-semibold text-[#1B2430]">{hw.description}</p>}
+              {hw.dueDate && (
+                <p className="text-xs font-semibold text-[#1B2430]/60">
+                  Son tarih: {new Date(hw.dueDate).toLocaleDateString('tr-TR', { dateStyle: 'long' })}
+                </p>
+              )}
               {hw.status !== 'completed' && <HomeworkSubmissionUploader homeworkId={hw.id} />}
-            </CardContent>
-          </Card>
-        ))
+            </div>
+          ))}
+        </div>
       )}
-    </div>
+    </DashboardPageShell>
   )
 }
