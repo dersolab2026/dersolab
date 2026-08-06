@@ -21,6 +21,10 @@ export async function getValidInstructorAccessToken(instructorId: string): Promi
     return credentials.access_token
   }
 
+  if (!credentials.refresh_token) {
+    throw new Error('Eğitmenin Google Takvim bağlantısı yeniden yetkilendirme gerektiriyor')
+  }
+
   const oauthClient = createGoogleOAuthClient()
   oauthClient.setCredentials({ refresh_token: credentials.refresh_token })
 

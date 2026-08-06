@@ -41,7 +41,14 @@ export async function GET(request: NextRequest) {
     settingsUrl.searchParams.set('calendar_connected', '1')
   } catch (err) {
     console.error('Google Calendar bağlantı hatası:', err)
-    settingsUrl.searchParams.set('calendar_error', 'token_exchange_failed')
+    const message = err instanceof Error ? err.message : ''
+    if (message.includes('missing_refresh_token')) {
+      // Google, bu hesap için daha önce zaten yetki verildiğinde refresh_token döndürmeyebilir.
+      // Kullanıcı Google hesap izinlerinden DersoLab'ı kaldırıp tekrar bağlamalı.
+      settingsUrl.searchParams.set('calendar_error', 'missing_refresh_token')
+    } else {
+      settingsUrl.searchParams.set('calendar_error', 'token_exchange_failed')
+    }
   }
 
   const response = NextResponse.redirect(settingsUrl)

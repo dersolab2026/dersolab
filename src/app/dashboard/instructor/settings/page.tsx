@@ -22,7 +22,23 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
       </div>
 
       {calendar_connected && <p className="text-sm text-green-600">Google Takvimin başarıyla bağlandı.</p>}
-      {calendar_error && <p className="text-sm text-destructive">Bağlantı sırasında bir sorun oluştu, tekrar dener misin?</p>}
+      {calendar_error === 'missing_refresh_token' && (
+        <p className="text-sm text-destructive">
+          Google bu hesap için gerekli izni döndürmedi. Lütfen{' '}
+          <a
+            href="https://myaccount.google.com/permissions"
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            Google hesap izinleri
+          </a>{' '}
+          sayfasından DersoLab&apos;ı kaldırıp tekrar bağlamayı dene.
+        </p>
+      )}
+      {calendar_error && calendar_error !== 'missing_refresh_token' && (
+        <p className="text-sm text-destructive">Bağlantı sırasında bir sorun oluştu, tekrar dener misin?</p>
+      )}
 
       <ConnectGoogleCalendarButton isConnected={instructorRow?.calendar_connected ?? false} />
     </div>
