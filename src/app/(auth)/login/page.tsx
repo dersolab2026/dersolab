@@ -62,7 +62,7 @@ export default function LoginPage() {
           <img
             src="/fox-mascot.png"
             alt="DersoLab Fox Mascot"
-            className="w-[220px] sm:w-[280px] h-auto mix-blend-multiply"
+            className="w-[220px] sm:w-[280px] h-auto"
             style={{ imageRendering: 'pixelated' }}
           />
         </div>
