@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
-import { loginUser } from '@/actions/auth'
+import { loginUser, signInWithGoogle } from '@/actions/auth'
 
 export function LoginForm() {
   const router = useRouter()
@@ -27,10 +27,26 @@ export function LoginForm() {
     })
   }
 
+  async function handleGoogleLogin() {
+    const result = await signInWithGoogle()
+    if ('url' in result) {
+      window.location.href = result.url
+    } else {
+      setError(result.error)
+    }
+  }
+
   return (
     <Card className="mx-auto mt-16 max-w-sm">
       <CardHeader><CardTitle>Giriş Yap</CardTitle></CardHeader>
       <CardContent>
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full border rounded-md py-2 text-sm font-medium mb-4"
+        >
+          Google ile Giriş Yap
+        </button>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="email">E-posta</Label>
@@ -40,6 +56,7 @@ export function LoginForm() {
             <Label htmlFor="password">Şifre</Label>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
+          <a href="/forgot-password" className="block text-sm text-muted-foreground underline">Şifremi unuttum</a>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Giriş Yap'}

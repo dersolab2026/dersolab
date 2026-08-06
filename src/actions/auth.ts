@@ -39,3 +39,30 @@ export async function logoutUser(): Promise<void> {
   await supabase.auth.signOut()
   redirect('/login')
 }
+
+export async function signInWithGoogle(): Promise<{ url: string } | { error: string }> {
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
+  })
+  if (error || !data.url) return { error: error?.message ?? 'Google girişi başlatılamadı' }
+  return { url: data.url }
+}
+
+export async function requestPasswordReset(email: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+  })
+  if (error) return { success: false, error: error.message }
+  return { success: true }
+}
+
+export async function updatePassword(newPassword: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  if (newPassword.length < 8) return { success: false, error: 'Şifre en az 8 karakter olmalı' }
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) return { success: false, error: error.message }
+  return { success: true }
+}

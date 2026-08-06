@@ -60,5 +60,18 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  if (event.type === 'charge.refunded') {
+    const charge = event.data.object as Stripe.Charge
+    const paymentIntentId = charge.payment_intent as string
+
+    const { error } = await admin
+      .from('package_purchases')
+      .update({ status: 'refunded' })
+      .eq('payment_reference', paymentIntentId)
+      .eq('status', 'completed')
+
+    if (error) console.error('Refund güncelleme hatası:', error)
+  }
+
   return NextResponse.json({ received: true })
 }
