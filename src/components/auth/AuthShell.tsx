@@ -52,6 +52,11 @@ export function AuthShell({
         <div className="font-sans font-semibold text-[#1B2430] text-left">
           {children}
         </div>
+
+        <div className="mt-6 flex justify-center gap-4 text-xs font-sans text-[#1B2430]/60">
+          <a href="/privacy" className="hover:underline">Gizlilik Politikası</a>
+          <a href="/terms" className="hover:underline">Kullanım Şartları</a>
+        </div>
       </div>
     </div>
   )
