@@ -35,7 +35,7 @@ export function InstructorCancelBookingButton({ bookingId }: InstructorCancelBoo
           <AlertDialogHeader>
             <AlertDialogTitle>Bu dersi iptal etmek istediğine emin misin?</AlertDialogTitle>
             <AlertDialogDescription>
-              Öğrencinin kredisi süre farketmeksizin iade edilecek ve kendisine bilgi verilecek.
+              Öğrencinin kredisi süre fark etmeksizin iade edilecek ve kendisine bilgi verilecek.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

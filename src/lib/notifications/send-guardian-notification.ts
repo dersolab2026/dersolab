@@ -1,4 +1,4 @@
-﻿import { Resend } from 'resend'
+import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -37,8 +37,8 @@ export async function notifyBookingCreated(params: BookingNotificationParams) {
       recipient_id: recipient.id,
       type: 'booking_created',
       channel: 'email',
-      title: 'Ders planlandi',
-      body: `${params.instructorName} ile ${formattedDate} tarihinde bir ders planlandi.`,
+      title: 'Ders planlandı',
+      body: `${params.instructorName} ile ${formattedDate} tarihinde bir ders planlandı.`,
       related_booking_id: params.bookingId,
     })
 
@@ -46,9 +46,9 @@ export async function notifyBookingCreated(params: BookingNotificationParams) {
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>',
         to: recipient.email,
-        subject: 'Ders planlandi - DersoLab',
+        subject: 'Ders planlandı - DersoLab',
         html: `<p>Merhaba ${recipient.name},</p>
-          <p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihinde bir ders planlandi.</p>
+          <p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihinde bir ders planlandı.</p>
           <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`,
       })
     } catch (err) {
@@ -74,7 +74,7 @@ export async function notifyBookingCancelled(params: {
 
   const refundNote = params.creditRefunded
     ? 'Kredin iade edildi.'
-    : 'Ders saatine 24 saatten az kaldigi icin kredi iade edilmedi.'
+    : 'Ders saatine 24 saatten az kaldığı için kredi iade edilmedi.'
 
   for (const recipient of recipients) {
     await admin.from('notifications').insert({
@@ -111,15 +111,15 @@ export async function notifyLessonCompleted(params: {
   for (const recipient of recipients) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id, type: 'lesson_completed', channel: 'email',
-      title: 'Ders tamamlandi',
-      body: `${params.instructorName} ile ${formattedDate} tarihindeki ders tamamlandi.`,
+      title: 'Ders tamamlandı',
+      body: `${params.instructorName} ile ${formattedDate} tarihindeki ders tamamlandı.`,
       related_booking_id: params.bookingId,
     })
     try {
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
-        subject: 'Ders tamamlandi - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihindeki ders tamamlandi.</p>`,
+        subject: 'Ders tamamlandı - DersoLab',
+        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihindeki ders tamamlandı.</p>`,
       })
     } catch (err) { console.error('Ders tamamlandi bildirimi gonderilemedi:', err) }
   }
@@ -136,15 +136,15 @@ export async function notifyHomeworkAssigned(params: {
   for (const recipient of recipients) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id, type: 'homework_assigned', channel: 'email',
-      title: 'Yeni odev verildi',
-      body: `"${params.title}" odevi verildi. Son tarih: ${dueDateText}.`,
+      title: 'Yeni ödev verildi',
+      body: `"${params.title}" ödevi verildi. Son tarih: ${dueDateText}.`,
       related_homework_id: params.homeworkId,
     })
     try {
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
-        subject: 'Yeni odev verildi - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> odevi verildi. Son tarih: ${dueDateText}.</p>`,
+        subject: 'Yeni ödev verildi - DersoLab',
+        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> ödevi verildi. Son tarih: ${dueDateText}.</p>`,
       })
     } catch (err) { console.error('Odev atama bildirimi gonderilemedi:', err) }
   }
@@ -157,15 +157,15 @@ export async function notifyHomeworkCompleted(params: { studentId: string; homew
   for (const recipient of recipients) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id, type: 'homework_completed', channel: 'email',
-      title: 'Odev onaylandi',
-      body: `"${params.title}" odevi egitmen tarafindan incelendi ve onaylandi.`,
+      title: 'Ödev onaylandı',
+      body: `"${params.title}" ödevi eğitmen tarafından incelendi ve onaylandı.`,
       related_homework_id: params.homeworkId,
     })
     try {
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
-        subject: 'Odev onaylandi - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> odevi egitmen tarafindan incelendi ve onaylandi.</p>`,
+        subject: 'Ödev onaylandı - DersoLab',
+        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> ödevi eğitmen tarafından incelendi ve onaylandı.</p>`,
       })
     } catch (err) { console.error('Odev onay bildirimi gonderilemedi:', err) }
   }
@@ -178,16 +178,16 @@ export async function notifyHomeworkSubmitted(params: { homeworkId: string; inst
 
   await admin.from('notifications').insert({
     recipient_id: params.instructorId, type: 'homework_submitted', channel: 'email',
-    title: 'Odev incelemeni bekliyor',
-    body: `"${params.title}" odevi icin ogrenci bir gonderim yapti.`,
+    title: 'Ödev incelemeni bekliyor',
+    body: `"${params.title}" ödevi için öğrencin bir gönderim yaptı.`,
     related_homework_id: params.homeworkId,
   })
 
   try {
     await resend.emails.send({
       from: 'DersoLab <bildirim@dersolab.com>', to: instructor.email,
-      subject: 'Odev incelemeni bekliyor - DersoLab',
-      html: `<p>Merhaba ${instructor.name},</p><p><strong>${params.title}</strong> odevi icin ogrencin bir gonderim yapti.</p>`,
+      subject: 'Ödev incelemeni bekliyor - DersoLab',
+      html: `<p>Merhaba ${instructor.name},</p><p><strong>${params.title}</strong> ödevi için öğrencin bir gönderim yaptı.</p>`,
     })
   } catch (err) { console.error('Odev gonderim bildirimi gonderilemedi:', err) }
 }
@@ -201,10 +201,10 @@ export async function notifyInstructorApprovalStatus(params: {
   const { data: instructor } = await admin.from('users').select('name, email').eq('id', params.instructorId).single()
   if (!instructor) return
 
-  const subject = params.approved ? 'Profilin onaylandi - DersoLab' : 'Profilin hakkinda guncelleme - DersoLab'
+  const subject = params.approved ? 'Profilin onaylandı - DersoLab' : 'Profilin hakkında güncelleme - DersoLab'
   const body = params.approved
-    ? `Merhaba ${instructor.name}, profilin incelendi ve onaylandi. Artik ogrenciler seni marketplace'te gorebilir ve rezervasyon yapabilir.`
-    : `Merhaba ${instructor.name}, profilin incelendi. ${params.note ?? 'Bazi duzenlemeler gerekiyor, lutfen bizimle iletisime gec.'}`
+    ? `Merhaba ${instructor.name}, profilin incelendi ve onaylandı. Artık öğrenciler seni marketplace'te görebilir ve rezervasyon yapabilir.`
+    : `Merhaba ${instructor.name}, profilin incelendi. ${params.note ?? 'Bazı düzenlemeler gerekiyor, lütfen bizimle iletişime geç.'}`
 
   try {
     await resend.emails.send({ from: 'DersoLab <bildirim@dersolab.com>', to: instructor.email, subject, html: `<p>${body}</p>` })
