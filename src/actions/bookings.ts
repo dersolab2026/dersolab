@@ -10,6 +10,7 @@ import {
   notifyBookingCancelled,
   notifyLessonCompleted,
 } from '@/lib/notifications/send-guardian-notification'
+import { TRIAL_LESSON_DURATION_MINUTES } from '@/lib/constants'
 import type { TimeSlot } from '@/types'
 
 type ActionResult = { success: true } | { success: false; error: string }
@@ -18,6 +19,7 @@ interface CreateBookingParams {
   instructorId: string
   studentId: string
   slot: TimeSlot
+  isTrial?: boolean
 }
 
 type CreateBookingResult =
@@ -28,6 +30,7 @@ export async function createBooking({
   instructorId,
   studentId,
   slot,
+  isTrial,
 }: CreateBookingParams): Promise<CreateBookingResult> {
   const supabase = await createClient()
   const admin = createAdminClient()
@@ -37,6 +40,10 @@ export async function createBooking({
     return { success: false, error: 'Bu işlem için giriş yapmalısın' }
   }
 
+  const endTime = isTrial
+    ? new Date(new Date(slot.start).getTime() + TRIAL_LESSON_DURATION_MINUTES * 60_000).toISOString()
+    : slot.end
+
   const { data: booking, error: bookingError } = await supabase
     .from('bookings')
     .insert({
@@ -44,14 +51,18 @@ export async function createBooking({
       instructor_id: instructorId,
       purchased_by: user.id,
       start_time: slot.start,
-      end_time: slot.end,
+      end_time: endTime,
       status: 'scheduled',
+      is_trial: isTrial ?? false,
     })
     .select('id')
     .single()
 
   if (bookingError || !booking) {
-    return { success: false, error: bookingError?.message ?? 'Rezervasyon oluşturulamadı' }
+    const message = bookingError?.message.includes('zaten kullanilmis')
+      ? 'Ücretsiz tanışma dersi hakkını zaten kullandın'
+      : bookingError?.message ?? 'Rezervasyon oluşturulamadı'
+    return { success: false, error: message }
   }
 
   const { data: studentUser } = await admin.from('users').select('name').eq('id', studentId).single()
@@ -62,7 +73,7 @@ export async function createBooking({
       instructorId,
       studentName: studentUser?.name ?? 'Öğrenci',
       startTime: slot.start,
-      endTime: slot.end,
+      endTime,
       bookingId: booking.id,
     })
 
@@ -89,9 +100,15 @@ export async function createBooking({
     console.error('Google Calendar event oluşturma hatası:', err)
     await admin.from('bookings').update({ status: 'cancelled' }).eq('id', booking.id)
 
+    if (isTrial) {
+      await admin.from('students').update({ free_trial_used: false }).eq('user_id', studentId)
+    }
+
     return {
       success: false,
-      error: 'Ders linki oluşturulamadı, kredin iade edildi. Lütfen tekrar dene.',
+      error: isTrial
+        ? 'Ders linki oluşturulamadı, ücretsiz tanışma dersi hakkın tekrar açıldı. Lütfen tekrar dene.'
+        : 'Ders linki oluşturulamadı, kredin iade edildi. Lütfen tekrar dene.',
     }
   }
 }

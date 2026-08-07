@@ -12,6 +12,7 @@ export interface StudentBookingItem {
   status: 'scheduled' | 'completed' | 'cancelled' | 'no_show'
   meetLink: string | null
   creditRefunded: boolean | null
+  isTrial: boolean
 }
 
 export async function getBookingsForViewer(viewerId: string, viewerRole: string): Promise<StudentBookingItem[]> {
@@ -27,7 +28,7 @@ export async function getBookingsForViewer(viewerId: string, viewerRole: string)
 
   const { data: bookings, error } = await supabase
     .from('bookings')
-    .select('id, student_id, instructor_id, start_time, end_time, status, meet_link, credit_refunded')
+    .select('id, student_id, instructor_id, start_time, end_time, status, meet_link, credit_refunded, is_trial')
     .in('student_id', studentIds)
     .order('start_time', { ascending: false })
 
@@ -52,5 +53,6 @@ export async function getBookingsForViewer(viewerId: string, viewerRole: string)
     status: b.status,
     meetLink: b.meet_link,
     creditRefunded: b.credit_refunded,
+    isTrial: b.is_trial,
   }))
 }

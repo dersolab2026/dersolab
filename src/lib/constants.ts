@@ -1,4 +1,5 @@
 export const LESSON_DURATION_MINUTES = 40
+export const TRIAL_LESSON_DURATION_MINUTES = 20
 
 export const GUIDANCE_SUBJECT = 'Rehberlik'
 

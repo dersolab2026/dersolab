@@ -53,7 +53,11 @@ export function StudentSelector({ instructorId, students }: StudentSelectorProps
           <button onClick={() => setSelectedStudentId(null)} className="underline text-[#DD7B3A] font-bold">değiştir</button>
         </p>
       )}
-      <InstructorBookingSection instructorId={instructorId} studentId={selectedStudentId} />
+      <InstructorBookingSection
+        instructorId={instructorId}
+        studentId={selectedStudentId}
+        trialEligible={!(selectedStudent?.freeTrialUsed ?? true)}
+      />
     </div>
   )
 }

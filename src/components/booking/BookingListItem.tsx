@@ -28,7 +28,10 @@ export function BookingListItem({ booking, showStudentName, materials }: Booking
     <div className={`${PIXEL_CARD} p-4 flex flex-wrap items-center justify-between gap-3`}>
       <div>
         {showStudentName && <p className="text-xs font-bold text-[#1B2430]/70">{booking.studentName}</p>}
-        <p className="font-bold text-[#1B2430]">{booking.instructorName}</p>
+        <p className="font-bold text-[#1B2430]">
+          {booking.instructorName}
+          {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#DD7B3A]">Tanışma Dersi</span>}
+        </p>
         <p className="text-sm font-semibold text-[#1B2430]/70">{formattedDate}</p>
         {booking.status === 'cancelled' && (
           <p className="text-xs font-semibold text-[#1B2430]/70">
