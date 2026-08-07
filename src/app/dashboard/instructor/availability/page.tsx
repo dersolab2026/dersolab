@@ -12,7 +12,7 @@ export default async function InstructorAvailabilityPage() {
   const rules = await getInstructorSchedule(user.id)
 
   return (
-    <DashboardPageShell title="Müsaitlik Takvimi" description="Öğrencilerin rezervasyon yapabileceği haftalık saatlerini belirle.">
+    <DashboardPageShell title="Ajanda" description="Öğrencilerin rezervasyon yapabileceği haftalık saatlerini belirle.">
       <WeeklyScheduleEditor initialRules={rules} />
     </DashboardPageShell>
   )

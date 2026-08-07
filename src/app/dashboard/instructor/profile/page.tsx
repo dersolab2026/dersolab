@@ -27,7 +27,7 @@ export default async function InstructorProfilePage() {
   }))
 
   return (
-    <DashboardPageShell title="Profilim" description="Öğrencilerin marketplace'te göreceği bilgiler.">
+    <DashboardPageShell title="Profilim" description="Öğrencilerin eğitmenler sayfasında göreceği bilgiler.">
       <div className={`${PIXEL_CARD} p-5`}>
         <AvatarUploader userId={user.id} currentAvatarUrl={userRow?.avatar_url ?? null} name={userRow?.name ?? ''} />
       </div>
