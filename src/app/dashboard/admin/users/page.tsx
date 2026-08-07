@@ -104,7 +104,12 @@ export default async function AdminUsersPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Öğrenciler</h2>
+        <div>
+          <h2 className="text-lg font-semibold">Öğrenciler</h2>
+          <p className="text-sm text-muted-foreground">
+            {students.filter((s) => s.freeTrialUsed).length} / {students.length} öğrenci demo dersini kullandı
+          </p>
+        </div>
         {students.length === 0 ? (
           <p className="text-sm text-muted-foreground">Kayıtlı öğrenci yok.</p>
         ) : (
@@ -116,6 +121,7 @@ export default async function AdminUsersPage() {
                   <th className="px-3 py-2 text-left font-medium">E-posta</th>
                   <th className="px-3 py-2 text-left font-medium">Sınav Türü</th>
                   <th className="px-3 py-2 text-left font-medium">Kredi Bakiyesi</th>
+                  <th className="px-3 py-2 text-left font-medium">Demo Ders</th>
                   <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
                 </tr>
               </thead>
@@ -126,6 +132,11 @@ export default async function AdminUsersPage() {
                     <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
                     <td className="px-3 py-2 text-muted-foreground">{u.gradeTrack ? u.gradeTrack.toUpperCase() : '—'}</td>
                     <td className="px-3 py-2 text-muted-foreground">{u.creditBalance}</td>
+                    <td className="px-3 py-2">
+                      <Badge variant={u.freeTrialUsed ? 'default' : 'outline'}>
+                        {u.freeTrialUsed ? 'Yaptı' : 'Yapmadı'}
+                      </Badge>
+                    </td>
                     <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
                   </tr>
                 ))}
