@@ -7,7 +7,7 @@ export default function HomePage() {
       cardMaxWidth="560px"
       mascotMaxWidth="none"
       mascotWidthClass="w-full"
-      subtitle="Sınav öğrencileri için online özel ders ve rehberlik platformu"
+      subtitle="Öğrenciler için online özel ders ve rehberlik platformu"
     >
       <Link
         href="/login"
