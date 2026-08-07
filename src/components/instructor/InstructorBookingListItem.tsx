@@ -4,11 +4,14 @@ import { Video } from 'lucide-react'
 import { InstructorCancelBookingButton } from './InstructorCancelBookingButton'
 import { MarkCompleteDialog } from './MarkCompleteDialog'
 import { AssignHomeworkDialog } from './AssignHomeworkDialog'
+import { LessonMaterials } from '@/components/booking/LessonMaterials'
 import type { InstructorBookingItem } from '@/lib/bookings/get-instructor-bookings'
+import type { LessonMaterial } from '@/lib/lessons/get-lesson-materials'
 import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface InstructorBookingListItemProps {
   booking: InstructorBookingItem
+  materials: LessonMaterial[]
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -18,7 +21,7 @@ const STATUS_LABELS: Record<string, string> = {
   no_show: 'Gerçekleşmedi',
 }
 
-export function InstructorBookingListItem({ booking }: InstructorBookingListItemProps) {
+export function InstructorBookingListItem({ booking, materials }: InstructorBookingListItemProps) {
   const statusLabel = STATUS_LABELS[booking.status] ?? booking.status
   const formattedDate = new Date(booking.startTime).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })
   const isPastDue = booking.status === 'scheduled' && new Date(booking.startTime) < new Date()
@@ -29,6 +32,7 @@ export function InstructorBookingListItem({ booking }: InstructorBookingListItem
         <p className="font-bold text-[#1B2430]">{booking.studentName}</p>
         <p className="text-sm font-semibold text-[#1B2430]/70">{formattedDate}</p>
         {booking.instructorNotes && <p className="mt-1 text-xs font-semibold text-[#1B2430]/60">Not: {booking.instructorNotes}</p>}
+        <LessonMaterials bookingId={booking.id} materials={materials} isInstructor />
       </div>
 
       <div className="flex items-center gap-2">

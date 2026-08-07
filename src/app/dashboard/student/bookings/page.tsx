@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getBookingsForViewer } from '@/lib/bookings/get-student-bookings'
+import { getLessonMaterialsForBookings } from '@/lib/lessons/get-lesson-materials'
 import { BookingListItem } from '@/components/booking/BookingListItem'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 
@@ -17,6 +18,7 @@ export default async function StudentBookingsPage() {
 
   const upcoming = bookings.filter((b) => b.status === 'scheduled')
   const past = bookings.filter((b) => b.status !== 'scheduled')
+  const materialsByBooking = await getLessonMaterialsForBookings(bookings.map((b) => b.id))
 
   return (
     <DashboardPageShell title="Derslerim" description="Planlanan ve geçmiş derslerin.">
@@ -26,7 +28,9 @@ export default async function StudentBookingsPage() {
           <p className="text-sm font-semibold text-[#1B2430]/70">Planlanmış ders yok.</p>
         ) : (
           <div className="space-y-3">
-            {upcoming.map((b) => <BookingListItem key={b.id} booking={b} showStudentName={showStudentName} />)}
+            {upcoming.map((b) => (
+              <BookingListItem key={b.id} booking={b} showStudentName={showStudentName} materials={materialsByBooking[b.id] ?? []} />
+            ))}
           </div>
         )}
       </div>
@@ -37,7 +41,9 @@ export default async function StudentBookingsPage() {
           <p className="text-sm font-semibold text-[#1B2430]/70">Henüz geçmiş ders yok.</p>
         ) : (
           <div className="space-y-3">
-            {past.map((b) => <BookingListItem key={b.id} booking={b} showStudentName={showStudentName} />)}
+            {past.map((b) => (
+              <BookingListItem key={b.id} booking={b} showStudentName={showStudentName} materials={materialsByBooking[b.id] ?? []} />
+            ))}
           </div>
         )}
       </div>

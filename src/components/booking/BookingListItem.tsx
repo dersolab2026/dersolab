@@ -2,12 +2,15 @@
 
 import { Video } from 'lucide-react'
 import { CancelBookingButton } from '@/components/booking/CancelBookingButton'
+import { LessonMaterials } from '@/components/booking/LessonMaterials'
 import type { StudentBookingItem } from '@/lib/bookings/get-student-bookings'
+import type { LessonMaterial } from '@/lib/lessons/get-lesson-materials'
 import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface BookingListItemProps {
   booking: StudentBookingItem
   showStudentName: boolean
+  materials: LessonMaterial[]
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -17,7 +20,7 @@ const STATUS_LABELS: Record<string, string> = {
   no_show: 'Gerçekleşmedi',
 }
 
-export function BookingListItem({ booking, showStudentName }: BookingListItemProps) {
+export function BookingListItem({ booking, showStudentName, materials }: BookingListItemProps) {
   const statusLabel = STATUS_LABELS[booking.status] ?? booking.status
   const formattedDate = new Date(booking.startTime).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })
 
@@ -32,6 +35,7 @@ export function BookingListItem({ booking, showStudentName }: BookingListItemPro
             {booking.creditRefunded ? 'Kredi iade edildi' : 'Kredi iade edilmedi'}
           </p>
         )}
+        <LessonMaterials bookingId={booking.id} materials={materials} isInstructor={false} />
       </div>
 
       <div className="flex items-center gap-2">

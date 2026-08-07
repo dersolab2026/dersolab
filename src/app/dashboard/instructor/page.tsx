@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getInstructorBookings } from '@/lib/bookings/get-instructor-bookings'
+import { getLessonMaterialsForBookings } from '@/lib/lessons/get-lesson-materials'
 import { InstructorBookingListItem } from '@/components/instructor/InstructorBookingListItem'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { PIXEL_CARD } from '@/lib/theme'
@@ -18,6 +19,7 @@ export default async function InstructorDashboardPage() {
   const needsAction = bookings.filter((b) => b.status === 'scheduled' && new Date(b.startTime) < new Date())
   const upcoming = bookings.filter((b) => b.status === 'scheduled' && new Date(b.startTime) >= new Date())
   const past = bookings.filter((b) => b.status !== 'scheduled')
+  const materialsByBooking = await getLessonMaterialsForBookings(bookings.map((b) => b.id))
 
   return (
     <DashboardPageShell title="Derslerim" description="Rezervasyonlarını buradan yönetebilirsin.">
@@ -40,7 +42,9 @@ export default async function InstructorDashboardPage() {
           <h2 className="font-bold text-[#1B2430]">Onay Bekleyen Dersler</h2>
           <p className="text-sm font-semibold text-[#1B2430]/70">Saati geçmiş, tamamlandı olarak işaretlemen gerekiyor.</p>
           <div className="space-y-3">
-            {needsAction.map((b) => <InstructorBookingListItem key={b.id} booking={b} />)}
+            {needsAction.map((b) => (
+              <InstructorBookingListItem key={b.id} booking={b} materials={materialsByBooking[b.id] ?? []} />
+            ))}
           </div>
         </div>
       )}
@@ -50,7 +54,11 @@ export default async function InstructorDashboardPage() {
         {upcoming.length === 0 ? (
           <p className="text-sm font-semibold text-[#1B2430]/70">Planlanmış ders yok.</p>
         ) : (
-          <div className="space-y-3">{upcoming.map((b) => <InstructorBookingListItem key={b.id} booking={b} />)}</div>
+          <div className="space-y-3">
+            {upcoming.map((b) => (
+              <InstructorBookingListItem key={b.id} booking={b} materials={materialsByBooking[b.id] ?? []} />
+            ))}
+          </div>
         )}
       </div>
 
@@ -59,7 +67,11 @@ export default async function InstructorDashboardPage() {
         {past.length === 0 ? (
           <p className="text-sm font-semibold text-[#1B2430]/70">Henüz geçmiş ders yok.</p>
         ) : (
-          <div className="space-y-3">{past.map((b) => <InstructorBookingListItem key={b.id} booking={b} />)}</div>
+          <div className="space-y-3">
+            {past.map((b) => (
+              <InstructorBookingListItem key={b.id} booking={b} materials={materialsByBooking[b.id] ?? []} />
+            ))}
+          </div>
         )}
       </div>
     </DashboardPageShell>

@@ -44,11 +44,19 @@ export function DashboardNav({ role }: DashboardNavProps) {
   const items = NAV_ITEMS[role] ?? []
 
   if (role === 'admin') {
+    const instructorItems = NAV_ITEMS.instructor
+
     return (
       <nav className="flex items-center justify-between border-b px-6 py-3">
         <div className="flex items-center gap-4 overflow-x-auto">
           <span className="font-semibold">DersoLab</span>
           {items.map((item) => (
+            <Link key={item.href} href={item.href} className={pathname === item.href ? 'text-sm font-medium' : 'text-sm text-muted-foreground'}>
+              {item.label}
+            </Link>
+          ))}
+          <span className="text-muted-foreground">|</span>
+          {instructorItems.map((item) => (
             <Link key={item.href} href={item.href} className={pathname === item.href ? 'text-sm font-medium' : 'text-sm text-muted-foreground'}>
               {item.label}
             </Link>
