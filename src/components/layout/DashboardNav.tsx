@@ -34,6 +34,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
   admin: [
     { href: '/dashboard/admin', label: 'Genel Bakış' },
+    { href: '/dashboard/admin/users', label: 'Kullanıcılar' },
     { href: '/dashboard/admin/instructors', label: 'Eğitmen Onayları' },
     { href: '/dashboard/admin/packages', label: 'Paketler' },
   ],
