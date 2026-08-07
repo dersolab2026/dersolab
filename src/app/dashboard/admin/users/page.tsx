@@ -1,70 +1,139 @@
 import { Badge } from '@/components/ui/badge'
 import { getAllStudentsAndInstructors } from '@/lib/admin/get-all-users'
 
-const ROLE_LABELS: Record<string, string> = {
-  student: 'Öğrenci',
-  parent: 'Veli',
-  instructor: 'Eğitmen',
-}
-
 const APPROVAL_LABELS: Record<string, string> = {
   pending: 'Onay bekliyor',
   approved: 'Onaylı',
   rejected: 'Reddedildi',
 }
 
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString('tr-TR', { dateStyle: 'medium' })
+}
+
 export default async function AdminUsersPage() {
-  const users = await getAllStudentsAndInstructors()
+  const { students, parents, instructors } = await getAllStudentsAndInstructors()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <div>
         <h1 className="text-2xl font-semibold">Kullanıcılar</h1>
-        <p className="text-muted-foreground">Kayıtlı öğrenci, veli ve eğitmenler ({users.length}).</p>
+        <p className="text-muted-foreground">
+          {students.length} öğrenci · {parents.length} veli · {instructors.length} eğitmen
+        </p>
       </div>
 
-      <div className="overflow-x-auto rounded-md border">
-        <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50">
-            <tr>
-              <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
-              <th className="px-3 py-2 text-left font-medium">E-posta</th>
-              <th className="px-3 py-2 text-left font-medium">Rol</th>
-              <th className="px-3 py-2 text-left font-medium">Durum</th>
-              <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id} className="border-b last:border-0">
-                <td className="px-3 py-2">{u.name || '—'}</td>
-                <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
-                <td className="px-3 py-2">
-                  <Badge variant="outline">{ROLE_LABELS[u.role] ?? u.role}</Badge>
-                </td>
-                <td className="px-3 py-2">
-                  {u.role === 'student' && u.gradeTrack && (
-                    <span className="text-muted-foreground">{u.gradeTrack.toUpperCase()}</span>
-                  )}
-                  {u.role === 'instructor' && u.approvalStatus && (
-                    <Badge variant={u.approvalStatus === 'approved' ? 'default' : u.approvalStatus === 'rejected' ? 'destructive' : 'outline'}>
-                      {APPROVAL_LABELS[u.approvalStatus] ?? u.approvalStatus}
-                    </Badge>
-                  )}
-                  {u.role === 'instructor' && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      {u.calendarConnected ? 'Takvim bağlı' : 'Takvim bağlı değil'}
-                    </span>
-                  )}
-                </td>
-                <td className="px-3 py-2 text-muted-foreground">
-                  {new Date(u.createdAt).toLocaleDateString('tr-TR', { dateStyle: 'medium' })}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Eğitmenler</h2>
+        {instructors.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Kayıtlı eğitmen yok.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-md border">
+            <table className="w-full text-sm">
+              <thead className="border-b bg-muted/50">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
+                  <th className="px-3 py-2 text-left font-medium">E-posta</th>
+                  <th className="px-3 py-2 text-left font-medium">Onay Durumu</th>
+                  <th className="px-3 py-2 text-left font-medium">Takvim</th>
+                  <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {instructors.map((u) => (
+                  <tr key={u.id} className="border-b last:border-0">
+                    <td className="px-3 py-2">{u.name || '—'}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
+                    <td className="px-3 py-2">
+                      {u.approvalStatus && (
+                        <Badge variant={u.approvalStatus === 'approved' ? 'default' : u.approvalStatus === 'rejected' ? 'destructive' : 'outline'}>
+                          {APPROVAL_LABELS[u.approvalStatus] ?? u.approvalStatus}
+                        </Badge>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">{u.calendarConnected ? 'Bağlı' : 'Bağlı değil'}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Veliler</h2>
+        {parents.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Kayıtlı veli yok.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-md border">
+            <table className="w-full text-sm">
+              <thead className="border-b bg-muted/50">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
+                  <th className="px-3 py-2 text-left font-medium">E-posta</th>
+                  <th className="px-3 py-2 text-left font-medium">Öğrencileri</th>
+                  <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {parents.map((u) => (
+                  <tr key={u.id} className="border-b last:border-0">
+                    <td className="px-3 py-2">{u.name || '—'}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
+                    <td className="px-3 py-2">
+                      {u.students.length === 0 ? (
+                        <span className="text-muted-foreground">Öğrenci eklenmemiş</span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1">
+                          {u.students.map((s) => (
+                            <Badge key={s.id} variant="outline">
+                              {s.name}{s.gradeTrack ? ` (${s.gradeTrack.toUpperCase()})` : ''}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Öğrenciler</h2>
+        {students.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Kayıtlı öğrenci yok.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-md border">
+            <table className="w-full text-sm">
+              <thead className="border-b bg-muted/50">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
+                  <th className="px-3 py-2 text-left font-medium">E-posta</th>
+                  <th className="px-3 py-2 text-left font-medium">Sınav Türü</th>
+                  <th className="px-3 py-2 text-left font-medium">Kredi Bakiyesi</th>
+                  <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((u) => (
+                  <tr key={u.id} className="border-b last:border-0">
+                    <td className="px-3 py-2">{u.name || '—'}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{u.gradeTrack ? u.gradeTrack.toUpperCase() : '—'}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{u.creditBalance}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   )
 }
