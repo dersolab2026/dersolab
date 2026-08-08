@@ -1,7 +1,6 @@
-import Link from 'next/link'
 import { InstructorCard } from '@/components/marketplace/InstructorCard'
+import { SubjectFilter } from '@/components/marketplace/SubjectFilter'
 import { getInstructors } from '@/lib/marketplace/get-instructors'
-import { SUBJECT_CATEGORIES } from '@/lib/constants'
 
 interface InstructorsPageProps {
   searchParams: Promise<{ subject?: string }>
@@ -28,34 +27,7 @@ export default async function InstructorsPage({ searchParams }: InstructorsPageP
           </h1>
         </div>
 
-        <div className="space-y-3">
-          <Link
-            href="/instructors"
-            className={`inline-block px-4 py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
-              !subject ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]' : 'bg-white text-[#1B2430]'
-            }`}
-          >
-            Tümü
-          </Link>
-          {SUBJECT_CATEGORIES.map((category) => (
-            <div key={category.label} className="space-y-1.5">
-              <p className="text-xs font-bold text-[#1B2430]/60 uppercase tracking-wide">{category.label}</p>
-              <div className="flex flex-wrap gap-2">
-                {category.subjects.map((s) => (
-                  <Link
-                    key={s}
-                    href={`/instructors?subject=${encodeURIComponent(s)}`}
-                    className={`px-4 py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
-                      subject === s ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]' : 'bg-white text-[#1B2430]'
-                    }`}
-                  >
-                    {s}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <SubjectFilter activeSubject={subject} />
 
         {instructors.length === 0 ? (
           <p className="font-sans font-semibold text-[#1B2430]">Bu branşta henüz eğitmen bulunmuyor.</p>
