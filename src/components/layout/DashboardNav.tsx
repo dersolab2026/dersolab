@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { logoutUser } from '@/actions/auth'
 import { NotificationBell } from '@/components/layout/NotificationBell'
 import type { NotificationItem } from '@/actions/notifications'
-import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
+import { PIXEL_BUTTON_SECONDARY, PIXEL_BADGE, PIXEL_BADGE_ACTIVE } from '@/lib/theme'
 
 interface DashboardNavProps {
   role: 'student' | 'parent' | 'instructor' | 'admin'
@@ -88,17 +88,15 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
 
   return (
     <nav className="flex items-center justify-between gap-2 border-b-4 border-[#1B2430] bg-[#F4F1E8] px-4 sm:px-6 py-3">
-      <div className="flex items-center gap-4 sm:gap-6 min-w-0 overflow-x-auto">
-        <Link href="/dashboard" className="shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto">
+        <Link href="/dashboard" className="shrink-0 mr-1">
           <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
         </Link>
         {items.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className={`text-sm font-bold whitespace-nowrap shrink-0 ${
-              pathname === item.href ? 'text-[#DD7B3A] underline underline-offset-4' : 'text-[#1B2430]'
-            }`}
+            className={`${pathname === item.href ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE} whitespace-nowrap shrink-0`}
           >
             {item.label}
           </Link>
