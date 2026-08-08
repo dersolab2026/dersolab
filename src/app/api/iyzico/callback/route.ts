@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Iyzipay from 'iyzipay'
-import { createIyzicoClient, type CheckoutFormRetrieveResult } from '@/lib/iyzico/client'
+import { retrieveCheckoutForm } from '@/lib/iyzico/client'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
@@ -8,27 +7,26 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData()
   const token = formData.get('token') as string | null
 
+  // iyzico buraya POST ile geldigi icin, tarayicinin hedef sayfaya da
+  // POST ile gitmeye calismamasi (Next.js'in server action protokolune
+  // takilmasi) icin 303 See Other kullaniyoruz; bu, metodu GET'e cevirir.
   if (!token) {
-    return NextResponse.redirect(`${appUrl}/dashboard/student/packages?canceled=1`)
+    return NextResponse.redirect(`${appUrl}/dashboard/student/packages?canceled=1`, { status: 303 })
   }
 
-  const iyzipay = createIyzicoClient()
-
-  const result = await new Promise<CheckoutFormRetrieveResult | null>((resolve) => {
-    iyzipay.checkoutForm.retrieve({ locale: Iyzipay.LOCALE.TR, token }, (err: unknown, res: CheckoutFormRetrieveResult) => {
-      if (err) {
-        console.error('iyzico checkoutForm.retrieve hatası:', err)
-        resolve(null)
-        return
-      }
-      resolve(res)
-    })
-  })
+  let result
+  try {
+    result = await retrieveCheckoutForm({ locale: 'tr', token })
+  } catch (err) {
+    console.error('iyzico checkoutForm retrieve hatası:', err)
+    return NextResponse.redirect(`${appUrl}/dashboard/student/packages?canceled=1`, { status: 303 })
+  }
 
   const purchaseId = result?.conversationId
 
   if (!result || !purchaseId) {
-    return NextResponse.redirect(`${appUrl}/dashboard/student/packages?canceled=1`)
+    console.error('iyzico checkoutForm retrieve: conversationId eksik', result)
+    return NextResponse.redirect(`${appUrl}/dashboard/student/packages?canceled=1`, { status: 303 })
   }
 
   const admin = createAdminClient()
@@ -42,14 +40,15 @@ export async function POST(request: NextRequest) {
 
     if (error) console.error('package_purchases güncelleme hatası:', error)
 
-    return NextResponse.redirect(`${appUrl}/dashboard/student/packages?success=1`)
+    return NextResponse.redirect(`${appUrl}/dashboard/student/packages?success=1`, { status: 303 })
   }
 
+  console.error('iyzico ödeme başarısız:', result)
   await admin
     .from('package_purchases')
     .update({ status: 'failed' })
     .eq('id', purchaseId)
     .eq('status', 'pending')
 
-  return NextResponse.redirect(`${appUrl}/dashboard/student/packages?canceled=1`)
+  return NextResponse.redirect(`${appUrl}/dashboard/student/packages?canceled=1`, { status: 303 })
 }
