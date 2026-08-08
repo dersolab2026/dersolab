@@ -7,12 +7,18 @@ const nextConfig: NextConfig = {
   // bundle'lamak yerine sunucuda dogrudan require etmesini sagliyoruz.
   serverExternalPackages: ['iyzipay'],
   // serverExternalPackages sayesinde bundle disi kaldi ama Vercel'in dosya
-  // izleme (tracing) sistemi dinamik require'i takip edemedigi icin
-  // lib/resources klasorunu deploy'a dahil etmiyordu (ENOENT hatasi).
-  // Bu klasoru elle dahil ediyoruz.
+  // izleme (tracing) sistemi dinamik require'leri takip edemedigi icin
+  // lib/resources klasorunu ve iyzipay'in gercek bagimliligi olan
+  // postman-request'i deploy'a dahil etmiyordu. Ikisini de elle ekliyoruz.
   outputFileTracingIncludes: {
-    '/dashboard/student/packages': ['./node_modules/iyzipay/lib/**/*'],
-    '/api/iyzico/callback': ['./node_modules/iyzipay/lib/**/*'],
+    '/dashboard/student/packages': [
+      './node_modules/iyzipay/lib/**/*',
+      './node_modules/postman-request/**/*',
+    ],
+    '/api/iyzico/callback': [
+      './node_modules/iyzipay/lib/**/*',
+      './node_modules/postman-request/**/*',
+    ],
   },
 };
 
