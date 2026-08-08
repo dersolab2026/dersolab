@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/layout/DashboardNav'
+import { MascotNotificationToast } from '@/components/layout/MascotNotificationToast'
+import { getNotifications } from '@/actions/notifications'
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient()
@@ -18,10 +20,13 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     offersFreeTrial = instructorRow?.offers_free_trial ?? false
   }
 
+  const notifications = await getNotifications()
+
   return (
     <div>
-      <DashboardNav role={role} offersFreeTrial={offersFreeTrial} />
+      <DashboardNav role={role} offersFreeTrial={offersFreeTrial} notifications={notifications} />
       <main>{children}</main>
+      <MascotNotificationToast />
     </div>
   )
 }

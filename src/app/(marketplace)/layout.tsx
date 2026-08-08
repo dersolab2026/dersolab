@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/layout/DashboardNav'
+import { MascotNotificationToast } from '@/components/layout/MascotNotificationToast'
+import { getNotifications } from '@/actions/notifications'
 
 export default async function MarketplaceLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient()
@@ -18,10 +20,13 @@ export default async function MarketplaceLayout({ children }: { children: ReactN
     offersFreeTrial = instructorRow?.offers_free_trial ?? false
   }
 
+  const notifications = await getNotifications()
+
   return (
     <div>
-      <DashboardNav role={role} offersFreeTrial={offersFreeTrial} />
+      <DashboardNav role={role} offersFreeTrial={offersFreeTrial} notifications={notifications} />
       {children}
+      <MascotNotificationToast />
     </div>
   )
 }

@@ -4,11 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { logoutUser } from '@/actions/auth'
+import { NotificationBell } from '@/components/layout/NotificationBell'
+import type { NotificationItem } from '@/actions/notifications'
 import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface DashboardNavProps {
   role: 'student' | 'parent' | 'instructor' | 'admin'
   offersFreeTrial?: boolean
+  notifications: NotificationItem[]
 }
 
 const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
@@ -45,7 +48,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
 }
 
-export function DashboardNav({ role, offersFreeTrial }: DashboardNavProps) {
+export function DashboardNav({ role, offersFreeTrial, notifications }: DashboardNavProps) {
   const pathname = usePathname()
 
   const instructorItemsWithDemo = offersFreeTrial
@@ -73,9 +76,12 @@ export function DashboardNav({ role, offersFreeTrial }: DashboardNavProps) {
             </Link>
           ))}
         </div>
-        <form action={logoutUser}>
-          <Button type="submit" variant="ghost" size="sm">Çıkış Yap</Button>
-        </form>
+        <div className="flex items-center gap-1 shrink-0">
+          <NotificationBell initialNotifications={notifications} role={role} />
+          <form action={logoutUser}>
+            <Button type="submit" variant="ghost" size="sm">Çıkış Yap</Button>
+          </form>
+        </div>
       </nav>
     )
   }
@@ -98,9 +104,12 @@ export function DashboardNav({ role, offersFreeTrial }: DashboardNavProps) {
           </Link>
         ))}
       </div>
-      <form action={logoutUser} className="shrink-0">
-        <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
-      </form>
+      <div className="flex items-center gap-2 shrink-0">
+        <NotificationBell initialNotifications={notifications} role={role} />
+        <form action={logoutUser}>
+          <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
+        </form>
+      </div>
     </nav>
   )
 }
