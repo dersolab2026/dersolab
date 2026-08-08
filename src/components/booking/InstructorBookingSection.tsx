@@ -10,12 +10,10 @@ import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
 interface InstructorBookingSectionProps {
   instructorId: string
   studentId: string
-  trialEligible?: boolean
 }
 
-export function InstructorBookingSection({ instructorId, studentId, trialEligible = false }: InstructorBookingSectionProps) {
+export function InstructorBookingSection({ instructorId, studentId }: InstructorBookingSectionProps) {
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
-  const [isTrial, setIsTrial] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
 
@@ -23,16 +21,10 @@ export function InstructorBookingSection({ instructorId, studentId, trialEligibl
     if (!selectedSlot) return
     setResult(null)
     startTransition(async () => {
-      const res = await createBooking({ instructorId, studentId, slot: selectedSlot, isTrial })
+      const res = await createBooking({ instructorId, studentId, slot: selectedSlot })
       if (res.success) {
-        setResult({
-          success: true,
-          message: isTrial
-            ? 'Ücretsiz tanışma dersin planlandı! Meet linki e-postana gönderildi.'
-            : 'Ders başarıyla planlandı! Meet linki e-postana gönderildi.',
-        })
+        setResult({ success: true, message: 'Ders başarıyla planlandı! Meet linki e-postana gönderildi.' })
         setSelectedSlot(null)
-        setIsTrial(false)
       } else {
         setResult({ success: false, message: res.error })
       }
@@ -41,20 +33,6 @@ export function InstructorBookingSection({ instructorId, studentId, trialEligibl
 
   return (
     <div className="space-y-4">
-      {trialEligible && (
-        <label className={`${PIXEL_CARD} flex items-center gap-3 p-4 cursor-pointer`}>
-          <input
-            type="checkbox"
-            checked={isTrial}
-            onChange={(e) => setIsTrial(e.target.checked)}
-            className="h-5 w-5 accent-[#DD7B3A]"
-          />
-          <span className="text-sm font-semibold text-[#1B2430]">
-            Bunu <strong>ücretsiz tanışma dersi</strong> olarak rezerve et (20 dk, kredi kullanılmaz — sadece bir kez hakkın var)
-          </span>
-        </label>
-      )}
-
       <BookingCalendar instructorId={instructorId} onSelectSlot={setSelectedSlot} />
 
       {selectedSlot && (
@@ -62,7 +40,6 @@ export function InstructorBookingSection({ instructorId, studentId, trialEligibl
           <p className="text-sm font-semibold text-[#1B2430]">
             Seçilen saat:{' '}
             <strong>{new Date(selectedSlot.start).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })}</strong>
-            {isTrial && <span className="ml-2 text-[#DD7B3A]">(20 dk tanışma dersi)</span>}
           </p>
           <button type="button" onClick={handleConfirm} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Rezervasyonu Onayla'}

@@ -23,11 +23,6 @@ export default async function InstructorDetailPage({ params }: InstructorDetailP
 
   const { data: userRecord } = await supabase.from('users').select('role').eq('id', user.id).single()
 
-  const { data: selfStudentRow } =
-    userRecord?.role === 'student'
-      ? await supabase.from('students').select('free_trial_used').eq('user_id', user.id).single()
-      : { data: null }
-
   const education = await getInstructorEducation(instructor.userId)
 
   const initials = instructor.name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
@@ -72,11 +67,7 @@ export default async function InstructorDetailPage({ params }: InstructorDetailP
             userRecord?.role === 'parent' ? (
               <StudentSelector instructorId={instructor.userId} students={await getGuardianStudents(user.id)} />
             ) : (
-              <InstructorBookingSection
-                instructorId={instructor.userId}
-                studentId={user.id}
-                trialEligible={!(selfStudentRow?.free_trial_used ?? true)}
-              />
+              <InstructorBookingSection instructorId={instructor.userId} studentId={user.id} />
             )
           ) : (
             <p className="font-semibold text-[#1B2430]">

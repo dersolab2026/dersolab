@@ -11,9 +11,16 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
   const role = (userRow?.role ?? 'student') as 'student' | 'parent' | 'instructor' | 'admin'
 
+  let offersFreeTrial = false
+  if (role === 'instructor' || role === 'admin') {
+    const { data: instructorRow } = await supabase
+      .from('instructors').select('offers_free_trial').eq('user_id', user.id).single()
+    offersFreeTrial = instructorRow?.offers_free_trial ?? false
+  }
+
   return (
     <div>
-      <DashboardNav role={role} />
+      <DashboardNav role={role} offersFreeTrial={offersFreeTrial} />
       <main>{children}</main>
     </div>
   )

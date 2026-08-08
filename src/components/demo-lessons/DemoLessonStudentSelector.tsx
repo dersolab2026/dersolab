@@ -1,16 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { InstructorBookingSection } from '@/components/booking/InstructorBookingSection'
+import { DemoLessonRequestCard } from '@/components/demo-lessons/DemoLessonRequestCard'
 import type { GuardianStudent } from '@/lib/marketplace/get-guardian-students'
 import { PIXEL_CARD, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
-interface StudentSelectorProps {
-  instructorId: string
-  students: GuardianStudent[]
+interface DemoLessonStudentSelectorProps {
+  students: (GuardianStudent & { requestStatus: 'pending' | 'assigned' | 'cancelled' | null })[]
 }
 
-export function StudentSelector({ instructorId, students }: StudentSelectorProps) {
+export function DemoLessonStudentSelector({ students }: DemoLessonStudentSelectorProps) {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     students.length === 1 ? students[0].studentId : null
   )
@@ -18,7 +17,7 @@ export function StudentSelector({ instructorId, students }: StudentSelectorProps
   if (students.length === 0) {
     return (
       <div className={`${PIXEL_CARD} p-4`}>
-        <p className="font-semibold text-[#1B2430]">Rezervasyon yapabilmen için önce bir öğrenci profili eklemen gerekiyor.</p>
+        <p className="font-semibold text-[#1B2430]">Önce bir öğrenci profili eklemen gerekiyor.</p>
       </div>
     )
   }
@@ -26,7 +25,7 @@ export function StudentSelector({ instructorId, students }: StudentSelectorProps
   if (!selectedStudentId) {
     return (
       <div className="space-y-3">
-        <p className="font-bold text-[#1B2430]">Hangi öğrenci için rezervasyon yapıyorsun?</p>
+        <p className="font-bold text-[#1B2430]">Hangi öğrenci için tanışma dersi istiyorsun?</p>
         <div className="flex flex-wrap gap-2">
           {students.map((student) => (
             <button
@@ -43,17 +42,20 @@ export function StudentSelector({ instructorId, students }: StudentSelectorProps
     )
   }
 
-  const selectedStudent = students.find((s) => s.studentId === selectedStudentId)
+  const selectedStudent = students.find((s) => s.studentId === selectedStudentId)!
 
   return (
     <div className="space-y-3">
       {students.length > 1 && (
         <p className="font-semibold text-[#1B2430]">
-          <strong>{selectedStudent?.name}</strong> için rezervasyon yapılıyor —{' '}
+          <strong>{selectedStudent.name}</strong> için —{' '}
           <button onClick={() => setSelectedStudentId(null)} className="underline text-[#DD7B3A] font-bold">değiştir</button>
         </p>
       )}
-      <InstructorBookingSection instructorId={instructorId} studentId={selectedStudentId} />
+      <DemoLessonRequestCard
+        studentId={selectedStudent.studentId}
+        initialStatus={{ freeTrialUsed: selectedStudent.freeTrialUsed, requestStatus: selectedStudent.requestStatus }}
+      />
     </div>
   )
 }

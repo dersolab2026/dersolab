@@ -8,6 +8,7 @@ import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface DashboardNavProps {
   role: 'student' | 'parent' | 'instructor' | 'admin'
+  offersFreeTrial?: boolean
 }
 
 const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
@@ -17,6 +18,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/student/packages', label: 'Paketler' },
     { href: '/instructors', label: 'Eğitmenler' },
     { href: '/rehberlik', label: 'Rehberlik' },
+    { href: '/demo-ders', label: 'Tanışma Dersi' },
   ],
   parent: [
     { href: '/dashboard/student/bookings', label: 'Derslerim' },
@@ -24,6 +26,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/student/packages', label: 'Paketler' },
     { href: '/instructors', label: 'Eğitmenler' },
     { href: '/rehberlik', label: 'Rehberlik' },
+    { href: '/demo-ders', label: 'Tanışma Dersi' },
   ],
   instructor: [
     { href: '/dashboard/instructor', label: 'Derslerim' },
@@ -40,12 +43,17 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
 }
 
-export function DashboardNav({ role }: DashboardNavProps) {
+export function DashboardNav({ role, offersFreeTrial }: DashboardNavProps) {
   const pathname = usePathname()
-  const items = NAV_ITEMS[role] ?? []
+
+  const instructorItemsWithDemo = offersFreeTrial
+    ? [...NAV_ITEMS.instructor, { href: '/dashboard/instructor/demo-talepleri', label: 'Demo Talepleri' }]
+    : NAV_ITEMS.instructor
+
+  const items = role === 'instructor' ? instructorItemsWithDemo : NAV_ITEMS[role] ?? []
 
   if (role === 'admin') {
-    const instructorItems = NAV_ITEMS.instructor
+    const instructorItems = instructorItemsWithDemo
 
     return (
       <nav className="flex items-center justify-between border-b px-6 py-3">
