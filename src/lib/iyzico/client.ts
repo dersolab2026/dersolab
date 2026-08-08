@@ -12,6 +12,7 @@ export interface CheckoutFormInitializeResult {
 export interface CheckoutFormRetrieveResult {
   status: string
   conversationId?: string
+  basketId?: string
   paymentStatus?: string
   paymentId?: string
   errorMessage?: string

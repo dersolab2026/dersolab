@@ -22,10 +22,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.redirect(`${appUrl}/dashboard/student/packages?canceled=1`, { status: 303 })
   }
 
-  const purchaseId = result?.conversationId
+  // iyzico bazı akışlarda conversationId'yi değil, initialize'da gönderdiğimiz
+  // basketId'yi geri döndürüyor (ikisini de purchase.id ile dolduruyoruz).
+  const purchaseId = result?.basketId ?? result?.conversationId
 
   if (!result || !purchaseId) {
-    console.error('iyzico checkoutForm retrieve: conversationId eksik', result)
+    console.error('iyzico checkoutForm retrieve: basketId/conversationId eksik', result)
     return NextResponse.redirect(`${appUrl}/dashboard/student/packages?canceled=1`, { status: 303 })
   }
 
