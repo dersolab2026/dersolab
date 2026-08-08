@@ -7,6 +7,7 @@ export interface NotificationItem {
   type: string
   title: string
   body: string | null
+  link: string | null
   isRead: boolean
   createdAt: string
 }
@@ -18,14 +19,14 @@ export async function getNotifications(): Promise<NotificationItem[]> {
 
   const { data, error } = await supabase
     .from('notifications')
-    .select('id, type, title, body, is_read, created_at')
+    .select('id, type, title, body, link, is_read, created_at')
     .eq('recipient_id', user.id)
     .order('created_at', { ascending: false })
     .limit(20)
 
   if (error) throw error
   return (data ?? []).map((n) => ({
-    id: n.id, type: n.type, title: n.title, body: n.body, isRead: n.is_read, createdAt: n.created_at,
+    id: n.id, type: n.type, title: n.title, body: n.body, link: n.link, isRead: n.is_read, createdAt: n.created_at,
   }))
 }
 

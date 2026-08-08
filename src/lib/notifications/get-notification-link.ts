@@ -1,3 +1,33 @@
+export type AdminNotificationCategory = 'general' | 'lessons' | 'homework' | 'packages' | 'questions'
+
+export const ADMIN_NOTIFICATION_CATEGORY_LABELS: Record<AdminNotificationCategory, string> = {
+  general: 'Genel',
+  lessons: 'Derslerim',
+  homework: 'Ödevler',
+  packages: 'Paketler',
+  questions: 'Sorularım',
+}
+
+export function getCategoryLink(
+  category: AdminNotificationCategory,
+  role: 'student' | 'parent' | 'instructor' | 'admin'
+): string {
+  const isInstructorLike = role === 'instructor' || role === 'admin'
+
+  switch (category) {
+    case 'lessons':
+      return isInstructorLike ? '/dashboard/instructor' : '/dashboard/student/bookings'
+    case 'homework':
+      return isInstructorLike ? '/dashboard/instructor/homework' : '/dashboard/student/homework'
+    case 'packages':
+      return isInstructorLike ? '/dashboard/instructor' : '/dashboard/student/packages'
+    case 'questions':
+      return isInstructorLike ? '/dashboard/instructor/questions' : '/dashboard/student/questions'
+    default:
+      return '/dashboard'
+  }
+}
+
 export function getNotificationLink(type: string, role: 'student' | 'parent' | 'instructor' | 'admin'): string {
   // Admin hesapları eğitmen olarak da işlev görebiliyor (ör. Egemen), bu yuzden
   // ders/ödev bildirimlerinde onlari da egitmen tarafina yönlendiriyoruz.

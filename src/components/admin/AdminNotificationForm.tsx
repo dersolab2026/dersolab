@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { ADMIN_NOTIFICATION_CATEGORY_LABELS, type AdminNotificationCategory } from '@/lib/notifications/get-notification-link'
 
 type Audience = 'all' | 'student' | 'parent' | 'instructor' | 'specific'
 
@@ -22,7 +23,7 @@ const AUDIENCE_LABELS: Record<Audience, string> = {
   student: 'Tüm Öğrenciler',
   parent: 'Tüm Veliler',
   instructor: 'Tüm Eğitmenler',
-  specific: 'Belirli Bir Kişi',
+  specific: 'Belirli Kişiler',
 }
 
 const ROLE_LABELS: Record<UserOption['role'], string> = {
@@ -33,17 +34,22 @@ const ROLE_LABELS: Record<UserOption['role'], string> = {
 
 export function AdminNotificationForm({ users }: { users: UserOption[] }) {
   const [audience, setAudience] = useState<Audience>('all')
-  const [userId, setUserId] = useState('')
+  const [userIds, setUserIds] = useState<string[]>([])
+  const [category, setCategory] = useState<AdminNotificationCategory>('general')
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
 
+  function toggleUser(id: string) {
+    setUserIds((prev) => (prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]))
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (audience === 'specific' && !userId) {
-      setError('Bir kişi seçmelisin')
+    if (audience === 'specific' && userIds.length === 0) {
+      setError('En az bir kişi seçmelisin')
       return
     }
     setError(null)
@@ -51,7 +57,8 @@ export function AdminNotificationForm({ users }: { users: UserOption[] }) {
     startTransition(async () => {
       const result = await sendAdminNotification({
         audience,
-        userId: audience === 'specific' ? userId : undefined,
+        userIds: audience === 'specific' ? userIds : undefined,
+        category,
         title,
         body,
       })
@@ -62,6 +69,7 @@ export function AdminNotificationForm({ users }: { users: UserOption[] }) {
       setSuccessMsg(`${result.count} kişiye gönderildi.`)
       setTitle('')
       setBody('')
+      setUserIds([])
     })
   }
 
@@ -83,25 +91,52 @@ export function AdminNotificationForm({ users }: { users: UserOption[] }) {
 
       {audience === 'specific' && (
         <div className="space-y-1.5">
-          <Label htmlFor="notif-user">Kişi</Label>
-          <select
-            id="notif-user"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            className="flex h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            required
-          >
-            <option value="">Seç...</option>
-            {(['student', 'parent', 'instructor'] as const).map((role) => (
-              <optgroup key={role} label={ROLE_LABELS[role]}>
-                {users.filter((u) => u.role === role).map((u) => (
-                  <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
+          <div className="flex items-center justify-between">
+            <Label>Kişiler ({userIds.length} seçili)</Label>
+            {userIds.length > 0 && (
+              <button type="button" onClick={() => setUserIds([])} className="text-xs font-bold text-muted-foreground underline">
+                Seçimi temizle
+              </button>
+            )}
+          </div>
+          <div className="max-h-56 space-y-3 overflow-y-auto rounded-md border p-3">
+            {(['student', 'parent', 'instructor'] as const).map((role) => {
+              const roleUsers = users.filter((u) => u.role === role)
+              if (roleUsers.length === 0) return null
+              return (
+                <div key={role} className="space-y-1">
+                  <p className="text-xs font-bold text-muted-foreground">{ROLE_LABELS[role]}</p>
+                  {roleUsers.map((u) => (
+                    <label key={u.id} className="flex items-center gap-2 py-0.5 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={userIds.includes(u.id)}
+                        onChange={() => toggleUser(u.id)}
+                      />
+                      {u.name} ({u.email})
+                    </label>
+                  ))}
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
+
+      <div className="space-y-1.5">
+        <Label htmlFor="notif-category">Kategori</Label>
+        <select
+          id="notif-category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value as AdminNotificationCategory)}
+          className="flex h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          {(Object.entries(ADMIN_NOTIFICATION_CATEGORY_LABELS) as [AdminNotificationCategory, string][]).map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+        <p className="text-xs text-muted-foreground">Bildirime tıklayınca kullanıcı ilgili sayfaya yönlendirilir.</p>
+      </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="notif-title">Başlık</Label>

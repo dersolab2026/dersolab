@@ -49,7 +49,7 @@ export function NotificationBell({ initialNotifications, role }: NotificationBel
       startTransition(() => { markNotificationRead(notification.id) })
     }
     setIsOpen(false)
-    router.push(getNotificationLink(notification.type, role))
+    router.push(notification.link ?? getNotificationLink(notification.type, role))
   }
 
   function handleMarkAllRead() {

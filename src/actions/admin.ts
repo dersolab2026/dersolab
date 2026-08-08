@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyInstructorApprovalStatus } from '@/lib/notifications/send-guardian-notification'
+import { getCategoryLink, type AdminNotificationCategory } from '@/lib/notifications/get-notification-link'
 
 type ActionResult = { success: true } | { success: false; error: string }
 
@@ -103,7 +104,8 @@ type SendNotificationResult = { success: true; count: number } | { success: fals
 
 interface SendAdminNotificationParams {
   audience: 'all' | 'student' | 'parent' | 'instructor' | 'specific'
-  userId?: string
+  userIds?: string[]
+  category: AdminNotificationCategory
   title: string
   body: string
 }
@@ -119,29 +121,32 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
 
   const admin = createAdminClient()
 
-  let recipientIds: string[] = []
+  let recipients: { id: string; role: string }[] = []
   if (params.audience === 'specific') {
-    if (!params.userId) return { success: false, error: 'Bir kişi seçmelisin' }
-    recipientIds = [params.userId]
+    if (!params.userIds || params.userIds.length === 0) return { success: false, error: 'En az bir kişi seçmelisin' }
+    const { data: users, error } = await admin.from('users').select('id, role').in('id', params.userIds)
+    if (error) return { success: false, error: error.message }
+    recipients = users ?? []
   } else {
     const roles = params.audience === 'all' ? ['student', 'parent', 'instructor'] : [params.audience]
-    const { data: users, error } = await admin.from('users').select('id').in('role', roles)
+    const { data: users, error } = await admin.from('users').select('id, role').in('role', roles)
     if (error) return { success: false, error: error.message }
-    recipientIds = (users ?? []).map((u) => u.id)
+    recipients = users ?? []
   }
 
-  if (recipientIds.length === 0) return { success: false, error: 'Gönderilecek kimse bulunamadı' }
+  if (recipients.length === 0) return { success: false, error: 'Gönderilecek kimse bulunamadı' }
 
-  const rows = recipientIds.map((id) => ({
-    recipient_id: id,
+  const rows = recipients.map((recipient) => ({
+    recipient_id: recipient.id,
     type: 'admin_message' as const,
     channel: 'in_app' as const,
     title,
     body,
+    link: getCategoryLink(params.category, recipient.role as 'student' | 'parent' | 'instructor' | 'admin'),
   }))
 
   const { error } = await admin.from('notifications').insert(rows)
   if (error) return { success: false, error: error.message }
 
-  return { success: true, count: recipientIds.length }
+  return { success: true, count: recipients.length }
 }
