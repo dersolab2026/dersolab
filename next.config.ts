@@ -1,24 +1,91 @@
 import type { NextConfig } from "next";
 
+// iyzipay'in fs.readdirSync + dinamik require ile yukledigi kaynaklari ve
+// gercek npm bagimliligi olan postman-request'in butun bagimlilik agacini
+// (iyzipay -> postman-request -> extend, qs, mime-types, aws-sign2, ...)
+// Vercel'in otomatik dosya izleme sistemi tespit edemiyor. Tam kapali kume
+// asagida elle listelendi (node -e ile iyzipay'den baslayip package.json
+// dependencies alanlarini recursive gezerek uretildi, 71 paket).
+const IYZICO_DEPENDENCY_GLOBS = [
+  '@postman/form-data',
+  '@postman/tough-cookie',
+  '@postman/tunnel-agent',
+  'agent-base',
+  'asn1',
+  'assert-plus',
+  'asynckit',
+  'aws-sign2',
+  'aws4',
+  'bcrypt-pbkdf',
+  'bluebird',
+  'call-bind-apply-helpers',
+  'call-bound',
+  'caseless',
+  'combined-stream',
+  'core-util-is',
+  'dashdash',
+  'debug',
+  'delayed-stream',
+  'dunder-proto',
+  'ecc-jsbn',
+  'es-define-property',
+  'es-errors',
+  'es-object-atoms',
+  'extend',
+  'extsprintf',
+  'forever-agent',
+  'function-bind',
+  'get-intrinsic',
+  'get-proto',
+  'getpass',
+  'gopd',
+  'has-symbols',
+  'hasown',
+  'http-signature',
+  'ip-address',
+  'is-typedarray',
+  'isstream',
+  'iyzipay',
+  'jsbn',
+  'json-schema',
+  'json-stringify-safe',
+  'jsprim',
+  'math-intrinsics',
+  'mime-db',
+  'mime-types',
+  'ms',
+  'oauth-sign',
+  'object-inspect',
+  'postman-request',
+  'psl',
+  'punycode',
+  'qs',
+  'querystringify',
+  'requires-port',
+  'safe-buffer',
+  'safer-buffer',
+  'side-channel',
+  'side-channel-list',
+  'side-channel-map',
+  'side-channel-weakmap',
+  'smart-buffer',
+  'socks',
+  'socks-proxy-agent',
+  'sshpk',
+  'stream-length',
+  'tweetnacl',
+  'universalify',
+  'url-parse',
+  'uuid',
+  'verror',
+].map((pkg) => `./node_modules/${pkg}/**/*`);
+
 const nextConfig: NextConfig = {
   /* config options here */
-  // iyzipay, kaynak dosyalarını fs.readdirSync + dinamik require ile yukluyor;
-  // bu, Turbopack'in statik analizle bundle edemedigi bir desen. Paketi
-  // bundle'lamak yerine sunucuda dogrudan require etmesini sagliyoruz.
   serverExternalPackages: ['iyzipay'],
-  // serverExternalPackages sayesinde bundle disi kaldi ama Vercel'in dosya
-  // izleme (tracing) sistemi dinamik require'leri takip edemedigi icin
-  // lib/resources klasorunu ve iyzipay'in gercek bagimliligi olan
-  // postman-request'i deploy'a dahil etmiyordu. Ikisini de elle ekliyoruz.
   outputFileTracingIncludes: {
-    '/dashboard/student/packages': [
-      './node_modules/iyzipay/lib/**/*',
-      './node_modules/postman-request/**/*',
-    ],
-    '/api/iyzico/callback': [
-      './node_modules/iyzipay/lib/**/*',
-      './node_modules/postman-request/**/*',
-    ],
+    '/dashboard/student/packages': IYZICO_DEPENDENCY_GLOBS,
+    '/api/iyzico/callback': IYZICO_DEPENDENCY_GLOBS,
   },
 };
 
