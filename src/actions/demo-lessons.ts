@@ -23,9 +23,14 @@ export async function requestDemoLesson(studentId: string): Promise<ActionResult
   })
 
   if (error) {
-    const message = error.message.includes('row-level security')
-      ? 'Ücretsiz tanışma dersi hakkın yok ya da zaten bekleyen bir talebin var'
-      : error.message
+    let message = error.message
+    if (error.message.includes('zaten kullanilmis')) {
+      message = 'Ücretsiz tanışma dersi hakkını zaten kullandın'
+    } else if (error.message.includes('zaten bekleyen bir tanisma dersi talebi')) {
+      message = 'Zaten bekleyen bir tanışma dersi talebin var'
+    } else if (error.message.includes('row-level security')) {
+      message = 'Bu işlem için yetkin yok'
+    }
     return { success: false, error: message }
   }
 

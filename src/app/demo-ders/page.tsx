@@ -8,7 +8,7 @@ import { DemoLessonStudentSelector } from '@/components/demo-lessons/DemoLessonS
 export default async function DemoLessonPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/register')
 
   const { data: userRecord } = await supabase.from('users').select('role').eq('id', user.id).single()
 
