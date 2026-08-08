@@ -58,7 +58,7 @@ export function DashboardNav({ role, offersFreeTrial }: DashboardNavProps) {
     return (
       <nav className="flex items-center justify-between border-b px-6 py-3">
         <div className="flex items-center gap-4 overflow-x-auto">
-          <span className="font-semibold">DersoLab</span>
+          <Link href="/dashboard" className="font-semibold">DersoLab</Link>
           {items.map((item) => (
             <Link key={item.href} href={item.href} className={pathname === item.href ? 'text-sm font-medium' : 'text-sm text-muted-foreground'}>
               {item.label}
@@ -81,7 +81,9 @@ export function DashboardNav({ role, offersFreeTrial }: DashboardNavProps) {
   return (
     <nav className="flex items-center justify-between gap-4 border-b-4 border-[#1B2430] bg-[#F4F1E8] px-4 sm:px-6 py-3 overflow-x-auto">
       <div className="flex items-center gap-4 sm:gap-6 shrink-0">
-        <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
+        <Link href="/dashboard" className="shrink-0">
+          <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
+        </Link>
         {items.map((item) => (
           <Link
             key={item.href}

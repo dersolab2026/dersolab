@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 interface AuthShellProps {
   subtitle?: string
   cardMaxWidth?: string
@@ -30,11 +32,9 @@ export function AuthShell({
         style={{ maxWidth: cardMaxWidth }}
       >
 
-        <img
-          src="/dersolab-logo.png"
-          alt="DersoLab"
-          className="mx-auto mb-6 h-auto w-full max-w-[280px]"
-        />
+        <Link href="/" className="block mx-auto mb-6 w-full max-w-[280px]">
+          <img src="/dersolab-logo.png" alt="DersoLab" className="h-auto w-full" />
+        </Link>
 
         <div className="flex justify-center mb-6">
           <img
