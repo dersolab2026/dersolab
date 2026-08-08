@@ -6,8 +6,8 @@ export const GUIDANCE_SUBJECT = 'Rehberlik'
 // Eğitmen Bul / marketplace branş filtresinde gösterilen dersler.
 export const LESSON_SUBJECTS = [
   'Lise Matematik', 'Ortaokul Matematik', 'Geometri', 'Fizik', 'Kimya', 'Biyoloji',
-  'Lise Türkçe', 'Ortaokul Türkçe', 'Edebiyat', 'Tarih', 'Coğrafya',
-  'Lise İngilizce', 'Ortaokul İngilizce', 'Fen Bilgisi', 'Sosyal Bilgiler',
+  'Lise Türkçe', 'Ortaokul Türkçe', 'Türk Dili ve Edebiyatı', 'Tarih', 'Coğrafya',
+  'Lise İngilizce', 'Ortaokul İngilizce', 'Fen Bilimleri', 'Sosyal Bilgiler',
 ] as const
 
 // Eğitmenin profilinde seçebileceği branşlar — Rehberlik marketplace filtresinde görünmez,
