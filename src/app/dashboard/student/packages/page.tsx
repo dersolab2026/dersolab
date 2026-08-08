@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getActivePackages } from '@/lib/marketplace/get-packages'
 import { getGuardianStudents } from '@/lib/marketplace/get-guardian-students'
+import { getBillingInfo } from '@/actions/billing'
 import { PackagesForStudent } from '@/components/marketplace/PackagesForStudent'
 import { PurchasePackageButton } from '@/components/marketplace/PurchasePackageButton'
 import { AddChildDialog } from '@/components/family/AddChildDialog'
@@ -20,6 +21,8 @@ export default async function StudentPackagesPage({ searchParams }: StudentPacka
 
   const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
   const packages = await getActivePackages()
+  const billingInfo = await getBillingInfo()
+  const hasBillingInfo = !!(billingInfo?.identityNumber && billingInfo.phone && billingInfo.address && billingInfo.city)
 
   return (
     <DashboardPageShell
@@ -35,7 +38,12 @@ export default async function StudentPackagesPage({ searchParams }: StudentPacka
       </div>
 
       {userRow?.role === 'parent' ? (
-        <PackagesForStudent packages={packages} students={await getGuardianStudents(user.id)} />
+        <PackagesForStudent
+          packages={packages}
+          students={await getGuardianStudents(user.id)}
+          billingInfo={billingInfo}
+          hasBillingInfo={hasBillingInfo}
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {packages.map((pkg) => (
@@ -44,7 +52,7 @@ export default async function StudentPackagesPage({ searchParams }: StudentPacka
               <p className="text-2xl font-bold text-[#1B2430]">{pkg.price.toLocaleString('tr-TR')} ₺</p>
               <p className="text-sm font-semibold text-[#6FA89E]">{pkg.creditAmount} ders kredisi</p>
               {pkg.description && <p className="text-sm font-semibold text-[#1B2430]/70">{pkg.description}</p>}
-              <PurchasePackageButton packageId={pkg.id} studentId={user.id} />
+              <PurchasePackageButton packageId={pkg.id} studentId={user.id} billingInfo={billingInfo} hasBillingInfo={hasBillingInfo} />
             </div>
           ))}
         </div>

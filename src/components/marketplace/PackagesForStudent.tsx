@@ -4,14 +4,17 @@ import { useState } from 'react'
 import { PurchasePackageButton } from '@/components/marketplace/PurchasePackageButton'
 import type { PackageItem } from '@/lib/marketplace/get-packages'
 import type { GuardianStudent } from '@/lib/marketplace/get-guardian-students'
+import type { BillingInfo } from '@/actions/billing'
 import { PIXEL_CARD, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface PackagesForStudentProps {
   packages: PackageItem[]
   students: GuardianStudent[]
+  billingInfo: BillingInfo | null
+  hasBillingInfo: boolean
 }
 
-export function PackagesForStudent({ packages, students }: PackagesForStudentProps) {
+export function PackagesForStudent({ packages, students, billingInfo, hasBillingInfo }: PackagesForStudentProps) {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     students.length === 1 ? students[0].studentId : null
   )
@@ -63,7 +66,7 @@ export function PackagesForStudent({ packages, students }: PackagesForStudentPro
             <p className="text-2xl font-bold text-[#1B2430]">{pkg.price.toLocaleString('tr-TR')} ₺</p>
             <p className="text-sm font-semibold text-[#6FA89E]">{pkg.creditAmount} ders kredisi</p>
             {pkg.description && <p className="text-sm font-semibold text-[#1B2430]/70">{pkg.description}</p>}
-            <PurchasePackageButton packageId={pkg.id} studentId={selectedStudentId} />
+            <PurchasePackageButton packageId={pkg.id} studentId={selectedStudentId} billingInfo={billingInfo} hasBillingInfo={hasBillingInfo} />
           </div>
         ))}
       </div>
