@@ -52,7 +52,7 @@ export default async function InstructorDashboardPage() {
       <div className="space-y-3">
         <h2 className="font-bold text-[#1B2430]">Yaklaşan Dersler</h2>
         {upcoming.length === 0 ? (
-          <p className="text-sm font-semibold text-[#1B2430]/70">Planlanmış ders yok.</p>
+          <p className="text-sm font-bold text-[#1B2430]">Planlanmış ders yok.</p>
         ) : (
           <div className="space-y-3">
             {upcoming.map((b) => (
@@ -65,7 +65,7 @@ export default async function InstructorDashboardPage() {
       <div className="space-y-3">
         <h2 className="font-bold text-[#1B2430]">Geçmiş Dersler</h2>
         {past.length === 0 ? (
-          <p className="text-sm font-semibold text-[#1B2430]/70">Henüz geçmiş ders yok.</p>
+          <p className="text-sm font-bold text-[#1B2430]">Henüz geçmiş ders yok.</p>
         ) : (
           <div className="space-y-3">
             {past.map((b) => (

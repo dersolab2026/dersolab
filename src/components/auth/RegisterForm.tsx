@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { AuthShell } from '@/components/auth/AuthShell'
+import { PasswordInput } from '@/components/auth/PasswordInput'
 import { registerUser } from '@/actions/auth'
 
 type Role = 'student' | 'parent' | 'instructor'
@@ -103,15 +104,7 @@ export function RegisterForm() {
 
         <div>
           <label className="block text-[#1B2430] font-bold mb-2">Şifre</label>
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
-            placeholder="••••••••"
-          />
+          <PasswordInput required minLength={8} value={password} onChange={setPassword} placeholder="••••••••" />
         </div>
 
         {error && <p className="text-sm font-bold text-red-600">{error}</p>}

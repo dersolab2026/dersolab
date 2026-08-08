@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { AuthShell } from '@/components/auth/AuthShell'
+import { PasswordInput } from '@/components/auth/PasswordInput'
 import { loginUser, signInWithGoogle } from '@/actions/auth'
 
 export default function LoginPage() {
@@ -72,14 +73,7 @@ export default function LoginPage() {
 
         <div>
           <label className="block text-[#1B2430] font-bold mb-2">Şifre</label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
-            placeholder="••••••••"
-          />
+          <PasswordInput required value={password} onChange={setPassword} placeholder="••••••••" />
           <div className="text-right mt-2">
             <Link href="/forgot-password" className="text-sm font-bold text-[#6FA89E] hover:underline">
               Şifremi Unuttum

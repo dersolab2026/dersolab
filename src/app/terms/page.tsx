@@ -12,7 +12,7 @@ export default function TermsPage() {
         <div className="space-y-6 leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2 [&_p]:mb-3 [&_li]:mb-1 [&_ul]:list-disc [&_ul]:pl-6">
 
           <p>
-            Bu Kullanım Şartları, DersoLab (&quot;platform&quot;) üzerinden sunulan online özel ders ve
+            Bu Kullanım Şartları; DersoLab (&quot;platform&quot;) üzerinden sunulan online özel ders ve
             danışmanlık hizmetlerini kullanan öğrenciler, veliler ve eğitmenler için geçerli kuralları belirler.
             Platformu kullanarak bu şartları kabul etmiş sayılırsınız.
           </p>
@@ -20,7 +20,7 @@ export default function TermsPage() {
           <h2>1. Hizmetin Tanımı</h2>
           <p>
             DersoLab, LGS ve YKS öğrencilerini bağımsız eğitmenlerle buluşturan bir online ders ve
-            rehberlik platformudur. Dersler, Google Meet üzerinden çevrimiçi olarak gerçekleştirilir.
+            rehberlik platformudur. Dersler, Google Meet üzerinden çevrim içi olarak gerçekleştirilir.
             DersoLab, eğitmenler ile öğrenciler/veliler arasında aracılık yapar; eğitmenler platforma
             bağımsız hizmet sağlayıcı olarak kayıt olur.
           </p>
@@ -36,11 +36,11 @@ export default function TermsPage() {
           <h2>3. Ders Paketleri ve Ödemeler</h2>
           <ul>
             <li>Dersler, önceden satın alınan kredi paketleri karşılığında planlanır.</li>
-            <li>Ödemeler Stripe altyapısı üzerinden güvenli şekilde alınır.</li>
-            <li>Bir dersin en az 24 saat öncesinden iptal edilmesi durumunda kredi iade edilir; 24 saatten
-              az kala yapılan iptallerde kredi iade edilmez.</li>
-            <li>Paket fiyatları ve içerikleri önceden haber verilmeksizin güncellenebilir; mevcut satın
-              alınmış krediler etkilenmez.</li>
+            <li>Ödemeler İyzico altyapısı üzerinden güvenli şekilde alınır.</li>
+            <li>Bir dersin en az 24 saat öncesinden iptal edilmesi durumunda kredi iade edilir.</li>
+            <li>24 saatten az kala yapılan iptallerde kredi iade edilmez.</li>
+            <li>Paket fiyatları ve içerikleri önceden haber verilmeksizin güncellenebilir.</li>
+            <li>Mevcut satın alınmış krediler etkilenmez.</li>
           </ul>
 
           <h2>4. Eğitmen Yükümlülükleri</h2>
@@ -60,10 +60,10 @@ export default function TermsPage() {
             <li>Platformun güvenliğini veya işleyişini bozmaya yönelik girişimlerde bulunmak</li>
           </ul>
 
-          <h2>6. Fikri Mülkiyet</h2>
+          <h2>6. Fikrî Mülkiyet</h2>
           <p>
             Platformda paylaşılan ödev materyalleri ve içerikler ilgili kullanıcıya aittir. DersoLab markası,
-            logosu ve platform yazılımı DersoLab&apos;ın fikri mülkiyetidir.
+            logosu ve platform yazılımı DersoLab&apos;ın fikrî mülkiyetidir.
           </p>
 
           <h2>7. Sorumluluğun Sınırlandırılması</h2>

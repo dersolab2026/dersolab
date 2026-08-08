@@ -20,19 +20,19 @@ export default function PrivacyPage() {
           <h2>1. Topladığımız Veriler</h2>
           <p>Hesabınızı oluşturduğunuzda ve platformu kullandığınızda aşağıdaki verileri toplarız:</p>
           <ul>
-            <li><strong>Hesap bilgileri:</strong> ad soyad, e-posta adresi, şifre (şifrelenmiş olarak), rol (öğrenci, veli, eğitmen), sınav türü (LGS/YKS)</li>
-            <li><strong>Profil bilgileri:</strong> profil fotoğrafı, eğitmenler için branşlar, biyografi, eğitim geçmişi, tanıtım videosu</li>
-            <li><strong>Rezervasyon ve ders verileri:</strong> planlanan/tamamlanan dersler, ödev içerikleri ve gönderimleri (fotoğraf/video)</li>
-            <li><strong>Ödeme verileri:</strong> satın alınan paketler ve tutarlar; kart bilgileriniz bizde saklanmaz, ödeme işlemi doğrudan Stripe üzerinden gerçekleştirilir</li>
-            <li><strong>Google Takvim verileri:</strong> eğitmenler Google hesaplarını bağladığında, ders saatlerini senkronize etmek ve Google Meet linki oluşturmak amacıyla sınırlı takvim erişimi (müsaitlik ve etkinlik oluşturma) kullanılır</li>
-            <li><strong>Teknik veriler:</strong> oturum çerezleri, IP adresi, tarayıcı bilgisi (kimlik doğrulama ve güvenlik amacıyla)</li>
+            <li><strong>Hesap Bilgileri:</strong> Ad soyad, e-posta adresi, şifre (şifrelenmiş olarak), rol (öğrenci, veli, eğitmen), sınav türü (LGS/YKS)</li>
+            <li><strong>Profil Bilgileri:</strong> Profil fotoğrafı, eğitmenler için branşlar, biyografi, eğitim geçmişi, tanıtım videosu</li>
+            <li><strong>Rezervasyon ve Ders Verileri:</strong> Planlanan/tamamlanan dersler, ödev içerikleri ve gönderimleri (fotoğraf/video)</li>
+            <li><strong>Ödeme Verileri:</strong> Satın alınan paketler ve tutarlar; kart bilgileriniz bizde saklanmaz, ödeme işlemi doğrudan İyzico üzerinden gerçekleştirilir</li>
+            <li><strong>Google Takvim Verileri:</strong> Eğitmenler Google hesaplarını bağladığında, ders saatlerini senkronize etmek ve Google Meet linki oluşturmak amacıyla sınırlı takvim erişimi (müsaitlik ve etkinlik oluşturma) kullanılır</li>
+            <li><strong>Teknik Veriler:</strong> Oturum çerezleri, IP adresi, tarayıcı bilgisi (kimlik doğrulama ve güvenlik amacıyla)</li>
           </ul>
 
           <h2>2. Verileri Nasıl Kullanıyoruz</h2>
           <ul>
             <li>Hesabınızı oluşturmak, doğrulamak ve size hizmet sunmak</li>
             <li>Ders rezervasyonlarını planlamak, Google Takvim/Meet entegrasyonunu sağlamak</li>
-            <li>Ödeme işlemlerini gerçekleştirmek (Stripe aracılığıyla)</li>
+            <li>Ödeme işlemlerini gerçekleştirmek (İyzico aracılığıyla)</li>
             <li>Rezervasyon, ödev ve ödeme bildirimlerini e-posta ile göndermek (Resend aracılığıyla)</li>
             <li>Platformun güvenliğini sağlamak ve kötüye kullanımı önlemek</li>
           </ul>
@@ -40,16 +40,16 @@ export default function PrivacyPage() {
           <h2>3. Verilerin Paylaşılması</h2>
           <p>Verilerinizi aşağıdaki hizmet sağlayıcılarla, yalnızca hizmeti sunabilmek için gerekli ölçüde paylaşırız:</p>
           <ul>
-            <li><strong>Supabase:</strong> veritabanı ve kimlik doğrulama altyapısı</li>
+            <li><strong>Supabase:</strong> Veritabanı ve kimlik doğrulama altyapısı</li>
             <li><strong>Google:</strong> Google ile giriş ve Google Takvim/Meet entegrasyonu</li>
-            <li><strong>Stripe:</strong> ödeme işlemleri</li>
-            <li><strong>Resend:</strong> e-posta bildirimleri</li>
+            <li><strong>İyzico:</strong> Ödeme işlemleri</li>
+            <li><strong>Resend:</strong> E-posta bildirimleri</li>
           </ul>
           <p>Verileriniz hiçbir şekilde üçüncü taraflara pazarlama amacıyla satılmaz veya kiralanmaz.</p>
 
           <h2>4. Reşit Olmayan Kullanıcılar</h2>
           <p>
-            Platform LGS ve YKS öğrencilerine yönelik hizmet verdiği için reşit olmayan kullanıcılar bulunabilir.
+            Platform LGS, YKS, DGS, ALES ve KPSS öğrencilerine yönelik hizmet verdiği için reşit olmayan kullanıcılar bulunabilir.
             Öğrenci profilleri, bir veli hesabı tarafından oluşturulur ve yönetilir; öğrenciler platforma
             bağımsız olarak kayıt olamaz. Veliler, öğrenci profillerini istedikleri zaman görüntüleyebilir
             ve yönetebilir.
