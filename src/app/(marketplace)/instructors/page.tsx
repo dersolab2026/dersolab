@@ -3,12 +3,12 @@ import { SubjectFilter } from '@/components/marketplace/SubjectFilter'
 import { getInstructors } from '@/lib/marketplace/get-instructors'
 
 interface InstructorsPageProps {
-  searchParams: Promise<{ subject?: string }>
+  searchParams: Promise<{ subject?: string; category?: string }>
 }
 
 export default async function InstructorsPage({ searchParams }: InstructorsPageProps) {
-  const { subject } = await searchParams
-  const instructors = await getInstructors({ subject })
+  const { subject, category } = await searchParams
+  const instructors = await getInstructors({ subject, category })
 
   return (
     <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
@@ -27,7 +27,7 @@ export default async function InstructorsPage({ searchParams }: InstructorsPageP
           </h1>
         </div>
 
-        <SubjectFilter activeSubject={subject} />
+        <SubjectFilter activeSubject={subject} activeCategory={category} />
 
         {instructors.length === 0 ? (
           <p className="font-sans font-semibold text-[#1B2430]">Bu branşta henüz eğitmen bulunmuyor.</p>

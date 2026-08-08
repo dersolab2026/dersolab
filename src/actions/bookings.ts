@@ -86,8 +86,10 @@ export async function createBooking({
 
     await notifyBookingCreated({
       studentId,
+      instructorId,
       bookingId: booking.id,
       instructorName: instructorUser?.name ?? 'Eğitmen',
+      studentName: studentUser?.name ?? 'Öğrenci',
       startTime: slot.start,
       meetLink,
     })
@@ -113,7 +115,7 @@ export async function createBooking({
   }
 }
 
-async function handlePostCancellation(bookingId: string) {
+async function handlePostCancellation(bookingId: string, cancelledBy: 'student' | 'instructor') {
   const admin = createAdminClient()
 
   const { data: booking } = await admin
@@ -134,12 +136,21 @@ async function handlePostCancellation(bookingId: string) {
     .eq('id', booking.instructor_id)
     .single()
 
+  const { data: studentUser } = await admin
+    .from('users')
+    .select('name')
+    .eq('id', booking.student_id)
+    .single()
+
   await notifyBookingCancelled({
     studentId: booking.student_id,
+    instructorId: booking.instructor_id,
     bookingId,
     instructorName: instructorUser?.name ?? 'Eğitmen',
+    studentName: studentUser?.name ?? 'Öğrenci',
     startTime: booking.start_time,
     creditRefunded: booking.credit_refunded ?? false,
+    cancelledBy,
   })
 }
 
@@ -154,7 +165,7 @@ export async function cancelBookingAsStudent(bookingId: string): Promise<ActionR
   })
   if (error) return { success: false, error: error.message }
 
-  await handlePostCancellation(bookingId)
+  await handlePostCancellation(bookingId, 'student')
   revalidatePath('/dashboard/student/bookings')
   revalidatePath('/dashboard/instructor')
   return { success: true }
@@ -171,7 +182,7 @@ export async function cancelBookingAsInstructor(bookingId: string): Promise<Acti
   })
   if (error) return { success: false, error: error.message }
 
-  await handlePostCancellation(bookingId)
+  await handlePostCancellation(bookingId, 'instructor')
   revalidatePath('/dashboard/instructor')
   revalidatePath('/dashboard/student/bookings')
   return { success: true }

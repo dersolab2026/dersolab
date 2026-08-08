@@ -6,10 +6,14 @@ import { SUBJECT_CATEGORIES } from '@/lib/constants'
 
 interface SubjectFilterProps {
   activeSubject?: string
+  activeCategory?: string
 }
 
-export function SubjectFilter({ activeSubject }: SubjectFilterProps) {
-  const initialOpen = SUBJECT_CATEGORIES.find((c) => (c.subjects as readonly string[]).includes(activeSubject ?? ''))?.label ?? null
+export function SubjectFilter({ activeSubject, activeCategory }: SubjectFilterProps) {
+  const initialOpen =
+    activeCategory ??
+    SUBJECT_CATEGORIES.find((c) => (c.subjects as readonly string[]).includes(activeSubject ?? ''))?.label ??
+    null
   const [openCategory, setOpenCategory] = useState<string | null>(initialOpen)
 
   const openSubjects = SUBJECT_CATEGORIES.find((c) => c.label === openCategory)?.subjects
@@ -20,22 +24,26 @@ export function SubjectFilter({ activeSubject }: SubjectFilterProps) {
         <Link
           href="/instructors"
           className={`px-4 py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
-            !activeSubject ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]' : 'bg-white text-[#1B2430]'
+            !activeSubject && !activeCategory ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]' : 'bg-white text-[#1B2430]'
           }`}
         >
           Tümü
         </Link>
         {SUBJECT_CATEGORIES.map((category) => (
-          <button
+          <Link
             key={category.label}
-            type="button"
+            href={`/instructors?category=${encodeURIComponent(category.label)}`}
             onClick={() => setOpenCategory((prev) => (prev === category.label ? null : category.label))}
             className={`px-4 py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
-              openCategory === category.label ? 'bg-[#6FA89E] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]' : 'bg-white text-[#1B2430]'
+              activeCategory === category.label
+                ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]'
+                : openCategory === category.label
+                  ? 'bg-[#6FA89E] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]'
+                  : 'bg-white text-[#1B2430]'
             }`}
           >
             {category.label}
-          </button>
+          </Link>
         ))}
       </div>
 

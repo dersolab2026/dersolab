@@ -1,8 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
+import { SUBJECT_CATEGORIES } from '@/lib/constants'
 import type { InstructorProfile, EducationEntry } from '@/types'
 
 interface GetInstructorsParams {
   subject?: string
+  category?: string
 }
 
 interface InstructorProfileRow {
@@ -31,6 +33,18 @@ function toInstructorProfile(row: InstructorProfileRow): InstructorProfile {
 
 export async function getInstructors(params: GetInstructorsParams = {}): Promise<InstructorProfile[]> {
   const supabase = await createClient()
+
+  if (params.category) {
+    const categorySubjects = SUBJECT_CATEGORIES.find((c) => c.label === params.category)?.subjects as
+      | readonly string[]
+      | undefined
+    const { data, error } = await supabase.rpc('get_instructor_profiles', { p_subject: null })
+    if (error) throw error
+    const profiles: InstructorProfile[] = (data ?? []).map(toInstructorProfile)
+    if (!categorySubjects) return profiles
+    return profiles.filter((p) => p.subjects.some((s) => categorySubjects.includes(s)))
+  }
+
   const { data, error } = await supabase.rpc('get_instructor_profiles', { p_subject: params.subject ?? null })
 
   if (error) throw error

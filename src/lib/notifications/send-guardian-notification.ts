@@ -17,8 +17,10 @@ export async function resolveGuardianOrSelfRecipients(studentId: string) {
 
 interface BookingNotificationParams {
   studentId: string
+  instructorId: string
   bookingId: string
   instructorName: string
+  studentName: string
   startTime: string
   meetLink: string
 }
@@ -55,14 +57,42 @@ export async function notifyBookingCreated(params: BookingNotificationParams) {
       console.error('Bildirim e-postasi gonderilemedi:', err)
     }
   }
+
+  const { data: instructor } = await admin.from('users').select('name, email').eq('id', params.instructorId).single()
+  if (instructor) {
+    await admin.from('notifications').insert({
+      recipient_id: params.instructorId,
+      type: 'booking_created',
+      channel: 'email',
+      title: 'Yeni ders rezervasyonu',
+      body: `${params.studentName} seninle ${formattedDate} tarihinde bir ders planladı.`,
+      related_booking_id: params.bookingId,
+    })
+
+    try {
+      await resend.emails.send({
+        from: 'DersoLab <bildirim@dersolab.com>',
+        to: instructor.email,
+        subject: 'Yeni ders rezervasyonu - DersoLab',
+        html: `<p>Merhaba ${instructor.name},</p>
+          <p><strong>${params.studentName}</strong> seninle <strong>${formattedDate}</strong> tarihinde bir ders planladı.</p>
+          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`,
+      })
+    } catch (err) {
+      console.error('Bildirim e-postasi gonderilemedi:', err)
+    }
+  }
 }
 
 export async function notifyBookingCancelled(params: {
   studentId: string
+  instructorId: string
   bookingId: string
   instructorName: string
+  studentName: string
   startTime: string
   creditRefunded: boolean
+  cancelledBy: 'student' | 'instructor'
 }) {
   const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
   const admin = createAdminClient()
@@ -97,6 +127,32 @@ export async function notifyBookingCancelled(params: {
       })
     } catch (err) {
       console.error('Iptal bildirimi e-postasi gonderilemedi:', err)
+    }
+  }
+
+  if (params.cancelledBy === 'student') {
+    const { data: instructor } = await admin.from('users').select('name, email').eq('id', params.instructorId).single()
+    if (instructor) {
+      await admin.from('notifications').insert({
+        recipient_id: params.instructorId,
+        type: 'booking_cancelled',
+        channel: 'email',
+        title: 'Ders iptal edildi',
+        body: `${params.studentName} ile ${formattedDate} tarihindeki ders iptal edildi.`,
+        related_booking_id: params.bookingId,
+      })
+
+      try {
+        await resend.emails.send({
+          from: 'DersoLab <bildirim@dersolab.com>',
+          to: instructor.email,
+          subject: 'Ders iptal edildi - DersoLab',
+          html: `<p>Merhaba ${instructor.name},</p>
+            <p><strong>${params.studentName}</strong> ile <strong>${formattedDate}</strong> tarihindeki ders iptal edildi.</p>`,
+        })
+      } catch (err) {
+        console.error('Iptal bildirimi e-postasi gonderilemedi:', err)
+      }
     }
   }
 }
