@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { tr } from 'date-fns/locale'
 import { Calendar } from '@/components/ui/calendar'
 import { Loader2 } from 'lucide-react'
 import type { TimeSlot } from '@/types'
@@ -64,6 +65,7 @@ export function BookingCalendar({ instructorId, onSelectSlot }: BookingCalendarP
       <div className={`${PIXEL_CARD} p-2`}>
         <Calendar
           mode="single"
+          locale={tr}
           selected={selectedDate}
           onSelect={(date) => {
             if (!date) return

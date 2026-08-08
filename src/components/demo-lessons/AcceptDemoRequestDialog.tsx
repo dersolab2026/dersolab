@@ -41,7 +41,7 @@ export function AcceptDemoRequestDialog({ requestId, instructorId }: AcceptDemoR
           Kabul Et
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader><DialogTitle>Tanışma dersi için bir saat seç</DialogTitle></DialogHeader>
         <BookingCalendar instructorId={instructorId} onSelectSlot={setSelectedSlot} />
         {error && <p className="text-sm text-destructive">{error}</p>}
