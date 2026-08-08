@@ -14,6 +14,9 @@ interface AvailabilityRule {
   end_time: string
 }
 
+// Türkiye 2016'dan beri yaz saati uygulamıyor, sabit UTC+3.
+const ISTANBUL_OFFSET_MS = 3 * 60 * 60 * 1000
+
 export async function getAvailableSlots(
   instructorId: string,
   rangeStart: Date,
@@ -66,20 +69,26 @@ function generateCandidateSlots(
   rangeEnd: Date
 ): TimeSlot[] {
   const slots: TimeSlot[] = []
-  const cursor = new Date(rangeStart)
   const now = new Date()
+  let cursor = new Date(rangeStart)
 
-  while (cursor <= rangeEnd) {
-    const dayRules = rules.filter((r) => r.day_of_week === cursor.getDay())
+  while (cursor.getTime() <= rangeEnd.getTime()) {
+    // cursor'u Istanbul yerel takvim gunune cevirip UTC getter'larla okuyoruz,
+    // boylece sunucunun calistigi saat dilimi (ornegin Vercel'de UTC) sonucu etkilemiyor.
+    const istanbulLocal = new Date(cursor.getTime() + ISTANBUL_OFFSET_MS)
+    const year = istanbulLocal.getUTCFullYear()
+    const month = istanbulLocal.getUTCMonth()
+    const day = istanbulLocal.getUTCDate()
+    const dayOfWeek = istanbulLocal.getUTCDay()
+
+    const dayRules = rules.filter((r) => r.day_of_week === dayOfWeek)
 
     for (const rule of dayRules) {
       const [startH, startM] = rule.start_time.split(':').map(Number)
       const [endH, endM] = rule.end_time.split(':').map(Number)
 
-      const windowStart = new Date(cursor)
-      windowStart.setHours(startH, startM, 0, 0)
-      const windowEnd = new Date(cursor)
-      windowEnd.setHours(endH, endM, 0, 0)
+      const windowStart = new Date(Date.UTC(year, month, day, startH, startM, 0, 0) - ISTANBUL_OFFSET_MS)
+      const windowEnd = new Date(Date.UTC(year, month, day, endH, endM, 0, 0) - ISTANBUL_OFFSET_MS)
 
       let slotStart = new Date(windowStart)
       while (slotStart.getTime() + LESSON_DURATION_MINUTES * 60_000 <= windowEnd.getTime()) {
@@ -91,7 +100,7 @@ function generateCandidateSlots(
       }
     }
 
-    cursor.setDate(cursor.getDate() + 1)
+    cursor = new Date(cursor.getTime() + 24 * 60 * 60 * 1000)
   }
 
   return slots

@@ -12,11 +12,13 @@ export async function GET(
     return NextResponse.json({ error: 'date parametresi gerekli' }, { status: 400 })
   }
 
-  const rangeStart = new Date(dateParam)
-  rangeStart.setHours(0, 0, 0, 0)
-  const rangeEnd = new Date(rangeStart)
-  rangeEnd.setDate(rangeEnd.getDate() + 6)
-  rangeEnd.setHours(23, 59, 59, 999)
+  // dateParam "YYYY-MM-DD" formatinda ve Istanbul yerel takvim gununu temsil ediyor.
+  // Sunucunun calistigi saat dilimine (ornegin Vercel'de UTC) bagli kalmadan
+  // sabit UTC+3 offset ile gunun basini/sonunu hesapliyoruz.
+  const ISTANBUL_OFFSET_MS = 3 * 60 * 60 * 1000
+  const [year, month, day] = dateParam.split('-').map(Number)
+  const rangeStart = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0) - ISTANBUL_OFFSET_MS)
+  const rangeEnd = new Date(rangeStart.getTime() + 7 * 24 * 60 * 60 * 1000 - 1)
 
   try {
     const slots = await getAvailableSlots(instructorId, rangeStart, rangeEnd)

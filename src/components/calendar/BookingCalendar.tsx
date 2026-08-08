@@ -25,7 +25,7 @@ export function BookingCalendar({ instructorId, onSelectSlot }: BookingCalendarP
       setIsLoading(true)
       setError(null)
       try {
-        const dateParam = selectedDate.toISOString().split('T')[0]
+        const dateParam = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
         const response = await fetch(
           `/api/instructors/${instructorId}/availability?date=${dateParam}`
         )
