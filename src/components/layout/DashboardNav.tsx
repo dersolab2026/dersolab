@@ -87,8 +87,8 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
   }
 
   return (
-    <nav className="flex items-center justify-between gap-4 border-b-4 border-[#1B2430] bg-[#F4F1E8] px-4 sm:px-6 py-3 overflow-x-auto">
-      <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+    <nav className="flex items-center justify-between gap-2 border-b-4 border-[#1B2430] bg-[#F4F1E8] px-4 sm:px-6 py-3">
+      <div className="flex items-center gap-4 sm:gap-6 min-w-0 overflow-x-auto">
         <Link href="/dashboard" className="shrink-0">
           <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
         </Link>
@@ -96,7 +96,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
           <Link
             key={item.href}
             href={item.href}
-            className={`text-sm font-bold whitespace-nowrap ${
+            className={`text-sm font-bold whitespace-nowrap shrink-0 ${
               pathname === item.href ? 'text-[#DD7B3A] underline underline-offset-4' : 'text-[#1B2430]'
             }`}
           >
