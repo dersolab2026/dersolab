@@ -42,3 +42,17 @@ export async function markAllNotificationsRead(): Promise<void> {
   if (!user) return
   await supabase.from('notifications').update({ is_read: true }).eq('recipient_id', user.id).eq('is_read', false)
 }
+
+export async function deleteNotification(id: string): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase.from('notifications').delete().eq('id', id).eq('recipient_id', user.id)
+}
+
+export async function clearReadNotifications(): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase.from('notifications').delete().eq('recipient_id', user.id).eq('is_read', true)
+}
