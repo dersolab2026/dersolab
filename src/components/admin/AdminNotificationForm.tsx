@@ -35,6 +35,7 @@ const ROLE_LABELS: Record<UserOption['role'], string> = {
 export function AdminNotificationForm({ users }: { users: UserOption[] }) {
   const [audience, setAudience] = useState<Audience>('all')
   const [userIds, setUserIds] = useState<string[]>([])
+  const [search, setSearch] = useState('')
   const [category, setCategory] = useState<AdminNotificationCategory>('general')
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
@@ -70,6 +71,7 @@ export function AdminNotificationForm({ users }: { users: UserOption[] }) {
       setTitle('')
       setBody('')
       setUserIds([])
+      setSearch('')
     })
   }
 
@@ -99,26 +101,41 @@ export function AdminNotificationForm({ users }: { users: UserOption[] }) {
               </button>
             )}
           </div>
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="İsim veya e-posta ile ara..."
+            className="h-8"
+          />
           <div className="max-h-56 space-y-3 overflow-y-auto rounded-md border p-3">
-            {(['student', 'parent', 'instructor'] as const).map((role) => {
-              const roleUsers = users.filter((u) => u.role === role)
-              if (roleUsers.length === 0) return null
-              return (
-                <div key={role} className="space-y-1">
-                  <p className="text-xs font-bold text-muted-foreground">{ROLE_LABELS[role]}</p>
-                  {roleUsers.map((u) => (
-                    <label key={u.id} className="flex items-center gap-2 py-0.5 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={userIds.includes(u.id)}
-                        onChange={() => toggleUser(u.id)}
-                      />
-                      {u.name} ({u.email})
-                    </label>
-                  ))}
-                </div>
+            {(() => {
+              const query = search.trim().toLowerCase()
+              const filtered = users.filter(
+                (u) => query === '' || u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query)
               )
-            })}
+              if (filtered.length === 0) {
+                return <p className="text-sm text-muted-foreground">Eşleşen kişi bulunamadı.</p>
+              }
+              return (['student', 'parent', 'instructor'] as const).map((role) => {
+                const roleUsers = filtered.filter((u) => u.role === role)
+                if (roleUsers.length === 0) return null
+                return (
+                  <div key={role} className="space-y-1">
+                    <p className="text-xs font-bold text-muted-foreground">{ROLE_LABELS[role]}</p>
+                    {roleUsers.map((u) => (
+                      <label key={u.id} className="flex items-center gap-2 py-0.5 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={userIds.includes(u.id)}
+                          onChange={() => toggleUser(u.id)}
+                        />
+                        {u.name} ({u.email})
+                      </label>
+                    ))}
+                  </div>
+                )
+              })
+            })()}
           </div>
         </div>
       )}

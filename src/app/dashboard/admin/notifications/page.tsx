@@ -1,8 +1,11 @@
 import { getAllStudentsAndInstructors } from '@/lib/admin/get-all-users'
+import { getSentAdminNotifications } from '@/actions/admin'
 import { AdminNotificationForm } from '@/components/admin/AdminNotificationForm'
+import { SentNotificationsList } from '@/components/admin/SentNotificationsList'
 
 export default async function AdminNotificationsPage() {
   const { students, parents, instructors } = await getAllStudentsAndInstructors()
+  const sentBatches = await getSentAdminNotifications()
 
   const users = [
     ...students.map((u) => ({ id: u.id, name: u.name, email: u.email, role: 'student' as const })),
@@ -20,6 +23,7 @@ export default async function AdminNotificationsPage() {
       </div>
 
       <AdminNotificationForm users={users} />
+      <SentNotificationsList initialBatches={sentBatches} />
     </div>
   )
 }

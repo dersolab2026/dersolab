@@ -136,6 +136,7 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
 
   if (recipients.length === 0) return { success: false, error: 'Gönderilecek kimse bulunamadı' }
 
+  const batchId = crypto.randomUUID()
   const rows = recipients.map((recipient) => ({
     recipient_id: recipient.id,
     type: 'admin_message' as const,
@@ -143,10 +144,57 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
     title,
     body,
     link: getCategoryLink(params.category, recipient.role as 'student' | 'parent' | 'instructor' | 'admin'),
+    batch_id: batchId,
   }))
 
   const { error } = await admin.from('notifications').insert(rows)
   if (error) return { success: false, error: error.message }
 
+  revalidatePath('/dashboard/admin/notifications')
   return { success: true, count: recipients.length }
+}
+
+export interface SentNotificationBatch {
+  batchId: string
+  title: string
+  body: string | null
+  createdAt: string
+  totalCount: number
+  readCount: number
+  recipients: { name: string; email: string; isRead: boolean }[]
+}
+
+export async function getSentAdminNotifications(): Promise<SentNotificationBatch[]> {
+  const { isAdmin } = await requireAdmin()
+  if (!isAdmin) return []
+
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('notifications')
+    .select('batch_id, title, body, created_at, is_read, recipient:users(name, email)')
+    .eq('type', 'admin_message')
+    .not('batch_id', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(500)
+
+  if (error || !data) return []
+
+  const batches = new Map<string, SentNotificationBatch>()
+  for (const row of data as any[]) {
+    const batchId = row.batch_id as string
+    if (!batches.has(batchId)) {
+      batches.set(batchId, {
+        batchId, title: row.title, body: row.body, createdAt: row.created_at,
+        totalCount: 0, readCount: 0, recipients: [],
+      })
+    }
+    const batch = batches.get(batchId)!
+    batch.totalCount += 1
+    if (row.is_read) batch.readCount += 1
+    batch.recipients.push({
+      name: row.recipient?.name ?? 'Bilinmeyen', email: row.recipient?.email ?? '', isRead: row.is_read,
+    })
+  }
+
+  return Array.from(batches.values())
 }
