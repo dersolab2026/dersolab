@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-async function resolveGuardianOrSelfRecipients(studentId: string) {
+export async function resolveGuardianOrSelfRecipients(studentId: string) {
   const admin = createAdminClient()
   const { data: guardianLinks } = await admin
     .from('guardian_links').select('guardian_id').eq('student_id', studentId)
