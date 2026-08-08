@@ -68,10 +68,11 @@ export async function createCheckoutSession({
   if (purchaseError || !purchase) {
     return { success: false, error: purchaseError?.message ?? 'Satın alma kaydı oluşturulamadı' }
   }
+  const purchaseId = purchase.id
 
   if (!process.env.IYZICO_API_KEY || !process.env.IYZICO_SECRET_KEY) {
     console.error('iyzico API key/secret key tanımlı değil')
-    await supabase.from('package_purchases').update({ status: 'failed' }).eq('id', purchase.id)
+    await supabase.from('package_purchases').update({ status: 'failed' }).eq('id', purchaseId)
     return { success: false, error: 'Ödeme sistemi şu anda kullanılamıyor, daha sonra tekrar dener misin?' }
   }
 
@@ -88,11 +89,11 @@ export async function createCheckoutSession({
 
   const request = {
     locale: Iyzipay.LOCALE.TR,
-    conversationId: purchase.id,
+    conversationId: purchaseId,
     price,
     paidPrice: price,
     currency: Iyzipay.CURRENCY.TRY,
-    basketId: purchase.id,
+    basketId: purchaseId,
     paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
     callbackUrl: `${appUrl}/api/iyzico/callback`,
     enabledInstallments: [1],
@@ -137,19 +138,30 @@ export async function createCheckoutSession({
   const createCheckoutForm = iyzipay.checkoutFormInitialize.create.bind(iyzipay.checkoutFormInitialize)
 
   return new Promise((resolve) => {
-    // @types/iyzipay tiplemesi checkoutFormInitialize.create icin yanlislikla
-    // 3DS/kart odemesi tipini bekliyor; Checkout Form akisinda kart bilgisi
-    // bizde toplanmiyor, bu yuzden request'i gercek sekliyle unknown uzerinden geciyoruz.
-    createCheckoutForm(request as unknown as CreateArgs[0], async (err: unknown, result: CheckoutFormInitializeResult) => {
-      if (err || result?.status !== 'success' || !result.paymentPageUrl) {
-        console.error('iyzico checkout form hatası:', err ?? result)
-        await supabase.from('package_purchases').update({ status: 'failed' }).eq('id', purchase.id)
-        resolve({ success: false, error: 'Ödeme sayfası oluşturulamadı, tekrar dener misin?' })
-        return
-      }
+    async function fail(reason: unknown) {
+      console.error('iyzico checkout form hatası:', reason)
+      await supabase.from('package_purchases').update({ status: 'failed' }).eq('id', purchaseId)
+      resolve({ success: false, error: 'Ödeme sayfası oluşturulamadı, tekrar dener misin?' })
+    }
 
-      await supabase.from('package_purchases').update({ payment_reference: result.token }).eq('id', purchase.id)
-      resolve({ success: true, checkoutUrl: result.paymentPageUrl })
-    })
+    try {
+      // @types/iyzipay tiplemesi checkoutFormInitialize.create icin yanlislikla
+      // 3DS/kart odemesi tipini bekliyor; Checkout Form akisinda kart bilgisi
+      // bizde toplanmiyor, bu yuzden request'i gercek sekliyle unknown uzerinden geciyoruz.
+      createCheckoutForm(request as unknown as CreateArgs[0], (err: unknown, result: CheckoutFormInitializeResult) => {
+        if (err || result?.status !== 'success' || !result.paymentPageUrl) {
+          fail(err ?? result)
+          return
+        }
+
+        supabase
+          .from('package_purchases')
+          .update({ payment_reference: result.token })
+          .eq('id', purchaseId)
+          .then(() => resolve({ success: true, checkoutUrl: result.paymentPageUrl! }))
+      })
+    } catch (syncErr) {
+      fail(syncErr)
+    }
   })
 }
