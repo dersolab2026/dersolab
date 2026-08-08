@@ -6,7 +6,11 @@ import { Button } from '@/components/ui/button'
 import { logoutUser } from '@/actions/auth'
 import { NotificationBell } from '@/components/layout/NotificationBell'
 import type { NotificationItem } from '@/actions/notifications'
-import { PIXEL_BUTTON_SECONDARY, PIXEL_BADGE, PIXEL_BADGE_ACTIVE } from '@/lib/theme'
+import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
+
+const NAV_LINK_BASE = 'inline-block px-3 py-1.5 rounded-lg border-2 border-[#1B2430] text-sm font-bold'
+const NAV_LINK_ACTIVE = `${NAV_LINK_BASE} bg-[#DD7B3A] text-[#F4F1E8]`
+const NAV_LINK_INACTIVE = `${NAV_LINK_BASE} bg-white text-[#1B2430]`
 
 interface DashboardNavProps {
   role: 'student' | 'parent' | 'instructor' | 'admin'
@@ -96,7 +100,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
           <Link
             key={item.href}
             href={item.href}
-            className={`${pathname === item.href ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE} whitespace-nowrap shrink-0`}
+            className={`${pathname === item.href ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE} whitespace-nowrap shrink-0`}
           >
             {item.label}
           </Link>
