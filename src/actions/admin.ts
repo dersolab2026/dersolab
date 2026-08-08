@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyInstructorApprovalStatus } from '@/lib/notifications/send-guardian-notification'
 
 type ActionResult = { success: true } | { success: false; error: string }
@@ -96,4 +97,51 @@ export async function upsertPackage(params: UpsertPackageParams): Promise<Action
   revalidatePath('/dashboard/admin/packages')
   revalidatePath('/dashboard/student/packages')
   return { success: true }
+}
+
+type SendNotificationResult = { success: true; count: number } | { success: false; error: string }
+
+interface SendAdminNotificationParams {
+  audience: 'all' | 'student' | 'parent' | 'instructor' | 'specific'
+  userId?: string
+  title: string
+  body: string
+}
+
+export async function sendAdminNotification(params: SendAdminNotificationParams): Promise<SendNotificationResult> {
+  const { user, isAdmin } = await requireAdmin()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+  if (!isAdmin) return { success: false, error: 'Bu işlem için yetkin yok' }
+
+  const title = params.title.trim()
+  const body = params.body.trim()
+  if (!title || !body) return { success: false, error: 'Başlık ve mesaj boş olamaz' }
+
+  const admin = createAdminClient()
+
+  let recipientIds: string[] = []
+  if (params.audience === 'specific') {
+    if (!params.userId) return { success: false, error: 'Bir kişi seçmelisin' }
+    recipientIds = [params.userId]
+  } else {
+    const roles = params.audience === 'all' ? ['student', 'parent', 'instructor'] : [params.audience]
+    const { data: users, error } = await admin.from('users').select('id').in('role', roles)
+    if (error) return { success: false, error: error.message }
+    recipientIds = (users ?? []).map((u) => u.id)
+  }
+
+  if (recipientIds.length === 0) return { success: false, error: 'Gönderilecek kimse bulunamadı' }
+
+  const rows = recipientIds.map((id) => ({
+    recipient_id: id,
+    type: 'admin_message' as const,
+    channel: 'in_app' as const,
+    title,
+    body,
+  }))
+
+  const { error } = await admin.from('notifications').insert(rows)
+  if (error) return { success: false, error: error.message }
+
+  return { success: true, count: recipientIds.length }
 }
