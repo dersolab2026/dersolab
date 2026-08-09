@@ -1,6 +1,26 @@
 import type { NextConfig } from "next";
 
+const SUPABASE_ORIGIN = "https://nkqifjcyudvwfaehgtgp.supabase.co";
+
+const isDev = process.env.NODE_ENV === 'development';
+
+const CSP = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
+  "style-src 'self' 'unsafe-inline'",
+  `img-src 'self' data: blob: ${SUPABASE_ORIGIN} https://img.youtube.com`,
+  `media-src 'self' ${SUPABASE_ORIGIN}`,
+  "font-src 'self' data:",
+  `connect-src 'self' ${SUPABASE_ORIGIN}`,
+  "frame-src https://www.youtube.com https://player.vimeo.com",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+].join('; ');
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   async headers() {
     return [
       {
@@ -11,6 +31,7 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'Content-Security-Policy', value: CSP },
         ],
       },
     ];
