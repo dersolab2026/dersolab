@@ -1,6 +1,7 @@
 import './globals.css'
 import type { ReactNode } from 'react'
 import { Inter } from 'next/font/google'
+import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
 
 const inter = Inter({ subsets: ['latin', 'latin-ext'], variable: '--font-sans' })
 
@@ -12,7 +13,10 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="tr" className={inter.variable}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <WhatsAppButton />
+      </body>
     </html>
   )
 }
