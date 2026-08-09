@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Loader2, Search, Send } from 'lucide-react'
-import { searchPrograms, sendTercihListesi, getTercihGonderilebilecekKisiler, type TercihGonderilebilecekKisi } from '@/actions/yok-atlas'
+import { searchPrograms, sendTercihListesi, sendTercihListesiToEmail, getTercihGonderilebilecekKisiler, type TercihGonderilebilecekKisi } from '@/actions/yok-atlas'
 import type { YokAtlasProgramRow } from '@/lib/yok-atlas/search-programs'
 import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY, PIXEL_INPUT, PIXEL_BADGE } from '@/lib/theme'
 
@@ -29,6 +29,7 @@ export function TercihRobotuForm({ illar, isLoggedIn, currentUserRole }: TercihR
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [kisiler, setKisiler] = useState<TercihGonderilebilecekKisi[] | null>(null)
   const [recipientId, setRecipientId] = useState('')
+  const [email, setEmail] = useState('')
   const [isSending, startSending] = useTransition()
   const [sendMessage, setSendMessage] = useState<string | null>(null)
   const [sendError, setSendError] = useState<string | null>(null)
@@ -78,6 +79,25 @@ export function TercihRobotuForm({ illar, isLoggedIn, currentUserRole }: TercihR
 
   function handleSend() {
     setSendError(null)
+
+    if (!isLoggedIn) {
+      if (!email.trim()) {
+        setSendError('E-posta adresini girmelisin')
+        return
+      }
+      startSending(async () => {
+        const result = await sendTercihListesiToEmail([...selected], email)
+        if (!result.success) {
+          setSendError(result.error)
+          return
+        }
+        setSendMessage('Liste PDF olarak hazırlanıp e-postana gönderildi.')
+        setSelected(new Set())
+        setEmail('')
+      })
+      return
+    }
+
     if (isInstructorOrAdmin && !recipientId) {
       setSendError('Bir kişi seçmelisin')
       return
@@ -200,10 +220,30 @@ export function TercihRobotuForm({ illar, isLoggedIn, currentUserRole }: TercihR
           {selected.size > 0 && (
             <div className={`${PIXEL_CARD} p-4 space-y-3`}>
               {!isLoggedIn ? (
-                <p className="text-sm font-semibold text-[#1B2430]">
-                  Seçtiğin listeyi PDF olarak kaydedip göndermek için{' '}
-                  <Link href="/login" className="underline text-[#DD7B3A] font-bold">giriş yapmalısın</Link>.
-                </p>
+                <>
+                  <p className="font-bold text-[#1B2430]">{selected.size} bölümü PDF olarak e-postana gönder</p>
+                  <div>
+                    <label className="block text-sm font-bold text-[#1B2430] mb-1">E-posta adresin</label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="ornek@mail.com"
+                      className={PIXEL_INPUT}
+                    />
+                  </div>
+                  {sendError && <p className="text-sm font-bold text-red-600">{sendError}</p>}
+                  {sendMessage && <p className="text-sm font-bold text-[#6FA89E]">{sendMessage}</p>}
+                  <button type="button" onClick={handleSend} disabled={isSending} className={`${PIXEL_BUTTON_PRIMARY} gap-2 px-5 py-2.5`}>
+                    {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    Gönder
+                  </button>
+                  <p className="text-xs font-semibold text-[#1B2430]/60">
+                    Hesabın yoksa sorun değil — istersen sonra{' '}
+                    <Link href="/register" className="underline text-[#DD7B3A] font-bold">kaydolabilirsin</Link>.
+                  </p>
+                </>
               ) : (
                 <>
                   <p className="font-bold text-[#1B2430]">{selected.size} bölümü PDF olarak kaydet ve gönder</p>

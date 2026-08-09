@@ -37,14 +37,19 @@ export async function searchYokAtlasPrograms(params: SearchYokAtlasParams): Prom
   if (params.ilAdi) query = query.eq('il_adi', params.ilAdi)
   if (params.universiteTuru) query = query.eq('universite_turu', params.universiteTuru)
   if (params.aramaMetni) query = query.or(`birim_adi.ilike.%${params.aramaMetni}%,universite_adi.ilike.%${params.aramaMetni}%`)
-  if (params.sadeceGirebilecekleri) query = query.gte('basari_sirasi', params.basariSirasi)
 
-  const margin = Math.max(params.basariSirasi * 0.3, 5000)
-  query = query
-    .gte('basari_sirasi', params.sadeceGirebilecekleri ? params.basariSirasi : params.basariSirasi - margin)
-    .lte('basari_sirasi', params.basariSirasi + margin)
-    .order('basari_sirasi', { ascending: true })
-    .limit(50)
+  if (params.sadeceGirebilecekleri) {
+    // Girebileceği TÜM programlar arasından sıralamasına en yakın (en "boşa gitmeyen") olanları göster;
+    // üst sınır koymuyoruz çünkü zaten sıralamaya en yakın 100 sonucu alıyoruz.
+    query = query.gte('basari_sirasi', params.basariSirasi)
+  } else {
+    const margin = Math.max(params.basariSirasi * 0.3, 5000)
+    query = query
+      .gte('basari_sirasi', params.basariSirasi - margin)
+      .lte('basari_sirasi', params.basariSirasi + margin)
+  }
+
+  query = query.order('basari_sirasi', { ascending: true }).limit(100)
 
   const { data, error } = await query
   if (error) throw error
