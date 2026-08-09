@@ -205,6 +205,57 @@ export async function notifyLessonMissed(params: {
   }
 }
 
+export async function notifyBookingReminder(params: {
+  studentId: string
+  instructorId: string
+  bookingId: string
+  instructorName: string
+  studentName: string
+  startTime: string
+  meetLink: string
+}) {
+  const admin = createAdminClient()
+  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const formattedTime = new Date(params.startTime).toLocaleString('tr-TR', { dateStyle: 'full', timeStyle: 'short' })
+
+  for (const recipient of recipients) {
+    await admin.from('notifications').insert({
+      recipient_id: recipient.id, type: 'booking_reminder', channel: 'email',
+      title: 'Dersin yaklaşıyor',
+      body: `${params.instructorName} ile ${formattedTime} tarihindeki dersin yaklaşıyor.`,
+      related_booking_id: params.bookingId,
+    })
+    try {
+      await resend.emails.send({
+        from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
+        subject: 'Dersin yaklaşıyor - DersoLab',
+        html: `<p>Merhaba ${recipient.name},</p>
+          <p><strong>${params.instructorName}</strong> ile <strong>${formattedTime}</strong> tarihindeki dersin yaklaşıyor.</p>
+          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`,
+      })
+    } catch (err) { console.error('Ders hatirlatma bildirimi gonderilemedi:', err) }
+  }
+
+  const { data: instructor } = await admin.from('users').select('name, email').eq('id', params.instructorId).single()
+  if (instructor) {
+    await admin.from('notifications').insert({
+      recipient_id: params.instructorId, type: 'booking_reminder', channel: 'email',
+      title: 'Dersin yaklaşıyor',
+      body: `${params.studentName} ile ${formattedTime} tarihindeki dersin yaklaşıyor.`,
+      related_booking_id: params.bookingId,
+    })
+    try {
+      await resend.emails.send({
+        from: 'DersoLab <bildirim@dersolab.com>', to: instructor.email,
+        subject: 'Dersin yaklaşıyor - DersoLab',
+        html: `<p>Merhaba ${instructor.name},</p>
+          <p><strong>${params.studentName}</strong> ile <strong>${formattedTime}</strong> tarihindeki dersin yaklaşıyor.</p>
+          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`,
+      })
+    } catch (err) { console.error('Ders hatirlatma bildirimi gonderilemedi:', err) }
+  }
+}
+
 export async function notifyHomeworkAssigned(params: {
   studentId: string; homeworkId: string; title: string; dueDate: string | null
 }) {

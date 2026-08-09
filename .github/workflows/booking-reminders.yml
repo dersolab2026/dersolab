@@ -1,0 +1,15 @@
+name: Ders Hatırlatma Cron
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call reminder endpoint
+        run: |
+          curl -sf -X POST "https://dersolab.com/api/cron/send-reminders" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
