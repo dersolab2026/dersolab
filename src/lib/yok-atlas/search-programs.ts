@@ -68,7 +68,8 @@ export async function searchYokAtlasPrograms(params: SearchYokAtlasParams): Prom
 
 export async function getYokAtlasIlListesi(): Promise<string[]> {
   const supabase = await createClient()
-  const { data } = await supabase.from('yok_atlas_programs').select('il_adi').not('il_adi', 'is', null)
-  const set = new Set((data ?? []).map((r) => r.il_adi as string))
-  return [...set].sort((a, b) => a.localeCompare(b, 'tr'))
+  const { data, error } = await supabase.rpc('get_yok_atlas_il_listesi')
+  if (error) throw error
+  const rows = (data ?? []) as { il_adi: string }[]
+  return rows.map((r) => r.il_adi).sort((a, b) => a.localeCompare(b, 'tr'))
 }

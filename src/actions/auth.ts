@@ -67,7 +67,7 @@ export async function loginUser(email: string, password: string): Promise<Action
 export async function logoutUser(): Promise<void> {
   const supabase = await createClient()
   await supabase.auth.signOut()
-  redirect('/login')
+  redirect('/')
 }
 
 export async function signInWithGoogle(): Promise<{ url: string } | { error: string }> {
