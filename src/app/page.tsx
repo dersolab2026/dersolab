@@ -76,6 +76,23 @@ export default function HomePage() {
           </Link>
         </div>
 
+        {/* Tercih Robotu banner */}
+        <Link
+          href="/tercih-robotu"
+          className="block bg-[#DD7B3A] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center hover:brightness-105 transition-all"
+        >
+          <p className="inline-block mb-2 px-3 py-1 rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] text-[#1B2430] text-xs font-black uppercase tracking-wide">
+            Yeni · Ücretsiz
+          </p>
+          <h2 className="font-sans text-xl sm:text-2xl font-black text-[#F4F1E8] mb-2">Tercih Robotu</h2>
+          <p className="font-sans font-semibold text-[#F4F1E8]/90 max-w-xl mx-auto mb-4">
+            YKS başarı sıralamanı gir, YÖK Atlas'ın resmi verileriyle girebileceğin bölümleri anında gör. Kayıt gerekmez.
+          </p>
+          <span className="inline-block py-3 px-8 bg-[#F4F1E8] text-[#1B2430] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430]">
+            Hemen Dene
+          </span>
+        </Link>
+
         {/* Features */}
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
           <h2 className="font-sans text-xl sm:text-2xl font-black text-[#1B2430] mb-5 text-center">Ne Sunuyoruz</h2>
