@@ -7,7 +7,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen w-full bg-[#F4F1E8]">
       <div className="mx-auto max-w-3xl px-5 py-12 text-[#1B2430]">
         <h1 className="text-3xl font-bold mb-2">Gizlilik Politikası</h1>
-        <p className="text-sm text-[#1B2430]/60 mb-8">Son güncelleme: 7 Ağustos 2026</p>
+        <p className="text-sm text-[#1B2430]/60 mb-8">Son güncelleme: 9 Ağustos 2026</p>
 
         <div className="space-y-6 leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2 [&_p]:mb-3 [&_li]:mb-1 [&_ul]:list-disc [&_ul]:pl-6">
 
@@ -47,7 +47,38 @@ export default function PrivacyPage() {
           </ul>
           <p>Verileriniz hiçbir şekilde üçüncü taraflara pazarlama amacıyla satılmaz veya kiralanmaz.</p>
 
-          <h2>4. Reşit Olmayan Kullanıcılar</h2>
+          <h2>4. Veri Koruma Önlemleri</h2>
+          <p>
+            Başta Google Takvim entegrasyonu üzerinden erişilen veriler olmak üzere, hassas verilerinizi
+            korumak için aşağıdaki teknik ve idari önlemleri uyguluyoruz:
+          </p>
+          <ul>
+            <li><strong>Şifreleme:</strong> Platform ile sunucularımız arasındaki tüm veri iletimi HTTPS/TLS ile şifrelenir; verileriniz veritabanımızda (Supabase/PostgreSQL) sağlayıcının şifreli depolama altyapısında, bekleme halinde de şifrelenmiş olarak saklanır.</li>
+            <li><strong>Erişim Kontrolü:</strong> Veritabanı seviyesinde satır bazlı güvenlik (Row Level Security) politikaları uygulanır; her kullanıcı yalnızca kendi verilerine veya rolüne uygun verilere erişebilir. Google Takvim erişim jetonları (access/refresh token) yalnızca sunucu tarafında saklanır, tarayıcıya veya istemci koduna hiçbir şekilde iletilmez.</li>
+            <li><strong>Sınırlı Erişim Kapsamı:</strong> Google Takvim entegrasyonu yalnızca eğitmenin kendi ders müsaitliğini görüntülemek ve planlanan dersler için Google Meet linkli takvim etkinliği oluşturmak amacıyla, gerekli minimum izin kapsamıyla (scope) kullanılır.</li>
+            <li><strong>Saklama ve Silme:</strong> Bir eğitmen Google hesap bağlantısını kaldırdığında veya hesabını sildiğinde, ilgili erişim jetonları derhal silinir.</li>
+            <li><strong>Personel Erişimi:</strong> Kullanıcı verilerine yalnızca hizmeti sunmak veya destek talebine yanıt vermek için yetkilendirilmiş sınırlı sayıda personel erişebilir.</li>
+          </ul>
+
+          <h2>5. Google Kullanıcı Verilerinin Sınırlı Kullanımı</h2>
+          <p>
+            DersoLab&apos;ın Google API&apos;lerinden aldığı bilgilerin kullanımı ve başka herhangi bir
+            uygulamaya aktarılması, Sınırlı Kullanım (Limited Use) şartları dahil olmak üzere{' '}
+            <a
+              href="https://developers.google.com/terms/api-services-user-data-policy"
+              className="underline text-[#DD7B3A] font-semibold"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Google API Hizmetleri Kullanıcı Verileri Politikası
+            </a>
+            &apos;na uygundur. Google Takvim üzerinden elde edilen veriler yalnızca ders planlama ve
+            Google Meet linki oluşturma özelliğini sağlamak amacıyla kullanılır; reklam amaçlı
+            kullanılmaz, üçüncü taraflara satılmaz veya kiralanmaz ve genel amaçlı yapay zeka/makine
+            öğrenmesi modellerini eğitmek için kullanılmaz.
+          </p>
+
+          <h2>6. Reşit Olmayan Kullanıcılar</h2>
           <p>
             Platform LGS, YKS, DGS, ALES ve KPSS öğrencilerine yönelik hizmet verdiği için reşit olmayan kullanıcılar bulunabilir.
             Öğrenci profilleri, bir veli hesabı tarafından oluşturulur ve yönetilir; öğrenciler platforma
@@ -55,14 +86,14 @@ export default function PrivacyPage() {
             ve yönetebilir.
           </p>
 
-          <h2>5. Veri Saklama</h2>
+          <h2>7. Veri Saklama</h2>
           <p>
             Verileriniz, hesabınız aktif olduğu sürece ve yasal yükümlülüklerimizi yerine getirmek için
             gerekli olduğu müddetçe saklanır. Hesap silme talebinde bulunduğunuzda verileriniz makul bir
             süre içinde silinir veya anonimleştirilir.
           </p>
 
-          <h2>6. Haklarınız</h2>
+          <h2>8. Haklarınız</h2>
           <p>KVKK ve ilgili mevzuat kapsamında şu haklara sahipsiniz:</p>
           <ul>
             <li>Hangi verilerinizin işlendiğini öğrenme</li>
@@ -72,19 +103,19 @@ export default function PrivacyPage() {
           </ul>
           <p>Bu haklarınızı kullanmak için aşağıdaki iletişim kanalından bize ulaşabilirsiniz.</p>
 
-          <h2>7. Çerezler</h2>
+          <h2>9. Çerezler</h2>
           <p>
             Platform, oturumunuzu açık tutmak ve güvenliği sağlamak amacıyla yalnızca zorunlu oturum
             çerezleri kullanır. Pazarlama veya izleme amaçlı üçüncü taraf çerezleri kullanılmaz.
           </p>
 
-          <h2>8. İletişim</h2>
+          <h2>10. İletişim</h2>
           <p>
             Gizlilikle ilgili sorularınız için bize <a href="mailto:destek@dersolab.com" className="underline text-[#DD7B3A] font-semibold">destek@dersolab.com</a> adresinden
             ulaşabilirsiniz.
           </p>
 
-          <h2>9. Değişiklikler</h2>
+          <h2>11. Değişiklikler</h2>
           <p>
             Bu politikayı zaman zaman güncelleyebiliriz. Önemli değişiklikler olduğunda kullanıcılarımızı
             e-posta yoluyla bilgilendireceğiz.
