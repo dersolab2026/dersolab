@@ -6,12 +6,12 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const CSP = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval' https://esm.sh" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${SUPABASE_ORIGIN} https://img.youtube.com`,
   `media-src 'self' ${SUPABASE_ORIGIN}`,
   "font-src 'self' data:",
-  `connect-src 'self' ${SUPABASE_ORIGIN}`,
+  `connect-src 'self' ${SUPABASE_ORIGIN}${isDev ? ' ws://localhost:* wss://localhost:*' : ''}`,
   "frame-src https://www.youtube.com https://player.vimeo.com",
   "frame-ancestors 'none'",
   "form-action 'self'",

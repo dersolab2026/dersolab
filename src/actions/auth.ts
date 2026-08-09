@@ -13,6 +13,26 @@ interface RegisterParams {
   gradeTrack?: 'lgs' | 'yks'
 }
 
+function friendlySignUpError(message: string): string {
+  const lower = message.toLowerCase()
+  if (lower.includes('already registered') || lower.includes('already exists')) {
+    return 'Bu e-posta adresiyle zaten bir hesap var'
+  }
+  if (lower.includes('confirmation email') || lower.includes('sending')) {
+    return 'Onay e-postası gönderilemedi, lütfen e-posta adresini kontrol edip tekrar dene'
+  }
+  if (lower.includes('invalid') && lower.includes('email')) {
+    return 'Geçerli bir e-posta adresi gir'
+  }
+  if (lower.includes('security purposes') || lower.includes('rate limit')) {
+    return 'Çok fazla deneme yaptın, lütfen biraz bekleyip tekrar dene'
+  }
+  if (/^[a-zçğıöşü0-9\s.,!?'"-]+$/i.test(message) && message.length < 200) {
+    return message
+  }
+  return 'Kayıt oluşturulamadı, lütfen tekrar dene'
+}
+
 export async function registerUser(params: RegisterParams): Promise<ActionResult> {
   if (params.password.length < 8) return { success: false, error: 'Şifre en az 8 karakter olmalı' }
 
@@ -23,7 +43,7 @@ export async function registerUser(params: RegisterParams): Promise<ActionResult
     options: { data: { name: params.name, role: params.role, grade_track: params.gradeTrack } },
   })
 
-  if (error) return { success: false, error: error.message }
+  if (error) return { success: false, error: friendlySignUpError(error.message) }
   return { success: true }
 }
 
