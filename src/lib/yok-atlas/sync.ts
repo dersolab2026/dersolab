@@ -46,22 +46,33 @@ export interface SyncResult {
   upserted: number
 }
 
-export async function syncYokAtlasPrograms(): Promise<SyncResult> {
-  const response = await fetch(YOK_ATLAS_SEARCH_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({}),
-  })
-
-  if (!response.ok) {
-    throw new Error(`YÖK Atlas isteği başarısız: ${response.status}`)
+async function fetchYokAtlasData(): Promise<YokAtlasSearchResponse> {
+  let lastError: unknown
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await fetch(YOK_ATLAS_SEARCH_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({}),
+        cache: 'no-store',
+      })
+      if (!response.ok) {
+        throw new Error(`YÖK Atlas isteği başarısız: ${response.status}`)
+      }
+      return (await response.json()) as YokAtlasSearchResponse
+    } catch (err) {
+      lastError = err
+    }
   }
+  throw lastError instanceof Error ? lastError : new Error('YÖK Atlas isteği başarısız oldu')
+}
 
-  const data = (await response.json()) as YokAtlasSearchResponse
+export async function syncYokAtlasPrograms(): Promise<SyncResult> {
+  const data = await fetchYokAtlasData()
   const admin = createAdminClient()
 
   const rows = data.content
-    .filter((r) => r.birimTuruAdi === 'LISANS')
+    .filter((r) => r.birimTuruAdi === 'LISANS' || r.birimTuruAdi === 'ÖNLISANS')
     .map((r) => ({
       kilavuz_kodu: r.kilavuzKodu,
       yil: r.yil,

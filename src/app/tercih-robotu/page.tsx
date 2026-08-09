@@ -1,8 +1,17 @@
+import { createClient } from '@/lib/supabase/server'
 import { getYokAtlasIlListesi } from '@/lib/yok-atlas/search-programs'
 import { TercihRobotuForm } from '@/components/tercih-robotu/TercihRobotuForm'
 
 export default async function TercihRobotuPage() {
   const illar = await getYokAtlasIlListesi()
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  let currentUserRole: 'student' | 'parent' | 'instructor' | 'admin' | null = null
+  if (user) {
+    const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+    currentUserRole = (userRow?.role as typeof currentUserRole) ?? null
+  }
 
   return (
     <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
@@ -13,7 +22,7 @@ export default async function TercihRobotuPage() {
             Başarı sıralamana göre girebileceğin bölümleri gör. Veriler YÖK Atlas&apos;ın resmi verilerinden alınmıştır.
           </p>
         </div>
-        <TercihRobotuForm illar={illar} />
+        <TercihRobotuForm illar={illar} isLoggedIn={!!user} currentUserRole={currentUserRole} />
       </div>
     </div>
   )
