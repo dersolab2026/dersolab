@@ -50,7 +50,17 @@ export async function registerUser(params: RegisterParams): Promise<ActionResult
 export async function loginUser(email: string, password: string): Promise<ActionResult> {
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) return { success: false, error: 'E-posta veya şifre hatalı' }
+
+  if (error) {
+    if (error.code === 'email_not_confirmed') {
+      return {
+        success: false,
+        error: 'E-posta adresini henüz onaylamamışsın. Kayıt olurken gönderdiğimiz onay e-postasındaki linke tıkla (gelen kutunda yoksa spam/gereksiz klasörüne bak).',
+      }
+    }
+    return { success: false, error: 'E-posta veya şifre hatalı' }
+  }
+
   return { success: true }
 }
 
