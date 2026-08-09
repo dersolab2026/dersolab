@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Loader2, CheckCircle2 } from 'lucide-react'
-import { markBookingCompleted } from '@/actions/bookings'
+import { markBookingCompleted, markBookingNoShow } from '@/actions/bookings'
 import { PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
 
 interface MarkCompleteDialogProps {
@@ -18,12 +18,23 @@ export function MarkCompleteDialog({ bookingId }: MarkCompleteDialogProps) {
   const [open, setOpen] = useState(false)
   const [notes, setNotes] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [isNoShowPending, startNoShowTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
   function handleSubmit() {
     setError(null)
     startTransition(async () => {
       const result = await markBookingCompleted(bookingId, notes.trim() || undefined)
+      if (!result.success) { setError(result.error); return }
+      setOpen(false)
+      router.refresh()
+    })
+  }
+
+  function handleNoShow() {
+    setError(null)
+    startNoShowTransition(async () => {
+      const result = await markBookingNoShow(bookingId)
       if (!result.success) { setError(result.error); return }
       setOpen(false)
       router.refresh()
@@ -49,8 +60,11 @@ export function MarkCompleteDialog({ bookingId }: MarkCompleteDialogProps) {
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)} disabled={isPending}>Vazgeç</Button>
-          <Button onClick={handleSubmit} disabled={isPending}>
+          <Button variant="ghost" onClick={() => setOpen(false)} disabled={isPending || isNoShowPending}>Vazgeç</Button>
+          <Button variant="outline" onClick={handleNoShow} disabled={isPending || isNoShowPending}>
+            {isNoShowPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Öğrenci Gelmedi'}
+          </Button>
+          <Button onClick={handleSubmit} disabled={isPending || isNoShowPending}>
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Onayla'}
           </Button>
         </DialogFooter>

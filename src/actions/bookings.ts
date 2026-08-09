@@ -9,6 +9,7 @@ import {
   notifyBookingCreated,
   notifyBookingCancelled,
   notifyLessonCompleted,
+  notifyLessonMissed,
 } from '@/lib/notifications/send-guardian-notification'
 import { TRIAL_LESSON_DURATION_MINUTES } from '@/lib/constants'
 import type { TimeSlot } from '@/types'
@@ -208,6 +209,33 @@ export async function markBookingCompleted(bookingId: string, instructorNotes?: 
   await notifyLessonCompleted({
     studentId: booking.student_id, bookingId,
     instructorName: instructorUser?.name ?? 'Eğitmen', startTime: booking.start_time,
+  })
+
+  revalidatePath('/dashboard/instructor')
+  revalidatePath('/dashboard/student/bookings')
+  return { success: true }
+}
+
+export async function markBookingNoShow(bookingId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const admin = createAdminClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
+  const { data: booking, error } = await supabase
+    .from('bookings')
+    .update({ status: 'no_show', completed_at: new Date().toISOString() })
+    .eq('id', bookingId)
+    .eq('instructor_id', user.id)
+    .select('student_id, start_time')
+    .single()
+
+  if (error || !booking) return { success: false, error: error?.message ?? 'Rezervasyon güncellenemedi' }
+
+  const { data: instructorUser2 } = await admin.from('users').select('name').eq('id', user.id).single()
+  await notifyLessonMissed({
+    studentId: booking.student_id, bookingId,
+    instructorName: instructorUser2?.name ?? 'Eğitmen', startTime: booking.start_time,
   })
 
   revalidatePath('/dashboard/instructor')

@@ -181,6 +181,30 @@ export async function notifyLessonCompleted(params: {
   }
 }
 
+export async function notifyLessonMissed(params: {
+  studentId: string; bookingId: string; instructorName: string; startTime: string
+}) {
+  const admin = createAdminClient()
+  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const formattedDate = new Date(params.startTime).toLocaleString('tr-TR', { dateStyle: 'full', timeStyle: 'short' })
+
+  for (const recipient of recipients) {
+    await admin.from('notifications').insert({
+      recipient_id: recipient.id, type: 'lesson_missed', channel: 'email',
+      title: 'Derse katılım sağlanmadı',
+      body: `${params.instructorName} ile ${formattedDate} tarihindeki derse katılım sağlanmadı.`,
+      related_booking_id: params.bookingId,
+    })
+    try {
+      await resend.emails.send({
+        from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
+        subject: 'Derse katılım sağlanmadı - DersoLab',
+        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihindeki derse katılım sağlanmadı.</p>`,
+      })
+    } catch (err) { console.error('Ders kacirildi bildirimi gonderilemedi:', err) }
+  }
+}
+
 export async function notifyHomeworkAssigned(params: {
   studentId: string; homeworkId: string; title: string; dueDate: string | null
 }) {
