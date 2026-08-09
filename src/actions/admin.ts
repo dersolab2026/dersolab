@@ -156,7 +156,7 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
   await Promise.allSettled(
     recipients.map((recipient) =>
       resend.emails.send({
-        from: 'DersoLab <bildirim@dersolab.com>',
+        from: 'DersoLab <notifications@dersolab.com>',
         to: recipient.email,
         subject: `${title} - DersoLab`,
         html: `<p>Merhaba ${recipient.name},</p><p>${body.replace(/\n/g, '<br/>')}</p>`,
