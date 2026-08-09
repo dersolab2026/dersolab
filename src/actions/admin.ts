@@ -1,11 +1,14 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyInstructorApprovalStatus } from '@/lib/notifications/send-guardian-notification'
 import { getCategoryLink, type AdminNotificationCategory } from '@/lib/notifications/get-notification-link'
 import { syncYokAtlasPrograms } from '@/lib/yok-atlas/sync'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 type ActionResult = { success: true } | { success: false; error: string }
 
@@ -122,15 +125,15 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
 
   const admin = createAdminClient()
 
-  let recipients: { id: string; role: string }[] = []
+  let recipients: { id: string; role: string; name: string; email: string }[] = []
   if (params.audience === 'specific') {
     if (!params.userIds || params.userIds.length === 0) return { success: false, error: 'En az bir kişi seçmelisin' }
-    const { data: users, error } = await admin.from('users').select('id, role').in('id', params.userIds)
+    const { data: users, error } = await admin.from('users').select('id, role, name, email').in('id', params.userIds)
     if (error) return { success: false, error: error.message }
     recipients = users ?? []
   } else {
     const roles = params.audience === 'all' ? ['student', 'parent', 'instructor'] : [params.audience]
-    const { data: users, error } = await admin.from('users').select('id, role').in('role', roles)
+    const { data: users, error } = await admin.from('users').select('id, role, name, email').in('role', roles)
     if (error) return { success: false, error: error.message }
     recipients = users ?? []
   }
@@ -141,7 +144,7 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
   const rows = recipients.map((recipient) => ({
     recipient_id: recipient.id,
     type: 'admin_message' as const,
-    channel: 'in_app' as const,
+    channel: 'email' as const,
     title,
     body,
     link: getCategoryLink(params.category, recipient.role as 'student' | 'parent' | 'instructor' | 'admin'),
@@ -150,6 +153,17 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
 
   const { error } = await admin.from('notifications').insert(rows)
   if (error) return { success: false, error: error.message }
+
+  await Promise.allSettled(
+    recipients.map((recipient) =>
+      resend.emails.send({
+        from: 'DersoLab <bildirim@dersolab.com>',
+        to: recipient.email,
+        subject: `${title} - DersoLab`,
+        html: `<p>Merhaba ${recipient.name},</p><p>${body.replace(/\n/g, '<br/>')}</p>`,
+      })
+    )
+  )
 
   revalidatePath('/dashboard/admin/notifications')
   return { success: true, count: recipients.length }

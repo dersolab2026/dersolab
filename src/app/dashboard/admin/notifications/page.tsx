@@ -18,7 +18,7 @@ export default async function AdminNotificationsPage() {
       <div>
         <h1 className="text-2xl font-semibold">Bildirim Gönder</h1>
         <p className="text-muted-foreground">
-          İstediğin kitleye ya da belirli bir kişiye uygulama içi bildirim gönder.
+          İstediğin kitleye ya da belirli bir kişiye uygulama içi bildirim ve e-posta gönder.
         </p>
       </div>
 
