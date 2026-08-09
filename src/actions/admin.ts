@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyInstructorApprovalStatus } from '@/lib/notifications/send-guardian-notification'
 import { getCategoryLink, type AdminNotificationCategory } from '@/lib/notifications/get-notification-link'
-import { syncYokAtlasPrograms } from '@/lib/yok-atlas/sync'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -253,18 +252,4 @@ export async function deleteUserAccount(userId: string): Promise<ActionResult> {
 
   revalidatePath('/dashboard/admin/users')
   return { success: true }
-}
-
-type SyncYokAtlasResult = { success: true; fetched: number; upserted: number } | { success: false; error: string }
-
-export async function syncYokAtlasData(): Promise<SyncYokAtlasResult> {
-  const { isAdmin } = await requireAdmin()
-  if (!isAdmin) return { success: false, error: 'Bu işlem için yetkin yok' }
-
-  try {
-    const result = await syncYokAtlasPrograms()
-    return { success: true, ...result }
-  } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : 'Senkronizasyon başarısız oldu' }
-  }
 }

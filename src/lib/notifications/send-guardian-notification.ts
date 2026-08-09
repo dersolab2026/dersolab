@@ -323,64 +323,6 @@ export async function notifyHomeworkSubmitted(params: { homeworkId: string; inst
   } catch (err) { console.error('Odev gonderim bildirimi gonderilemedi:', err) }
 }
 
-export async function notifyTercihListesiHazir(params: {
-  recipientId: string
-  senderName: string
-  programCount: number
-  pdfBuffer: Buffer
-}) {
-  const admin = createAdminClient()
-  const { data: recipient } = await admin.from('users').select('name, email').eq('id', params.recipientId).single()
-  if (!recipient) return
-
-  await admin.from('notifications').insert({
-    recipient_id: params.recipientId, type: 'tercih_listesi', channel: 'email',
-    title: 'Tercih listen hazır',
-    body: `${params.senderName} senin için ${params.programCount} bölümlük bir tercih listesi hazırladı.`,
-    link: '/dashboard/tercih-listelerim',
-  })
-
-  try {
-    await resend.emails.send({
-      from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
-      subject: 'Tercih listen hazır - DersoLab',
-      html: `<p>Merhaba ${recipient.name},</p>
-        <p><strong>${params.senderName}</strong> senin için <strong>${params.programCount}</strong> bölümlük bir tercih listesi hazırladı. PDF'i ekte bulabilirsin, ya da DersoLab'a giriş yapıp &quot;Tercih Listelerim&quot; sayfasından indirebilirsin.</p>`,
-      attachments: [{ filename: 'tercih-listesi.pdf', content: params.pdfBuffer.toString('base64') }],
-    })
-  } catch (err) { console.error('Tercih listesi bildirimi gonderilemedi:', err) }
-}
-
-export async function notifyTercihListesiToEmail(params: {
-  email: string
-  programCount: number
-  pdfBuffer: Buffer
-}) {
-  try {
-    await resend.emails.send({
-      from: 'DersoLab <bildirim@dersolab.com>',
-      to: params.email,
-      subject: 'Tercih listen hazır - DersoLab',
-      html: `<p>Merhaba,</p>
-        <p>Tercih Robotu'nda seçtiğin <strong>${params.programCount}</strong> bölümü PDF olarak hazırladık, ekte bulabilirsin.</p>`,
-      attachments: [{ filename: 'tercih-listesi.pdf', content: params.pdfBuffer.toString('base64') }],
-    })
-  } catch (err) { console.error('Tercih listesi (email) gonderilemedi:', err) }
-}
-
-export async function notifyTercihListesiPromosyon(email: string) {
-  try {
-    await resend.emails.send({
-      from: 'DersoLab <bildirim@dersolab.com>',
-      to: email,
-      subject: 'Tercih sürecinde yalnız kalma - DersoLab',
-      html: `<p>Merhaba,</p>
-        <p>Tercih Robotu'nu kullandığın için teşekkürler! DersoLab'da rehberlik desteği ve alanında deneyimli, onaylı eğitmenlerle birebir online derslerle de yanındayız.</p>
-        <p><a href="https://dersolab.com/demo-ders">Ücretsiz bir tanışma dersiyle</a> başlayabilir, ya da <a href="https://dersolab.com/register">hemen ücretsiz kaydolabilirsin</a>.</p>`,
-    })
-  } catch (err) { console.error('Tanitim maili gonderilemedi:', err) }
-}
-
 export async function notifyInstructorApprovalStatus(params: {
   instructorId: string
   approved: boolean
