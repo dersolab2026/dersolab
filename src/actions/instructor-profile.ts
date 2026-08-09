@@ -63,6 +63,24 @@ export async function updateInstructorSubjects(subjects: string[]): Promise<Acti
   return { success: true }
 }
 
+export async function resubmitForReview(): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
+  const { error, count } = await supabase
+    .from('instructors')
+    .update({ approval_status: 'pending', approval_note: null, reviewed_at: null, reviewed_by: null }, { count: 'exact' })
+    .eq('user_id', user.id)
+    .eq('approval_status', 'rejected')
+
+  if (error) return { success: false, error: error.message }
+  if (!count) return { success: false, error: 'Sadece reddedilmiş bir profil tekrar incelemeye gönderilebilir' }
+
+  revalidatePath('/dashboard/instructor')
+  return { success: true }
+}
+
 export async function updateIntroVideo(videoUrl: string): Promise<ActionResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

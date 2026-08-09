@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { getAllStudentsAndInstructors } from '@/lib/admin/get-all-users'
+import { DeleteUserButton } from '@/components/admin/DeleteUserButton'
 
 const APPROVAL_LABELS: Record<string, string> = {
   pending: 'Onay bekliyor',
@@ -37,6 +38,7 @@ export default async function AdminUsersPage() {
                   <th className="px-3 py-2 text-left font-medium">Onay Durumu</th>
                   <th className="px-3 py-2 text-left font-medium">Takvim</th>
                   <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
+                  <th className="px-3 py-2 text-right font-medium">İşlemler</th>
                 </tr>
               </thead>
               <tbody>
@@ -53,6 +55,9 @@ export default async function AdminUsersPage() {
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">{u.calendarConnected ? 'Bağlı' : 'Bağlı değil'}</td>
                     <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
+                    <td className="px-3 py-2 text-right">
+                      <DeleteUserButton userId={u.id} userName={u.name || u.email} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -74,6 +79,7 @@ export default async function AdminUsersPage() {
                   <th className="px-3 py-2 text-left font-medium">E-posta</th>
                   <th className="px-3 py-2 text-left font-medium">Öğrencileri</th>
                   <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
+                  <th className="px-3 py-2 text-right font-medium">İşlemler</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,6 +101,9 @@ export default async function AdminUsersPage() {
                       )}
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
+                    <td className="px-3 py-2 text-right">
+                      <DeleteUserButton userId={u.id} userName={u.name || u.email} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -123,6 +132,7 @@ export default async function AdminUsersPage() {
                   <th className="px-3 py-2 text-left font-medium">Kredi Bakiyesi</th>
                   <th className="px-3 py-2 text-left font-medium">Demo Ders</th>
                   <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
+                  <th className="px-3 py-2 text-right font-medium">İşlemler</th>
                 </tr>
               </thead>
               <tbody>
@@ -138,6 +148,9 @@ export default async function AdminUsersPage() {
                       </Badge>
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
+                    <td className="px-3 py-2 text-right">
+                      <DeleteUserButton userId={u.id} userName={u.name || u.email} />
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -198,3 +198,44 @@ export async function getSentAdminNotifications(): Promise<SentNotificationBatch
 
   return Array.from(batches.values())
 }
+
+export async function deleteUserAccount(userId: string): Promise<ActionResult> {
+  const { user, isAdmin } = await requireAdmin()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+  if (!isAdmin) return { success: false, error: 'Bu işlem için yetkin yok' }
+  if (userId === user.id) return { success: false, error: 'Kendi hesabını silemezsin' }
+
+  const admin = createAdminClient()
+  const anonymizedEmail = `silinmis-${userId}@dersolab.local`
+
+  const { error: userError } = await admin
+    .from('users')
+    .update({
+      name: 'Silinmiş Kullanıcı',
+      email: anonymizedEmail,
+      phone: null,
+      birth_date: null,
+      avatar_url: null,
+      identity_number: null,
+      address: null,
+      city: null,
+    })
+    .eq('id', userId)
+
+  if (userError) return { success: false, error: userError.message }
+
+  await admin
+    .from('instructors')
+    .update({ approval_status: 'rejected', bio: null, intro_video_url: null })
+    .eq('user_id', userId)
+
+  const { error: authError } = await admin.auth.admin.updateUserById(userId, {
+    email: anonymizedEmail,
+    ban_duration: '876000h',
+  })
+
+  if (authError) return { success: false, error: authError.message }
+
+  revalidatePath('/dashboard/admin/users')
+  return { success: true }
+}

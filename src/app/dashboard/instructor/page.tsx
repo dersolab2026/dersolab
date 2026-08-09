@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getInstructorBookings } from '@/lib/bookings/get-instructor-bookings'
 import { getLessonMaterialsForBookings } from '@/lib/lessons/get-lesson-materials'
 import { InstructorBookingListItem } from '@/components/instructor/InstructorBookingListItem'
+import { RejectedInstructorBanner } from '@/components/instructor/RejectedInstructorBanner'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { PIXEL_CARD } from '@/lib/theme'
 
@@ -13,7 +14,7 @@ export default async function InstructorDashboardPage() {
   if (!user) redirect('/login')
 
   const { data: instructorRow } = await supabase
-    .from('instructors').select('approval_status, calendar_connected').eq('user_id', user.id).single()
+    .from('instructors').select('approval_status, calendar_connected, approval_note').eq('user_id', user.id).single()
   const bookings = await getInstructorBookings(user.id)
 
   const needsAction = bookings.filter((b) => b.status === 'scheduled' && new Date(b.startTime) < new Date())
@@ -27,6 +28,9 @@ export default async function InstructorDashboardPage() {
         <div className={`${PIXEL_CARD} p-3`}>
           <p className="text-sm font-semibold text-[#1B2430]">Profilin henüz onay bekliyor, onaylanana kadar öğrenciler seni göremez.</p>
         </div>
+      )}
+      {instructorRow?.approval_status === 'rejected' && (
+        <RejectedInstructorBanner approvalNote={instructorRow.approval_note} />
       )}
       {instructorRow?.approval_status === 'approved' && !instructorRow.calendar_connected && (
         <div className={`${PIXEL_CARD} p-3`}>
