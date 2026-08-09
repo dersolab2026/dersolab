@@ -4,8 +4,14 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL!
-  const formData = await request.formData()
-  const token = formData.get('token') as string | null
+
+  let token: string | null = null
+  try {
+    const formData = await request.formData()
+    token = formData.get('token') as string | null
+  } catch (err) {
+    console.error('iyzico callback: form verisi okunamadı', err)
+  }
 
   // iyzico buraya POST ile geldigi icin, tarayicinin hedef sayfaya da
   // POST ile gitmeye calismamasi (Next.js'in server action protokolune
