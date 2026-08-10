@@ -17,6 +17,7 @@ export interface AdminInstructorRow {
   createdAt: string
   approvalStatus: string | null
   calendarConnected: boolean
+  offersFreeTrial: boolean
 }
 
 export interface AdminParentRow {
@@ -39,7 +40,7 @@ export async function getAllStudentsAndInstructors(): Promise<AdminUsersData> {
   const [{ data: users }, { data: students }, { data: instructors }, { data: guardianLinks }] = await Promise.all([
     admin.from('users').select('id, name, email, role, created_at').in('role', ['student', 'parent', 'instructor']),
     admin.from('students').select('user_id, grade_track, credit_balance, free_trial_used'),
-    admin.from('instructors').select('user_id, approval_status, calendar_connected'),
+    admin.from('instructors').select('user_id, approval_status, calendar_connected, offers_free_trial'),
     admin.from('guardian_links').select('guardian_id, student_id'),
   ])
 
@@ -69,6 +70,7 @@ export async function getAllStudentsAndInstructors(): Promise<AdminUsersData> {
       createdAt: u.created_at,
       approvalStatus: instructorByUserId.get(u.id)?.approval_status ?? null,
       calendarConnected: instructorByUserId.get(u.id)?.calendar_connected ?? false,
+      offersFreeTrial: instructorByUserId.get(u.id)?.offers_free_trial ?? false,
     }))
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 

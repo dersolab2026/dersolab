@@ -62,6 +62,22 @@ export async function rejectInstructor(instructorId: string, note: string): Prom
   return { success: true }
 }
 
+export async function setInstructorFreeTrial(instructorId: string, enabled: boolean): Promise<ActionResult> {
+  const { supabase, user, isAdmin } = await requireAdmin()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+  if (!isAdmin) return { success: false, error: 'Bu işlem için yetkin yok' }
+
+  const { error } = await supabase
+    .from('instructors')
+    .update({ offers_free_trial: enabled })
+    .eq('user_id', instructorId)
+
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/dashboard/admin/users')
+  return { success: true }
+}
+
 interface UpsertPackageParams {
   id?: string
   title: string
