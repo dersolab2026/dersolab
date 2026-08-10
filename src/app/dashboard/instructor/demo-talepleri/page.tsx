@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getPendingDemoRequests } from '@/lib/demo-lessons/get-pending-demo-requests'
 import { AcceptDemoRequestDialog } from '@/components/demo-lessons/AcceptDemoRequestDialog'
+import { ClaimDemoLeadButton } from '@/components/demo-lessons/ClaimDemoLeadButton'
 import { DeclineDemoRequestButton } from '@/components/demo-lessons/DeclineDemoRequestButton'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { PIXEL_CARD } from '@/lib/theme'
@@ -28,13 +29,21 @@ export default async function DemoRequestsPage() {
             <div key={r.id} className={`${PIXEL_CARD} p-4 flex flex-wrap items-center justify-between gap-3`}>
               <div>
                 <p className="font-bold text-[#1B2430]">{r.studentName}</p>
+                {r.leadEmail && (
+                  <p className="text-sm font-semibold text-[#1B2430]/70">{r.leadEmail}</p>
+                )}
                 <p className="text-sm font-semibold text-[#1B2430]/70">
                   {new Date(r.createdAt).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })} tarihinde talep edildi
+                  {!r.studentId && ' · hesapsız, kabul edince e-posta ile iletişime geç'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <DeclineDemoRequestButton requestId={r.id} />
-                <AcceptDemoRequestDialog requestId={r.id} instructorId={user.id} />
+                {r.studentId ? (
+                  <AcceptDemoRequestDialog requestId={r.id} instructorId={user.id} />
+                ) : (
+                  <ClaimDemoLeadButton requestId={r.id} />
+                )}
               </div>
             </div>
           ))}

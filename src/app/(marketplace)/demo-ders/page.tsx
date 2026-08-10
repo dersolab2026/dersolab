@@ -1,16 +1,18 @@
-import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getGuardianStudents } from '@/lib/marketplace/get-guardian-students'
 import { getDemoLessonStatus } from '@/lib/demo-lessons/get-demo-lesson-status'
 import { DemoLessonRequestCard } from '@/components/demo-lessons/DemoLessonRequestCard'
 import { DemoLessonStudentSelector } from '@/components/demo-lessons/DemoLessonStudentSelector'
+import { DemoLessonEmailForm } from '@/components/demo-lessons/DemoLessonEmailForm'
 
 export default async function DemoLessonPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/register')
 
-  const { data: userRecord } = await supabase.from('users').select('role').eq('id', user.id).single()
+  const { data: userRecord } = user
+    ? await supabase.from('users').select('role').eq('id', user.id).single()
+    : { data: null }
 
   return (
     <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
@@ -32,7 +34,15 @@ export default async function DemoLessonPage() {
           </p>
         </div>
 
-        {userRecord?.role === 'parent' ? (
+        {!user ? (
+          <>
+            <DemoLessonEmailForm />
+            <p className="text-center text-sm font-semibold text-[#1B2430]">
+              Zaten hesabın var mı?{' '}
+              <Link href="/login" className="text-[#DD7B3A] font-bold underline">Giriş Yap</Link>
+            </p>
+          </>
+        ) : userRecord?.role === 'parent' ? (
           <DemoLessonStudentSelector
             students={await Promise.all(
               (await getGuardianStudents(user.id)).map(async (s) => {
