@@ -30,6 +30,8 @@ export async function requestDemoLesson(studentId: string): Promise<ActionResult
       message = 'Zaten bekleyen bir tanışma dersi talebin var'
     } else if (error.message.includes('row-level security')) {
       message = 'Bu işlem için yetkin yok'
+    } else if (error.code === '23503') {
+      message = 'Ücretsiz tanışma dersi sadece öğrenci hesapları için geçerli'
     }
     return { success: false, error: message }
   }

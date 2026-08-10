@@ -41,8 +41,14 @@ export default async function DemoLessonPage() {
               })
             )}
           />
-        ) : (
+        ) : userRecord?.role === 'student' ? (
           <DemoLessonRequestCard studentId={user.id} initialStatus={await getDemoLessonStatus(user.id)} />
+        ) : (
+          <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
+            <p className="font-sans font-semibold text-[#1B2430]">
+              Ücretsiz tanışma dersi sadece öğrenci ve veli hesapları için geçerli.
+            </p>
+          </div>
         )}
       </div>
     </div>
