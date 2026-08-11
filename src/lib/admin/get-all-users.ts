@@ -32,7 +32,7 @@ export async function getAllStudentsAndInstructors(): Promise<AdminUsersData> {
   const admin = createAdminClient()
 
   const [{ data: users }, { data: students }, { data: instructors }] = await Promise.all([
-    admin.from('users').select('id, name, email, role, created_at').in('role', ['student', 'instructor']),
+    admin.from('users').select('id, name, email, role, created_at').in('role', ['student', 'instructor']).is('deleted_at', null),
     admin.from('students').select('user_id, grade_track, credit_balance, free_trial_used'),
     admin.from('instructors').select('user_id, approval_status, calendar_connected, offers_free_trial, payout_name, payout_iban, payout_updated_at'),
   ])
