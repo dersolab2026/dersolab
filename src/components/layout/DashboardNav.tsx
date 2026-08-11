@@ -35,6 +35,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/instructor/questions', label: 'Sorularım' },
     { href: '/dashboard/instructor/availability', label: 'Ajanda' },
     { href: '/dashboard/instructor/profile', label: 'Profilim' },
+    { href: '/dashboard/instructor/odemeler', label: 'Ödemelerim' },
     { href: '/dashboard/instructor/settings', label: 'Ayarlar' },
     { href: '/dashboard/instructor/nasil-calisir', label: 'Nasıl Çalışır?' },
   ],
@@ -44,6 +45,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/admin/instructors', label: 'Eğitmen Onayları' },
     { href: '/dashboard/admin/packages', label: 'Paketler' },
     { href: '/dashboard/admin/odemeler', label: 'Eşleşmeyen Ödemeler' },
+    { href: '/dashboard/admin/muhasebe', label: 'Muhasebe' },
     { href: '/dashboard/admin/notifications', label: 'Bildirim Gönder' },
   ],
 }

@@ -179,8 +179,8 @@ export async function resolveUnmatchedShopierPayment(paymentId: string, studentI
   const { data: pkg } = await supabase.from('packages').select('credit_amount, price').eq('id', payment.package_id).single()
   if (!pkg) return { success: false, error: 'Paket bulunamadı' }
 
-  // package_purchases'a RLS, sadece ogrenci/veli kendi adina 'pending' olarak
-  // ekleyebilsin diye izin veriyor (bkz. 0016). Admin'in başkası adına
+  // package_purchases'a RLS, sadece ogrenci kendi adina 'pending' olarak
+  // ekleyebilsin diye izin veriyor (bkz. 0016/0064). Admin'in başkası adına
   // doğrudan 'completed' eklemesi icin service-role client gerekiyor.
   const admin = createAdminClient()
 

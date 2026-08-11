@@ -13,7 +13,7 @@ export default function TermsPage() {
 
           <p>
             Bu Kullanım Şartları; DersoLab (&quot;platform&quot;) üzerinden sunulan online özel ders ve
-            danışmanlık hizmetlerini kullanan öğrenciler, veliler ve eğitmenler için geçerli kuralları belirler.
+            danışmanlık hizmetlerini kullanan öğrenciler ve eğitmenler için geçerli kuralları belirler.
             Platformu kullanarak bu şartları kabul etmiş sayılırsınız.
           </p>
 
@@ -21,13 +21,13 @@ export default function TermsPage() {
           <p>
             DersoLab, LGS ve YKS öğrencilerini bağımsız eğitmenlerle buluşturan bir online ders ve
             rehberlik platformudur. Dersler, Google Meet üzerinden çevrim içi olarak gerçekleştirilir.
-            DersoLab, eğitmenler ile öğrenciler/veliler arasında aracılık yapar; eğitmenler platforma
+            DersoLab, eğitmenler ile öğrenciler arasında aracılık yapar; eğitmenler platforma
             bağımsız hizmet sağlayıcı olarak kayıt olur.
           </p>
 
           <h2>2. Hesap Oluşturma</h2>
           <ul>
-            <li>Öğrenci profilleri yalnızca bir veli hesabı tarafından oluşturulabilir.</li>
+            <li>Öğrenciler platforma kendi hesaplarıyla doğrudan kayıt olur.</li>
             <li>Eğitmen hesapları, platform tarafından onaylandıktan sonra öğrencilere görünür hale gelir.</li>
             <li>Verdiğiniz bilgilerin doğru ve güncel olmasından siz sorumlusunuz.</li>
             <li>Hesap güvenliğinizden (şifrenizin gizliliğinden) siz sorumlusunuz.</li>
@@ -36,7 +36,7 @@ export default function TermsPage() {
           <h2>3. Ders Paketleri ve Ödemeler</h2>
           <ul>
             <li>Dersler, önceden satın alınan kredi paketleri karşılığında planlanır.</li>
-            <li>Ödemeler İyzico altyapısı üzerinden güvenli şekilde alınır.</li>
+            <li>Ödemeler Shopier altyapısı üzerinden güvenli şekilde alınır.</li>
             <li>Bir dersin en az 24 saat öncesinden iptal edilmesi durumunda kredi iade edilir.</li>
             <li>24 saatten az kala yapılan iptallerde kredi iade edilmez.</li>
             <li>Paket fiyatları ve içerikleri önceden haber verilmeksizin güncellenebilir.</li>

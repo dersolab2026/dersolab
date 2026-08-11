@@ -53,7 +53,7 @@ export function MarkCompleteDialog({ bookingId }: MarkCompleteDialogProps) {
         <DialogHeader><DialogTitle>Dersi tamamlandı olarak işaretle</DialogTitle></DialogHeader>
         <div className="space-y-3">
           <Textarea
-            placeholder="Ders notu (opsiyonel) — sadece sen ve öğrenci/veli görebilir"
+            placeholder="Ders notu (opsiyonel) — sadece sen ve öğrenci görebilir"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />

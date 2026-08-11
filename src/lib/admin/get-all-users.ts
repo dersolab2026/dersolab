@@ -18,6 +18,9 @@ export interface AdminInstructorRow {
   approvalStatus: string | null
   calendarConnected: boolean
   offersFreeTrial: boolean
+  payoutName: string | null
+  payoutIban: string | null
+  payoutUpdatedAt: string | null
 }
 
 export interface AdminUsersData {
@@ -31,7 +34,7 @@ export async function getAllStudentsAndInstructors(): Promise<AdminUsersData> {
   const [{ data: users }, { data: students }, { data: instructors }] = await Promise.all([
     admin.from('users').select('id, name, email, role, created_at').in('role', ['student', 'instructor']),
     admin.from('students').select('user_id, grade_track, credit_balance, free_trial_used'),
-    admin.from('instructors').select('user_id, approval_status, calendar_connected, offers_free_trial'),
+    admin.from('instructors').select('user_id, approval_status, calendar_connected, offers_free_trial, payout_name, payout_iban, payout_updated_at'),
   ])
 
   const studentByUserId = new Map((students ?? []).map((s) => [s.user_id, s]))
@@ -60,6 +63,9 @@ export async function getAllStudentsAndInstructors(): Promise<AdminUsersData> {
       approvalStatus: instructorByUserId.get(u.id)?.approval_status ?? null,
       calendarConnected: instructorByUserId.get(u.id)?.calendar_connected ?? false,
       offersFreeTrial: instructorByUserId.get(u.id)?.offers_free_trial ?? false,
+      payoutName: instructorByUserId.get(u.id)?.payout_name ?? null,
+      payoutIban: instructorByUserId.get(u.id)?.payout_iban ?? null,
+      payoutUpdatedAt: instructorByUserId.get(u.id)?.payout_updated_at ?? null,
     }))
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 

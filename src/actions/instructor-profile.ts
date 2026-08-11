@@ -63,6 +63,34 @@ export async function updateInstructorSubjects(subjects: string[]): Promise<Acti
   return { success: true }
 }
 
+export async function updateInstructorPayoutInfo(payoutName: string, payoutIban: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
+  const trimmedName = payoutName.trim()
+  if (!trimmedName) return { success: false, error: 'Ad soyad boş olamaz' }
+
+  const normalizedIban = payoutIban.replace(/\s+/g, '').toUpperCase()
+  if (!/^TR\d{24}$/.test(normalizedIban)) {
+    return { success: false, error: 'Geçerli bir IBAN gir (TR ile başlayan, 26 haneli)' }
+  }
+
+  const { data: updated, error } = await supabase
+    .from('instructors')
+    .update({ payout_name: trimmedName, payout_iban: normalizedIban, payout_updated_at: new Date().toISOString() })
+    .eq('user_id', user.id)
+    .select('user_id')
+    .maybeSingle()
+
+  if (error) return { success: false, error: error.message }
+  if (!updated) return { success: false, error: 'Kaydedilemedi, oturumun sona ermiş olabilir — sayfayı yenileyip tekrar dener misin?' }
+
+  revalidatePath('/dashboard/instructor/odemeler')
+  revalidatePath('/dashboard/admin/muhasebe')
+  return { success: true }
+}
+
 export async function setInstructorPaused(paused: boolean): Promise<ActionResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
