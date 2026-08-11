@@ -14,9 +14,11 @@ export function QuestionCard({ question }: QuestionCardProps) {
   return (
     <div className={`${PIXEL_CARD} p-5 space-y-2`}>
       <div className="flex items-center justify-between gap-3">
-        <p className="font-bold text-[#1B2430]">{question.instructorName}</p>
+        <p className="font-bold text-[#1B2430]">
+          {question.instructorName || question.subject || 'Genel'}
+        </p>
         <span className={question.status === 'answered' ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE}>
-          {question.status === 'answered' ? 'Cevaplandı' : 'Bekliyor'}
+          {question.status === 'answered' ? 'Cevaplandı' : 'Havuzda bekliyor'}
         </span>
       </div>
 

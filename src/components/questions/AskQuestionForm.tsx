@@ -1,17 +1,19 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import Link from 'next/link'
 import { Loader2, Paperclip, X } from 'lucide-react'
 import { askQuestion } from '@/actions/questions'
 import { uploadQuestionAttachment } from '@/lib/storage/upload-question-attachment'
+import { INSTRUCTOR_SUBJECT_OPTIONS } from '@/lib/constants'
 import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
 
 interface AskQuestionFormProps {
-  instructors: { instructorId: string; name: string }[]
+  questionCreditsRemaining: number
 }
 
-export function AskQuestionForm({ instructors }: AskQuestionFormProps) {
-  const [instructorId, setInstructorId] = useState('')
+export function AskQuestionForm({ questionCreditsRemaining }: AskQuestionFormProps) {
+  const [subject, setSubject] = useState('')
   const [text, setText] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -19,23 +21,24 @@ export function AskQuestionForm({ instructors }: AskQuestionFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  if (instructors.length === 0) {
+  if (questionCreditsRemaining <= 0) {
     return (
-      <div className={`${PIXEL_CARD} p-5`}>
-        <p className="font-semibold text-[#1B2430]">
-          Soru sorabilmek için önce bir eğitmenden ders almış olman gerekiyor.
-        </p>
+      <div className={`${PIXEL_CARD} p-5 space-y-2`}>
+        <p className="font-semibold text-[#1B2430]">Soru kredin kalmadı.</p>
+        <Link href="/dashboard/student/packages" className="text-sm font-bold text-[#DD7B3A] underline">
+          Soru paketi satın al
+        </Link>
       </div>
     )
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!instructorId || !text.trim()) return
+    if (!subject || !text.trim()) return
     setError(null)
     setSuccess(false)
     startTransition(async () => {
-      const result = await askQuestion({ instructorId, questionText: text.trim() })
+      const result = await askQuestion({ subject, questionText: text.trim() })
       if (!result.success) {
         setError(result.error)
         return
@@ -47,6 +50,7 @@ export function AskQuestionForm({ instructors }: AskQuestionFormProps) {
           return
         }
       }
+      setSubject('')
       setText('')
       setFile(null)
       if (inputRef.current) inputRef.current.value = ''
@@ -56,10 +60,12 @@ export function AskQuestionForm({ instructors }: AskQuestionFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className={`${PIXEL_CARD} p-5 space-y-3`}>
-      <select value={instructorId} onChange={(e) => setInstructorId(e.target.value)} className={PIXEL_INPUT} required>
-        <option value="">Eğitmen seç</option>
-        {instructors.map((i) => (
-          <option key={i.instructorId} value={i.instructorId}>{i.name}</option>
+      <p className="text-sm font-semibold text-[#1B2430]/70">Kalan soru kredin: <strong>{questionCreditsRemaining}</strong></p>
+
+      <select value={subject} onChange={(e) => setSubject(e.target.value)} className={PIXEL_INPUT} required>
+        <option value="">Branş seç</option>
+        {INSTRUCTOR_SUBJECT_OPTIONS.map((s) => (
+          <option key={s} value={s}>{s}</option>
         ))}
       </select>
 
@@ -95,9 +101,9 @@ export function AskQuestionForm({ instructors }: AskQuestionFormProps) {
       </div>
 
       {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-      {success && <p className="text-sm font-semibold text-[#6FA89E]">Sorun eğitmene iletildi.</p>}
+      {success && <p className="text-sm font-semibold text-[#6FA89E]">Sorun havuza iletildi, bir eğitmen cevaplayınca haber vereceğiz.</p>}
 
-      <button type="submit" disabled={isPending || !instructorId} className={`${PIXEL_BUTTON_PRIMARY} gap-2 px-4 py-2 text-sm`}>
+      <button type="submit" disabled={isPending || !subject} className={`${PIXEL_BUTTON_PRIMARY} gap-2 px-4 py-2 text-sm`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Soruyu Gönder'}
       </button>
     </form>

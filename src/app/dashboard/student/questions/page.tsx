@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getStudentInstructors } from '@/lib/questions/get-student-instructors'
 import { getQuestionsForStudent } from '@/lib/questions/get-questions-list'
+import { getStudentCreditSummary } from '@/lib/students/get-credit-summary'
 import { AskQuestionForm } from '@/components/questions/AskQuestionForm'
 import { QuestionCard } from '@/components/questions/QuestionCard'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
@@ -11,14 +11,14 @@ export default async function StudentQuestionsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const [instructors, questions] = await Promise.all([
-    getStudentInstructors(user.id),
+  const [questions, creditSummary] = await Promise.all([
     getQuestionsForStudent(user.id),
+    getStudentCreditSummary(user.id),
   ])
 
   return (
-    <DashboardPageShell title="Soru Sor" description="Ders aldığın eğitmenlere soru sorabilirsin.">
-      <AskQuestionForm instructors={instructors} />
+    <DashboardPageShell title="Soru Sor" description="Branşını seç, o branşı bilen bir eğitmen sorunu cevaplasın.">
+      <AskQuestionForm questionCreditsRemaining={creditSummary.questionCreditsRemaining} />
 
       {questions.length === 0 ? (
         <p className="font-semibold text-[#1B2430]">Henüz soru sormadın.</p>

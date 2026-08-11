@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { Loader2, Paperclip, X } from 'lucide-react'
-import { answerQuestion } from '@/actions/questions'
+import { answerQuestion, declineQuestion } from '@/actions/questions'
 import { uploadQuestionAttachment, getQuestionAttachmentSignedUrl } from '@/lib/storage/upload-question-attachment'
 import type { QuestionListItem } from '@/lib/questions/get-questions-list'
 import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
@@ -12,17 +13,27 @@ interface AnswerQuestionCardProps {
 }
 
 export function AnswerQuestionCard({ question }: AnswerQuestionCardProps) {
+  const router = useRouter()
   const [isAnswering, setIsAnswering] = useState(false)
   const [answer, setAnswer] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [isPending, startTransition] = useTransition()
+  const [isDeclining, startDeclineTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
   function handleSubmit() {
     if (!answer.trim() && !file) return
     setError(null)
     startTransition(async () => {
+      // Once cevabi/soru sahipligini ata, ekli dosyayi ANCAK bundan sonra
+      // yukle — instructor_id claim'den once bos oldugu icin ek yukleme
+      // politikasi henuz izin vermiyor.
+      const result = await answerQuestion(question.id, answer.trim() || null)
+      if (!result.success) {
+        setError(result.error)
+        return
+      }
       if (file) {
         const uploadResult = await uploadQuestionAttachment(question.id, 'answer', file)
         if (!uploadResult.success) {
@@ -30,21 +41,29 @@ export function AnswerQuestionCard({ question }: AnswerQuestionCardProps) {
           return
         }
       }
-      const result = await answerQuestion(question.id, answer.trim() || null)
-      if (!result.success) {
-        setError(result.error)
-        return
-      }
       setIsAnswering(false)
+      router.refresh()
+    })
+  }
+
+  function handleDecline() {
+    setError(null)
+    startDeclineTransition(async () => {
+      const result = await declineQuestion(question.id)
+      if (!result.success) { setError(result.error); return }
+      router.refresh()
     })
   }
 
   return (
     <div className={`${PIXEL_CARD} p-5 space-y-2`}>
       <div className="flex items-center justify-between gap-3">
-        <p className="font-bold text-[#1B2430]">{question.studentName}</p>
+        <div>
+          <p className="font-bold text-[#1B2430]">{question.studentName || question.subject}</p>
+          {question.subject && <p className="text-xs font-semibold text-[#1B2430]/60">{question.subject}</p>}
+        </div>
         <span className={question.status === 'answered' ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE}>
-          {question.status === 'answered' ? 'Cevaplandı' : 'Bekliyor'}
+          {question.status === 'answered' ? 'Cevaplandı' : 'Açık Havuzda'}
         </span>
       </div>
 
@@ -100,9 +119,15 @@ export function AnswerQuestionCard({ question }: AnswerQuestionCardProps) {
             </div>
           </div>
         ) : (
-          <button type="button" onClick={() => setIsAnswering(true)} className={`${PIXEL_BUTTON_PRIMARY} px-3 py-1.5 text-sm`}>
-            Cevapla
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {error && <p className="w-full text-sm font-semibold text-red-600">{error}</p>}
+            <button type="button" onClick={() => setIsAnswering(true)} className={`${PIXEL_BUTTON_PRIMARY} px-3 py-1.5 text-sm`}>
+              Cevapla
+            </button>
+            <button type="button" onClick={handleDecline} disabled={isDeclining} className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-sm`}>
+              {isDeclining ? <Loader2 className="h-4 w-4 animate-spin" /> : 'İlgilenmiyorum'}
+            </button>
+          </div>
         )
       )}
     </div>

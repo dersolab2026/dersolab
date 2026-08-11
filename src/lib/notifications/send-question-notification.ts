@@ -3,37 +3,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export async function notifyQuestionAsked(params: {
-  instructorId: string
-  studentName: string
-  questionText: string
-}) {
-  const admin = createAdminClient()
-  const { data: instructor } = await admin.from('users').select('name, email').eq('id', params.instructorId).single()
-  if (!instructor) return
-
-  await admin.from('notifications').insert({
-    recipient_id: params.instructorId,
-    type: 'question_asked',
-    channel: 'email',
-    title: 'Yeni bir sorun var',
-    body: `${params.studentName} sana bir soru sordu: "${params.questionText}"`,
-  })
-
-  try {
-    await resend.emails.send({
-      from: 'DersoLab <bildirim@dersolab.com>',
-      to: instructor.email,
-      subject: 'Yeni bir sorun var - DersoLab',
-      html: `<p>Merhaba ${instructor.name},</p>
-        <p><strong>${params.studentName}</strong> sana bir soru sordu:</p>
-        <p>"${params.questionText}"</p>
-        <p>Panelden cevaplayabilirsin.</p>`,
-    })
-  } catch (err) {
-    console.error('Soru bildirimi gonderilemedi:', err)
-  }
-}
+// Soru artik belirli bir egitmene degil acik havuza dusuyor (bkz. 0067),
+// bu yuzden soru sorulunca tek bir alici yok — tum uygun egitmenlere toplu
+// bildirim atmak yerine egitmenler "Sorularim" sayfasindaki havuzu kontrol ediyor.
 
 export async function notifyQuestionAnswered(params: {
   studentId: string

@@ -86,6 +86,7 @@ interface UpsertPackageParams {
   creditAmount: number
   price: number
   isActive: boolean
+  packageType: 'lesson' | 'question'
 }
 
 export async function upsertPackage(params: UpsertPackageParams): Promise<ActionResult> {
@@ -108,6 +109,7 @@ export async function upsertPackage(params: UpsertPackageParams): Promise<Action
     credit_amount: params.creditAmount,
     price: params.price,
     is_active: params.isActive,
+    package_type: params.packageType,
   }
 
   let packageId = params.id
