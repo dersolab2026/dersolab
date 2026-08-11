@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getActivePackages } from '@/lib/marketplace/get-packages'
+import { getStudentCreditSummary } from '@/lib/students/get-credit-summary'
 import { PurchasePackageButton } from '@/components/marketplace/PurchasePackageButton'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { PIXEL_CARD } from '@/lib/theme'
@@ -15,7 +16,10 @@ export default async function StudentPackagesPage({ searchParams }: StudentPacka
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const packages = await getActivePackages()
+  const [packages, creditSummary] = await Promise.all([
+    getActivePackages(),
+    getStudentCreditSummary(user.id),
+  ])
 
   return (
     <DashboardPageShell
@@ -25,8 +29,22 @@ export default async function StudentPackagesPage({ searchParams }: StudentPacka
       {success && <p className="font-semibold text-[#6FA89E]">Ödeme alındı, krediler hesabına eklendi.</p>}
       {canceled && <p className="font-semibold text-[#1B2430]/70">Ödeme tamamlanmadı.</p>}
 
-      <div className={`${PIXEL_CARD} p-4`}>
-        <p className="text-sm font-semibold text-[#1B2430]/70">1 ders kredisi, 40 dakikalık bir derse karşılık gelir.</p>
+      <div className={`${PIXEL_CARD} p-5 space-y-3`}>
+        <div>
+          <p className="text-sm font-semibold text-[#1B2430]/70">Kalan Kredin</p>
+          <p className="text-3xl font-bold text-[#1B2430]">{creditSummary.remaining}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 pt-2 border-t-2 border-[#1B2430]/10">
+          <div>
+            <p className="text-xs font-semibold text-[#1B2430]/60">Ders</p>
+            <p className="font-bold text-[#1B2430]">{creditSummary.lessonCount} ders · {creditSummary.lessonCreditsUsed} kredi</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-[#1B2430]/60">Rehberlik Seansı</p>
+            <p className="font-bold text-[#1B2430]">{creditSummary.guidanceCount} seans · {creditSummary.guidanceCreditsUsed} kredi</p>
+          </div>
+        </div>
+        <p className="text-xs font-semibold text-[#1B2430]/60">1 ders kredisi, 40 dakikalık bir derse karşılık gelir.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
