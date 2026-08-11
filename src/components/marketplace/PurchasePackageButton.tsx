@@ -1,69 +1,24 @@
-'use client'
-
-import { useState, useTransition } from 'react'
-import { Loader2 } from 'lucide-react'
-import { createCheckoutSession } from '@/actions/packages'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { BillingInfoForm } from '@/components/packages/BillingInfoForm'
-import type { BillingInfo } from '@/actions/billing'
 import { PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
 
 interface PurchasePackageButtonProps {
-  packageId: string
-  studentId: string
-  billingInfo: BillingInfo | null
-  hasBillingInfo: boolean
+  shopierProductUrl: string | null
 }
 
-export function PurchasePackageButton({ packageId, studentId, billingInfo, hasBillingInfo }: PurchasePackageButtonProps) {
-  const [isPending, startTransition] = useTransition()
-  const [error, setError] = useState<string | null>(null)
-  const [showBillingForm, setShowBillingForm] = useState(false)
-  const [billingReady, setBillingReady] = useState(hasBillingInfo)
-
-  function startPurchase() {
-    setError(null)
-    startTransition(async () => {
-      const result = await createCheckoutSession({ packageId, studentId })
-      if (!result.success) {
-        if (result.missingBillingInfo) {
-          setShowBillingForm(true)
-          return
-        }
-        setError(result.error)
-        return
-      }
-      window.location.href = result.checkoutUrl
-    })
-  }
-
-  function handlePurchase() {
-    if (!billingReady) {
-      setShowBillingForm(true)
-      return
-    }
-    startPurchase()
-  }
-
-  function handleBillingSaved() {
-    setBillingReady(true)
-    setShowBillingForm(false)
-    startPurchase()
+export function PurchasePackageButton({ shopierProductUrl }: PurchasePackageButtonProps) {
+  if (!shopierProductUrl) {
+    return (
+      <p className="text-sm font-semibold text-red-600">Bu paket şu anda satın alınamıyor, bizi bilgilendirdik.</p>
+    )
   }
 
   return (
-    <div className="space-y-2">
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-      <button type="button" onClick={handlePurchase} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} w-full py-2.5`}>
-        {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Satın Al'}
-      </button>
-
-      <Dialog open={showBillingForm} onOpenChange={setShowBillingForm}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Fatura Bilgileri</DialogTitle></DialogHeader>
-          <BillingInfoForm initialInfo={billingInfo} onSaved={handleBillingSaved} />
-        </DialogContent>
-      </Dialog>
+    <div className="space-y-1.5">
+      <a href={shopierProductUrl} className={`${PIXEL_BUTTON_PRIMARY} block w-full py-2.5 text-center`}>
+        Satın Al
+      </a>
+      <p className="text-xs font-semibold text-[#1B2430]/60">
+        Ödeme Shopier üzerinden alınır. Kredilerin doğru hesaba tanımlanması için Shopier&apos;de bu DersoLab hesabınla aynı e-postayı kullan.
+      </p>
     </div>
   )
 }

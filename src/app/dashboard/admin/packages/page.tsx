@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAllPackagesForAdmin } from '@/lib/marketplace/get-packages'
 import { PackageFormDialog } from '@/components/admin/PackageFormDialog'
+import { SyncShopierProductButton } from '@/components/admin/SyncShopierProductButton'
 
 export default async function AdminPackagesPage() {
   const packages = await getAllPackagesForAdmin()
@@ -31,14 +32,24 @@ export default async function AdminPackagesPage() {
               <CardContent className="space-y-3">
                 <p className="text-sm text-muted-foreground">{pkg.creditAmount} kredi — {pkg.price.toLocaleString('tr-TR')} ₺</p>
                 {pkg.description && <p className="text-sm text-muted-foreground">{pkg.description}</p>}
-                <PackageFormDialog
-                  packageId={pkg.id}
-                  initialTitle={pkg.title}
-                  initialDescription={pkg.description ?? ''}
-                  initialCreditAmount={pkg.creditAmount}
-                  initialPrice={pkg.price}
-                  initialIsActive={pkg.isActive}
-                />
+                {pkg.shopierProductUrl ? (
+                  <a href={pkg.shopierProductUrl} target="_blank" rel="noreferrer" className="block text-xs text-muted-foreground underline">
+                    Shopier ürün linki
+                  </a>
+                ) : (
+                  <p className="text-xs text-destructive">Shopier ile senkronize değil — satın alma çalışmaz</p>
+                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  <PackageFormDialog
+                    packageId={pkg.id}
+                    initialTitle={pkg.title}
+                    initialDescription={pkg.description ?? ''}
+                    initialCreditAmount={pkg.creditAmount}
+                    initialPrice={pkg.price}
+                    initialIsActive={pkg.isActive}
+                  />
+                  <SyncShopierProductButton packageId={pkg.id} />
+                </div>
               </CardContent>
             </Card>
           ))}

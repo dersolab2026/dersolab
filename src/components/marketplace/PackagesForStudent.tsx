@@ -4,17 +4,14 @@ import { useState } from 'react'
 import { PurchasePackageButton } from '@/components/marketplace/PurchasePackageButton'
 import type { PackageItem } from '@/lib/marketplace/get-packages'
 import type { GuardianStudent } from '@/lib/marketplace/get-guardian-students'
-import type { BillingInfo } from '@/actions/billing'
 import { PIXEL_CARD, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface PackagesForStudentProps {
   packages: PackageItem[]
   students: GuardianStudent[]
-  billingInfo: BillingInfo | null
-  hasBillingInfo: boolean
 }
 
-export function PackagesForStudent({ packages, students, billingInfo, hasBillingInfo }: PackagesForStudentProps) {
+export function PackagesForStudent({ packages, students }: PackagesForStudentProps) {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     students.length === 1 ? students[0].studentId : null
   )
@@ -54,10 +51,15 @@ export function PackagesForStudent({ packages, students, billingInfo, hasBilling
   return (
     <div className="space-y-4">
       {students.length > 1 && (
-        <p className="font-semibold text-[#1B2430]">
-          <strong>{selectedStudent?.name}</strong> için paket alınıyor —{' '}
-          <button onClick={() => setSelectedStudentId(null)} className="underline text-[#DD7B3A] font-bold">değiştir</button>
-        </p>
+        <div className="space-y-1">
+          <p className="font-semibold text-[#1B2430]">
+            <strong>{selectedStudent?.name}</strong> için paket alınıyor —{' '}
+            <button onClick={() => setSelectedStudentId(null)} className="underline text-[#DD7B3A] font-bold">değiştir</button>
+          </p>
+          <p className="text-xs font-semibold text-[#1B2430]/60">
+            Birden fazla öğrencin olduğu için Shopier ödeme sayfasındaki not alanına <strong>&quot;{selectedStudent?.name}&quot;</strong> yazmayı unutma — krediler doğru öğrenciye tanımlanabilsin.
+          </p>
+        </div>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         {packages.map((pkg) => (
@@ -66,7 +68,7 @@ export function PackagesForStudent({ packages, students, billingInfo, hasBilling
             <p className="text-2xl font-bold text-[#1B2430]">{pkg.price.toLocaleString('tr-TR')} ₺</p>
             <p className="text-sm font-semibold text-[#6FA89E]">{pkg.creditAmount} ders kredisi</p>
             {pkg.description && <p className="text-sm font-semibold text-[#1B2430]/70">{pkg.description}</p>}
-            <PurchasePackageButton packageId={pkg.id} studentId={selectedStudentId} billingInfo={billingInfo} hasBillingInfo={hasBillingInfo} />
+            <PurchasePackageButton shopierProductUrl={pkg.shopierProductUrl} />
           </div>
         ))}
       </div>

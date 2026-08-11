@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyInstructorApprovalStatus } from '@/lib/notifications/send-guardian-notification'
 import { getCategoryLink, type AdminNotificationCategory } from '@/lib/notifications/get-notification-link'
+import { createShopierProduct, updateShopierProduct } from '@/lib/shopier/client'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -100,22 +101,129 @@ export async function upsertPackage(params: UpsertPackageParams): Promise<Action
     return { success: false, error: 'Fiyat 0\'dan büyük bir sayı olmalı' }
   }
 
+  const title = params.title.trim()
   const payload = {
-    title: params.title.trim(),
+    title,
     description: params.description?.trim() || null,
     credit_amount: params.creditAmount,
     price: params.price,
     is_active: params.isActive,
   }
 
-  const { error } = params.id
-    ? await supabase.from('packages').update(payload).eq('id', params.id)
-    : await supabase.from('packages').insert(payload)
+  let packageId = params.id
+  let existingShopierId: string | null = null
 
-  if (error) return { success: false, error: error.message }
+  if (packageId) {
+    const { data: existing } = await supabase.from('packages').select('shopier_product_id').eq('id', packageId).single()
+    existingShopierId = existing?.shopier_product_id ?? null
+    const { error } = await supabase.from('packages').update(payload).eq('id', packageId)
+    if (error) return { success: false, error: error.message }
+  } else {
+    const { data: inserted, error } = await supabase.from('packages').insert(payload).select('id').single()
+    if (error || !inserted) return { success: false, error: error?.message ?? 'Paket oluşturulamadı' }
+    packageId = inserted.id
+  }
+
+  try {
+    // Shopier'da PUT ile guncelleme calismiyor (403); updateShopierProduct
+    // aslinda eskiyi silip yenisini olusturuyor, bu yuzden id/url her
+    // seferinde degisir ve yeniden kaydedilmesi gerekiyor.
+    const product = existingShopierId
+      ? await updateShopierProduct(existingShopierId, { title, price: params.price })
+      : await createShopierProduct({ title, price: params.price })
+    await supabase.from('packages').update({ shopier_product_id: product.id, shopier_product_url: product.url }).eq('id', packageId)
+  } catch (err) {
+    console.error('Shopier ürün senkronizasyon hatası:', err)
+  }
 
   revalidatePath('/dashboard/admin/packages')
   revalidatePath('/dashboard/student/packages')
+  return { success: true }
+}
+
+export async function syncPackageWithShopier(packageId: string): Promise<ActionResult> {
+  const { supabase, user, isAdmin } = await requireAdmin()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+  if (!isAdmin) return { success: false, error: 'Bu işlem için yetkin yok' }
+
+  const { data: pkg } = await supabase.from('packages').select('title, price, shopier_product_id').eq('id', packageId).single()
+  if (!pkg) return { success: false, error: 'Paket bulunamadı' }
+
+  try {
+    const product = pkg.shopier_product_id
+      ? await updateShopierProduct(pkg.shopier_product_id, { title: pkg.title, price: pkg.price })
+      : await createShopierProduct({ title: pkg.title, price: pkg.price })
+    await supabase.from('packages').update({ shopier_product_id: product.id, shopier_product_url: product.url }).eq('id', packageId)
+  } catch (err) {
+    console.error('Shopier ürün senkronizasyon hatası:', err)
+    return { success: false, error: 'Shopier ile senkronize edilemedi, tekrar dener misin?' }
+  }
+
+  revalidatePath('/dashboard/admin/packages')
+  return { success: true }
+}
+
+export async function resolveUnmatchedShopierPayment(paymentId: string, studentId: string): Promise<ActionResult> {
+  const { supabase, user, isAdmin } = await requireAdmin()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+  if (!isAdmin) return { success: false, error: 'Bu işlem için yetkin yok' }
+
+  const { data: payment } = await supabase
+    .from('shopier_unmatched_payments')
+    .select('id, shopier_order_id, package_id, status')
+    .eq('id', paymentId)
+    .single()
+  if (!payment || payment.status !== 'pending') return { success: false, error: 'Ödeme bulunamadı ya da zaten çözüldü' }
+  if (!payment.package_id) return { success: false, error: 'Bu ödemenin hangi pakete ait olduğu bilinmiyor' }
+
+  const { data: pkg } = await supabase.from('packages').select('credit_amount, price').eq('id', payment.package_id).single()
+  if (!pkg) return { success: false, error: 'Paket bulunamadı' }
+
+  // package_purchases'a RLS, sadece ogrenci/veli kendi adina 'pending' olarak
+  // ekleyebilsin diye izin veriyor (bkz. 0016). Admin'in başkası adına
+  // doğrudan 'completed' eklemesi icin service-role client gerekiyor.
+  const admin = createAdminClient()
+
+  const { data: purchase, error: purchaseError } = await admin
+    .from('package_purchases')
+    .insert({
+      package_id: payment.package_id,
+      student_id: studentId,
+      purchased_by: studentId,
+      credits_granted: pkg.credit_amount,
+      amount_paid: pkg.price,
+      payment_provider: 'shopier',
+      payment_reference: payment.shopier_order_id,
+      status: 'completed',
+    })
+    .select('id')
+    .single()
+  if (purchaseError || !purchase) return { success: false, error: purchaseError?.message ?? 'Kredi tanımlanamadı' }
+
+  const { error } = await admin
+    .from('shopier_unmatched_payments')
+    .update({ status: 'resolved', resolved_student_id: studentId, resolved_purchase_id: purchase.id, resolved_at: new Date().toISOString() })
+    .eq('id', paymentId)
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/dashboard/admin/odemeler')
+  revalidatePath('/dashboard/student/packages')
+  return { success: true }
+}
+
+export async function dismissUnmatchedShopierPayment(paymentId: string): Promise<ActionResult> {
+  const { supabase, user, isAdmin } = await requireAdmin()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+  if (!isAdmin) return { success: false, error: 'Bu işlem için yetkin yok' }
+
+  const { error } = await supabase
+    .from('shopier_unmatched_payments')
+    .update({ status: 'resolved', resolved_at: new Date().toISOString() })
+    .eq('id', paymentId)
+    .eq('status', 'pending')
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/dashboard/admin/odemeler')
   return { success: true }
 }
 

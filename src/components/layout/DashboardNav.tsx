@@ -49,6 +49,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/admin/users', label: 'Kullanıcılar' },
     { href: '/dashboard/admin/instructors', label: 'Eğitmen Onayları' },
     { href: '/dashboard/admin/packages', label: 'Paketler' },
+    { href: '/dashboard/admin/odemeler', label: 'Eşleşmeyen Ödemeler' },
     { href: '/dashboard/admin/notifications', label: 'Bildirim Gönder' },
   ],
 }
