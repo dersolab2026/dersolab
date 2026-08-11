@@ -32,7 +32,7 @@ export async function getAllStudentsAndInstructors(): Promise<AdminUsersData> {
   const admin = createAdminClient()
 
   const [{ data: users }, { data: students }, { data: instructors }] = await Promise.all([
-    admin.from('users').select('id, name, email, role, created_at').in('role', ['student', 'instructor']).is('deleted_at', null),
+    admin.from('users').select('id, name, email, role, created_at').in('role', ['student', 'instructor', 'admin']).is('deleted_at', null),
     admin.from('students').select('user_id, grade_track, credit_balance, free_trial_used'),
     admin.from('instructors').select('user_id, approval_status, calendar_connected, offers_free_trial, payout_name, payout_iban, payout_updated_at'),
   ])
@@ -54,7 +54,10 @@ export async function getAllStudentsAndInstructors(): Promise<AdminUsersData> {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
   const instructorRows: AdminInstructorRow[] = (users ?? [])
-    .filter((u) => u.role === 'instructor')
+    // Admin hesabi da (ör. sahibinin kendisi) bir instructors satirina
+    // sahipse Eğitmenler listesinde görünsün — sadece role='instructor'
+    // ile sınırlamıyoruz.
+    .filter((u) => instructorByUserId.has(u.id))
     .map((u) => ({
       id: u.id,
       name: u.name,
