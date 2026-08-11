@@ -2,6 +2,7 @@ import './globals.css'
 import type { ReactNode } from 'react'
 import { Inter } from 'next/font/google'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
+import { NativeAuthBridge } from '@/components/native/NativeAuthBridge'
 
 const inter = Inter({ subsets: ['latin', 'latin-ext'], variable: '--font-sans' })
 
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         {children}
         <WhatsAppButton />
+        <NativeAuthBridge />
       </body>
     </html>
   )

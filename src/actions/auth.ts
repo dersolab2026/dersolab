@@ -70,11 +70,11 @@ export async function logoutUser(): Promise<void> {
   redirect('/')
 }
 
-export async function signInWithGoogle(): Promise<{ url: string } | { error: string }> {
+export async function signInWithGoogle(redirectTo?: string): Promise<{ url: string } | { error: string }> {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
+    options: { redirectTo: redirectTo ?? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
   })
   if (error || !data.url) return { error: error?.message ?? 'Google girişi başlatılamadı' }
   return { url: data.url }

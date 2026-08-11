@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Capacitor } from '@capacitor/core'
+import { Browser } from '@capacitor/browser'
 import { AuthShell } from '@/components/auth/AuthShell'
 import { PasswordInput } from '@/components/auth/PasswordInput'
 import { loginUser, signInWithGoogle } from '@/actions/auth'
@@ -29,9 +31,15 @@ export default function LoginPage() {
   async function handleGoogleLogin() {
     setError(null)
     setIsGooglePending(true)
-    const result = await signInWithGoogle()
+    const isNative = Capacitor.isNativePlatform()
+    const result = await signInWithGoogle(isNative ? 'com.dersolab.app://auth/callback' : undefined)
     if ('url' in result) {
-      window.location.href = result.url
+      if (isNative) {
+        await Browser.open({ url: result.url })
+        setIsGooglePending(false)
+      } else {
+        window.location.href = result.url
+      }
     } else {
       setError(result.error)
       setIsGooglePending(false)
