@@ -10,7 +10,7 @@ export default async function MarketplaceLayout({ children }: { children: ReactN
   if (!user) return <>{children}</>
 
   const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
-  const role = (userRow?.role ?? 'student') as 'student' | 'parent' | 'instructor' | 'admin'
+  const role = (userRow?.role ?? 'student') as 'student' | 'instructor' | 'admin'
 
   let offersFreeTrial = false
   if (role === 'instructor' || role === 'admin') {

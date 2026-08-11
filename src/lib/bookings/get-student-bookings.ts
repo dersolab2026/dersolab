@@ -15,21 +15,13 @@ export interface StudentBookingItem {
   isTrial: boolean
 }
 
-export async function getBookingsForViewer(viewerId: string, viewerRole: string): Promise<StudentBookingItem[]> {
+export async function getBookingsForViewer(viewerId: string): Promise<StudentBookingItem[]> {
   const supabase = await createClient()
-
-  let studentIds: string[] = [viewerId]
-
-  if (viewerRole === 'parent') {
-    const { data: links } = await supabase.from('guardian_links').select('student_id').eq('guardian_id', viewerId)
-    studentIds = (links ?? []).map((l: any) => l.student_id)
-    if (studentIds.length === 0) return []
-  }
 
   const { data: bookings, error } = await supabase
     .from('bookings')
     .select('id, student_id, instructor_id, start_time, end_time, status, meet_link, credit_refunded, is_trial')
-    .in('student_id', studentIds)
+    .eq('student_id', viewerId)
     .order('start_time', { ascending: false })
 
   if (error) throw error

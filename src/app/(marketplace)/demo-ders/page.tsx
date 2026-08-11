@@ -1,9 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { getGuardianStudents } from '@/lib/marketplace/get-guardian-students'
 import { getDemoLessonStatus } from '@/lib/demo-lessons/get-demo-lesson-status'
 import { DemoLessonRequestCard } from '@/components/demo-lessons/DemoLessonRequestCard'
-import { DemoLessonStudentSelector } from '@/components/demo-lessons/DemoLessonStudentSelector'
 import { DemoLessonEmailForm } from '@/components/demo-lessons/DemoLessonEmailForm'
 
 export default async function DemoLessonPage() {
@@ -42,21 +40,12 @@ export default async function DemoLessonPage() {
               <Link href="/login" className="text-[#DD7B3A] font-bold underline">Giriş Yap</Link>
             </p>
           </>
-        ) : userRecord?.role === 'parent' ? (
-          <DemoLessonStudentSelector
-            students={await Promise.all(
-              (await getGuardianStudents(user.id)).map(async (s) => {
-                const status = await getDemoLessonStatus(s.studentId)
-                return { ...s, requestStatus: status.requestStatus }
-              })
-            )}
-          />
         ) : userRecord?.role === 'student' ? (
           <DemoLessonRequestCard studentId={user.id} initialStatus={await getDemoLessonStatus(user.id)} />
         ) : (
           <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
             <p className="font-sans font-semibold text-[#1B2430]">
-              Ücretsiz tanışma dersi sadece öğrenci ve veli hesapları için geçerli.
+              Ücretsiz tanışma dersi sadece öğrenci hesapları için geçerli.
             </p>
           </div>
         )}

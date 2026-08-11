@@ -14,7 +14,7 @@ const POLL_INTERVAL_MS = 30_000
 
 interface NotificationBellProps {
   initialNotifications: NotificationItem[]
-  role: 'student' | 'parent' | 'instructor' | 'admin'
+  role: 'student' | 'instructor' | 'admin'
 }
 
 export function NotificationBell({ initialNotifications, role }: NotificationBellProps) {

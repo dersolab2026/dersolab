@@ -14,14 +14,14 @@ function formatDate(value: string) {
 }
 
 export default async function AdminUsersPage() {
-  const { students, parents, instructors } = await getAllStudentsAndInstructors()
+  const { students, instructors } = await getAllStudentsAndInstructors()
 
   return (
     <div className="space-y-10">
       <div>
         <h1 className="text-2xl font-semibold">Kullanıcılar</h1>
         <p className="text-muted-foreground">
-          {students.length} öğrenci · {parents.length} veli · {instructors.length} eğitmen
+          {students.length} öğrenci · {instructors.length} eğitmen
         </p>
       </div>
 
@@ -58,52 +58,6 @@ export default async function AdminUsersPage() {
                     <td className="px-3 py-2 text-muted-foreground">{u.calendarConnected ? 'Bağlı' : 'Bağlı değil'}</td>
                     <td className="px-3 py-2">
                       <ToggleFreeTrialButton instructorId={u.id} offersFreeTrial={u.offersFreeTrial} />
-                    </td>
-                    <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
-                    <td className="px-3 py-2 text-right">
-                      <DeleteUserButton userId={u.id} userName={u.name || u.email} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Veliler</h2>
-        {parents.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Kayıtlı veli yok.</p>
-        ) : (
-          <div className="overflow-x-auto rounded-md border">
-            <table className="w-full text-sm">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
-                  <th className="px-3 py-2 text-left font-medium">E-posta</th>
-                  <th className="px-3 py-2 text-left font-medium">Öğrencileri</th>
-                  <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
-                  <th className="px-3 py-2 text-right font-medium">İşlemler</th>
-                </tr>
-              </thead>
-              <tbody>
-                {parents.map((u) => (
-                  <tr key={u.id} className="border-b last:border-0">
-                    <td className="px-3 py-2">{u.name || '—'}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
-                    <td className="px-3 py-2">
-                      {u.students.length === 0 ? (
-                        <span className="text-muted-foreground">Öğrenci eklenmemiş</span>
-                      ) : (
-                        <div className="flex flex-wrap gap-1">
-                          {u.students.map((s) => (
-                            <Badge key={s.id} variant="outline">
-                              {s.name}{s.gradeTrack ? ` (${s.gradeTrack.toUpperCase()})` : ''}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
                     <td className="px-3 py-2 text-right">

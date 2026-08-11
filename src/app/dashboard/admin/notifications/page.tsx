@@ -4,12 +4,11 @@ import { AdminNotificationForm } from '@/components/admin/AdminNotificationForm'
 import { SentNotificationsList } from '@/components/admin/SentNotificationsList'
 
 export default async function AdminNotificationsPage() {
-  const { students, parents, instructors } = await getAllStudentsAndInstructors()
+  const { students, instructors } = await getAllStudentsAndInstructors()
   const sentBatches = await getSentAdminNotifications()
 
   const users = [
     ...students.map((u) => ({ id: u.id, name: u.name, email: u.email, role: 'student' as const })),
-    ...parents.map((u) => ({ id: u.id, name: u.name, email: u.email, role: 'parent' as const })),
     ...instructors.map((u) => ({ id: u.id, name: u.name, email: u.email, role: 'instructor' as const })),
   ]
 

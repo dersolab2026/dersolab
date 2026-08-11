@@ -9,26 +9,24 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ADMIN_NOTIFICATION_CATEGORY_LABELS, type AdminNotificationCategory } from '@/lib/notifications/get-notification-link'
 
-type Audience = 'all' | 'student' | 'parent' | 'instructor' | 'specific'
+type Audience = 'all' | 'student' | 'instructor' | 'specific'
 
 interface UserOption {
   id: string
   name: string
   email: string
-  role: 'student' | 'parent' | 'instructor'
+  role: 'student' | 'instructor'
 }
 
 const AUDIENCE_LABELS: Record<Audience, string> = {
   all: 'Tüm Kullanıcılar',
   student: 'Tüm Öğrenciler',
-  parent: 'Tüm Veliler',
   instructor: 'Tüm Eğitmenler',
   specific: 'Belirli Kişiler',
 }
 
 const ROLE_LABELS: Record<UserOption['role'], string> = {
   student: 'Öğrenciler',
-  parent: 'Veliler',
   instructor: 'Eğitmenler',
 }
 
@@ -116,7 +114,7 @@ export function AdminNotificationForm({ users }: { users: UserOption[] }) {
               if (filtered.length === 0) {
                 return <p className="text-sm text-muted-foreground">Eşleşen kişi bulunamadı.</p>
               }
-              return (['student', 'parent', 'instructor'] as const).map((role) => {
+              return (['student', 'instructor'] as const).map((role) => {
                 const roleUsers = filtered.filter((u) => u.role === role)
                 if (roleUsers.length === 0) return null
                 return (

@@ -2,9 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { createClient } from '@/lib/supabase/server'
 import { getInstructorById, getInstructorEducation } from '@/lib/marketplace/get-instructors'
-import { getGuardianStudents } from '@/lib/marketplace/get-guardian-students'
 import { InstructorBookingSection } from '@/components/booking/InstructorBookingSection'
-import { StudentSelector } from '@/components/booking/StudentSelector'
 import { EducationList } from '@/components/marketplace/EducationList'
 import { IntroVideoPlayer } from '@/components/marketplace/IntroVideoPlayer'
 
@@ -20,8 +18,6 @@ export default async function InstructorDetailPage({ params }: InstructorDetailP
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
-
-  const { data: userRecord } = await supabase.from('users').select('role').eq('id', user.id).single()
 
   const education = await getInstructorEducation(instructor.userId)
 
@@ -64,11 +60,7 @@ export default async function InstructorDetailPage({ params }: InstructorDetailP
 
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
           {instructor.isCalendarConnected ? (
-            userRecord?.role === 'parent' ? (
-              <StudentSelector instructorId={instructor.userId} students={await getGuardianStudents(user.id)} />
-            ) : (
-              <InstructorBookingSection instructorId={instructor.userId} studentId={user.id} />
-            )
+            <InstructorBookingSection instructorId={instructor.userId} studentId={user.id} />
           ) : (
             <p className="font-semibold text-[#1B2430]">
               Bu eğitmen henüz takvimini bağlamadı, rezervasyon şu anda açık değil.

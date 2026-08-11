@@ -10,14 +10,7 @@ export default async function StudentHomeworkPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
-  let studentIds = [user.id]
-  if (userRow?.role === 'parent') {
-    const { data: links } = await supabase.from('guardian_links').select('student_id').eq('guardian_id', user.id)
-    studentIds = (links ?? []).map((l) => l.student_id)
-  }
-
-  const homeworkList = await getHomeworkForStudent(studentIds)
+  const homeworkList = await getHomeworkForStudent([user.id])
 
   return (
     <DashboardPageShell title="Ödevlerim" description="Eğitmenlerin verdiği ödevler ve teslim durumları.">

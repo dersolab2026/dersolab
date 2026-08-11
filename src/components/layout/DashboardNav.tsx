@@ -13,7 +13,7 @@ const NAV_LINK_ACTIVE = `${NAV_LINK_BASE} bg-[#DD7B3A] text-[#F4F1E8]`
 const NAV_LINK_INACTIVE = `${NAV_LINK_BASE} bg-white text-[#1B2430]`
 
 interface DashboardNavProps {
-  role: 'student' | 'parent' | 'instructor' | 'admin'
+  role: 'student' | 'instructor' | 'admin'
   offersFreeTrial?: boolean
   notifications: NotificationItem[]
 }
@@ -24,14 +24,6 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/student/homework', label: 'Ödevlerim' },
     { href: '/dashboard/student/packages', label: 'Paketler' },
     { href: '/dashboard/student/questions', label: 'Soru Sor' },
-    { href: '/instructors', label: 'Eğitmenler' },
-    { href: '/rehberlik', label: 'Rehberlik' },
-    { href: '/demo-ders', label: 'Tanışma Dersi' },
-  ],
-  parent: [
-    { href: '/dashboard/student/bookings', label: 'Derslerim' },
-    { href: '/dashboard/student/homework', label: 'Ödevler' },
-    { href: '/dashboard/student/packages', label: 'Paketler' },
     { href: '/instructors', label: 'Eğitmenler' },
     { href: '/rehberlik', label: 'Rehberlik' },
     { href: '/demo-ders', label: 'Tanışma Dersi' },

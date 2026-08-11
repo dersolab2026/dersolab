@@ -6,10 +6,9 @@ import { AuthShell } from '@/components/auth/AuthShell'
 import { PasswordInput } from '@/components/auth/PasswordInput'
 import { registerUser } from '@/actions/auth'
 
-type Role = 'student' | 'parent' | 'instructor'
+type Role = 'student' | 'instructor'
 
 const ROLE_LABELS: Record<Role, string> = {
-  parent: 'Veli',
   student: 'Öğrenci',
   instructor: 'Eğitmen',
 }
@@ -18,7 +17,7 @@ export function RegisterForm() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [role, setRole] = useState<Role>('parent')
+  const [role, setRole] = useState<Role>('student')
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -57,8 +56,8 @@ export function RegisterForm() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[#1B2430] font-bold mb-2">Hesap Türü</label>
-          <div className="grid grid-cols-3 gap-2">
-            {(['parent', 'student', 'instructor'] as const).map((r) => (
+          <div className="grid grid-cols-2 gap-2">
+            {(['student', 'instructor'] as const).map((r) => (
               <button
                 key={r}
                 type="button"
@@ -73,11 +72,6 @@ export function RegisterForm() {
               </button>
             ))}
           </div>
-          {role === 'student' && (
-            <p className="mt-2 text-xs text-[#1B2430]">
-              LGS öğrencisiysen, önce bir veli &quot;Veli&quot; seçeneğiyle kayıt olmalı ve seni eklemeli.
-            </p>
-          )}
         </div>
 
         <div>

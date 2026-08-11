@@ -230,7 +230,7 @@ export async function dismissUnmatchedShopierPayment(paymentId: string): Promise
 type SendNotificationResult = { success: true; count: number } | { success: false; error: string }
 
 interface SendAdminNotificationParams {
-  audience: 'all' | 'student' | 'parent' | 'instructor' | 'specific'
+  audience: 'all' | 'student' | 'instructor' | 'specific'
   userIds?: string[]
   category: AdminNotificationCategory
   title: string
@@ -255,7 +255,7 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
     if (error) return { success: false, error: error.message }
     recipients = users ?? []
   } else {
-    const roles = params.audience === 'all' ? ['student', 'parent', 'instructor'] : [params.audience]
+    const roles = params.audience === 'all' ? ['student', 'instructor'] : [params.audience]
     const { data: users, error } = await admin.from('users').select('id, role, name, email').in('role', roles)
     if (error) return { success: false, error: error.message }
     recipients = users ?? []
@@ -270,7 +270,7 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
     channel: 'email' as const,
     title,
     body,
-    link: getCategoryLink(params.category, recipient.role as 'student' | 'parent' | 'instructor' | 'admin'),
+    link: getCategoryLink(params.category, recipient.role as 'student' | 'instructor' | 'admin'),
     batch_id: batchId,
   }))
 

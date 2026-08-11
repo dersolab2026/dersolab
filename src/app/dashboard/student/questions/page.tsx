@@ -11,9 +11,6 @@ export default async function StudentQuestionsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
-  if (userRow?.role === 'parent') redirect('/dashboard')
-
   const [instructors, questions] = await Promise.all([
     getStudentInstructors(user.id),
     getQuestionsForStudent(user.id),

@@ -92,25 +92,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, queued: true })
   }
 
-  let studentId: string | null = null
-  if (buyer.role === 'student') {
-    studentId = buyer.id
-  } else if (buyer.role === 'parent') {
-    const { data: children } = await admin.from('guardian_links').select('student_id').eq('guardian_id', buyer.id)
-    if (children && children.length === 1) {
-      studentId = children[0].student_id
-    } else {
-      await queueUnmatched(admin, order, pkg.id, children && children.length > 1 ? 'veli_coklu_cocuk' : 'veli_cocuksuz')
-      return NextResponse.json({ ok: true, queued: true })
-    }
-  } else {
+  if (buyer.role !== 'student') {
     await queueUnmatched(admin, order, pkg.id, 'gecersiz_rol')
     return NextResponse.json({ ok: true, queued: true })
   }
 
   const { error: insertError } = await admin.from('package_purchases').insert({
     package_id: pkg.id,
-    student_id: studentId,
+    student_id: buyer.id,
     purchased_by: buyer.id,
     credits_granted: pkg.credit_amount,
     amount_paid: pkg.price,

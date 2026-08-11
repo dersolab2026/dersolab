@@ -9,7 +9,7 @@ interface RegisterParams {
   name: string
   email: string
   password: string
-  role: 'student' | 'parent' | 'instructor'
+  role: 'student' | 'instructor'
   gradeTrack?: 'lgs' | 'yks'
 }
 

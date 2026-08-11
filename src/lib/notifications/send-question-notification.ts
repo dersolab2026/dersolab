@@ -1,6 +1,5 @@
 import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveGuardianOrSelfRecipients } from './send-guardian-notification'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -43,29 +42,28 @@ export async function notifyQuestionAnswered(params: {
   answerText: string
 }) {
   const admin = createAdminClient()
-  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const { data: recipient } = await admin.from('users').select('id, name, email').eq('id', params.studentId).single()
+  if (!recipient) return
 
-  for (const recipient of recipients) {
-    await admin.from('notifications').insert({
-      recipient_id: recipient.id,
-      type: 'question_answered',
-      channel: 'email',
-      title: 'Sorun cevaplandı',
-      body: `${params.instructorName} sorunu cevapladı: "${params.answerText}"`,
+  await admin.from('notifications').insert({
+    recipient_id: recipient.id,
+    type: 'question_answered',
+    channel: 'email',
+    title: 'Sorun cevaplandı',
+    body: `${params.instructorName} sorunu cevapladı: "${params.answerText}"`,
+  })
+
+  try {
+    await resend.emails.send({
+      from: 'DersoLab <bildirim@dersolab.com>',
+      to: recipient.email,
+      subject: 'Sorun cevaplandı - DersoLab',
+      html: `<p>Merhaba ${recipient.name},</p>
+        <p><strong>${params.instructorName}</strong> sorduğun soruyu cevapladı:</p>
+        <p><em>"${params.questionText}"</em></p>
+        <p>${params.answerText}</p>`,
     })
-
-    try {
-      await resend.emails.send({
-        from: 'DersoLab <bildirim@dersolab.com>',
-        to: recipient.email,
-        subject: 'Sorun cevaplandı - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p>
-          <p><strong>${params.instructorName}</strong> sorduğun soruyu cevapladı:</p>
-          <p><em>"${params.questionText}"</em></p>
-          <p>${params.answerText}</p>`,
-      })
-    } catch (err) {
-      console.error('Cevap bildirimi gonderilemedi:', err)
-    }
+  } catch (err) {
+    console.error('Cevap bildirimi gonderilemedi:', err)
   }
 }

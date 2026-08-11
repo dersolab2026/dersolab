@@ -3,16 +3,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export async function resolveGuardianOrSelfRecipients(studentId: string) {
+async function getStudentRecipient(studentId: string) {
   const admin = createAdminClient()
-  const { data: guardianLinks } = await admin
-    .from('guardian_links').select('guardian_id').eq('student_id', studentId)
-
-  const recipientIds =
-    guardianLinks && guardianLinks.length > 0 ? guardianLinks.map((g) => g.guardian_id) : [studentId]
-
-  const { data: recipients } = await admin.from('users').select('id, name, email').in('id', recipientIds)
-  return recipients ?? []
+  const { data } = await admin.from('users').select('id, name, email').eq('id', studentId).single()
+  return data
 }
 
 interface BookingNotificationParams {
@@ -27,14 +21,14 @@ interface BookingNotificationParams {
 
 export async function notifyBookingCreated(params: BookingNotificationParams) {
   const admin = createAdminClient()
-  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const recipient = await getStudentRecipient(params.studentId)
 
   const formattedDate = new Date(params.startTime).toLocaleString('tr-TR', {
     dateStyle: 'full',
     timeStyle: 'short',
   })
 
-  for (const recipient of recipients) {
+  if (recipient) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id,
       type: 'booking_created',
@@ -94,7 +88,7 @@ export async function notifyBookingCancelled(params: {
   creditRefunded: boolean
   cancelledBy: 'student' | 'instructor'
 }) {
-  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const recipient = await getStudentRecipient(params.studentId)
   const admin = createAdminClient()
 
   const formattedDate = new Date(params.startTime).toLocaleString('tr-TR', {
@@ -106,7 +100,7 @@ export async function notifyBookingCancelled(params: {
     ? 'Kredin iade edildi.'
     : 'Ders saatine 24 saatten az kaldığı için kredi iade edilmedi.'
 
-  for (const recipient of recipients) {
+  if (recipient) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id,
       type: 'booking_cancelled',
@@ -161,10 +155,10 @@ export async function notifyLessonCompleted(params: {
   studentId: string; bookingId: string; instructorName: string; startTime: string
 }) {
   const admin = createAdminClient()
-  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const recipient = await getStudentRecipient(params.studentId)
   const formattedDate = new Date(params.startTime).toLocaleString('tr-TR', { dateStyle: 'full', timeStyle: 'short' })
 
-  for (const recipient of recipients) {
+  if (recipient) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id, type: 'lesson_completed', channel: 'email',
       title: 'Ders tamamlandı',
@@ -185,10 +179,10 @@ export async function notifyLessonMissed(params: {
   studentId: string; bookingId: string; instructorName: string; startTime: string
 }) {
   const admin = createAdminClient()
-  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const recipient = await getStudentRecipient(params.studentId)
   const formattedDate = new Date(params.startTime).toLocaleString('tr-TR', { dateStyle: 'full', timeStyle: 'short' })
 
-  for (const recipient of recipients) {
+  if (recipient) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id, type: 'lesson_missed', channel: 'email',
       title: 'Derse katılım sağlanmadı',
@@ -215,10 +209,10 @@ export async function notifyBookingReminder(params: {
   meetLink: string
 }) {
   const admin = createAdminClient()
-  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const recipient = await getStudentRecipient(params.studentId)
   const formattedTime = new Date(params.startTime).toLocaleString('tr-TR', { dateStyle: 'full', timeStyle: 'short' })
 
-  for (const recipient of recipients) {
+  if (recipient) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id, type: 'booking_reminder', channel: 'email',
       title: 'Dersin yaklaşıyor',
@@ -260,11 +254,11 @@ export async function notifyHomeworkAssigned(params: {
   studentId: string; homeworkId: string; title: string; dueDate: string | null
 }) {
   const admin = createAdminClient()
-  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const recipient = await getStudentRecipient(params.studentId)
   const dueDateText = params.dueDate
     ? new Date(params.dueDate).toLocaleDateString('tr-TR', { dateStyle: 'long' }) : 'belirtilmedi'
 
-  for (const recipient of recipients) {
+  if (recipient) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id, type: 'homework_assigned', channel: 'email',
       title: 'Yeni ödev verildi',
@@ -283,9 +277,9 @@ export async function notifyHomeworkAssigned(params: {
 
 export async function notifyHomeworkCompleted(params: { studentId: string; homeworkId: string; title: string }) {
   const admin = createAdminClient()
-  const recipients = await resolveGuardianOrSelfRecipients(params.studentId)
+  const recipient = await getStudentRecipient(params.studentId)
 
-  for (const recipient of recipients) {
+  if (recipient) {
     await admin.from('notifications').insert({
       recipient_id: recipient.id, type: 'homework_completed', channel: 'email',
       title: 'Ödev onaylandı',

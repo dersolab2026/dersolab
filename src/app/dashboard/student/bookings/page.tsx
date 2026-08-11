@@ -10,11 +10,7 @@ export default async function StudentBookingsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
-  const role = userRow?.role ?? 'student'
-
-  const bookings = await getBookingsForViewer(user.id, role)
-  const showStudentName = role === 'parent' && new Set(bookings.map((b) => b.studentId)).size > 1
+  const bookings = await getBookingsForViewer(user.id)
 
   const upcoming = bookings.filter((b) => b.status === 'scheduled')
   const past = bookings.filter((b) => b.status !== 'scheduled')
@@ -29,7 +25,7 @@ export default async function StudentBookingsPage() {
         ) : (
           <div className="space-y-3">
             {upcoming.map((b) => (
-              <BookingListItem key={b.id} booking={b} showStudentName={showStudentName} materials={materialsByBooking[b.id] ?? []} />
+              <BookingListItem key={b.id} booking={b} materials={materialsByBooking[b.id] ?? []} />
             ))}
           </div>
         )}
@@ -42,7 +38,7 @@ export default async function StudentBookingsPage() {
         ) : (
           <div className="space-y-3">
             {past.map((b) => (
-              <BookingListItem key={b.id} booking={b} showStudentName={showStudentName} materials={materialsByBooking[b.id] ?? []} />
+              <BookingListItem key={b.id} booking={b} materials={materialsByBooking[b.id] ?? []} />
             ))}
           </div>
         )}

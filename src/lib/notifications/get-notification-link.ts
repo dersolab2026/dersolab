@@ -10,7 +10,7 @@ export const ADMIN_NOTIFICATION_CATEGORY_LABELS: Record<AdminNotificationCategor
 
 export function getCategoryLink(
   category: AdminNotificationCategory,
-  role: 'student' | 'parent' | 'instructor' | 'admin'
+  role: 'student' | 'instructor' | 'admin'
 ): string {
   const isInstructorLike = role === 'instructor' || role === 'admin'
 
@@ -28,7 +28,7 @@ export function getCategoryLink(
   }
 }
 
-export function getNotificationLink(type: string, role: 'student' | 'parent' | 'instructor' | 'admin'): string {
+export function getNotificationLink(type: string, role: 'student' | 'instructor' | 'admin'): string {
   // Admin hesapları eğitmen olarak da işlev görebiliyor (ör. Egemen), bu yuzden
   // ders/ödev bildirimlerinde onlari da egitmen tarafina yönlendiriyoruz.
   const isInstructorLike = role === 'instructor' || role === 'admin'

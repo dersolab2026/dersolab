@@ -9,7 +9,6 @@ import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_SECONDARY } f
 
 interface BookingListItemProps {
   booking: StudentBookingItem
-  showStudentName: boolean
   materials: LessonMaterial[]
 }
 
@@ -20,14 +19,13 @@ const STATUS_LABELS: Record<string, string> = {
   no_show: 'Gerçekleşmedi',
 }
 
-export function BookingListItem({ booking, showStudentName, materials }: BookingListItemProps) {
+export function BookingListItem({ booking, materials }: BookingListItemProps) {
   const statusLabel = STATUS_LABELS[booking.status] ?? booking.status
   const formattedDate = new Date(booking.startTime).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })
 
   return (
     <div className={`${PIXEL_CARD} p-4 flex flex-wrap items-center justify-between gap-3`}>
       <div>
-        {showStudentName && <p className="text-xs font-bold text-[#1B2430]/70">{booking.studentName}</p>}
         <p className="font-bold text-[#1B2430]">
           {booking.instructorName}
           {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#DD7B3A]">Tanışma Dersi</span>}
