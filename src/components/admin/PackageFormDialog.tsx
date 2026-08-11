@@ -17,7 +17,6 @@ interface PackageFormDialogProps {
   initialCreditAmount?: number
   initialPrice?: number
   initialIsActive?: boolean
-  initialPackageType?: 'lesson' | 'question'
 }
 
 export function PackageFormDialog({
@@ -27,7 +26,6 @@ export function PackageFormDialog({
   initialCreditAmount = 10,
   initialPrice = 0,
   initialIsActive = true,
-  initialPackageType = 'lesson',
 }: PackageFormDialogProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -36,7 +34,6 @@ export function PackageFormDialog({
   const [creditAmount, setCreditAmount] = useState(String(initialCreditAmount))
   const [price, setPrice] = useState(String(initialPrice))
   const [isActive, setIsActive] = useState(initialIsActive)
-  const [packageType, setPackageType] = useState<'lesson' | 'question'>(initialPackageType)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -50,7 +47,6 @@ export function PackageFormDialog({
         creditAmount: Number(creditAmount),
         price: Number(price),
         isActive,
-        packageType,
       })
       if (!result.success) { setError(result.error); return }
       setOpen(false)
@@ -77,21 +73,9 @@ export function PackageFormDialog({
             <Label htmlFor="pkg-description">Açıklama (opsiyonel)</Label>
             <Textarea id="pkg-description" value={description} onChange={(e: any) => setDescription(e.target.value)} />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="pkg-type">Paket Türü</Label>
-            <select
-              id="pkg-type"
-              value={packageType}
-              onChange={(e: any) => setPackageType(e.target.value)}
-              className="flex h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <option value="lesson">Ders Kredisi</option>
-              <option value="question">Soru Hakkı</option>
-            </select>
-          </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="pkg-credits">{packageType === 'question' ? 'Soru Hakkı Miktarı' : 'Kredi Miktarı'}</Label>
+              <Label htmlFor="pkg-credits">Kredi Miktarı</Label>
               <Input id="pkg-credits" type="number" min="1" value={creditAmount} onChange={(e: any) => setCreditAmount(e.target.value)} />
             </div>
             <div className="space-y-1.5">

@@ -33,12 +33,12 @@ export default async function InstructorPayoutPage({ searchParams }: InstructorP
   const isGuidance = instructorRow?.subjects?.includes(GUIDANCE_SUBJECT) ?? false
 
   return (
-    <DashboardPageShell title="Ödemelerim" description="Ders ücretlerinin yatırılacağı hesap bilgilerini ve ders/soru istatistiklerini yönet.">
+    <DashboardPageShell title="Ödemelerim" description="Ders ücretlerinin yatırılacağı hesap bilgilerini ve ders istatistiklerini yönet.">
       <div className={`${PIXEL_CARD} p-5 space-y-4`}>
         <div>
           <p className="font-bold text-[#1B2430]">İstatistikler</p>
           <p className="text-sm font-semibold text-[#1B2430]/70">
-            Seçtiğin tarih aralığındaki {isGuidance ? 'seans' : 'ders'} ve cevapladığın soru sayısı.
+            Seçtiğin tarih aralığındaki {isGuidance ? 'seans' : 'ders'} sayısı.
           </p>
         </div>
 
@@ -66,15 +66,9 @@ export default async function InstructorPayoutPage({ searchParams }: InstructorP
           <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm`}>Filtrele</button>
         </form>
 
-        <div className="grid grid-cols-2 gap-3 pt-2 border-t-2 border-[#1B2430]/10">
-          <div>
-            <p className="text-xs font-semibold text-[#1B2430]/60">{isGuidance ? 'Seans Sayısı' : 'Ders Sayısı'}</p>
-            <p className="text-2xl font-bold text-[#1B2430]">{stats.lessonCount}</p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-[#1B2430]/60">Çözülen Soru Sayısı</p>
-            <p className="text-2xl font-bold text-[#1B2430]">{stats.answeredQuestionCount}</p>
-          </div>
+        <div className="pt-2 border-t-2 border-[#1B2430]/10">
+          <p className="text-xs font-semibold text-[#1B2430]/60">{isGuidance ? 'Seans Sayısı' : 'Ders Sayısı'}</p>
+          <p className="text-2xl font-bold text-[#1B2430]">{stats.lessonCount}</p>
         </div>
       </div>
 

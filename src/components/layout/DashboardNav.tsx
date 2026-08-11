@@ -23,7 +23,6 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/student/bookings', label: 'Derslerim' },
     { href: '/dashboard/student/homework', label: 'Ödevlerim' },
     { href: '/dashboard/student/packages', label: 'Paketler' },
-    { href: '/dashboard/student/questions', label: 'Soru Sor' },
     { href: '/instructors', label: 'Eğitmenler' },
     { href: '/rehberlik', label: 'Rehberlik' },
     { href: '/demo-ders', label: 'Tanışma Dersi' },
@@ -32,7 +31,6 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   instructor: [
     { href: '/dashboard/instructor', label: 'Derslerim' },
     { href: '/dashboard/instructor/homework', label: 'Ödevler' },
-    { href: '/dashboard/instructor/questions', label: 'Sorularım' },
     { href: '/dashboard/instructor/availability', label: 'Ajanda' },
     { href: '/dashboard/instructor/profile', label: 'Profilim' },
     { href: '/dashboard/instructor/odemeler', label: 'Ödemelerim' },

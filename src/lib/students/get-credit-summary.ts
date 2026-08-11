@@ -7,17 +7,12 @@ export interface StudentCreditSummary {
   lessonCreditsUsed: number
   guidanceCount: number
   guidanceCreditsUsed: number
-  questionCreditsRemaining: number
-  questionsAsked: number
 }
 
 export async function getStudentCreditSummary(studentId: string): Promise<StudentCreditSummary> {
   const supabase = await createClient()
 
-  const [{ data: studentRow }, { count: questionsAsked }] = await Promise.all([
-    supabase.from('students').select('credit_balance, question_credit_balance').eq('user_id', studentId).single(),
-    supabase.from('questions').select('id', { count: 'exact', head: true }).eq('student_id', studentId),
-  ])
+  const { data: studentRow } = await supabase.from('students').select('credit_balance').eq('user_id', studentId).single()
 
   const { data: bookings } = await supabase
     .from('bookings')
@@ -57,7 +52,5 @@ export async function getStudentCreditSummary(studentId: string): Promise<Studen
     lessonCreditsUsed,
     guidanceCount,
     guidanceCreditsUsed,
-    questionCreditsRemaining: studentRow?.question_credit_balance ?? 0,
-    questionsAsked: questionsAsked ?? 0,
   }
 }

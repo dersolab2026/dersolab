@@ -1,11 +1,10 @@
-export type AdminNotificationCategory = 'general' | 'lessons' | 'homework' | 'packages' | 'questions'
+export type AdminNotificationCategory = 'general' | 'lessons' | 'homework' | 'packages'
 
 export const ADMIN_NOTIFICATION_CATEGORY_LABELS: Record<AdminNotificationCategory, string> = {
   general: 'Genel',
   lessons: 'Derslerim',
   homework: 'Ödevler',
   packages: 'Paketler',
-  questions: 'Sorularım',
 }
 
 export function getCategoryLink(
@@ -21,8 +20,6 @@ export function getCategoryLink(
       return isInstructorLike ? '/dashboard/instructor/homework' : '/dashboard/student/homework'
     case 'packages':
       return isInstructorLike ? '/dashboard/instructor' : '/dashboard/student/packages'
-    case 'questions':
-      return isInstructorLike ? '/dashboard/instructor/questions' : '/dashboard/student/questions'
     default:
       return '/dashboard'
   }
@@ -47,10 +44,6 @@ export function getNotificationLink(type: string, role: 'student' | 'instructor'
       return '/dashboard/instructor/homework'
     case 'demo_lesson_requested':
       return '/dashboard/instructor/demo-talepleri'
-    case 'question_asked':
-      return '/dashboard/instructor/questions'
-    case 'question_answered':
-      return '/dashboard/student/questions'
     default:
       return '/dashboard'
   }

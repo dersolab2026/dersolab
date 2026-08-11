@@ -29,11 +29,6 @@ const ITEMS: { question: string; answer: string }[] = [
     answer:
       '"Ödevlerim" sayfasında eğitmeninin sana verdiği ödevleri görürsün. Görsel ya da video olarak teslim edebilir, eğitmenin onayladıktan sonra durumunu takip edebilirsin.',
   },
-  {
-    question: 'Eğitmenime soru sorabilir miyim?',
-    answer:
-      'Evet — daha önce ders aldığın bir eğitmene "Soru Sor" sayfasından soru sorabilirsin. Eğitmen cevapladığında bildirim alırsın.',
-  },
 ]
 
 export default async function StudentHowItWorksPage() {

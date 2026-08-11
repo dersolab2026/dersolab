@@ -30,9 +30,9 @@ const ITEMS: { question: string; answer: string }[] = [
       'Admin senin için "ücretsiz ders" yetkisini açtıysa, bekleyen tanışma dersi taleplerini "Demo Talepleri" sayfasında görürsün. İlk kabul eden eğitmen dersi alır, 20 dakikalık ve kredisiz bir tanışma dersi olur.',
   },
   {
-    question: 'Ödev ve soru akışı nasıl işliyor?',
+    question: 'Ödev akışı nasıl işliyor?',
     answer:
-      '"Ödevler" sayfasından öğrencilerine ödev verip teslimlerini inceleyip onaylayabilirsin. "Sorularım" sayfasından öğrencilerin sana sorduğu soruları görüp cevaplayabilirsin.',
+      '"Ödevler" sayfasından öğrencilerine ödev verip teslimlerini inceleyip onaylayabilirsin.',
   },
   {
     question: 'Profilimi geçici olarak kapatabilir miyim?',
