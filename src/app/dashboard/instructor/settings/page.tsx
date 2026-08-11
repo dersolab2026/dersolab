@@ -1,7 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ConnectGoogleCalendarButton } from '@/components/instructor/ConnectGoogleCalendarButton'
+import { PauseProfileButton } from '@/components/instructor/PauseProfileButton'
+import { DeleteAccountButton } from '@/components/instructor/DeleteAccountButton'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
+import { PIXEL_CARD } from '@/lib/theme'
 
 interface InstructorSettingsPageProps {
   searchParams: Promise<{ calendar_connected?: string; calendar_error?: string }>
@@ -13,7 +16,7 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: instructorRow } = await supabase.from('instructors').select('calendar_connected').eq('user_id', user.id).single()
+  const { data: instructorRow } = await supabase.from('instructors').select('calendar_connected, paused').eq('user_id', user.id).single()
 
   return (
     <DashboardPageShell title="Ayarlar" description="Google Takvim bağlantını buradan yönet.">
@@ -37,6 +40,17 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
       )}
 
       <ConnectGoogleCalendarButton isConnected={instructorRow?.calendar_connected ?? false} />
+
+      <div className={`${PIXEL_CARD} p-5 space-y-4`}>
+        <div>
+          <p className="font-bold text-[#1B2430]">Tehlikeli Bölge</p>
+          <p className="text-sm font-semibold text-[#1B2430]/70">Profilini dondurabilir ya da hesabını tamamen silebilirsin.</p>
+        </div>
+        <PauseProfileButton paused={instructorRow?.paused ?? false} />
+        <div className="pt-2 border-t-2 border-[#1B2430]/10">
+          <DeleteAccountButton />
+        </div>
+      </div>
     </DashboardPageShell>
   )
 }

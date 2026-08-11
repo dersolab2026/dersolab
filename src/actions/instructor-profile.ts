@@ -63,6 +63,19 @@ export async function updateInstructorSubjects(subjects: string[]): Promise<Acti
   return { success: true }
 }
 
+export async function setInstructorPaused(paused: boolean): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
+  const { error } = await supabase.from('instructors').update({ paused }).eq('user_id', user.id)
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/dashboard/instructor/settings')
+  revalidatePath('/instructors')
+  return { success: true }
+}
+
 export async function resubmitForReview(): Promise<ActionResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
