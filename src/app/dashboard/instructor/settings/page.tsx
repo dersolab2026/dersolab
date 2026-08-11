@@ -43,7 +43,7 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
 
       <div className={`${PIXEL_CARD} p-5 space-y-4`}>
         <div>
-          <p className="font-bold text-[#1B2430]">Tehlikeli Bölge</p>
+          <p className="font-bold text-[#1B2430]">Hesap Ayarları</p>
           <p className="text-sm font-semibold text-[#1B2430]/70">Profilini dondurabilir ya da hesabını tamamen silebilirsin.</p>
         </div>
         <PauseProfileButton paused={instructorRow?.paused ?? false} />
