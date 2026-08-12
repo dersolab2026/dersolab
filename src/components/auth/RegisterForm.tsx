@@ -15,6 +15,7 @@ const ROLE_LABELS: Record<Role, string> = {
 }
 
 const GRADES = [5, 6, 7, 8, 9, 10, 11, 12]
+const MEZUN_GRADE = 13
 
 const TRACK_LABELS: Record<Track, string> = {
   sayisal: 'Sayısal',
@@ -158,6 +159,7 @@ export function RegisterForm() {
                 {GRADES.map((g) => (
                   <option key={g} value={g}>{g}. Sınıf</option>
                 ))}
+                <option value={MEZUN_GRADE}>Mezun</option>
               </select>
             </div>
 
