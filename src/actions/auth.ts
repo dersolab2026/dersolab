@@ -10,7 +10,9 @@ interface RegisterParams {
   email: string
   password: string
   role: 'student' | 'instructor'
-  gradeTrack?: 'lgs' | 'yks'
+  schoolName?: string
+  grade?: number
+  track?: 'sayisal' | 'sozel' | 'ea' | 'dil'
 }
 
 function friendlySignUpError(message: string): string {
@@ -36,11 +38,22 @@ function friendlySignUpError(message: string): string {
 export async function registerUser(params: RegisterParams): Promise<ActionResult> {
   if (params.password.length < 8) return { success: false, error: 'Şifre en az 8 karakter olmalı' }
 
+  const gradeTrack = params.grade ? (params.grade <= 8 ? 'lgs' : 'yks') : undefined
+
   const supabase = await createClient()
   const { error } = await supabase.auth.signUp({
     email: params.email,
     password: params.password,
-    options: { data: { name: params.name, role: params.role, grade_track: params.gradeTrack } },
+    options: {
+      data: {
+        name: params.name,
+        role: params.role,
+        grade_track: gradeTrack,
+        school_name: params.schoolName,
+        grade: params.grade,
+        track: params.track,
+      },
+    },
   })
 
   if (error) return { success: false, error: friendlySignUpError(error.message) }

@@ -7,28 +7,56 @@ import { PasswordInput } from '@/components/auth/PasswordInput'
 import { registerUser } from '@/actions/auth'
 
 type Role = 'student' | 'instructor'
+type Track = 'sayisal' | 'sozel' | 'ea' | 'dil'
 
 const ROLE_LABELS: Record<Role, string> = {
   student: 'Öğrenci',
   instructor: 'Eğitmen',
 }
 
+const GRADES = [5, 6, 7, 8, 9, 10, 11, 12]
+
+const TRACK_LABELS: Record<Track, string> = {
+  sayisal: 'Sayısal',
+  sozel: 'Sözel',
+  ea: 'Eşit Ağırlık',
+  dil: 'Dil',
+}
+
 export function RegisterForm() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
   const [role, setRole] = useState<Role>('student')
+  const [schoolName, setSchoolName] = useState('')
+  const [grade, setGrade] = useState('')
+  const [track, setTrack] = useState<Track | ''>('')
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
+  const gradeNumber = grade ? Number(grade) : undefined
+  const isLise = gradeNumber !== undefined && gradeNumber >= 9
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
+
+    if (password !== passwordConfirm) {
+      setError('Şifreler eşleşmiyor')
+      return
+    }
+
     startTransition(async () => {
       const result = await registerUser({
-        name, email, password, role,
-        gradeTrack: role === 'student' ? 'yks' : undefined,
+        name,
+        email,
+        password,
+        role,
+        schoolName: role === 'student' ? schoolName : undefined,
+        grade: role === 'student' ? gradeNumber : undefined,
+        track: role === 'student' && isLise && track ? track : undefined,
       })
       if (!result.success) { setError(result.error); return }
       setSuccess(true)
@@ -100,6 +128,57 @@ export function RegisterForm() {
           <label className="block text-[#1B2430] font-bold mb-2">Şifre</label>
           <PasswordInput required minLength={8} value={password} onChange={setPassword} placeholder="••••••••" />
         </div>
+
+        <div>
+          <label className="block text-[#1B2430] font-bold mb-2">Şifre (Tekrar)</label>
+          <PasswordInput required minLength={8} value={passwordConfirm} onChange={setPasswordConfirm} placeholder="••••••••" />
+        </div>
+
+        {role === 'student' && (
+          <>
+            <div>
+              <label className="block text-[#1B2430] font-bold mb-2">Okul Adı</label>
+              <input
+                required
+                value={schoolName}
+                onChange={(e) => setSchoolName(e.target.value)}
+                className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[#1B2430] font-bold mb-2">Sınıf</label>
+              <select
+                required
+                value={grade}
+                onChange={(e) => { setGrade(e.target.value); setTrack('') }}
+                className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+              >
+                <option value="" disabled>Seç</option>
+                {GRADES.map((g) => (
+                  <option key={g} value={g}>{g}. Sınıf</option>
+                ))}
+              </select>
+            </div>
+
+            {isLise && (
+              <div>
+                <label className="block text-[#1B2430] font-bold mb-2">Alan</label>
+                <select
+                  required
+                  value={track}
+                  onChange={(e) => setTrack(e.target.value as Track)}
+                  className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+                >
+                  <option value="" disabled>Seç</option>
+                  {(Object.keys(TRACK_LABELS) as Track[]).map((t) => (
+                    <option key={t} value={t}>{TRACK_LABELS[t]}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </>
+        )}
 
         {error && <p className="text-sm font-bold text-red-600">{error}</p>}
 
