@@ -1,12 +1,17 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { logoutUser } from '@/actions/auth'
 import { NotificationBell } from '@/components/layout/NotificationBell'
 import type { NotificationItem } from '@/actions/notifications'
 import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
+
+const SIDEBAR_COLLAPSED_KEY = 'dersolab-sidebar-collapsed'
+const SIDEBAR_WIDTH = 224
 
 const NAV_LINK_BASE = 'inline-block px-3 py-1.5 rounded-lg border-2 border-[#1B2430] text-sm font-bold'
 const NAV_LINK_ACTIVE = `${NAV_LINK_BASE} bg-[#DD7B3A] text-[#F4F1E8]`
@@ -56,6 +61,21 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
 
 export function DashboardNav({ role, offersFreeTrial, notifications }: DashboardNavProps) {
   const pathname = usePathname()
+  const [collapsed, setCollapsed] = useState(false)
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setCollapsed(localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1')
+    setHasMounted(true)
+  }, [])
+
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, next ? '1' : '0')
+      return next
+    })
+  }
 
   const instructorItemsWithDemo = offersFreeTrial
     ? [...NAV_ITEMS.instructor, { href: '/dashboard/instructor/demo-talepleri', label: 'Demo Talepleri' }]
@@ -118,29 +138,51 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
         </div>
       </nav>
 
-      {/* Masaüstü: sol menü */}
-      <aside className="hidden md:flex md:flex-col md:w-56 md:shrink-0 md:sticky md:top-0 md:h-screen md:overflow-y-auto border-r-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-5">
-        <Link href="/dashboard" className="mb-6 block">
-          <img src="/dersolab-logo.png" alt="DersoLab" className="h-8 w-auto" />
-        </Link>
-        <div className="flex-1 flex flex-col gap-2">
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={pathname === item.href ? SIDEBAR_LINK_ACTIVE : SIDEBAR_LINK_INACTIVE}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-        <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t-2 border-[#1B2430]/10">
-          <NotificationBell initialNotifications={notifications} role={role} />
-          <form action={logoutUser}>
-            <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
-          </form>
+      {/* Masaüstü: sol menü (açılıp kapanabilir) */}
+      <aside
+        className={`hidden md:flex md:flex-col md:shrink-0 md:min-w-0 md:sticky md:top-0 md:h-screen md:overflow-hidden border-r-4 border-[#1B2430] bg-[#F4F1E8] py-5 ${hasMounted ? 'transition-[width,padding] duration-300 ease-in-out' : ''}`}
+        style={{
+          width: collapsed ? 0 : SIDEBAR_WIDTH,
+          flexBasis: collapsed ? 0 : SIDEBAR_WIDTH,
+          flexGrow: 0,
+          flexShrink: 0,
+          paddingLeft: collapsed ? 0 : 16,
+          paddingRight: collapsed ? 0 : 16,
+        }}
+      >
+        <div className="flex flex-col h-full" style={{ width: SIDEBAR_WIDTH - 32 }}>
+          <Link href="/dashboard" className="mb-6 block shrink-0">
+            <img src="/dersolab-logo.png" alt="DersoLab" className="h-8 w-auto" />
+          </Link>
+          <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+            {items.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={pathname === item.href ? SIDEBAR_LINK_ACTIVE : SIDEBAR_LINK_INACTIVE}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+          <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t-2 border-[#1B2430]/10 shrink-0">
+            <NotificationBell initialNotifications={notifications} role={role} />
+            <form action={logoutUser}>
+              <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
+            </form>
+          </div>
         </div>
       </aside>
+
+      <button
+        type="button"
+        onClick={toggleCollapsed}
+        aria-label={collapsed ? 'Menüyü aç' : 'Menüyü kapat'}
+        className={`hidden md:flex fixed top-24 z-30 h-7 w-7 items-center justify-center rounded-full border-2 border-[#1B2430] bg-white text-[#1B2430] shadow-sm ${hasMounted ? 'transition-[left] duration-300 ease-in-out' : ''}`}
+        style={{ left: (collapsed ? 0 : SIDEBAR_WIDTH) - 14 }}
+      >
+        {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+      </button>
     </>
   )
 }
