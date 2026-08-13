@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { logoutUser } from '@/actions/auth'
 import { NotificationBell } from '@/components/layout/NotificationBell'
 import type { NotificationItem } from '@/actions/notifications'
@@ -81,36 +80,14 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
     ? [...NAV_ITEMS.instructor, { href: '/dashboard/instructor/demo-talepleri', label: 'Demo Talepleri' }]
     : NAV_ITEMS.instructor
 
-  const items = role === 'instructor' ? instructorItemsWithDemo : NAV_ITEMS[role] ?? []
+  // Admin hesabı genelde aynı zamanda aktif bir eğitmen de olduğu için
+  // (sahibinin kendi hesabı gibi) admin menüsünün altında eğitmen
+  // sekmeleri de gösteriliyor, aralarına bir ayraç konuyor.
+  const items = role === 'admin'
+    ? [...NAV_ITEMS.admin, ...instructorItemsWithDemo]
+    : role === 'instructor' ? instructorItemsWithDemo : NAV_ITEMS[role] ?? []
 
-  if (role === 'admin') {
-    const instructorItems = instructorItemsWithDemo
-
-    return (
-      <nav className="flex items-center justify-between border-b px-6 py-3">
-        <div className="flex items-center gap-4 overflow-x-auto">
-          <Link href="/dashboard" className="font-semibold">DersoLab</Link>
-          {items.map((item) => (
-            <Link key={item.href} href={item.href} className={pathname === item.href ? 'text-sm font-medium' : 'text-sm text-muted-foreground'}>
-              {item.label}
-            </Link>
-          ))}
-          <span className="text-muted-foreground">|</span>
-          {instructorItems.map((item) => (
-            <Link key={item.href} href={item.href} className={pathname === item.href ? 'text-sm font-medium' : 'text-sm text-muted-foreground'}>
-              {item.label}
-            </Link>
-          ))}
-        </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <NotificationBell initialNotifications={notifications} role={role} />
-          <form action={logoutUser}>
-            <Button type="submit" variant="ghost" size="sm">Çıkış Yap</Button>
-          </form>
-        </div>
-      </nav>
-    )
-  }
+  const dividerIndex = role === 'admin' ? NAV_ITEMS.admin.length : -1
 
   return (
     <>
@@ -120,14 +97,16 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
           <Link href="/dashboard" className="shrink-0 mr-1">
             <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
           </Link>
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${pathname === item.href ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE} whitespace-nowrap shrink-0`}
-            >
-              {item.label}
-            </Link>
+          {items.map((item, i) => (
+            <div key={item.href} className="flex items-center gap-2 shrink-0">
+              {i === dividerIndex && <span className="h-6 w-px bg-[#1B2430]/20 shrink-0" />}
+              <Link
+                href={item.href}
+                className={`${pathname === item.href ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE} whitespace-nowrap shrink-0`}
+              >
+                {item.label}
+              </Link>
+            </div>
           ))}
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -155,14 +134,16 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
             <img src="/dersolab-logo.png" alt="DersoLab" className="h-8 w-auto" />
           </Link>
           <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
-            {items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={pathname === item.href ? SIDEBAR_LINK_ACTIVE : SIDEBAR_LINK_INACTIVE}
-              >
-                {item.label}
-              </Link>
+            {items.map((item, i) => (
+              <div key={item.href}>
+                {i === dividerIndex && <div className="my-2 border-t-2 border-[#1B2430]/10" />}
+                <Link
+                  href={item.href}
+                  className={pathname === item.href ? SIDEBAR_LINK_ACTIVE : SIDEBAR_LINK_INACTIVE}
+                >
+                  {item.label}
+                </Link>
+              </div>
             ))}
           </div>
           <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t-2 border-[#1B2430]/10 shrink-0">

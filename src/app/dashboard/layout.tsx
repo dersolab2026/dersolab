@@ -22,9 +22,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   const notifications = await getNotifications()
 
   return (
-    <div className={role === 'admin' ? '' : 'md:flex'}>
+    <div className="md:flex">
       <DashboardNav role={role} offersFreeTrial={offersFreeTrial} notifications={notifications} />
-      <main className={role === 'admin' ? '' : 'md:flex-1 md:min-w-0'}>{children}</main>
+      <main className="md:flex-1 md:min-w-0">{children}</main>
     </div>
   )
 }
