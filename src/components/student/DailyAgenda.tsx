@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { PIXEL_CARD, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 import type { StudentBookingItem } from '@/lib/bookings/get-student-bookings'
+import type { StudyLogEntry } from '@/actions/study-log'
+import { StudyLogSection } from '@/components/student/StudyLogSection'
 
 const DAY_LABELS = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
 
@@ -25,7 +27,14 @@ function isSameDay(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
 }
 
-export function DailyAgenda({ bookings }: { bookings: StudentBookingItem[] }) {
+function toDateKey(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+export function DailyAgenda({ bookings, studyLogs }: { bookings: StudentBookingItem[]; studyLogs: StudyLogEntry[] }) {
   const today = new Date()
   const [weekOffset, setWeekOffset] = useState(0)
   const [selectedDay, setSelectedDay] = useState(today)
@@ -37,6 +46,9 @@ export function DailyAgenda({ bookings }: { bookings: StudentBookingItem[] }) {
   const dayBookings = scheduled
     .filter((b) => isSameDay(new Date(b.startTime), selectedDay))
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+
+  const selectedDayKey = toDateKey(selectedDay)
+  const dayStudyLogs = studyLogs.filter((entry) => entry.logDate === selectedDayKey)
 
   const rangeLabel = `${weekStart.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })} - ${addDays(weekStart, 6).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })}`
 
@@ -72,6 +84,7 @@ export function DailyAgenda({ bookings }: { bookings: StudentBookingItem[] }) {
           const isSelected = isSameDay(day, selectedDay)
           const isToday = isSameDay(day, today)
           const hasLesson = scheduled.some((b) => isSameDay(new Date(b.startTime), day))
+          const hasStudyLog = studyLogs.some((entry) => entry.logDate === toDateKey(day))
 
           return (
             <button
@@ -84,8 +97,11 @@ export function DailyAgenda({ bookings }: { bookings: StudentBookingItem[] }) {
             >
               <p className="text-[10px] sm:text-xs font-bold">{DAY_LABELS[i]}</p>
               <p className="text-xs sm:text-sm font-black">{day.getDate()}</p>
-              {hasLesson && (
-                <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-[#F4F1E8]' : 'bg-[#DD7B3A]'}`} />
+              {(hasLesson || hasStudyLog) && (
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+                  {hasLesson && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-[#F4F1E8]' : 'bg-[#DD7B3A]'}`} />}
+                  {hasStudyLog && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-[#F4F1E8]' : 'bg-[#6FA89E]'}`} />}
+                </span>
               )}
             </button>
           )
@@ -115,6 +131,8 @@ export function DailyAgenda({ bookings }: { bookings: StudentBookingItem[] }) {
           </div>
         )}
       </div>
+
+      <StudyLogSection logDate={selectedDayKey} entries={dayStudyLogs} />
     </div>
   )
 }
