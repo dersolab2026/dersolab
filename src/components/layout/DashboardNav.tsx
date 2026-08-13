@@ -25,7 +25,7 @@ interface DashboardNavProps {
 const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   student: [
     { href: '/dashboard/student/bookings', label: 'Derslerim' },
-    { href: '/dashboard/student/ajanda', label: 'Ajanda' },
+    { href: '/dashboard/student/gunluk', label: 'Günlük' },
     { href: '/dashboard/student/homework', label: 'Ödevlerim' },
     { href: '/dashboard/student/packages', label: 'Paketler' },
     { href: '/instructors', label: 'Eğitmenler' },
