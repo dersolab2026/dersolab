@@ -27,6 +27,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/rehberlik', label: 'Rehberlik' },
     { href: '/demo-ders', label: 'Tanışma Dersi' },
     { href: '/dashboard/student/nasil-calisir', label: 'Nasıl Çalışır?' },
+    { href: '/dashboard/student/settings', label: 'Ayarlar' },
   ],
   instructor: [
     { href: '/dashboard/instructor', label: 'Derslerim' },

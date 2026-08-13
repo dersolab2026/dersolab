@@ -5,6 +5,19 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 type ActionResult = { success: true } | { success: false; error: string }
 
+export async function updateMyPassword(newPassword: string): Promise<ActionResult> {
+  if (newPassword.length < 8) return { success: false, error: 'Şifre en az 8 karakter olmalı' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) return { success: false, error: error.message }
+
+  return { success: true }
+}
+
 export async function deleteMyAccount(): Promise<ActionResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
