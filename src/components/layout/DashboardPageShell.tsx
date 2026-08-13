@@ -9,7 +9,7 @@ interface DashboardPageShellProps {
 
 export function DashboardPageShell({ title, description, headerExtra, children }: DashboardPageShellProps) {
   return (
-    <div className="min-h-[calc(100vh-57px)] w-full bg-[#D5EAE3] relative">
+    <div className="min-h-[calc(100vh-57px)] md:min-h-screen w-full bg-[#D5EAE3] relative">
       <div
         className="absolute inset-0 z-0 opacity-40 pointer-events-none"
         style={{

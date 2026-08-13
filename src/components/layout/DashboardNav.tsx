@@ -12,6 +12,10 @@ const NAV_LINK_BASE = 'inline-block px-3 py-1.5 rounded-lg border-2 border-[#1B2
 const NAV_LINK_ACTIVE = `${NAV_LINK_BASE} bg-[#DD7B3A] text-[#F4F1E8]`
 const NAV_LINK_INACTIVE = `${NAV_LINK_BASE} bg-white text-[#1B2430]`
 
+const SIDEBAR_LINK_BASE = 'block w-full px-3 py-2 rounded-lg border-2 border-[#1B2430] text-sm font-bold text-left'
+const SIDEBAR_LINK_ACTIVE = `${SIDEBAR_LINK_BASE} bg-[#DD7B3A] text-[#F4F1E8]`
+const SIDEBAR_LINK_INACTIVE = `${SIDEBAR_LINK_BASE} bg-white text-[#1B2430]`
+
 interface DashboardNavProps {
   role: 'student' | 'instructor' | 'admin'
   offersFreeTrial?: boolean
@@ -21,6 +25,7 @@ interface DashboardNavProps {
 const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   student: [
     { href: '/dashboard/student/bookings', label: 'Derslerim' },
+    { href: '/dashboard/student/ajanda', label: 'Ajanda' },
     { href: '/dashboard/student/homework', label: 'Ödevlerim' },
     { href: '/dashboard/student/packages', label: 'Paketler' },
     { href: '/instructors', label: 'Eğitmenler' },
@@ -88,27 +93,54 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
   }
 
   return (
-    <nav className="flex items-center justify-between gap-2 border-b-4 border-[#1B2430] bg-[#F4F1E8] px-4 sm:px-6 py-3">
-      <div className="flex items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto">
-        <Link href="/dashboard" className="shrink-0 mr-1">
-          <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
-        </Link>
-        {items.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`${pathname === item.href ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE} whitespace-nowrap shrink-0`}
-          >
-            {item.label}
+    <>
+      {/* Mobil: üst bar */}
+      <nav className="flex md:hidden items-center justify-between gap-2 border-b-4 border-[#1B2430] bg-[#F4F1E8] px-4 sm:px-6 py-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto">
+          <Link href="/dashboard" className="shrink-0 mr-1">
+            <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
           </Link>
-        ))}
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <NotificationBell initialNotifications={notifications} role={role} />
-        <form action={logoutUser}>
-          <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
-        </form>
-      </div>
-    </nav>
+          {items.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${pathname === item.href ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE} whitespace-nowrap shrink-0`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <NotificationBell initialNotifications={notifications} role={role} />
+          <form action={logoutUser}>
+            <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
+          </form>
+        </div>
+      </nav>
+
+      {/* Masaüstü: sol menü */}
+      <aside className="hidden md:flex md:flex-col md:w-56 md:shrink-0 md:sticky md:top-0 md:h-screen md:overflow-y-auto border-r-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-5">
+        <Link href="/dashboard" className="mb-6 block">
+          <img src="/dersolab-logo.png" alt="DersoLab" className="h-8 w-auto" />
+        </Link>
+        <div className="flex-1 flex flex-col gap-2">
+          {items.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={pathname === item.href ? SIDEBAR_LINK_ACTIVE : SIDEBAR_LINK_INACTIVE}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+        <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t-2 border-[#1B2430]/10">
+          <NotificationBell initialNotifications={notifications} role={role} />
+          <form action={logoutUser}>
+            <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
+          </form>
+        </div>
+      </aside>
+    </>
   )
 }
