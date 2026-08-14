@@ -197,10 +197,10 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
         type="button"
         onClick={toggleCollapsed}
         aria-label={collapsed ? 'Menüyü aç' : 'Menüyü kapat'}
-        className={`hidden md:flex fixed top-24 z-30 h-7 w-7 items-center justify-center rounded-full border-2 border-[#1B2430] bg-white text-[#1B2430] shadow-sm ${hasMounted ? 'transition-[left] duration-300 ease-in-out' : ''}`}
-        style={{ left: (collapsed ? 0 : SIDEBAR_WIDTH) - 14 }}
+        className={`hidden md:flex fixed top-24 z-30 h-8 w-8 items-center justify-center rounded-full border-2 border-[#1B2430] bg-white text-[#1B2430] shadow-sm ${hasMounted ? 'transition-[left] duration-300 ease-in-out' : ''}`}
+        style={{ left: collapsed ? 12 : SIDEBAR_WIDTH - 16 }}
       >
-        {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        {collapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
       </button>
     </>
   )
