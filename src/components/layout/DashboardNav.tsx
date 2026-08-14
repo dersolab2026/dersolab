@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react'
 import { logoutUser } from '@/actions/auth'
 import { NotificationBell } from '@/components/layout/NotificationBell'
 import type { NotificationItem } from '@/actions/notifications'
@@ -11,10 +11,6 @@ import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 const SIDEBAR_COLLAPSED_KEY = 'dersolab-sidebar-collapsed'
 const SIDEBAR_WIDTH = 224
-
-const NAV_LINK_BASE = 'inline-block px-3 py-1.5 rounded-lg border-2 border-[#1B2430] text-sm font-bold'
-const NAV_LINK_ACTIVE = `${NAV_LINK_BASE} bg-[#DD7B3A] text-[#F4F1E8]`
-const NAV_LINK_INACTIVE = `${NAV_LINK_BASE} bg-white text-[#1B2430]`
 
 const SIDEBAR_LINK_BASE = 'block w-full px-3 py-2 rounded-lg border-2 border-[#1B2430] text-sm font-bold text-left'
 const SIDEBAR_LINK_ACTIVE = `${SIDEBAR_LINK_BASE} bg-[#DD7B3A] text-[#F4F1E8]`
@@ -62,11 +58,21 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     setCollapsed(localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1')
     setHasMounted(true)
   }, [])
+
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [mobileMenuOpen])
 
   function toggleCollapsed() {
     setCollapsed((prev) => {
@@ -91,31 +97,63 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
 
   return (
     <>
-      {/* Mobil: üst bar */}
-      <nav className="flex md:hidden items-center justify-between gap-2 border-b-4 border-[#1B2430] bg-[#F4F1E8] px-4 sm:px-6 py-3">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto">
-          <Link href="/dashboard" className="shrink-0 mr-1">
+      {/* Mobil: üst bar + hamburger */}
+      <nav className="flex md:hidden items-center justify-between gap-2 border-b-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Menüyü aç"
+            className={`${PIXEL_BUTTON_SECONDARY} p-2`}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <Link href="/dashboard">
             <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
           </Link>
+        </div>
+        <NotificationBell initialNotifications={notifications} role={role} />
+      </nav>
+
+      {/* Mobil: kayan menü (drawer) */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-[#1B2430]/50 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] flex flex-col border-r-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-5 transition-transform duration-300 ease-in-out md:hidden ${
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between mb-6 shrink-0">
+          <Link href="/dashboard">
+            <img src="/dersolab-logo.png" alt="DersoLab" className="h-8 w-auto" />
+          </Link>
+          <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Menüyü kapat" className="p-1">
+            <X className="h-5 w-5 text-[#1B2430]" />
+          </button>
+        </div>
+        <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
           {items.map((item, i) => (
-            <div key={item.href} className="flex items-center gap-2 shrink-0">
-              {i === dividerIndex && <span className="h-6 w-px bg-[#1B2430]/20 shrink-0" />}
+            <div key={item.href}>
+              {i === dividerIndex && <div className="my-2 border-t-2 border-[#1B2430]/10" />}
               <Link
                 href={item.href}
-                className={`${pathname === item.href ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE} whitespace-nowrap shrink-0`}
+                className={pathname === item.href ? SIDEBAR_LINK_ACTIVE : SIDEBAR_LINK_INACTIVE}
               >
                 {item.label}
               </Link>
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <NotificationBell initialNotifications={notifications} role={role} />
+        <div className="pt-4 mt-4 border-t-2 border-[#1B2430]/10 shrink-0">
           <form action={logoutUser}>
-            <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
+            <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} w-full px-3 py-1.5 text-xs`}>Çıkış Yap</button>
           </form>
         </div>
-      </nav>
+      </div>
 
       {/* Masaüstü: sol menü (açılıp kapanabilir) */}
       <aside
