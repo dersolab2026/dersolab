@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { Capacitor } from '@capacitor/core'
+import { Browser } from '@capacitor/browser'
 import { AuthShell } from '@/components/auth/AuthShell'
 import { PasswordInput } from '@/components/auth/PasswordInput'
-import { registerUser } from '@/actions/auth'
+import { registerUser, signInWithGoogle } from '@/actions/auth'
 
 type Role = 'student' | 'instructor'
 type Track = 'sayisal' | 'sozel' | 'ea' | 'dil'
@@ -34,11 +36,30 @@ export function RegisterForm() {
   const [grade, setGrade] = useState('')
   const [track, setTrack] = useState<Track | ''>('')
   const [isPending, startTransition] = useTransition()
+  const [isGooglePending, setIsGooglePending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
   const gradeNumber = grade ? Number(grade) : undefined
   const isLise = gradeNumber !== undefined && gradeNumber >= 9
+
+  async function handleGoogleRegister() {
+    setError(null)
+    setIsGooglePending(true)
+    const isNative = Capacitor.isNativePlatform()
+    const result = await signInWithGoogle(isNative ? 'com.dersolab.app://auth/callback' : undefined)
+    if ('url' in result) {
+      if (isNative) {
+        await Browser.open({ url: result.url })
+        setIsGooglePending(false)
+      } else {
+        window.location.href = result.url
+      }
+    } else {
+      setError(result.error)
+      setIsGooglePending(false)
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -102,6 +123,28 @@ export function RegisterForm() {
             ))}
           </div>
         </div>
+
+        {role === 'student' && (
+          <>
+            <button
+              type="button"
+              onClick={handleGoogleRegister}
+              disabled={isGooglePending}
+              className="w-full py-3 px-4 bg-white text-[#1B2430] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3 disabled:opacity-60"
+            >
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
+              </svg>
+              {isGooglePending ? 'Yönlendiriliyor...' : 'Google ile Kaydol'}
+            </button>
+
+            <div className="flex items-center gap-2">
+              <div className="h-1 w-full bg-[#1B2430] rounded-full"></div>
+              <span className="text-[#1B2430] font-bold px-2">VEYA</span>
+              <div className="h-1 w-full bg-[#1B2430] rounded-full"></div>
+            </div>
+          </>
+        )}
 
         <div>
           <label className="block text-[#1B2430] font-bold mb-2">Ad Soyad</label>

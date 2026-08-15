@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { PlayCircle } from 'lucide-react'
+import { PlayCircle, GraduationCap } from 'lucide-react'
 import type { InstructorProfile } from '@/types'
 
 interface InstructorCardProps {
@@ -18,7 +18,15 @@ export function InstructorCard({ instructor }: InstructorCardProps) {
             <AvatarImage src={instructor.avatarUrl ?? undefined} alt={instructor.name} />
             <AvatarFallback className="bg-white text-[#1B2430] font-bold">{initials}</AvatarFallback>
           </Avatar>
-          <p className="font-bold text-[#1B2430]">{instructor.name}</p>
+          <div>
+            <p className="font-bold text-[#1B2430]">{instructor.name}</p>
+            {instructor.completedLessonCount > 0 && (
+              <span className="flex items-center gap-1 text-xs font-bold text-[#6FA89E]">
+                <GraduationCap className="h-3.5 w-3.5" />
+                {instructor.completedLessonCount} ders tamamladı
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="mt-3 space-y-2 flex-1">

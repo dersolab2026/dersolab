@@ -42,6 +42,9 @@ export default async function InstructorDetailPage({ params }: InstructorDetailP
             </Avatar>
             <div>
               <h1 className="text-2xl font-bold text-[#1B2430]">{instructor.name}</h1>
+              {instructor.completedLessonCount > 0 && (
+                <p className="text-sm font-bold text-[#6FA89E]">{instructor.completedLessonCount} ders tamamladı</p>
+              )}
               <div className="mt-1 flex flex-wrap gap-1">
                 {instructor.subjects.map((s) => (
                   <span key={s} className="px-2 py-0.5 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-xs font-bold">
