@@ -5,6 +5,7 @@ import { getInstructorBookings } from '@/lib/bookings/get-instructor-bookings'
 import { getLessonMaterialsForBookings } from '@/lib/lessons/get-lesson-materials'
 import { InstructorBookingListItem } from '@/components/instructor/InstructorBookingListItem'
 import { RejectedInstructorBanner } from '@/components/instructor/RejectedInstructorBanner'
+import { OnboardingChecklist } from '@/components/instructor/OnboardingChecklist'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { PIXEL_CARD } from '@/lib/theme'
 
@@ -14,7 +15,10 @@ export default async function InstructorDashboardPage() {
   if (!user) redirect('/login')
 
   const { data: instructorRow } = await supabase
-    .from('instructors').select('approval_status, calendar_connected, approval_note').eq('user_id', user.id).single()
+    .from('instructors').select('approval_status, calendar_connected, approval_note, subjects').eq('user_id', user.id).single()
+  const { count: availabilityCount } = await supabase
+    .from('instructor_availability').select('id', { count: 'exact', head: true })
+    .eq('instructor_id', user.id).eq('is_active', true)
   const bookings = await getInstructorBookings(user.id)
 
   const needsAction = bookings.filter((b) => b.status === 'scheduled' && new Date(b.startTime) < new Date())
@@ -39,6 +43,16 @@ export default async function InstructorDashboardPage() {
             <Link href="/dashboard/instructor/settings" className="underline text-[#DD7B3A]">Google Takvimini bağlaman</Link> gerekiyor.
           </p>
         </div>
+      )}
+
+      {instructorRow?.approval_status === 'approved' && (
+        <OnboardingChecklist
+          steps={[
+            { label: 'Google Takvimini bağla', href: '/dashboard/instructor/settings', done: instructorRow.calendar_connected },
+            { label: 'Ajandanı doldur (müsait olduğun saatler)', href: '/dashboard/instructor/availability', done: (availabilityCount ?? 0) > 0 },
+            { label: 'Profilini tamamla (branş, eğitim, tanıtım videosu)', href: '/dashboard/instructor/profile', done: (instructorRow.subjects ?? []).length > 0 },
+          ]}
+        />
       )}
 
       {needsAction.length > 0 && (
