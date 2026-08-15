@@ -106,8 +106,9 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
             aria-label="Menüyü aç"
             className={`${PIXEL_BUTTON_SECONDARY} p-1.5`}
           >
+            {/* Mobilde buton menü açılınca örtülüyor; sürekli uyuyan tilki durmasın diye gözler hep açık. */}
             <img
-              src={mobileMenuOpen ? '/fox-head-open.png' : '/fox-head-closed.png'}
+              src="/fox-head-open.png"
               alt=""
               className="h-7 w-7"
               style={{ imageRendering: 'pixelated' }}
