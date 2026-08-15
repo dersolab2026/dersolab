@@ -17,6 +17,10 @@ export const SUBJECT_CATEGORIES = [
     label: 'Dil',
     subjects: ['Ortaokul İngilizce', 'Lise İngilizce'],
   },
+  {
+    label: 'Beceri',
+    subjects: ['Hızlı Okuma'],
+  },
 ] as const
 
 export const LESSON_SUBJECTS = SUBJECT_CATEGORIES.flatMap((c) => c.subjects)

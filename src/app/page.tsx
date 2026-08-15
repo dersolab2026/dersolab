@@ -105,6 +105,36 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Referans programı */}
+        <div className="bg-[#DD7B3A] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
+          <div className="flex flex-col sm:flex-row items-center gap-5">
+            <img
+              src="/fox-mascot.png"
+              alt=""
+              className="w-24 shrink-0 h-auto"
+              style={{ imageRendering: 'pixelated' }}
+            />
+            <div className="flex-1 text-center sm:text-left">
+              <span className="inline-block mb-2 px-3 py-1 rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] text-xs font-black text-[#1B2430]">
+                DAVET ET & KAZAN
+              </span>
+              <h2 className="font-sans text-xl sm:text-2xl font-black text-[#F4F1E8] mb-2">
+                Arkadaşını getirene 1 ders bizden!
+              </h2>
+              <p className="font-semibold text-[#F4F1E8]/90 mb-4">
+                Ayarlar sayfandaki davet kodunu arkadaşınla paylaş. O kayıt olurken kodu girsin,
+                hesabını onayladığı anda ikinize de birer ders kredisi hediye edelim.
+              </p>
+              <Link
+                href="/register"
+                className="inline-block py-3 px-8 bg-[#F4F1E8] text-[#1B2430] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
+              >
+                Hemen Kaydol
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Final CTA */}
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center">
           <p className="font-sans text-lg font-bold text-[#1B2430] mb-4">
