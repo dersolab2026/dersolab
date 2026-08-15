@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useTransition } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { Lightbulb, X } from 'lucide-react'
 import {
@@ -11,14 +12,14 @@ import { getNotificationLink } from '@/lib/notifications/get-notification-link'
 import { PIXEL_CARD } from '@/lib/theme'
 
 const POLL_INTERVAL_MS = 30_000
+const PANEL_WIDTH = 320
+const PANEL_GAP = 8
 
 interface NotificationBellProps {
   initialNotifications: NotificationItem[]
   role: 'student' | 'instructor' | 'admin'
   panelPosition?: 'up' | 'down'
 }
-
-const PANEL_WIDTH = 320
 
 export function NotificationBell({ initialNotifications, role, panelPosition = 'down' }: NotificationBellProps) {
   const router = useRouter()
@@ -27,10 +28,14 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
   const [, startTransition] = useTransition()
   const containerRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const [fixedStyle, setFixedStyle] = useState<{ left: number; bottom: number } | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [coords, setCoords] = useState<{ left: number; top?: number; bottom?: number } | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
 
   const unreadCount = notifications.filter((n) => !n.isRead).length
   const readCount = notifications.filter((n) => n.isRead).length
+
+  useEffect(() => setIsMounted(true), [])
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -42,29 +47,38 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setIsOpen(false)
+      const target = e.target as Node
+      if (containerRef.current?.contains(target)) return
+      if (panelRef.current?.contains(target)) return
+      setIsOpen(false)
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Kenar çubuğu taşmayı gizlediği için paneli sabit konumlandırıp kırpılmasını önlüyoruz.
+  // Panel body'ye taşındığı için konumunu butona göre kendimiz hesaplıyoruz.
   useEffect(() => {
-    if (panelPosition !== 'up') return
-    if (!isOpen) { setFixedStyle(null); return }
+    if (!isOpen) { setCoords(null); return }
 
     function reposition() {
       const rect = buttonRef.current?.getBoundingClientRect()
       if (!rect) return
-      setFixedStyle({
-        left: Math.max(8, Math.min(rect.left, window.innerWidth - PANEL_WIDTH - 8)),
-        bottom: window.innerHeight - rect.top + 8,
-      })
+      const preferredLeft = panelPosition === 'up' ? rect.left : rect.right - PANEL_WIDTH
+      const left = Math.max(PANEL_GAP, Math.min(preferredLeft, window.innerWidth - PANEL_WIDTH - PANEL_GAP))
+      setCoords(
+        panelPosition === 'up'
+          ? { left, bottom: window.innerHeight - rect.top + PANEL_GAP }
+          : { left, top: rect.bottom + PANEL_GAP },
+      )
     }
 
     reposition()
     window.addEventListener('resize', reposition)
-    return () => window.removeEventListener('resize', reposition)
+    window.addEventListener('scroll', reposition, true)
+    return () => {
+      window.removeEventListener('resize', reposition)
+      window.removeEventListener('scroll', reposition, true)
+    }
   }, [isOpen, panelPosition])
 
   function handleItemClick(notification: NotificationItem) {
@@ -90,6 +104,59 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
     setNotifications((prev) => prev.filter((n) => !n.isRead))
     startTransition(() => { clearReadNotifications() })
   }
+
+  const panel = (
+    <div
+      ref={panelRef}
+      className={`fixed max-h-96 w-80 overflow-y-auto z-50 ${PIXEL_CARD} p-0`}
+      style={{ left: coords?.left, top: coords?.top, bottom: coords?.bottom }}
+    >
+      <div className="flex items-center justify-between border-b-2 border-[#1B2430] p-3">
+        <p className="font-bold text-[#1B2430]">Bildirimler</p>
+        <div className="flex items-center gap-3">
+          {readCount > 0 && (
+            <button type="button" onClick={handleClearRead} className="text-xs font-bold text-[#1B2430]/60 underline">
+              Okunanları temizle
+            </button>
+          )}
+          {unreadCount > 0 && (
+            <button type="button" onClick={handleMarkAllRead} className="text-xs font-bold text-[#DD7B3A] underline">
+              Tümünü okundu işaretle
+            </button>
+          )}
+        </div>
+      </div>
+      {notifications.length === 0 ? (
+        <p className="p-4 text-sm font-semibold text-[#1B2430]/60">Henüz bildirimin yok.</p>
+      ) : (
+        <ul>
+          {notifications.map((n) => (
+            <li key={n.id} className="relative border-b border-[#1B2430]/10">
+              <button
+                type="button"
+                onClick={() => handleItemClick(n)}
+                className={`block w-full p-3 pr-8 text-left hover:bg-[#1B2430]/5 ${n.isRead ? '' : 'bg-[#DD7B3A]/10'}`}
+              >
+                <p className="text-sm font-bold text-[#1B2430]">{n.title}</p>
+                {n.body && <p className="mt-0.5 text-xs font-semibold text-[#1B2430]/70">{n.body}</p>}
+                <p className="mt-1 text-[10px] font-semibold text-[#1B2430]/50">
+                  {new Date(n.createdAt).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })}
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleDelete(n.id) }}
+                className="absolute top-3 right-2 text-[#1B2430]/40 hover:text-[#1B2430]"
+                aria-label="Bildirimi sil"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
 
   return (
     <div className="relative shrink-0" ref={containerRef}>
@@ -120,59 +187,7 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
         )}
       </button>
 
-      {isOpen && (
-        <div
-          className={`${
-            panelPosition === 'up' ? 'fixed' : 'absolute right-0 top-full mt-2'
-          } max-h-96 w-80 overflow-y-auto z-50 ${PIXEL_CARD} p-0`}
-          style={panelPosition === 'up' ? { left: fixedStyle?.left, bottom: fixedStyle?.bottom, visibility: fixedStyle ? 'visible' : 'hidden' } : undefined}
-        >
-          <div className="flex items-center justify-between border-b-2 border-[#1B2430] p-3">
-            <p className="font-bold text-[#1B2430]">Bildirimler</p>
-            <div className="flex items-center gap-3">
-              {readCount > 0 && (
-                <button type="button" onClick={handleClearRead} className="text-xs font-bold text-[#1B2430]/60 underline">
-                  Okunanları temizle
-                </button>
-              )}
-              {unreadCount > 0 && (
-                <button type="button" onClick={handleMarkAllRead} className="text-xs font-bold text-[#DD7B3A] underline">
-                  Tümünü okundu işaretle
-                </button>
-              )}
-            </div>
-          </div>
-          {notifications.length === 0 ? (
-            <p className="p-4 text-sm font-semibold text-[#1B2430]/60">Henüz bildirimin yok.</p>
-          ) : (
-            <ul>
-              {notifications.map((n) => (
-                <li key={n.id} className="relative border-b border-[#1B2430]/10">
-                  <button
-                    type="button"
-                    onClick={() => handleItemClick(n)}
-                    className={`block w-full p-3 pr-8 text-left hover:bg-[#1B2430]/5 ${n.isRead ? '' : 'bg-[#DD7B3A]/10'}`}
-                  >
-                    <p className="text-sm font-bold text-[#1B2430]">{n.title}</p>
-                    {n.body && <p className="mt-0.5 text-xs font-semibold text-[#1B2430]/70">{n.body}</p>}
-                    <p className="mt-1 text-[10px] font-semibold text-[#1B2430]/50">
-                      {new Date(n.createdAt).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })}
-                    </p>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); handleDelete(n.id) }}
-                    className="absolute top-3 right-2 text-[#1B2430]/40 hover:text-[#1B2430]"
-                    aria-label="Bildirimi sil"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+      {isOpen && isMounted && coords && createPortal(panel, document.body)}
     </div>
   )
 }
