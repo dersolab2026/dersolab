@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateStudentProfile } from '@/actions/student-profile'
+import { useToast } from '@/components/ui/Toast'
 import { PIXEL_BUTTON_PRIMARY, PIXEL_CARD } from '@/lib/theme'
 
 type Track = 'sayisal' | 'sozel' | 'ea' | 'dil'
@@ -32,7 +33,7 @@ export function StudentProfileForm({ name: initialName, schoolName: initialSchoo
   const [track, setTrack] = useState<Track | ''>(initialTrack ?? '')
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  const { showToast } = useToast()
 
   const gradeNumber = grade ? Number(grade) : undefined
   const isLise = gradeNumber !== undefined && gradeNumber >= 9
@@ -40,7 +41,6 @@ export function StudentProfileForm({ name: initialName, schoolName: initialSchoo
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    setSuccess(false)
 
     if (!gradeNumber) { setError('Sınıf seçmelisin'); return }
 
@@ -52,7 +52,7 @@ export function StudentProfileForm({ name: initialName, schoolName: initialSchoo
         track: isLise && track ? track : undefined,
       })
       if (!result.success) { setError(result.error); return }
-      setSuccess(true)
+      showToast('Bilgilerin güncellendi.')
       router.refresh()
     })
   }
@@ -115,7 +115,6 @@ export function StudentProfileForm({ name: initialName, schoolName: initialSchoo
       )}
 
       {error && <p className="text-sm font-bold text-red-600">{error}</p>}
-      {success && <p className="text-sm font-bold text-[#6FA89E]">Bilgilerin güncellendi.</p>}
 
       <button type="submit" disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2`}>
         {isPending ? 'Kaydediliyor...' : 'Kaydet'}

@@ -6,6 +6,7 @@ import { Loader2, Upload } from 'lucide-react'
 import { updateIntroVideo } from '@/actions/instructor-profile'
 import { uploadIntroVideo } from '@/lib/storage/upload-intro-video'
 import { parseVideoUrl } from '@/lib/video/parse-video-url'
+import { useToast } from '@/components/ui/Toast'
 import { PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
 
 interface IntroVideoEditorProps {
@@ -15,6 +16,7 @@ interface IntroVideoEditorProps {
 
 export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
   const [url, setUrl] = useState(initialUrl ?? '')
   const [isPending, startTransition] = useTransition()
@@ -32,6 +34,7 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
         setError(result.error)
         return
       }
+      showToast(url.trim() ? 'Tanıtım videon kaydedildi.' : 'Tanıtım videon kaldırıldı.')
       router.refresh()
     })
   }
@@ -58,6 +61,7 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
         return
       }
       setUrl(uploadResult.publicUrl)
+      showToast('Tanıtım videon yüklendi.')
       router.refresh()
     })
   }

@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { Loader2 } from 'lucide-react'
 import { updateInstructorSubjects } from '@/actions/instructor-profile'
+import { useToast } from '@/components/ui/Toast'
 import { INSTRUCTOR_SUBJECT_OPTIONS } from '@/lib/constants'
 import { PIXEL_BADGE, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
 
@@ -14,6 +15,7 @@ export function SubjectsEditor({ initialSubjects }: SubjectsEditorProps) {
   const [selected, setSelected] = useState<string[]>(initialSubjects)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const { showToast } = useToast()
 
   function toggle(subject: string) {
     setSelected((prev) => (prev.includes(subject) ? prev.filter((s) => s !== subject) : [...prev, subject]))
@@ -23,7 +25,8 @@ export function SubjectsEditor({ initialSubjects }: SubjectsEditorProps) {
     setError(null)
     startTransition(async () => {
       const result = await updateInstructorSubjects(selected)
-      if (!result.success) setError(result.error)
+      if (!result.success) { setError(result.error); return }
+      showToast('Branşların kaydedildi.')
     })
   }
 

@@ -4,10 +4,12 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { setInstructorPaused } from '@/actions/instructor-profile'
+import { useToast } from '@/components/ui/Toast'
 import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 export function PauseProfileButton({ paused }: { paused: boolean }) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -16,6 +18,7 @@ export function PauseProfileButton({ paused }: { paused: boolean }) {
     startTransition(async () => {
       const result = await setInstructorPaused(!paused)
       if (!result.success) { setError(result.error); return }
+      showToast(paused ? 'Profilin tekrar aktif.' : 'Profilin donduruldu.')
       router.refresh()
     })
   }

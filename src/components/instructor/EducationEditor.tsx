@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, Plus, X } from 'lucide-react'
 import { addEducationEntry, removeEducationEntry } from '@/actions/instructor-profile'
+import { useToast } from '@/components/ui/Toast'
 import type { EducationEntry } from '@/types'
 import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
 
@@ -13,6 +14,7 @@ interface EducationEditorProps {
 
 export function EducationEditor({ initialEntries }: EducationEditorProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [isAdding, setIsAdding] = useState(false)
@@ -32,6 +34,7 @@ export function EducationEditor({ initialEntries }: EducationEditorProps) {
       setDegree('')
       setFieldOfStudy('')
       setIsAdding(false)
+      showToast('Eğitim bilgin eklendi.')
       router.refresh()
     })
   }
@@ -39,6 +42,7 @@ export function EducationEditor({ initialEntries }: EducationEditorProps) {
   function handleRemove(id: string) {
     startTransition(async () => {
       await removeEducationEntry(id)
+      showToast('Eğitim bilgin silindi.')
       router.refresh()
     })
   }

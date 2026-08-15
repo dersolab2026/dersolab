@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Loader2 } from 'lucide-react'
 import { addAvailabilityRule, removeAvailabilityRule } from '@/actions/availability'
+import { useToast } from '@/components/ui/Toast'
 import type { AvailabilityRule } from '@/types'
 import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
 
@@ -19,6 +20,7 @@ interface WeeklyScheduleEditorProps {
 
 export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [openDayForm, setOpenDayForm] = useState<number | null>(null)
@@ -39,6 +41,7 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
         return
       }
       setOpenDayForm(null)
+      showToast(`${DAY_NAMES[dayOfWeek]} için ${startTime}–${endTime} saat aralığı eklendi.`)
       router.refresh()
     })
   }
@@ -51,6 +54,7 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
         setError(result.error)
         return
       }
+      showToast('Saat aralığı kaldırıldı.')
       router.refresh()
     })
   }

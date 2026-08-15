@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Loader2, Camera } from 'lucide-react'
 import { uploadAvatar } from '@/lib/storage/upload-avatar'
+import { useToast } from '@/components/ui/Toast'
 import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface AvatarUploaderProps {
@@ -15,6 +16,7 @@ interface AvatarUploaderProps {
 
 export function AvatarUploader({ userId, currentAvatarUrl, name }: AvatarUploaderProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -34,6 +36,7 @@ export function AvatarUploader({ userId, currentAvatarUrl, name }: AvatarUploade
         return
       }
       setPreviewUrl(result.publicUrl ?? null)
+      showToast('Profil fotoğrafın güncellendi.')
       router.refresh()
     })
   }
