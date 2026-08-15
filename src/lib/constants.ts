@@ -1,7 +1,7 @@
 export const LESSON_DURATION_MINUTES = 40
 export const TRIAL_LESSON_DURATION_MINUTES = 20
 
-export const GUIDANCE_SUBJECT = 'Rehberlik'
+export const GUIDANCE_SUBJECT = 'Koçluk'
 
 // Eğitmen Bul / marketplace branş filtresinde kategori başlıklarıyla gösterilen dersler.
 export const SUBJECT_CATEGORIES = [
@@ -25,6 +25,6 @@ export const SUBJECT_CATEGORIES = [
 
 export const LESSON_SUBJECTS = SUBJECT_CATEGORIES.flatMap((c) => c.subjects)
 
-// Eğitmenin profilinde seçebileceği branşlar — Rehberlik marketplace filtresinde görünmez,
-// ayrı bir sayfadan (Rehberlik) erişilir.
+// Eğitmenin profilinde seçebileceği branşlar — Koçluk marketplace filtresinde görünmez,
+// ayrı bir sayfadan (Koçluk) erişilir.
 export const INSTRUCTOR_SUBJECT_OPTIONS = [...LESSON_SUBJECTS, GUIDANCE_SUBJECT] as const

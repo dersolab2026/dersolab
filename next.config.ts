@@ -21,6 +21,12 @@ const CSP = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  async redirects() {
+    return [
+      // Rehberlik sayfasi Kocluk olarak yeniden adlandirildi; eski baglantilar kirilmasin.
+      { source: '/rehberlik', destination: '/kocluk', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

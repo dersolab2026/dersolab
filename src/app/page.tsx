@@ -6,8 +6,8 @@ const FEATURES = [
     body: 'Google Meet üzerinden, eğitmenin müsaitliğine göre esnek şekilde planlanan dersler. Ders anında takvimine ve mailine düşer.',
   },
   {
-    title: 'Rehberlik Desteği',
-    body: 'Sınav ve bölüm/kariyer tercihlerinde yol gösteren, derslerden ayrı bir rehberlik hattı.',
+    title: 'Koçluk Desteği',
+    body: 'Sınav ve bölüm/kariyer tercihlerinde yol gösteren, derslerden ayrı bir koçluk hattı.',
   },
   {
     title: 'Ödev ve Ders Notu Takibi',

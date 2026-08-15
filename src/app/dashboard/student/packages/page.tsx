@@ -40,7 +40,7 @@ export default async function StudentPackagesPage({ searchParams }: StudentPacka
             <p className="font-bold text-[#1B2430]">{creditSummary.lessonCount} ders · {creditSummary.lessonCreditsUsed} kredi</p>
           </div>
           <div>
-            <p className="text-xs font-semibold text-[#1B2430]/60">Rehberlik Seansı</p>
+            <p className="text-xs font-semibold text-[#1B2430]/60">Koçluk Seansı</p>
             <p className="font-bold text-[#1B2430]">{creditSummary.guidanceCount} seans · {creditSummary.guidanceCreditsUsed} kredi</p>
           </div>
         </div>

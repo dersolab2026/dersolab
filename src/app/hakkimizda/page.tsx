@@ -21,7 +21,7 @@ export default function AboutPage() {
           <h2>Ne Sunuyoruz?</h2>
           <ul>
             <li><strong>Birebir Online Dersler:</strong> Google Meet üzerinden eğitmenin ajandasına göre esnek şekilde planlanan dersler.</li>
-            <li><strong>Rehberlik Desteği:</strong> Sınav ve bölüm/kariyer tercihlerinde yol gösteren ayrı bir rehberlik hattı.</li>
+            <li><strong>Koçluk Desteği:</strong> Sınav ve bölüm/kariyer tercihlerinde yol gösteren ayrı bir koçluk hattı.</li>
             <li><strong>Ödev Takibi:</strong> Eğitmenlerin verdiği ödevleri görüntüleme, teslim etme ve eğitmenden geri alma.</li>
             <li><strong>Ders Notları:</strong> Eğitmenlerin ders sonrası paylaştığı materyallere kalıcı erişim.</li>
             <li><strong>Esnek Kredi Paketleri:</strong> İhtiyacına göre ders kredisi satın alma.</li>
