@@ -9,6 +9,7 @@ import {
   deleteLessonMaterial,
 } from '@/lib/storage/upload-lesson-material'
 import type { LessonMaterial } from '@/lib/lessons/get-lesson-materials'
+import { useToast } from '@/components/ui/Toast'
 import { PIXEL_BUTTON_SECONDARY, PIXEL_BADGE } from '@/lib/theme'
 
 interface LessonMaterialsProps {
@@ -19,6 +20,7 @@ interface LessonMaterialsProps {
 
 export function LessonMaterials({ bookingId, materials, isInstructor }: LessonMaterialsProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -36,6 +38,7 @@ export function LessonMaterials({ bookingId, materials, isInstructor }: LessonMa
         return
       }
       if (inputRef.current) inputRef.current.value = ''
+      showToast('Ders notu yüklendi.')
       router.refresh()
     })
   }
@@ -54,6 +57,7 @@ export function LessonMaterials({ bookingId, materials, isInstructor }: LessonMa
         setError(result.error ?? 'Silinemedi')
         return
       }
+      showToast('Ders notu silindi.')
       router.refresh()
     })
   }

@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from 'react'
 import { Loader2, Upload, CheckCircle2 } from 'lucide-react'
 import { uploadHomeworkSubmission } from '@/lib/storage/upload-homework-submission'
 import { notifyHomeworkSubmitted } from '@/actions/homework'
+import { useToast } from '@/components/ui/Toast'
 import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface HomeworkSubmissionUploaderProps {
@@ -13,6 +14,7 @@ interface HomeworkSubmissionUploaderProps {
 
 export function HomeworkSubmissionUploader({ homeworkId, onUploaded }: HomeworkSubmissionUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const { showToast } = useToast()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -31,6 +33,7 @@ export function HomeworkSubmissionUploader({ homeworkId, onUploaded }: HomeworkS
         return
       }
       setSuccess(true)
+      showToast('Ödevin teslim edildi, eğitmenine bildirildi.')
       await notifyHomeworkSubmitted(homeworkId)
       onUploaded?.()
       if (inputRef.current) inputRef.current.value = ''

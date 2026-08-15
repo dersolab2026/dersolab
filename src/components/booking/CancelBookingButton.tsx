@@ -6,6 +6,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { cancelBookingAsStudent } from '@/actions/bookings'
+import { useToast } from '@/components/ui/Toast'
 import { PIXEL_BUTTON_DANGER } from '@/lib/theme'
 
 interface CancelBookingButtonProps {
@@ -16,6 +17,7 @@ interface CancelBookingButtonProps {
 export function CancelBookingButton({ bookingId, startTime }: CancelBookingButtonProps) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const { showToast } = useToast()
 
   const hoursUntilLesson = (new Date(startTime).getTime() - Date.now()) / (1000 * 60 * 60)
   const willBeRefunded = hoursUntilLesson >= 24
@@ -24,7 +26,8 @@ export function CancelBookingButton({ bookingId, startTime }: CancelBookingButto
     setError(null)
     startTransition(async () => {
       const result = await cancelBookingAsStudent(bookingId)
-      if (!result.success) setError(result.error)
+      if (!result.success) { setError(result.error); return }
+      showToast(willBeRefunded ? 'Ders iptal edildi, kredin iade edildi.' : 'Ders iptal edildi.')
     })
   }
 

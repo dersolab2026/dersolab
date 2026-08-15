@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
 import { addStudyLogEntry, deleteStudyLogEntry, type StudyLogEntry } from '@/actions/study-log'
+import { useToast } from '@/components/ui/Toast'
 import { LESSON_SUBJECTS } from '@/lib/constants'
 import { PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
@@ -14,6 +15,7 @@ interface StudyLogSectionProps {
 
 export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [subject, setSubject] = useState('')
   const [topic, setTopic] = useState('')
@@ -45,6 +47,7 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
       setQuestionsSolved('')
       setSource('')
       setIsOpen(false)
+      showToast('Çalışman günlüğüne eklendi.')
       router.refresh()
     })
   }
@@ -52,6 +55,7 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
   function handleDelete(id: string) {
     startTransition(async () => {
       await deleteStudyLogEntry(id)
+      showToast('Kayıt silindi.')
       router.refresh()
     })
   }
