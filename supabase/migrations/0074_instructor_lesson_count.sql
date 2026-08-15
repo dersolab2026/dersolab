@@ -1,4 +1,8 @@
 -- Egitmen kartlarinda sosyal kanit icin tamamlanan ders sayisini ekliyoruz.
+-- Donus tipi (OUT parametreleri) degistigi icin fonksiyonlari once silmemiz gerekiyor.
+
+drop function if exists public.get_instructor_profile_by_id(uuid);
+drop function if exists public.get_instructor_profiles(text);
 
 create or replace function public.get_instructor_profiles(p_subject text default null)
 returns table(
