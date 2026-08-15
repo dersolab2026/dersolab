@@ -35,6 +35,7 @@ export function RegisterForm() {
   const [schoolName, setSchoolName] = useState('')
   const [grade, setGrade] = useState('')
   const [track, setTrack] = useState<Track | ''>('')
+  const [referralCode, setReferralCode] = useState('')
   const [isPending, startTransition] = useTransition()
   const [isGooglePending, setIsGooglePending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -79,6 +80,7 @@ export function RegisterForm() {
         schoolName: role === 'student' ? schoolName : undefined,
         grade: role === 'student' ? gradeNumber : undefined,
         track: role === 'student' && isLise && track ? track : undefined,
+        referralCode: role === 'student' ? referralCode : undefined,
       })
       if (!result.success) { setError(result.error); return }
       setSuccess(true)
@@ -222,6 +224,18 @@ export function RegisterForm() {
                 </select>
               </div>
             )}
+
+            <div>
+              <label className="block text-[#1B2430] font-bold mb-2">
+                Davet Kodu <span className="font-semibold text-[#1B2430]/60">(isteğe bağlı)</span>
+              </label>
+              <input
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value)}
+                placeholder="Bir arkadaşın davet ettiyse kodunu gir"
+                className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+              />
+            </div>
           </>
         )}
 

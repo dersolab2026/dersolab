@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { StudentProfileForm } from '@/components/student/StudentProfileForm'
+import { ReferralCard } from '@/components/student/ReferralCard'
 import { ChangePasswordForm } from '@/components/account/ChangePasswordForm'
 import { DeleteAccountButton } from '@/components/instructor/DeleteAccountButton'
 import { PIXEL_CARD } from '@/lib/theme'
@@ -13,7 +14,7 @@ export default async function StudentSettingsPage() {
 
   const [{ data: userRow }, { data: studentRow }] = await Promise.all([
     supabase.from('users').select('name').eq('id', user.id).single(),
-    supabase.from('students').select('school_name, grade, track').eq('user_id', user.id).single(),
+    supabase.from('students').select('school_name, grade, track, referral_code').eq('user_id', user.id).single(),
   ])
 
   return (
@@ -24,6 +25,8 @@ export default async function StudentSettingsPage() {
         grade={studentRow?.grade ?? null}
         track={studentRow?.track ?? null}
       />
+
+      {studentRow?.referral_code && <ReferralCard referralCode={studentRow.referral_code} />}
 
       <ChangePasswordForm />
 

@@ -13,6 +13,7 @@ interface RegisterParams {
   schoolName?: string
   grade?: number
   track?: 'sayisal' | 'sozel' | 'ea' | 'dil'
+  referralCode?: string
 }
 
 function friendlySignUpError(message: string): string {
@@ -52,6 +53,7 @@ export async function registerUser(params: RegisterParams): Promise<ActionResult
         school_name: params.schoolName,
         grade: params.grade,
         track: params.track,
+        referral_code: params.referralCode?.trim() || undefined,
       },
     },
   })
