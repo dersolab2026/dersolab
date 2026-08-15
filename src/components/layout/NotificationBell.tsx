@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Bell, X } from 'lucide-react'
+import { Lightbulb, X } from 'lucide-react'
 import {
   getNotifications, markNotificationRead, markAllNotificationsRead,
   deleteNotification, clearReadNotifications, type NotificationItem,
@@ -15,9 +15,10 @@ const POLL_INTERVAL_MS = 30_000
 interface NotificationBellProps {
   initialNotifications: NotificationItem[]
   role: 'student' | 'instructor' | 'admin'
+  panelPosition?: 'up' | 'down'
 }
 
-export function NotificationBell({ initialNotifications, role }: NotificationBellProps) {
+export function NotificationBell({ initialNotifications, role, panelPosition = 'down' }: NotificationBellProps) {
   const router = useRouter()
   const [notifications, setNotifications] = useState(initialNotifications)
   const [isOpen, setIsOpen] = useState(false)
@@ -69,17 +70,31 @@ export function NotificationBell({ initialNotifications, role }: NotificationBel
 
   return (
     <div className="relative shrink-0" ref={containerRef}>
-      <button type="button" onClick={() => setIsOpen((v) => !v)} className="relative p-2" aria-label="Bildirimler">
-        <Bell className={`h-5 w-5 ${unreadCount > 0 ? 'text-[#DD7B3A]' : 'text-[#1B2430]'}`} />
+      <button type="button" onClick={() => setIsOpen((v) => !v)} className="relative p-1" aria-label="Bildirimler">
+        <Lightbulb
+          className={`absolute -top-1.5 left-1/2 h-3.5 w-3.5 -translate-x-1/2 transition-all ${
+            unreadCount > 0
+              ? 'fill-yellow-300 text-yellow-500 drop-shadow-[0_0_5px_rgba(250,204,21,0.9)] animate-pulse'
+              : 'text-[#1B2430]/20'
+          }`}
+        />
+        <img
+          src="/fox-mascot.png"
+          alt="Bildirimler"
+          className="h-8 w-8"
+          style={{ imageRendering: 'pixelated' }}
+        />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#DD7B3A] px-1 text-[10px] font-bold text-white">
+          <span className="absolute -bottom-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#DD7B3A] px-1 text-[10px] font-bold text-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className={`absolute right-0 top-full mt-2 max-h-96 w-80 overflow-y-auto z-50 ${PIXEL_CARD} p-0`}>
+        <div
+          className={`absolute right-0 ${panelPosition === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'} max-h-96 w-80 overflow-y-auto z-50 ${PIXEL_CARD} p-0`}
+        >
           <div className="flex items-center justify-between border-b-2 border-[#1B2430] p-3">
             <p className="font-bold text-[#1B2430]">Bildirimler</p>
             <div className="flex items-center gap-3">

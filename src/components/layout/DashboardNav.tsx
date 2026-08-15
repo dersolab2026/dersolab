@@ -185,7 +185,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
             ))}
           </div>
           <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t-2 border-[#1B2430]/10 shrink-0">
-            <NotificationBell initialNotifications={notifications} role={role} />
+            <NotificationBell initialNotifications={notifications} role={role} panelPosition="up" />
             <form action={logoutUser}>
               <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
             </form>
