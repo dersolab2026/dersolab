@@ -109,7 +109,7 @@ export default function HomePage() {
         <div className="bg-[#DD7B3A] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
           <div className="flex flex-col sm:flex-row items-center gap-5">
             <img
-              src="/fox-mascot.png"
+              src="/fox-mascot-icon.png"
               alt=""
               className="w-24 shrink-0 h-auto"
               style={{ imageRendering: 'pixelated' }}

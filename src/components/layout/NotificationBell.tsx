@@ -18,12 +18,16 @@ interface NotificationBellProps {
   panelPosition?: 'up' | 'down'
 }
 
+const PANEL_WIDTH = 320
+
 export function NotificationBell({ initialNotifications, role, panelPosition = 'down' }: NotificationBellProps) {
   const router = useRouter()
   const [notifications, setNotifications] = useState(initialNotifications)
   const [isOpen, setIsOpen] = useState(false)
   const [, startTransition] = useTransition()
   const containerRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const [fixedStyle, setFixedStyle] = useState<{ left: number; bottom: number } | null>(null)
 
   const unreadCount = notifications.filter((n) => !n.isRead).length
   const readCount = notifications.filter((n) => n.isRead).length
@@ -43,6 +47,25 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Kenar çubuğu taşmayı gizlediği için paneli sabit konumlandırıp kırpılmasını önlüyoruz.
+  useEffect(() => {
+    if (panelPosition !== 'up') return
+    if (!isOpen) { setFixedStyle(null); return }
+
+    function reposition() {
+      const rect = buttonRef.current?.getBoundingClientRect()
+      if (!rect) return
+      setFixedStyle({
+        left: Math.max(8, Math.min(rect.left, window.innerWidth - PANEL_WIDTH - 8)),
+        bottom: window.innerHeight - rect.top + 8,
+      })
+    }
+
+    reposition()
+    window.addEventListener('resize', reposition)
+    return () => window.removeEventListener('resize', reposition)
+  }, [isOpen, panelPosition])
 
   function handleItemClick(notification: NotificationItem) {
     if (!notification.isRead) {
@@ -70,22 +93,28 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
 
   return (
     <div className="relative shrink-0" ref={containerRef}>
-      <button type="button" onClick={() => setIsOpen((v) => !v)} className="relative p-1" aria-label="Bildirimler">
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
+        className="relative block pt-4"
+        aria-label="Bildirimler"
+      >
         <Lightbulb
-          className={`absolute -top-1.5 left-1/2 h-3.5 w-3.5 -translate-x-1/2 transition-all ${
+          className={`absolute top-0 left-1/2 h-5 w-5 -translate-x-1/2 transition-all ${
             unreadCount > 0
-              ? 'fill-yellow-300 text-yellow-500 drop-shadow-[0_0_5px_rgba(250,204,21,0.9)] animate-pulse'
-              : 'text-[#1B2430]/20'
+              ? 'fill-yellow-300 text-yellow-500 drop-shadow-[0_0_6px_rgba(250,204,21,0.95)] animate-pulse'
+              : 'text-[#1B2430]/25'
           }`}
         />
         <img
-          src="/fox-mascot.png"
+          src="/fox-mascot-icon.png"
           alt="Bildirimler"
-          className="h-8 w-8"
+          className="h-12 w-12"
           style={{ imageRendering: 'pixelated' }}
         />
         {unreadCount > 0 && (
-          <span className="absolute -bottom-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#DD7B3A] px-1 text-[10px] font-bold text-white">
+          <span className="absolute bottom-0 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-[#1B2430] bg-[#DD7B3A] px-1 text-[10px] font-bold text-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -93,7 +122,10 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
 
       {isOpen && (
         <div
-          className={`absolute right-0 ${panelPosition === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'} max-h-96 w-80 overflow-y-auto z-50 ${PIXEL_CARD} p-0`}
+          className={`${
+            panelPosition === 'up' ? 'fixed' : 'absolute right-0 top-full mt-2'
+          } max-h-96 w-80 overflow-y-auto z-50 ${PIXEL_CARD} p-0`}
+          style={panelPosition === 'up' ? { left: fixedStyle?.left, bottom: fixedStyle?.bottom, visibility: fixedStyle ? 'visible' : 'hidden' } : undefined}
         >
           <div className="flex items-center justify-between border-b-2 border-[#1B2430] p-3">
             <p className="font-bold text-[#1B2430]">Bildirimler</p>
