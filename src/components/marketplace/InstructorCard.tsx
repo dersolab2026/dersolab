@@ -5,13 +5,18 @@ import type { InstructorProfile } from '@/types'
 
 interface InstructorCardProps {
   instructor: InstructorProfile
+  /** Koçluk sayfasından gelindiğinde rezervasyonda koçluk türü ön seçili gelsin. */
+  sessionTypeHint?: 'kocluk'
 }
 
-export function InstructorCard({ instructor }: InstructorCardProps) {
+export function InstructorCard({ instructor, sessionTypeHint }: InstructorCardProps) {
   const initials = instructor.name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
+  const href = sessionTypeHint
+    ? `/instructors/${instructor.userId}?tur=${sessionTypeHint}`
+    : `/instructors/${instructor.userId}`
 
   return (
-    <Link href={`/instructors/${instructor.userId}`}>
+    <Link href={href}>
       <div className="h-full flex flex-col bg-[#F4F1E8] rounded-2xl p-5 border-4 border-[#1B2430] shadow-[0_6px_0_#1B2430] transition-all hover:-translate-y-0.5">
         <div className="flex items-center gap-3">
           <Avatar className="h-12 w-12 border-2 border-[#1B2430]">

@@ -50,7 +50,7 @@ export default function HomePage() {
             />
           </div>
           <p className="font-sans text-lg font-bold text-[#1B2430] mb-1">
-            Öğrenciler için online özel ders ve rehberlik platformu
+            Öğrenciler için online özel ders ve koçluk platformu
           </p>
           <p className="font-sans font-semibold text-[#1B2430]/70 mb-8 max-w-xl mx-auto">
             Okul derslerinden LGS, YKS, KPSS, DGS ve ALES hazırlığına kadar — alanında deneyimli, onaylı

@@ -29,7 +29,9 @@ export default async function CoachingPage() {
           <p className="font-sans font-semibold text-[#1B2430]">Şu anda müsait koç bulunmuyor.</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {instructors.map((instructor) => <InstructorCard key={instructor.userId} instructor={instructor} />)}
+            {instructors.map((instructor) => (
+              <InstructorCard key={instructor.userId} instructor={instructor} sessionTypeHint="kocluk" />
+            ))}
           </div>
         )}
       </div>

@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin', 'latin-ext'], variable: '--font-sans' }
 
 export const metadata = {
   title: 'DersoLab',
-  description: 'Öğrenciler için online özel ders ve rehberlik platformu',
+  description: 'Öğrenciler için online özel ders ve koçluk platformu',
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

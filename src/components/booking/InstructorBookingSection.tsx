@@ -4,27 +4,46 @@ import { useState, useTransition } from 'react'
 import { BookingCalendar } from '@/components/calendar/BookingCalendar'
 import { Loader2 } from 'lucide-react'
 import { createBooking } from '@/actions/bookings'
-import type { TimeSlot } from '@/types'
+import type { TimeSlot, SessionType } from '@/types'
 import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
 
 interface InstructorBookingSectionProps {
   instructorId: string
   studentId: string
+  /** Eğitmen hem ders hem koçluk veriyorsa öğrenci seans türünü kendisi seçer. */
+  offersLessons: boolean
+  offersCoaching: boolean
+  defaultSessionType: SessionType
 }
 
-export function InstructorBookingSection({ instructorId, studentId }: InstructorBookingSectionProps) {
+const SESSION_TYPE_LABELS: Record<SessionType, string> = {
+  lesson: 'Ders',
+  coaching: 'Koçluk Seansı',
+}
+
+export function InstructorBookingSection({
+  instructorId, studentId, offersLessons, offersCoaching, defaultSessionType,
+}: InstructorBookingSectionProps) {
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [topicNote, setTopicNote] = useState('')
+  const [sessionType, setSessionType] = useState<SessionType>(defaultSessionType)
   const [isPending, startTransition] = useTransition()
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
+
+  const canChooseType = offersLessons && offersCoaching
 
   function handleConfirm() {
     if (!selectedSlot) return
     setResult(null)
     startTransition(async () => {
-      const res = await createBooking({ instructorId, studentId, slot: selectedSlot, topicNote })
+      const res = await createBooking({ instructorId, studentId, slot: selectedSlot, topicNote, sessionType })
       if (res.success) {
-        setResult({ success: true, message: 'Ders başarıyla planlandı! Meet linki e-postana gönderildi.' })
+        setResult({
+          success: true,
+          message: sessionType === 'coaching'
+            ? 'Koçluk seansın planlandı! Meet linki e-postana gönderildi.'
+            : 'Ders başarıyla planlandı! Meet linki e-postana gönderildi.',
+        })
         setSelectedSlot(null)
         setTopicNote('')
       } else {
@@ -43,6 +62,26 @@ export function InstructorBookingSection({ instructorId, studentId }: Instructor
             Seçilen saat:{' '}
             <strong>{new Date(selectedSlot.start).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })}</strong>
           </p>
+          {canChooseType && (
+            <div>
+              <label className="block text-sm font-bold text-[#1B2430] mb-1">Ne planlamak istiyorsun?</label>
+              <div className="grid grid-cols-2 gap-2">
+                {(['lesson', 'coaching'] as const).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setSessionType(type)}
+                    className={`py-2 rounded-xl border-2 border-[#1B2430] font-bold text-sm transition-all ${
+                      sessionType === type ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+                    }`}
+                  >
+                    {SESSION_TYPE_LABELS[type]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-bold text-[#1B2430] mb-1">
               Hangi konuda yardım istiyorsun? <span className="font-semibold text-[#1B2430]/60">(isteğe bağlı)</span>

@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { GUIDANCE_SUBJECT } from '@/lib/constants'
 
 export interface StudentCreditSummary {
   remaining: number
@@ -16,20 +15,11 @@ export async function getStudentCreditSummary(studentId: string): Promise<Studen
 
   const { data: bookings } = await supabase
     .from('bookings')
-    .select('instructor_id, credits_used, status, credit_refunded')
+    .select('credits_used, status, credit_refunded, session_type')
     .eq('student_id', studentId)
 
   // Iade edilmis (gec olmayan) iptaller haric, gercekten harcanmis krediler.
   const usedBookings = (bookings ?? []).filter((b) => !(b.status === 'cancelled' && b.credit_refunded === true))
-
-  const instructorIds = [...new Set(usedBookings.map((b) => b.instructor_id))]
-  const { data: instructors } = instructorIds.length
-    ? await supabase.from('instructors').select('user_id, subjects').in('user_id', instructorIds)
-    : { data: [] as { user_id: string; subjects: string[] }[] }
-
-  const guidanceInstructorIds = new Set(
-    (instructors ?? []).filter((i) => i.subjects?.includes(GUIDANCE_SUBJECT)).map((i) => i.user_id)
-  )
 
   let lessonCount = 0
   let lessonCreditsUsed = 0
@@ -37,7 +27,7 @@ export async function getStudentCreditSummary(studentId: string): Promise<Studen
   let guidanceCreditsUsed = 0
 
   for (const b of usedBookings) {
-    if (guidanceInstructorIds.has(b.instructor_id)) {
+    if (b.session_type === 'coaching') {
       guidanceCount += 1
       guidanceCreditsUsed += b.credits_used
     } else {

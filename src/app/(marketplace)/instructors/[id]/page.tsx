@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { createClient } from '@/lib/supabase/server'
+import { GUIDANCE_SUBJECT } from '@/lib/constants'
 import { getInstructorById, getInstructorEducation } from '@/lib/marketplace/get-instructors'
 import { InstructorBookingSection } from '@/components/booking/InstructorBookingSection'
 import { EducationList } from '@/components/marketplace/EducationList'
@@ -8,12 +9,20 @@ import { IntroVideoPlayer } from '@/components/marketplace/IntroVideoPlayer'
 
 interface InstructorDetailPageProps {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ tur?: string }>
 }
 
-export default async function InstructorDetailPage({ params }: InstructorDetailPageProps) {
+export default async function InstructorDetailPage({ params, searchParams }: InstructorDetailPageProps) {
   const { id } = await params
+  const { tur } = await searchParams
   const instructor = await getInstructorById(id)
   if (!instructor) notFound()
+
+  const offersCoaching = instructor.subjects.includes(GUIDANCE_SUBJECT)
+  const offersLessons = instructor.subjects.some((s) => s !== GUIDANCE_SUBJECT)
+  // Koçluk sayfasından gelindiyse koçluk, aksi halde eğitmenin verdiği tek tür.
+  const defaultSessionType =
+    (tur === 'kocluk' && offersCoaching) || !offersLessons ? 'coaching' : 'lesson'
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -63,7 +72,13 @@ export default async function InstructorDetailPage({ params }: InstructorDetailP
 
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
           {instructor.isCalendarConnected ? (
-            <InstructorBookingSection instructorId={instructor.userId} studentId={user.id} />
+            <InstructorBookingSection
+              instructorId={instructor.userId}
+              studentId={user.id}
+              offersLessons={offersLessons}
+              offersCoaching={offersCoaching}
+              defaultSessionType={defaultSessionType}
+            />
           ) : (
             <p className="font-semibold text-[#1B2430]">
               Bu eğitmen henüz takvimini bağlamadı, rezervasyon şu anda açık değil.

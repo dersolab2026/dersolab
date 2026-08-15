@@ -12,7 +12,7 @@ import {
   notifyLessonMissed,
 } from '@/lib/notifications/send-guardian-notification'
 import { TRIAL_LESSON_DURATION_MINUTES } from '@/lib/constants'
-import type { TimeSlot } from '@/types'
+import type { TimeSlot, SessionType } from '@/types'
 
 type ActionResult = { success: true } | { success: false; error: string }
 
@@ -22,6 +22,7 @@ interface CreateBookingParams {
   slot: TimeSlot
   isTrial?: boolean
   topicNote?: string
+  sessionType?: SessionType
 }
 
 type CreateBookingResult =
@@ -34,6 +35,7 @@ export async function createBooking({
   slot,
   isTrial,
   topicNote,
+  sessionType,
 }: CreateBookingParams): Promise<CreateBookingResult> {
   const supabase = await createClient()
   const admin = createAdminClient()
@@ -58,6 +60,7 @@ export async function createBooking({
       status: 'scheduled',
       is_trial: isTrial ?? false,
       topic_note: topicNote?.trim() || null,
+      session_type: sessionType ?? 'lesson',
     })
     .select('id')
     .single()
