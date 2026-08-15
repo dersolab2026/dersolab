@@ -34,6 +34,7 @@ export function InstructorBookingListItem({ booking, materials }: InstructorBook
           {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#DD7B3A]">Tanışma Dersi</span>}
         </p>
         <p className="text-sm font-semibold text-[#1B2430]/70">{formattedDate}</p>
+        {booking.topicNote && <p className="mt-1 text-xs font-bold text-[#DD7B3A]">Öğrencinin sorusu: {booking.topicNote}</p>}
         {booking.instructorNotes && <p className="mt-1 text-xs font-semibold text-[#1B2430]/60">Not: {booking.instructorNotes}</p>}
         <LessonMaterials bookingId={booking.id} materials={materials} isInstructor />
       </div>

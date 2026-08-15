@@ -10,6 +10,7 @@ export interface InstructorBookingItem {
   status: 'scheduled' | 'completed' | 'cancelled' | 'no_show'
   meetLink: string | null
   instructorNotes: string | null
+  topicNote: string | null
   isTrial: boolean
 }
 
@@ -18,7 +19,7 @@ export async function getInstructorBookings(instructorId: string): Promise<Instr
 
   const { data: bookings, error } = await supabase
     .from('bookings')
-    .select('id, student_id, start_time, end_time, status, meet_link, instructor_notes, is_trial')
+    .select('id, student_id, start_time, end_time, status, meet_link, instructor_notes, topic_note, is_trial')
     .eq('instructor_id', instructorId)
     .order('start_time', { ascending: false })
 
@@ -39,6 +40,7 @@ export async function getInstructorBookings(instructorId: string): Promise<Instr
     status: b.status,
     meetLink: b.meet_link,
     instructorNotes: b.instructor_notes,
+    topicNote: b.topic_note,
     isTrial: b.is_trial,
   }))
 }

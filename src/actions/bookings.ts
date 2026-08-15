@@ -21,6 +21,7 @@ interface CreateBookingParams {
   studentId: string
   slot: TimeSlot
   isTrial?: boolean
+  topicNote?: string
 }
 
 type CreateBookingResult =
@@ -32,6 +33,7 @@ export async function createBooking({
   studentId,
   slot,
   isTrial,
+  topicNote,
 }: CreateBookingParams): Promise<CreateBookingResult> {
   const supabase = await createClient()
   const admin = createAdminClient()
@@ -55,6 +57,7 @@ export async function createBooking({
       end_time: endTime,
       status: 'scheduled',
       is_trial: isTrial ?? false,
+      topic_note: topicNote?.trim() || null,
     })
     .select('id')
     .single()
