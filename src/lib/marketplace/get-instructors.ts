@@ -33,6 +33,13 @@ function toInstructorProfile(row: InstructorProfileRow): InstructorProfile {
   }
 }
 
+// Brans secmemis egitmen hicbir filtreyle bulunamiyor ve rezervasyon
+// alamiyor; listede bos kart olarak durmasin diye eliyoruz. Profil sayfasi
+// (get_instructor_profile_by_id) etkilenmiyor, mevcut linkler calismaya devam eder.
+function hasSubjects(p: InstructorProfile): boolean {
+  return p.subjects.length > 0
+}
+
 export async function getInstructors(params: GetInstructorsParams = {}): Promise<InstructorProfile[]> {
   const supabase = await createClient()
 
@@ -42,7 +49,7 @@ export async function getInstructors(params: GetInstructorsParams = {}): Promise
       | undefined
     const { data, error } = await supabase.rpc('get_instructor_profiles', { p_subject: null })
     if (error) throw error
-    const profiles: InstructorProfile[] = (data ?? []).map(toInstructorProfile)
+    const profiles: InstructorProfile[] = (data ?? []).map(toInstructorProfile).filter(hasSubjects)
     if (!categorySubjects) return profiles
     return profiles.filter((p) => p.subjects.some((s) => categorySubjects.includes(s)))
   }
@@ -50,7 +57,7 @@ export async function getInstructors(params: GetInstructorsParams = {}): Promise
   const { data, error } = await supabase.rpc('get_instructor_profiles', { p_subject: params.subject ?? null })
 
   if (error) throw error
-  return (data ?? []).map(toInstructorProfile)
+  return (data ?? []).map(toInstructorProfile).filter(hasSubjects)
 }
 
 export async function getInstructorById(instructorId: string): Promise<InstructorProfile | null> {

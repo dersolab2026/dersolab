@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { getAvailableSlots } from '@/lib/availability/get-available-slots'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Eğitmenin haftalık müsaitliği kişisel bilgi; rezervasyon sayfası zaten
+  // giriş istiyor, API de aynı sınırda olmalı.
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Bu bilgi için giriş yapmalısın' }, { status: 401 })
+  }
+
   const { id: instructorId } = await params
   const dateParam = request.nextUrl.searchParams.get('date')
 
