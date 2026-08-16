@@ -50,6 +50,26 @@ export async function removeEducationEntry(entryId: string): Promise<ActionResul
   return { success: true }
 }
 
+const BIO_MAX_LENGTH = 400
+
+export async function updateInstructorBio(bio: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
+  const temiz = bio.trim()
+  if (temiz.length > BIO_MAX_LENGTH) {
+    return { success: false, error: `Tanıtım yazısı en fazla ${BIO_MAX_LENGTH} karakter olabilir` }
+  }
+
+  const { error } = await supabase.from('instructors').update({ bio: temiz || null }).eq('user_id', user.id)
+
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/dashboard/instructor/profile')
+  revalidatePath('/instructors')
+  return { success: true }
+}
+
 export async function updateInstructorSubjects(subjects: string[]): Promise<ActionResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

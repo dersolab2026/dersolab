@@ -1,6 +1,7 @@
 import { InstructorCard } from '@/components/marketplace/InstructorCard'
 import { SubjectFilter } from '@/components/marketplace/SubjectFilter'
 import { getInstructors } from '@/lib/marketplace/get-instructors'
+import { getNextAvailableSlots } from '@/lib/availability/get-next-slots'
 
 interface InstructorsPageProps {
   searchParams: Promise<{ subject?: string; category?: string }>
@@ -9,6 +10,9 @@ interface InstructorsPageProps {
 export default async function InstructorsPage({ searchParams }: InstructorsPageProps) {
   const { subject, category } = await searchParams
   const instructors = await getInstructors({ subject, category })
+  const nextSlots = await getNextAvailableSlots(
+    instructors.filter((i) => i.isCalendarConnected).map((i) => i.userId),
+  )
 
   return (
     <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
@@ -33,7 +37,13 @@ export default async function InstructorsPage({ searchParams }: InstructorsPageP
           <p className="font-sans font-semibold text-[#1B2430]">Bu branşta henüz eğitmen bulunmuyor.</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {instructors.map((instructor) => <InstructorCard key={instructor.userId} instructor={instructor} />)}
+            {instructors.map((instructor) => (
+              <InstructorCard
+                key={instructor.userId}
+                instructor={instructor}
+                nextSlot={nextSlots.get(instructor.userId)}
+              />
+            ))}
           </div>
         )}
       </div>

@@ -1,9 +1,13 @@
 import { InstructorCard } from '@/components/marketplace/InstructorCard'
 import { getInstructors } from '@/lib/marketplace/get-instructors'
+import { getNextAvailableSlots } from '@/lib/availability/get-next-slots'
 import { GUIDANCE_SUBJECT } from '@/lib/constants'
 
 export default async function CoachingPage() {
   const instructors = await getInstructors({ subject: GUIDANCE_SUBJECT })
+  const nextSlots = await getNextAvailableSlots(
+    instructors.filter((i) => i.isCalendarConnected).map((i) => i.userId),
+  )
 
   return (
     <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
@@ -30,7 +34,12 @@ export default async function CoachingPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {instructors.map((instructor) => (
-              <InstructorCard key={instructor.userId} instructor={instructor} sessionTypeHint="kocluk" />
+              <InstructorCard
+                key={instructor.userId}
+                instructor={instructor}
+                sessionTypeHint="kocluk"
+                nextSlot={nextSlots.get(instructor.userId)}
+              />
             ))}
           </div>
         )}

@@ -76,6 +76,26 @@ export default function HomePage() {
           </Link>
         </div>
 
+        {/* Ücretsiz tanışma dersi — rakiplerde olmayan koz, ayrı bir blokta */}
+        <div className="bg-[#6FA89E] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center">
+          <span className="inline-block mb-3 px-3 py-1 rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] text-xs font-black text-[#1B2430]">
+            ÖDEME YOK · KART YOK
+          </span>
+          <h2 className="font-sans text-2xl sm:text-3xl font-black text-[#F4F1E8] mb-2">
+            Önce ücretsiz tanış, sonra karar ver
+          </h2>
+          <p className="font-semibold text-[#F4F1E8]/90 mb-5 max-w-xl mx-auto">
+            Her öğrencinin 20 dakikalık bir tanışma dersi hakkı var. Eğitmenle tanış, nasıl
+            çalıştığını gör, beğenmezsen hiçbir şey ödemeden bırak.
+          </p>
+          <Link
+            href="/demo-ders"
+            className="inline-block py-4 px-10 bg-[#DD7B3A] text-[#F4F1E8] font-bold text-lg rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
+          >
+            Ücretsiz Tanışma Dersi Al
+          </Link>
+        </div>
+
         {/* Features */}
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
           <h2 className="font-sans text-xl sm:text-2xl font-black text-[#1B2430] mb-5 text-center">Ne Sunuyoruz</h2>
@@ -138,13 +158,13 @@ export default function HomePage() {
         {/* Final CTA */}
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center">
           <p className="font-sans text-lg font-bold text-[#1B2430] mb-4">
-            Hemen ücretsiz bir tanışma dersiyle başla, doğru eğitmeni bul.
+            Branşına uygun eğitmenleri incele, sana en uygununu seç.
           </p>
           <Link
-            href="/demo-ders"
+            href="/instructors"
             className="inline-block py-3 px-8 bg-[#DD7B3A] text-[#F4F1E8] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
           >
-            Ücretsiz Tanışma Dersi Talep Et
+            Eğitmenleri İncele
           </Link>
         </div>
 
