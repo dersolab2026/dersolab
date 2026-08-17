@@ -5,6 +5,11 @@ import { LESSON_DURATION_MINUTES } from '@/lib/constants'
 const ISTANBUL_OFFSET_MS = 3 * 60 * 60 * 1000
 const LOOKAHEAD_DAYS = 14
 
+// Import edilen sabiti dogrudan bir `for` dongusunun artirma ifadesinde
+// kullanmayin: Next 16 paketleyicisi orada referansi yeniden yazmayi atlayip
+// uretim derlemesinde "is not defined" hatasi veriyor (dev'de gorunmuyor).
+const SLOT_MS = LESSON_DURATION_MINUTES * 60_000
+
 interface AvailabilityRuleRow {
   instructor_id: string
   day_of_week: number
@@ -93,11 +98,7 @@ function ilkMusaitSlot(
       const pencereBas = Date.UTC(yil, ay, gun, basSaat, basDk) - ISTANBUL_OFFSET_MS
       const pencereBit = Date.UTC(yil, ay, gun, bitSaat, bitDk) - ISTANBUL_OFFSET_MS
 
-      for (
-        let t = pencereBas;
-        t + LESSON_DURATION_MINUTES * 60_000 <= pencereBit;
-        t += LESSON_DURATION_MINUTES * 60_000
-      ) {
+      for (let t = pencereBas; t + SLOT_MS <= pencereBit; t += SLOT_MS) {
         if (t <= now.getTime()) continue
         if (dolu.has(t)) continue
         return new Date(t)
