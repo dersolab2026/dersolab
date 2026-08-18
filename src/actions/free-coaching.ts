@@ -19,10 +19,14 @@ export async function requestFreeCoaching(): Promise<ActionResult> {
   })
 
   if (error) {
+    // Uygunluk kontrolu security definer trigger'da; mesajlari oradan geliyor.
     let message = error.message
-    if (error.message.includes('row-level security')) {
-      // Politika hem "hak kullanildi" hem "bekleyen talep var" durumunu kapsiyor.
-      message = 'Ücretsiz koçluk hakkını zaten kullandın ya da bekleyen bir talebin var'
+    if (error.message.includes('kocluk hakki zaten kullanilmis')) {
+      message = 'Ücretsiz koçluk hakkını zaten kullandın'
+    } else if (error.message.includes('zaten bekleyen bir kocluk talebi')) {
+      message = 'Zaten bekleyen bir koçluk talebin var'
+    } else if (error.message.includes('row-level security')) {
+      message = 'Bu işlem için yetkin yok'
     } else if (error.code === '23503') {
       message = 'Ücretsiz koçluk sadece öğrenci hesapları için geçerli'
     }
