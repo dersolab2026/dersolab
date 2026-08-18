@@ -25,10 +25,10 @@ export default async function DemoLessonPage() {
       <div className="relative z-10 mx-auto max-w-2xl space-y-6 p-5 py-10">
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
           <h1 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430] leading-snug">
-            Ücretsiz Tanışma Dersi + 1 Hafta Koçluk
+            Hoş Geldin Paketi
           </h1>
           <p className="mt-2 font-sans font-semibold text-[#1B2430]">
-            Her öğrenci bir kere, ikisini birden ücretsiz alabilir.
+            20 dakikalık tanışma dersi + 1 hafta koçluk desteği. Her öğrenciye bir kere, tamamen ücretsiz.
           </p>
         </div>
 
@@ -45,7 +45,7 @@ export default async function DemoLessonPage() {
         ) : (
           <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
             <p className="font-sans font-semibold text-[#1B2430]">
-              Ücretsiz başlangıç paketi sadece öğrenci hesapları için geçerli.
+              Hoş geldin paketi sadece öğrenci hesapları için geçerli.
             </p>
           </div>
         )}

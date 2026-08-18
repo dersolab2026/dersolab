@@ -24,12 +24,12 @@ export async function notifyStudentDemoLessonReminder(params: { name: string; em
     await resend.emails.send({
       from: 'DersoLab <bildirim@dersolab.com>',
       to: params.email,
-      subject: 'Ücretsiz Tanışma Dersini Kaçırma - DersoLab',
+      subject: 'Hoş Geldin Paketini Kaçırma - DersoLab',
       html: `<p>Merhaba ${params.name},</p>
-        <p>DersoLab'da ücretsiz bir tanışma dersi hakkın var! Bir eğitmenle tanışıp platformu nasıl kullanacağını öğrenebilirsin.</p>
-        <p><a href="${appUrl}/demo-ders">Hemen talep et</a>, ilk uygun eğitmen seninle iletişime geçsin.</p>`,
+        <p>DersoLab'da henüz kullanmadığın bir hoş geldin paketin var: 20 dakikalık ücretsiz bir tanışma dersi ve bir hafta boyunca koçluk desteği.</p>
+        <p><a href="${appUrl}/demo-ders">Hemen talep et</a>, uygun bir eğitmen ve koç seninle iletişime geçsin.</p>`,
     })
   } catch (err) {
-    console.error('Tanisma dersi hatirlatma e-postasi gonderilemedi:', err)
+    console.error('Hos geldin paketi hatirlatma e-postasi gonderilemedi:', err)
   }
 }

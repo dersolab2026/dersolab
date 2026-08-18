@@ -33,7 +33,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/student/packages', label: 'Paketler' },
     { href: '/instructors', label: 'Eğitmenler' },
     { href: '/kocluk', label: 'Koçluk' },
-    { href: '/demo-ders', label: 'Ücretsiz Başlangıç' },
+    { href: '/demo-ders', label: 'Hoş Geldin Paketi' },
     { href: '/dashboard/student/nasil-calisir', label: 'Nasıl Çalışır?' },
     { href: '/dashboard/student/settings', label: 'Ayarlar' },
   ],
@@ -87,7 +87,7 @@ export function DashboardNav({ role, offersFreeTrial, isCoach, notifications }: 
 
   // Tanışma dersi verenler ve koçlar aynı talep sayfasını kullanıyor.
   const instructorItemsWithDemo = offersFreeTrial || isCoach
-    ? [...NAV_ITEMS.instructor, { href: '/dashboard/instructor/demo-talepleri', label: 'Ücretsiz Talepler' }]
+    ? [...NAV_ITEMS.instructor, { href: '/dashboard/instructor/demo-talepleri', label: 'Hoş Geldin Talepleri' }]
     : NAV_ITEMS.instructor
 
   // Admin hesabı genelde aynı zamanda aktif bir eğitmen de olduğu için

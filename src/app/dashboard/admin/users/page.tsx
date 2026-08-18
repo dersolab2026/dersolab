@@ -75,7 +75,7 @@ export default async function AdminUsersPage() {
         <div>
           <h2 className="text-lg font-semibold">Öğrenciler</h2>
           <p className="text-sm text-muted-foreground">
-            {students.filter((s) => s.freeTrialUsed).length} / {students.length} öğrenci demo dersini kullandı
+            {students.filter((s) => s.freeTrialUsed).length} / {students.length} öğrenci tanışma dersini kullandı
           </p>
         </div>
         {students.length === 0 ? (
@@ -89,7 +89,7 @@ export default async function AdminUsersPage() {
                   <th className="px-3 py-2 text-left font-medium">E-posta</th>
                   <th className="px-3 py-2 text-left font-medium">Sınav Türü</th>
                   <th className="px-3 py-2 text-left font-medium">Kredi Bakiyesi</th>
-                  <th className="px-3 py-2 text-left font-medium">Demo Ders</th>
+                  <th className="px-3 py-2 text-left font-medium">Tanışma Dersi</th>
                   <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
                   <th className="px-3 py-2 text-right font-medium">İşlemler</th>
                 </tr>

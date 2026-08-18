@@ -38,10 +38,11 @@ export function DemoLessonEmailForm() {
 
   return (
     <form onSubmit={handleSubmit} className={`${PIXEL_CARD} p-5 space-y-3`}>
-      <p className="font-bold text-[#1B2430]">Ücretsiz Tanışma Dersi</p>
+      <p className="font-bold text-[#1B2430]">Tanışma Dersinle Başla</p>
       <p className="text-sm font-semibold text-[#1B2430]/70">
-        20 dakikalık, kredi kullanmadan alabileceğin bir tanışma dersi talep et. Uygun bir eğitmenimiz
-        e-posta adresinden seninle iletişime geçip dersi planlayacak.
+        Hoş geldin paketinin ilk yarısını hesap açmadan da alabilirsin: 20 dakikalık, kredi
+        kullanmayan bir tanışma dersi. Uygun bir eğitmenimiz e-posta adresinden seninle iletişime
+        geçip dersi planlar. Hesabını açtığında 1 haftalık koçluk desteğin de açılır.
       </p>
       <div>
         <label className="block text-sm font-bold text-[#1B2430] mb-1">Ad Soyad</label>

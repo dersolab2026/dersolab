@@ -57,7 +57,7 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
       <div className={`${PIXEL_CARD} p-5 space-y-3`}>
         <p className="font-bold text-[#1B2430]">Talebin alındı!</p>
         <ul className="space-y-2">
-          <DurumSatiri etiket="Ücretsiz tanışma dersi" durum={dersDurumu} />
+          <DurumSatiri etiket="20 dakikalık tanışma dersi" durum={dersDurumu} />
           <DurumSatiri etiket="1 haftalık koçluk" durum={koclukDurumu} />
         </ul>
       </div>
@@ -66,7 +66,7 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
 
   return (
     <div className={`${PIXEL_CARD} p-5 space-y-3`}>
-      <p className="font-bold text-[#1B2430]">Ücretsiz Başlangıç Paketin</p>
+      <p className="font-bold text-[#1B2430]">Hoş Geldin Paketin</p>
       <p className="text-sm font-semibold text-[#1B2430]/70">
         Tek talep, iki hak: 20 dakikalık bir tanışma dersi ve bir hafta boyunca koçluk desteği.
         Kredi harcamıyorsun, kart bilgisi istemiyoruz.
@@ -77,7 +77,7 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
       </ul>
       {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
       <button type="button" onClick={handleRequest} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
-        {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ücretsiz Başlangıcı Talep Et'}
+        {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Hoş Geldin Paketini Al'}
       </button>
     </div>
   )

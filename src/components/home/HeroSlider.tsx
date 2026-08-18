@@ -26,9 +26,9 @@ const SLIDES: Slide[] = [
   },
   {
     rozet: 'ÖDEME YOK · KART YOK',
-    baslik: 'Tanışma dersi + 1 hafta koçluk, ikisi de bizden',
-    metin: 'Her öğrencinin bir kerelik başlangıç hakkı var: 20 dakikalık bir tanışma dersi ve bir hafta boyunca koçluk desteği. Beğenmezsen hiçbir şey ödemeden bırak.',
-    cta: { href: '/demo-ders', label: 'Ücretsiz Başlangıcı Al' },
+    baslik: 'Hoş geldin paketin bizden: tanışma dersi + 1 hafta koçluk',
+    metin: 'Her öğrenciye bir kere: 20 dakikalık bir tanışma dersi ve bir hafta boyunca koçluk desteği. Beğenmezsen hiçbir şey ödemeden bırak.',
+    cta: { href: '/demo-ders', label: 'Hoş Geldin Paketini Al' },
     arka: 'bg-[#6FA89E]', yazi: 'text-[#F4F1E8]', rozetArka: 'bg-[#F4F1E8] text-[#1B2430]',
   },
   {

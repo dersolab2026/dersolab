@@ -22,7 +22,7 @@ const FEATURES = [
 
 const STEPS = [
   { step: '1', title: 'Kaydol', body: 'Birkaç saniyede ücretsiz hesap oluştur.' },
-  { step: '2', title: 'Eğitmen Bul ya da Tanışma Dersi Al', body: 'Branşına uygun eğitmeni incele, istersen önce ücretsiz bir tanışma dersiyle başla.' },
+  { step: '2', title: 'Eğitmen Bul ya da Hoş Geldin Paketini Al', body: 'Branşına uygun eğitmeni incele, istersen önce ücretsiz hoş geldin paketinle başla.' },
   { step: '3', title: 'Dersini Planla', body: 'Uygun saati seç, ders otomatik takvimine ve Google Meet linkin mailine düşsün.' },
 ]
 

@@ -10,9 +10,9 @@ const ITEMS: { question: string; answer: string }[] = [
       '1 ders kredisi, 40 dakikalık bir derse karşılık gelir. "Paketler" sayfasından bir kredi paketi satın alarak kredi kazanırsın; ödeme Shopier üzerinden alınır.',
   },
   {
-    question: 'Ücretsiz tanışma dersi nedir?',
+    question: 'Hoş geldin paketi nedir?',
     answer:
-      'Her öğrenci platformda bir kere, 20 dakikalık, kredi kullanmadan ücretsiz bir tanışma dersi alabilir. "Tanışma Dersi" sayfasından talep edersin, uygun bir eğitmen seninle iletişime geçip dersi planlar.',
+      'Her öğrenci platformda bir kere ücretsiz hoş geldin paketi alır: 20 dakikalık, kredi harcamayan bir tanışma dersi ve bir hafta boyunca koçluk desteği. "Hoş Geldin Paketi" sayfasından tek seferde talep edersin; uygun bir eğitmen dersini planlar, bir koç da haftalık programını kurmak için seninle iletişime geçer.',
   },
   {
     question: 'Bir eğitmenden nasıl ders alırım?',

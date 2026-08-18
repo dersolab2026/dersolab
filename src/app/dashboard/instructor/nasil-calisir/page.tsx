@@ -25,9 +25,9 @@ const ITEMS: { question: string; answer: string }[] = [
       'Sen iptal edersen öğrencinin kredisi her zaman iade edilir. Öğrenci ders saatine 24 saatten az kala iptal ederse kredisi iade edilmez, 24 saatten fazla varsa iade edilir.',
   },
   {
-    question: 'Ücretsiz tanışma dersi talepleri nasıl çalışır?',
+    question: 'Hoş geldin paketi talepleri nasıl çalışır?',
     answer:
-      'Admin senin için "ücretsiz ders" yetkisini açtıysa, bekleyen tanışma dersi taleplerini "Demo Talepleri" sayfasında görürsün. İlk kabul eden eğitmen dersi alır, 20 dakikalık ve kredisiz bir tanışma dersi olur.',
+      'Öğrenci hoş geldin paketini talep ettiğinde arka planda iki ayrı talep açılır: tanışma dersi ve 1 haftalık koçluk. Admin senin için "ücretsiz ders" yetkisini açtıysa tanışma dersi taleplerini, Koçluk branşın varsa koçluk taleplerini "Hoş Geldin Talepleri" sayfasında görürsün. İlk üstlenen alır; tanışma dersi 20 dakikalık ve kredisizdir.',
   },
   {
     question: 'Ödev akışı nasıl işliyor?',

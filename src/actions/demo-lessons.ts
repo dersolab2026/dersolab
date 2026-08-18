@@ -10,7 +10,7 @@ import type { TimeSlot } from '@/types'
 type ActionResult = { success: true } | { success: false; error: string }
 
 /**
- * Ucretsiz baslangic paketi: tanisma dersi ve 1 haftalik kocluk birlikte
+ * Hos geldin paketi: tanisma dersi ve 1 haftalik kocluk birlikte
  * veriliyor. Ogrenci tek sefer talep ediyor, arka planda iki ayri talep
  * aciliyor cunku ikisini farkli havuzlar ustleniyor: dersi tanisma dersi
  * veren egitmenler, koclugu Koçluk bransi olan koclar.
@@ -45,13 +45,13 @@ export async function requestDemoLesson(studentId: string): Promise<ActionResult
     const hepsi = hatalar.join(' | ')
     let message = hepsi
     if (hepsi.includes('zaten kullanilmis')) {
-      message = 'Ücretsiz başlangıç hakkını zaten kullandın'
+      message = 'Hoş geldin paketini zaten kullandın'
     } else if (hepsi.includes('zaten bekleyen')) {
       message = 'Zaten bekleyen bir talebin var'
     } else if (hepsi.includes('row-level security')) {
       message = 'Bu işlem için yetkin yok'
     } else if (hepsi.includes('violates foreign key')) {
-      message = 'Ücretsiz başlangıç sadece öğrenci hesapları için geçerli'
+      message = 'Hoş geldin paketi sadece öğrenci hesapları için geçerli'
     }
     return { success: false, error: message }
   }
@@ -75,7 +75,7 @@ export async function requestDemoLessonByEmail(name: string, email: string): Pro
 
   const { data: existingUser } = await admin.from('users').select('id').eq('email', trimmedEmail).maybeSingle()
   if (existingUser) {
-    return { success: false, error: 'Bu e-posta zaten kayıtlı — giriş yapıp tanışma dersi talep edebilirsin' }
+    return { success: false, error: 'Bu e-posta zaten kayıtlı — giriş yapıp hoş geldin paketini talep edebilirsin' }
   }
 
   const { data: existingRequest } = await admin
