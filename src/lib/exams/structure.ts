@@ -37,6 +37,11 @@ const FLAT_SECTIONS: Partial<Record<ExamType, ExamSection[]>> = {
     { name: 'Sosyal Bilimler', questionCount: 20 },
     { name: 'Fen Bilimleri', questionCount: 20 },
   ],
+  // YDT, YKS'nin ucuncu oturumu (AYT'nin bir testi degil). ÖSYM Tablo 1B'de
+  // adlandirilmis alt testlere bolunmuyor, tek bir 80 soruluk test.
+  ydt: [
+    { name: 'Yabancı Dil', questionCount: 80 },
+  ],
   kpss: [
     { name: 'Türkçe', questionCount: 30 },
     { name: 'Matematik', questionCount: 30 },

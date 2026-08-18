@@ -1,12 +1,13 @@
 import { getTotalQuestions, type ExamTrack } from './structure'
 
-export const EXAM_TYPES = ['lgs', 'tyt', 'ayt', 'kpss', 'dgs', 'ales'] as const
+export const EXAM_TYPES = ['lgs', 'tyt', 'ayt', 'ydt', 'kpss', 'dgs', 'ales'] as const
 export type ExamType = (typeof EXAM_TYPES)[number]
 
 export const EXAM_TYPE_LABELS: Record<ExamType, string> = {
   lgs: 'LGS',
   tyt: 'TYT',
   ayt: 'AYT',
+  ydt: 'YDT (Yabancı Dil)',
   kpss: 'KPSS',
   dgs: 'DGS',
   ales: 'ALES',
@@ -17,7 +18,7 @@ export const EXAM_TYPE_LABELS: Record<ExamType, string> = {
  * diger sinavlarda 4.
  */
 const WRONG_PER_CORRECT: Record<ExamType, number> = {
-  lgs: 3, tyt: 4, ayt: 4, kpss: 4, dgs: 4, ales: 4,
+  lgs: 3, tyt: 4, ayt: 4, ydt: 4, kpss: 4, dgs: 4, ales: 4,
 }
 
 /** OBP'nin yerlestirme puanina katki katsayisi (YKS). */
@@ -65,9 +66,9 @@ export function estimateScore(examType: ExamType, net: number, track?: ExamTrack
   return Math.round(Math.min(SCORE_CEILING, puan) * 100) / 100
 }
 
-/** OBP yalnizca YKS (TYT/AYT) yerlestirme puanina giriyor. */
+/** OBP yalnizca YKS oturumlarinin (TYT/AYT/YDT) yerlestirme puanina giriyor. */
 export function supportsObp(examType: ExamType): boolean {
-  return examType === 'tyt' || examType === 'ayt'
+  return examType === 'tyt' || examType === 'ayt' || examType === 'ydt'
 }
 
 /**
