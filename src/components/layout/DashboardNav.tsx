@@ -19,6 +19,8 @@ const SIDEBAR_LINK_INACTIVE = `${SIDEBAR_LINK_BASE} bg-white text-[#1B2430]`
 interface DashboardNavProps {
   role: 'student' | 'instructor' | 'admin'
   offersFreeTrial?: boolean
+  /** Koçluk branşı olan eğitmen — ücretsiz koçluk taleplerini görebilir. */
+  isCoach?: boolean
   notifications: NotificationItem[]
 }
 
@@ -32,6 +34,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/instructors', label: 'Eğitmenler' },
     { href: '/kocluk', label: 'Koçluk' },
     { href: '/demo-ders', label: 'Tanışma Dersi' },
+    { href: '/ucretsiz-kocluk', label: 'Ücretsiz Koçluk' },
     { href: '/dashboard/student/nasil-calisir', label: 'Nasıl Çalışır?' },
     { href: '/dashboard/student/settings', label: 'Ayarlar' },
   ],
@@ -55,7 +58,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
 }
 
-export function DashboardNav({ role, offersFreeTrial, notifications }: DashboardNavProps) {
+export function DashboardNav({ role, offersFreeTrial, isCoach, notifications }: DashboardNavProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
@@ -83,8 +86,9 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
     })
   }
 
-  const instructorItemsWithDemo = offersFreeTrial
-    ? [...NAV_ITEMS.instructor, { href: '/dashboard/instructor/demo-talepleri', label: 'Demo Talepleri' }]
+  // Tanışma dersi verenler ve koçlar aynı talep sayfasını kullanıyor.
+  const instructorItemsWithDemo = offersFreeTrial || isCoach
+    ? [...NAV_ITEMS.instructor, { href: '/dashboard/instructor/demo-talepleri', label: 'Ücretsiz Talepler' }]
     : NAV_ITEMS.instructor
 
   // Admin hesabı genelde aynı zamanda aktif bir eğitmen de olduğu için

@@ -1,20 +1,28 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+export type DemoRequestType = 'demo_lesson' | 'coaching_week'
+
 export interface PendingDemoRequest {
   id: string
   studentId: string | null
   studentName: string
   leadEmail: string | null
   createdAt: string
+  requestType: DemoRequestType
 }
 
+/**
+ * Bekleyen talepler. RLS zaten egitmene gore filtreliyor: tanisma dersi
+ * taleplerini "offers_free_trial" egitmenler, kocluk taleplerini Koçluk
+ * bransi olan egitmenler goruyor.
+ */
 export async function getPendingDemoRequests(): Promise<PendingDemoRequest[]> {
   const supabase = await createClient()
 
   const { data: requests, error } = await supabase
     .from('demo_lesson_requests')
-    .select('id, student_id, lead_name, lead_email, created_at')
+    .select('id, student_id, lead_name, lead_email, created_at, request_type')
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
 
@@ -34,5 +42,6 @@ export async function getPendingDemoRequests(): Promise<PendingDemoRequest[]> {
     studentName: r.student_id ? (nameById.get(r.student_id) ?? 'Öğrenci') : (r.lead_name ?? 'İsimsiz'),
     leadEmail: r.lead_email,
     createdAt: r.created_at,
+    requestType: (r.request_type ?? 'demo_lesson') as DemoRequestType,
   }))
 }

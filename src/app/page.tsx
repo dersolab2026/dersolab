@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { HeroSlider } from '@/components/home/HeroSlider'
 
 const FEATURES = [
   {
@@ -38,63 +39,30 @@ export default function HomePage() {
 
       <div className="relative z-10 mx-auto max-w-4xl space-y-6 p-5 py-10">
 
-        {/* Hero */}
-        <div className="bg-[#F4F1E8] rounded-2xl p-8 sm:p-12 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center">
-          <img src="/dersolab-logo.png" alt="DersoLab" className="mx-auto mb-6 h-auto w-full max-w-[320px]" />
-          <div className="flex justify-center mb-6">
-            <img
-              src="/fox-mascot.png"
-              alt="DersoLab Fox Mascot"
-              className="w-3/5 max-w-[240px] h-auto"
-              style={{ imageRendering: 'pixelated' }}
-            />
-          </div>
-          <p className="font-sans text-lg font-bold text-[#1B2430] mb-1">
-            Öğrenciler için online özel ders ve koçluk platformu
-          </p>
-          <p className="font-sans font-semibold text-[#1B2430]/70 mb-8 max-w-xl mx-auto">
-            Okul derslerinden LGS, YKS, KPSS, DGS ve ALES hazırlığına kadar — alanında deneyimli, onaylı
-            eğitmenlerle birebir online ders al.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-xl mx-auto">
-            <Link
-              href="/demo-ders"
-              className="flex-1 py-4 bg-[#DD7B3A] text-[#F4F1E8] font-bold text-lg rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all text-center"
-            >
-              Ücretsiz Tanışma Dersi
-            </Link>
-            <Link
-              href="/register"
-              className="flex-1 py-4 bg-white text-[#1B2430] font-bold text-lg rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all text-center"
-            >
-              Kaydol
-            </Link>
-          </div>
-          <Link href="/login" className="inline-block mt-4 text-sm font-bold text-[#1B2430] underline">
-            Zaten hesabın var mı? Giriş Yap
-          </Link>
+        {/* Logo + maskot: slaytın üstünde sabit kimlik şeridi */}
+        <div className="bg-[#F4F1E8] rounded-2xl p-5 sm:p-6 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] flex items-center justify-center gap-4">
+          <img
+            src="/fox-head-open.png"
+            alt=""
+            className="h-14 w-14 sm:h-16 sm:w-16 shrink-0"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          <img src="/dersolab-logo.png" alt="DersoLab" className="h-auto w-full max-w-[260px]" />
         </div>
 
-        {/* Ücretsiz tanışma dersi — rakiplerde olmayan koz, ayrı bir blokta */}
-        <div className="bg-[#6FA89E] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center">
-          <span className="inline-block mb-3 px-3 py-1 rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] text-xs font-black text-[#1B2430]">
-            ÖDEME YOK · KART YOK
-          </span>
-          <h2 className="font-sans text-2xl sm:text-3xl font-black text-[#F4F1E8] mb-2">
-            Önce ücretsiz tanış, sonra karar ver
-          </h2>
-          <p className="font-semibold text-[#F4F1E8]/90 mb-5 max-w-xl mx-auto">
-            Her öğrencinin 20 dakikalık bir tanışma dersi hakkı var. Eğitmenle tanış, nasıl
-            çalıştığını gör, beğenmezsen hiçbir şey ödemeden bırak.
-          </p>
-          <Link
-            href="/demo-ders"
-            className="inline-block py-4 px-10 bg-[#DD7B3A] text-[#F4F1E8] font-bold text-lg rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
-          >
-            Ücretsiz Tanışma Dersi Al
-          </Link>
-        </div>
+        {/* Sayfanın tek h1'i; görsel tasarımı bozmadan arama motorları ve
+            ekran okuyucular için başlığı taşıyor. */}
+        <h1 className="sr-only">
+          DersoLab — öğrenciler için online özel ders ve koçluk platformu
+        </h1>
+
+        {/* Fırsatlar: aşağı inmeden görünsün diye slayt gösterisi */}
+        <HeroSlider />
+
+        <p className="text-center text-sm font-bold text-[#1B2430]">
+          Zaten hesabın var mı?{' '}
+          <Link href="/login" className="underline">Giriş Yap</Link>
+        </p>
 
         {/* Features */}
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
@@ -122,36 +90,6 @@ export default function HomePage() {
                 <p className="text-sm font-semibold text-[#1B2430]/70">{s.body}</p>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Referans programı */}
-        <div className="bg-[#DD7B3A] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
-          <div className="flex flex-col sm:flex-row items-center gap-5">
-            <img
-              src="/fox-mascot-icon.png"
-              alt=""
-              className="w-24 shrink-0 h-auto"
-              style={{ imageRendering: 'pixelated' }}
-            />
-            <div className="flex-1 text-center sm:text-left">
-              <span className="inline-block mb-2 px-3 py-1 rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] text-xs font-black text-[#1B2430]">
-                DAVET ET & KAZAN
-              </span>
-              <h2 className="font-sans text-xl sm:text-2xl font-black text-[#F4F1E8] mb-2">
-                Arkadaşını getirene 1 ders bizden!
-              </h2>
-              <p className="font-semibold text-[#F4F1E8]/90 mb-4">
-                Ayarlar sayfandaki davet kodunu arkadaşınla paylaş. O kayıt olurken kodu girsin,
-                hesabını onayladığı anda ikinize de birer ders kredisi hediye edelim.
-              </p>
-              <Link
-                href="/register"
-                className="inline-block py-3 px-8 bg-[#F4F1E8] text-[#1B2430] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
-              >
-                Hemen Kaydol
-              </Link>
-            </div>
           </div>
         </div>
 
