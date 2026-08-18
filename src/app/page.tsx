@@ -96,13 +96,13 @@ export default function HomePage() {
         {/* Final CTA */}
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center">
           <p className="font-sans text-lg font-bold text-[#1B2430] mb-4">
-            Branşına uygun eğitmenleri incele, sana en uygununu seç.
+            Ücretsiz hesabını aç, branşına uygun eğitmenleri incelemeye başla.
           </p>
           <Link
-            href="/instructors"
+            href="/register"
             className="inline-block py-3 px-8 bg-[#DD7B3A] text-[#F4F1E8] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
           >
-            Eğitmenleri İncele
+            Ücretsiz Kaydol
           </Link>
         </div>
 

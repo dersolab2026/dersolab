@@ -1,5 +1,7 @@
+import { redirect } from 'next/navigation'
 import { InstructorCard } from '@/components/marketplace/InstructorCard'
 import { SubjectFilter } from '@/components/marketplace/SubjectFilter'
+import { createClient } from '@/lib/supabase/server'
 import { getInstructors } from '@/lib/marketplace/get-instructors'
 import { getNextAvailableSlots } from '@/lib/availability/get-next-slots'
 
@@ -8,6 +10,11 @@ interface InstructorsPageProps {
 }
 
 export default async function InstructorsPage({ searchParams }: InstructorsPageProps) {
+  // Eğitmen listesi üyelere özel; giriş yapmayan göremiyor.
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
   const { subject, category } = await searchParams
   const instructors = await getInstructors({ subject, category })
   const nextSlots = await getNextAvailableSlots(

@@ -9,6 +9,15 @@ import type { TimeSlot } from '@/types'
 
 type ActionResult = { success: true } | { success: false; error: string }
 
+/**
+ * Ucretsiz baslangic paketi: tanisma dersi ve 1 haftalik kocluk birlikte
+ * veriliyor. Ogrenci tek sefer talep ediyor, arka planda iki ayri talep
+ * aciliyor cunku ikisini farkli havuzlar ustleniyor: dersi tanisma dersi
+ * veren egitmenler, koclugu Koçluk bransi olan koclar.
+ *
+ * Ogrenci haklardan birini daha once kullandiysa (ornegin eski tek hakli
+ * donemden kalma) yalnizca kalan hak icin talep aciliyor.
+ */
 export async function requestDemoLesson(studentId: string): Promise<ActionResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -17,21 +26,32 @@ export async function requestDemoLesson(studentId: string): Promise<ActionResult
   const admin = createAdminClient()
   const { data: studentUser } = await admin.from('users').select('name').eq('id', studentId).single()
 
-  const { error } = await supabase.from('demo_lesson_requests').insert({
-    student_id: studentId,
-    requested_by: user.id,
-  })
+  const turler = ['demo_lesson', 'coaching_week'] as const
+  const hatalar: string[] = []
+  let acilan = 0
 
-  if (error) {
-    let message = error.message
-    if (error.message.includes('zaten kullanilmis')) {
-      message = 'Ücretsiz tanışma dersi hakkını zaten kullandın'
-    } else if (error.message.includes('zaten bekleyen bir tanisma dersi talebi')) {
-      message = 'Zaten bekleyen bir tanışma dersi talebin var'
-    } else if (error.message.includes('row-level security')) {
+  for (const tur of turler) {
+    const { error } = await supabase.from('demo_lesson_requests').insert({
+      student_id: studentId,
+      requested_by: user.id,
+      request_type: tur,
+    })
+    if (error) hatalar.push(error.message)
+    else acilan++
+  }
+
+  // Ikisi de acilamadiysa kullaniciya sebebini soyle.
+  if (acilan === 0) {
+    const hepsi = hatalar.join(' | ')
+    let message = hepsi
+    if (hepsi.includes('zaten kullanilmis')) {
+      message = 'Ücretsiz başlangıç hakkını zaten kullandın'
+    } else if (hepsi.includes('zaten bekleyen')) {
+      message = 'Zaten bekleyen bir talebin var'
+    } else if (hepsi.includes('row-level security')) {
       message = 'Bu işlem için yetkin yok'
-    } else if (error.code === '23503') {
-      message = 'Ücretsiz tanışma dersi sadece öğrenci hesapları için geçerli'
+    } else if (hepsi.includes('violates foreign key')) {
+      message = 'Ücretsiz başlangıç sadece öğrenci hesapları için geçerli'
     }
     return { success: false, error: message }
   }

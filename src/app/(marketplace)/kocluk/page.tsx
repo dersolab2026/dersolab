@@ -1,9 +1,16 @@
+import { redirect } from 'next/navigation'
 import { InstructorCard } from '@/components/marketplace/InstructorCard'
+import { createClient } from '@/lib/supabase/server'
 import { getInstructors } from '@/lib/marketplace/get-instructors'
 import { getNextAvailableSlots } from '@/lib/availability/get-next-slots'
 import { GUIDANCE_SUBJECT } from '@/lib/constants'
 
 export default async function CoachingPage() {
+  // Koç listesi de üyelere özel.
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
   const instructors = await getInstructors({ subject: GUIDANCE_SUBJECT })
   const nextSlots = await getNextAvailableSlots(
     instructors.filter((i) => i.isCalendarConnected).map((i) => i.userId),
