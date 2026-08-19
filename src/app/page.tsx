@@ -54,7 +54,7 @@ export default function HomePage() {
         {/* Sayfanın tek h1'i; görsel tasarımı bozmadan arama motorları ve
             ekran okuyucular için başlığı taşıyor. */}
         <h1 className="sr-only">
-          DersoLab — Öğrenciler İçin Online Özel Ders Ve Koçluk Platformu
+          DersoLab — Öğrenciler İçin Online Özel Ders ve Koçluk Platformu
         </h1>
 
         {/* Fırsatlar: aşağı inmeden görünsün diye slayt gösterisi */}

@@ -19,7 +19,7 @@ interface Slide {
 const SLIDES: Slide[] = [
   {
     rozet: 'DERSOLAB',
-    baslik: 'Öğrenciler İçin Online Özel Ders Ve Koçluk',
+    baslik: 'Öğrenciler İçin Online Özel Ders ve Koçluk',
     metin: 'Okul derslerinden LGS, YKS, KPSS, DGS ve ALES hazırlığına kadar, alanında deneyimli ve onaylı eğitmenlerden bire bir online ders alın.',
     cta: { href: '/register', label: 'Ücretsiz Kaydolun' },
     arka: 'bg-[#F4F1E8]', yazi: 'text-[#1B2430]', rozetArka: 'bg-[#DD7B3A] text-[#F4F1E8]',
@@ -27,16 +27,9 @@ const SLIDES: Slide[] = [
   {
     rozet: 'ÖDEME YOK · KART YOK',
     baslik: 'Hoş Geldin Paketiniz Bizden',
-    metin: 'Her öğrenciye bir kere: 20 dakikalık bir tanışma dersi ve bir hafta boyunca koçluk desteği. Beğenmezseniz hiçbir ödeme yapmadan bırakabilirsiniz.',
+    metin: 'Her öğrenciye bir kere: bir tanışma dersi ve bir hafta boyunca koçluk desteği. Beğenmezseniz hiçbir ödeme yapmadan bırakabilirsiniz.',
     cta: { href: '/demo-ders', label: 'Hoş Geldin Paketini Alın' },
     arka: 'bg-[#6FA89E]', yazi: 'text-[#F4F1E8]', rozetArka: 'bg-[#F4F1E8] text-[#1B2430]',
-  },
-  {
-    rozet: 'NASIL ÇALIŞIR',
-    baslik: 'Dersiniz Takviminize Ve E-posta Adresinize Düşer',
-    metin: 'Uygun saati seçin; ders Google Takviminize eklensin, Meet bağlantısı e-posta adresinize gelsin. Ödevlerinizi buradan teslim edin, ders notlarına sonradan da ulaşın.',
-    cta: { href: '/register', label: 'Hemen Başlayın' },
-    arka: 'bg-[#1B2430]', yazi: 'text-[#F4F1E8]', rozetArka: 'bg-[#DD7B3A] text-[#F4F1E8]',
   },
 ]
 

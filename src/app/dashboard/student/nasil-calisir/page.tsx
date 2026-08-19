@@ -12,7 +12,7 @@ const ITEMS: { question: string; answer: string }[] = [
   {
     question: 'Hoş geldin paketi nedir?',
     answer:
-      'Her öğrenci platformda bir kere ücretsiz hoş geldin paketi alır: 20 dakikalık, kredi harcamayan bir tanışma dersi ve bir hafta boyunca koçluk desteği. "Hoş Geldin Paketi" sayfasından tek seferde talep edersin; uygun bir eğitmen dersini planlar, bir koç da haftalık programını kurmak için seninle iletişime geçer.',
+      'Her öğrenci platformda bir kere ücretsiz hoş geldin paketi alır: kredi harcamayan bir tanışma dersi ve bir hafta boyunca koçluk desteği. "Hoş Geldin Paketi" sayfasından tek seferde talep edersin; uygun bir eğitmen dersini planlar, bir koç da haftalık programını kurmak için seninle iletişime geçer.',
   },
   {
     question: 'Bir eğitmenden nasıl ders alırım?',

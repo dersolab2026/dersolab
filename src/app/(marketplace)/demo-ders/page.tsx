@@ -28,7 +28,7 @@ export default async function DemoLessonPage() {
             Hoş Geldin Paketi
           </h1>
           <p className="mt-2 font-sans font-semibold text-[#1B2430]">
-            20 dakikalık tanışma dersi + 1 hafta koçluk desteği. Her öğrenciye bir kere, tamamen ücretsiz.
+            Tanışma dersi + 1 hafta koçluk desteği. Her öğrenciye bir kere, tamamen ücretsiz.
           </p>
         </div>
 

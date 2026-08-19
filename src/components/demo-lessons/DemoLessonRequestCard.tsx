@@ -57,7 +57,7 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
       <div className={`${PIXEL_CARD} p-5 space-y-3`}>
         <p className="font-bold text-[#1B2430]">Talebin alındı!</p>
         <ul className="space-y-2">
-          <DurumSatiri etiket="20 dakikalık tanışma dersi" durum={dersDurumu} />
+          <DurumSatiri etiket="Tanışma dersi" durum={dersDurumu} />
           <DurumSatiri etiket="1 haftalık koçluk" durum={koclukDurumu} />
         </ul>
       </div>
@@ -68,7 +68,7 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
     <div className={`${PIXEL_CARD} p-5 space-y-3`}>
       <p className="font-bold text-[#1B2430]">Hoş Geldin Paketin</p>
       <p className="text-sm font-semibold text-[#1B2430]/70">
-        Tek talep, iki hak: 20 dakikalık bir tanışma dersi ve bir hafta boyunca koçluk desteği.
+        Tek talep, iki hak: bir tanışma dersi ve bir hafta boyunca koçluk desteği.
         Kredi harcamıyorsun, kart bilgisi istemiyoruz.
       </p>
       <ul className="space-y-1.5 text-sm font-semibold text-[#1B2430]/80 list-disc pl-5">
