@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge'
+import { kisaTarihSaat } from '@/lib/format/datetime'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getUnmatchedShopierPayments, getStudentOptions, unmatchedReasonLabel } from '@/lib/admin/get-unmatched-shopier-payments'
 import { ResolveUnmatchedPaymentForm } from '@/components/admin/ResolveUnmatchedPaymentForm'
@@ -33,7 +34,7 @@ export default async function AdminUnmatchedPaymentsPage() {
                 {p.buyerEmail && <p><span className="text-muted-foreground">E-posta:</span> {p.buyerEmail}</p>}
                 {p.amount != null && <p><span className="text-muted-foreground">Tutar:</span> {Number(p.amount).toLocaleString('tr-TR')} ₺</p>}
                 {p.note && <p><span className="text-muted-foreground">Not:</span> {p.note}</p>}
-                <p className="text-xs text-muted-foreground">{new Date(p.createdAt).toLocaleString('tr-TR')}</p>
+                <p className="text-xs text-muted-foreground">{kisaTarihSaat(p.createdAt)}</p>
                 <ResolveUnmatchedPaymentForm paymentId={p.id} students={students} hasPackage={!!p.packageTitle} />
               </CardContent>
             </Card>

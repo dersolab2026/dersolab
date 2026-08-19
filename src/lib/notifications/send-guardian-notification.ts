@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { tamTarihSaat } from '@/lib/format/datetime'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -23,10 +24,7 @@ export async function notifyBookingCreated(params: BookingNotificationParams) {
   const admin = createAdminClient()
   const recipient = await getStudentRecipient(params.studentId)
 
-  const formattedDate = new Date(params.startTime).toLocaleString('tr-TR', {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  })
+  const formattedDate = tamTarihSaat(params.startTime)
 
   if (recipient) {
     await admin.from('notifications').insert({
@@ -91,10 +89,7 @@ export async function notifyBookingCancelled(params: {
   const recipient = await getStudentRecipient(params.studentId)
   const admin = createAdminClient()
 
-  const formattedDate = new Date(params.startTime).toLocaleString('tr-TR', {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  })
+  const formattedDate = tamTarihSaat(params.startTime)
 
   const refundNote = params.creditRefunded
     ? 'Kredin iade edildi.'
@@ -156,7 +151,7 @@ export async function notifyLessonCompleted(params: {
 }) {
   const admin = createAdminClient()
   const recipient = await getStudentRecipient(params.studentId)
-  const formattedDate = new Date(params.startTime).toLocaleString('tr-TR', { dateStyle: 'full', timeStyle: 'short' })
+  const formattedDate = tamTarihSaat(params.startTime)
 
   if (recipient) {
     await admin.from('notifications').insert({
@@ -180,7 +175,7 @@ export async function notifyLessonMissed(params: {
 }) {
   const admin = createAdminClient()
   const recipient = await getStudentRecipient(params.studentId)
-  const formattedDate = new Date(params.startTime).toLocaleString('tr-TR', { dateStyle: 'full', timeStyle: 'short' })
+  const formattedDate = tamTarihSaat(params.startTime)
 
   if (recipient) {
     await admin.from('notifications').insert({
@@ -210,7 +205,7 @@ export async function notifyBookingReminder(params: {
 }) {
   const admin = createAdminClient()
   const recipient = await getStudentRecipient(params.studentId)
-  const formattedTime = new Date(params.startTime).toLocaleString('tr-TR', { dateStyle: 'full', timeStyle: 'short' })
+  const formattedTime = tamTarihSaat(params.startTime)
 
   if (recipient) {
     await admin.from('notifications').insert({

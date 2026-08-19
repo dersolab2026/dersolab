@@ -49,3 +49,4 @@ next-env.d.ts
 
 # supabase cli local state
 supabase/.temp/
+graphify-out/

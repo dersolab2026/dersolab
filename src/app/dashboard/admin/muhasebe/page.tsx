@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge'
+import { kisaTarihSaat } from '@/lib/format/datetime'
 import { getAllStudentsAndInstructors } from '@/lib/admin/get-all-users'
 import { CopyIbanButton } from '@/components/admin/CopyIbanButton'
 
@@ -7,7 +8,7 @@ function formatIban(iban: string) {
 }
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })
+  return kisaTarihSaat(value)
 }
 
 export default async function AdminMuhasebePage() {

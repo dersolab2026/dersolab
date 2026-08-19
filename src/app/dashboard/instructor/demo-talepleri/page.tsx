@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { kisaTarihSaat } from '@/lib/format/datetime'
 import { createClient } from '@/lib/supabase/server'
 import { getPendingDemoRequests } from '@/lib/demo-lessons/get-pending-demo-requests'
 import { AcceptDemoRequestDialog } from '@/components/demo-lessons/AcceptDemoRequestDialog'
@@ -48,7 +49,7 @@ export default async function DemoRequestsPage() {
                     <p className="text-sm font-semibold text-[#1B2430]/70">{r.leadEmail}</p>
                   )}
                   <p className="text-sm font-semibold text-[#1B2430]/70">
-                    {new Date(r.createdAt).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })} tarihinde talep edildi
+                    {kisaTarihSaat(r.createdAt)} tarihinde talep edildi
                     {kocluk
                       ? ' · üstlenince öğrenciyle iletişime geçip haftayı planla'
                       : !r.studentId && ' · hesapsız, kabul edince e-posta ile iletişime geç'}

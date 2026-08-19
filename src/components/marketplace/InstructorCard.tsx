@@ -11,16 +11,41 @@ interface InstructorCardProps {
   nextSlot?: Date
 }
 
+const ISTANBUL = 'Europe/Istanbul'
+
+/**
+ * Bir anin Istanbul takvimindeki gunu (YYYY-MM-DD).
+ *
+ * en-CA yerel ayari tam bu bicimi veriyor, elle parcalamaya gerek yok.
+ */
+function istanbulGunu(an: Date): string {
+  return an.toLocaleDateString('en-CA', { timeZone: ISTANBUL })
+}
+
+/**
+ * Ilk musait saati kart uzerinde gosterir.
+ *
+ * SAAT DILIMI ACIKCA VERILMELI: bu bir sunucu bileseni ve uretimde sunucu
+ * UTC'de calisiyor. timeZone verilmezse Istanbul'daki 09:00 kartta 06:00
+ * gorunuyor; ayni sebeple "Bugun/Yarin" hesabi da gece yarisi civarinda
+ * yanlis gune kayiyor. Hem saat hem gun karsilastirmasi Istanbul takvimi
+ * uzerinden yapiliyor.
+ */
 function formatNextSlot(slot: Date): string {
-  const bugun = new Date()
-  const gunFarki = Math.floor(
-    (new Date(slot.getFullYear(), slot.getMonth(), slot.getDate()).getTime() -
-      new Date(bugun.getFullYear(), bugun.getMonth(), bugun.getDate()).getTime()) / 86400000,
+  const saat = slot.toLocaleTimeString('tr-TR', {
+    timeZone: ISTANBUL, hour: '2-digit', minute: '2-digit',
+  })
+
+  const gunFarki = Math.round(
+    (Date.parse(`${istanbulGunu(slot)}T00:00:00Z`) -
+      Date.parse(`${istanbulGunu(new Date())}T00:00:00Z`)) / 86_400_000,
   )
-  const saat = slot.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+
   if (gunFarki === 0) return `Bugün ${saat}`
   if (gunFarki === 1) return `Yarın ${saat}`
-  return `${slot.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })} ${saat}`
+  return `${slot.toLocaleDateString('tr-TR', {
+    timeZone: ISTANBUL, day: 'numeric', month: 'long',
+  })} ${saat}`
 }
 
 export function InstructorCard({ instructor, sessionTypeHint, nextSlot }: InstructorCardProps) {
