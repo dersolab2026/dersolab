@@ -2,6 +2,9 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getStudentInsight } from '@/lib/students/get-student-insight'
+import { getMyTargets } from '@/lib/students/get-my-targets'
+import { TargetPanel } from '@/components/student/TargetPanel'
+import { requiresTrack } from '@/lib/exams/structure'
 import { ExamAnalysis } from '@/components/student/ExamAnalysis'
 import { CoachingPlanPanel } from '@/components/coaching/CoachingPlanPanel'
 import { CoachingSessionForm } from '@/components/instructor/CoachingSessionForm'
@@ -26,6 +29,10 @@ export default async function StudentInsightPage({
 
   const veri = await getStudentInsight(studentId)
   if (!veri) notFound()
+
+  const targets = await getMyTargets(studentId)
+  const enSikTur = veri.exams.length > 0 ? veri.exams[0].examType : 'tyt'
+  const enSikTrack = requiresTrack(enSikTur) ? (veri.exams[0]?.track ?? 'sayisal') : null
 
   const sonDeneme = veri.exams[0]
   const sonNet = sonDeneme
@@ -88,7 +95,11 @@ export default async function StudentInsightPage({
           Öğrenci henüz deneme sonucu kaydetmemiş.
         </p>
       ) : (
-        <ExamAnalysis entries={veri.exams} />
+        <ExamAnalysis entries={veri.exams} targetNets={targets.nets} />
+      )}
+
+      {(targets.program || targets.nets.length > 0) && (
+        <TargetPanel targets={targets} examType={enSikTur} track={enSikTrack} readOnly />
       )}
 
       <CoachingPlanPanel

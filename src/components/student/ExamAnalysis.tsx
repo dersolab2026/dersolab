@@ -10,6 +10,7 @@ import {
 import {
   getExamSections, getTotalQuestions, requiresTrack, TRACK_LABELS, type ExamTrack,
 } from '@/lib/exams/structure'
+import { degerlendir, toplamHedefNet, DURUM_RENK } from '@/lib/exams/targets'
 import { PIXEL_CARD } from '@/lib/theme'
 
 /**
@@ -27,6 +28,8 @@ import { PIXEL_CARD } from '@/lib/theme'
 
 interface ExamAnalysisProps {
   entries: ExamResultEntry[]
+  /** Ders bazli hedef netler; grafige hedef cizgisi cizmek icin. */
+  targetNets?: { examType: string; track: string | null; sectionName: string; targetNet: number }[]
 }
 
 interface Nokta {
@@ -45,7 +48,7 @@ function tarihKisa(iso: string): string {
   return `${d.getDate()}.${d.getMonth() + 1}`
 }
 
-export function ExamAnalysis({ entries }: ExamAnalysisProps) {
+export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
   // Hangi tur + alan kombinasyonlari var?
   const gruplar = useMemo(() => {
     const m = new Map<string, { examType: ExamType; track: ExamTrack | null; adet: number }>()
@@ -120,6 +123,20 @@ export function ExamAnalysis({ entries }: ExamAnalysisProps) {
       .filter((x): x is NonNullable<typeof x> => x !== null)
       .sort((a, b) => b.oran - a.oran)
   }, [dersler, secililer, grup])
+
+  // Secili tur+alan icin hedef net toplami.
+  const hedefNet = useMemo(() => {
+    if (!grup) return null
+    const uygun = targetNets.filter(
+      (t) => t.examType === grup.examType && (t.track ?? null) === grup.track,
+    )
+    return toplamHedefNet(uygun.map((t) => ({ targetNet: t.targetNet })))
+  }, [targetNets, grup])
+
+  const degerlendirme = useMemo(
+    () => degerlendir(noktalar.map((n) => n.net), hedefNet),
+    [noktalar, hedefNet],
+  )
 
   function toggle(id: string) {
     setHaricTutulan((p) => {
@@ -196,7 +213,22 @@ export function ExamAnalysis({ entries }: ExamAnalysisProps) {
           Gelişim grafiği için en az iki deneme seçmelisin.
         </p>
       ) : (
-        <NetGrafigi noktalar={noktalar} enYuksek={toplamSoru} />
+        <NetGrafigi noktalar={noktalar} enYuksek={toplamSoru} hedefNet={hedefNet} />
+      )}
+
+      {hedefNet !== null && (
+        <div className="flex items-start gap-2 rounded-xl border-4 border-[#1B2430] bg-white px-4 py-3">
+          <span className="mt-1 inline-block h-3 w-3 shrink-0 rounded-full border-2 border-[#1B2430]"
+            style={{ backgroundColor: DURUM_RENK[degerlendirme.durum] }} />
+          <div>
+            <p className="text-sm font-bold text-[#1B2430]">{degerlendirme.mesaj}</p>
+            {degerlendirme.fark !== null && (
+              <p className="text-xs font-semibold text-[#1B2430]/60">
+                Hedef {hedefNet} net · son deneme {degerlendirme.fark >= 0 ? '+' : ''}{degerlendirme.fark}
+              </p>
+            )}
+          </div>
+        </div>
       )}
 
       <HataTipiDagilimi entries={secililer} />
@@ -206,9 +238,13 @@ export function ExamAnalysis({ entries }: ExamAnalysisProps) {
           <p className="text-sm font-bold text-[#1B2430]/70">
             Ders ders durumun — {secililer.length} denemenin ortalaması
           </p>
-          {dersDurumu.map((d, i) => {
-            const guclu = i < Math.ceil(dersDurumu.length / 3)
-            const zayif = i >= dersDurumu.length - Math.ceil(dersDurumu.length / 3)
+          {dersDurumu.map((d) => {
+            // Renk SIRALAMAYA degil MUTLAK basariya gore. Siralamaya gore
+            // renklendirince dort dersin ikisi zorunlu olarak "zayif" oluyordu;
+            // 20 sorunun 20'sini dogru yapan bir ders bile sonuncuysa turuncu
+            // gorunurdu. Esikler: %65 ustu guclu, %40 alti zayif, arasi orta.
+            const guclu = d.oran >= 0.65
+            const zayif = d.oran < 0.40
             return (
               <div key={d.ad} className="flex items-center gap-3">
                 <span className="w-40 shrink-0 truncate text-sm font-bold text-[#1B2430]" title={d.ad}>
@@ -230,8 +266,9 @@ export function ExamAnalysis({ entries }: ExamAnalysisProps) {
             )
           })}
           <p className="pt-1 text-xs font-semibold text-[#1B2430]/60">
-            Yeşil barlar en güçlü, turuncular en zayıf derslerin. Sayı, o dersteki
-            ortalama netinin toplam soru sayısına oranı.
+            Sayı, o dersteki ortalama netinin dersin kendi soru sayısına oranı.
+            Yeşil: %65 ve üstü · Gri: %40–65 · Turuncu: %40 altı. Dersler en
+            yüksekten en düşüğe sıralı.
           </p>
         </div>
       )}
@@ -306,7 +343,7 @@ function HataTipiDagilimi({ entries }: { entries: ExamResultEntry[] }) {
 }
 
 /** Net gelisimini gosteren basit cizgi grafigi. */
-function NetGrafigi({ noktalar, enYuksek }: { noktalar: Nokta[]; enYuksek: number }) {
+function NetGrafigi({ noktalar, enYuksek, hedefNet }: { noktalar: Nokta[]; enYuksek: number; hedefNet: number | null }) {
   const G = 640
   const Y = 240
   const solBosluk = 44
@@ -321,7 +358,9 @@ function NetGrafigi({ noktalar, enYuksek }: { noktalar: Nokta[]; enYuksek: numbe
   // dusuk netlerde egri duz bir cizgi gibi gorunuyor ve degisim okunmuyor.
   const netler = noktalar.map((n) => n.net)
   const enBuyukNet = Math.max(...netler)
-  const tavan = Math.max(5, Math.min(enYuksek, Math.ceil((enBuyukNet * 1.15) / 5) * 5))
+  // Hedef cizgisi grafigin disinda kalmasin diye tavan hedefi de kapsiyor.
+  const gerekli = Math.max(enBuyukNet, hedefNet ?? 0)
+  const tavan = Math.max(5, Math.min(enYuksek, Math.ceil((gerekli * 1.15) / 5) * 5))
 
   const x = (i: number) =>
     solBosluk + (noktalar.length === 1 ? cizimG / 2 : (i / (noktalar.length - 1)) * cizimG)
@@ -367,6 +406,19 @@ function NetGrafigi({ noktalar, enYuksek }: { noktalar: Nokta[]; enYuksek: numbe
               </g>
             )
           })}
+
+          {hedefNet !== null && hedefNet <= tavan && (
+            <g>
+              <line
+                x1={solBosluk} y1={y(hedefNet)} x2={G - sagBosluk} y2={y(hedefNet)}
+                stroke={TEAL} strokeWidth="3" strokeDasharray="8 5"
+              />
+              <text x={G - sagBosluk} y={y(hedefNet) - 6} textAnchor="end"
+                fontSize="11" fontWeight="700" fill={TEAL}>
+                hedef {hedefNet}
+              </text>
+            </g>
+          )}
 
           <path d={cizgi} fill="none" stroke={TURUNCU} strokeWidth="4"
             strokeLinecap="round" strokeLinejoin="round" />

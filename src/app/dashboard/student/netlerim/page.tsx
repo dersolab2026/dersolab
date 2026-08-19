@@ -1,11 +1,25 @@
 import { Info } from 'lucide-react'
 import { getExamResults } from '@/actions/exam-results'
+import { getMyTargets } from '@/lib/students/get-my-targets'
+import { TargetPanel } from '@/components/student/TargetPanel'
+import { requiresTrack } from '@/lib/exams/structure'
 import { ExamResultsSection } from '@/components/student/ExamResultsSection'
 import { ExamAnalysis } from '@/components/student/ExamAnalysis'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 
 export default async function NetlerimPage() {
-  const entries = await getExamResults()
+  const [entries, targets] = await Promise.all([getExamResults(), getMyTargets()])
+
+  // Hedef netler tek bir tur uzerinden giriliyor: ogrencinin en cok deneme
+  // kaydettigi tur. Hic denemesi yoksa TYT varsayiliyor.
+  const enSik = entries.length > 0
+    ? [...entries.reduce((m, e) => m.set(e.examType, (m.get(e.examType) ?? 0) + 1), new Map<string, number>())]
+        .sort((a, b) => b[1] - a[1])[0][0]
+    : 'tyt'
+  const enSikTur = enSik as typeof entries[number]['examType']
+  const enSikTrack = requiresTrack(enSikTur)
+    ? (entries.find((e) => e.examType === enSikTur)?.track ?? 'sayisal')
+    : null
 
   return (
     <DashboardPageShell
@@ -20,7 +34,9 @@ export default async function NetlerimPage() {
         </p>
       </div>
 
-      <ExamAnalysis entries={entries} />
+      <TargetPanel targets={targets} examType={enSikTur} track={enSikTrack} />
+
+      <ExamAnalysis entries={entries} targetNets={targets.nets} />
 
       <ExamResultsSection entries={entries} />
 
