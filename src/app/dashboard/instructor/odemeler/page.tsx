@@ -25,8 +25,13 @@ export default async function InstructorPayoutPage({ searchParams }: InstructorP
   const fromDate = from ? new Date(`${from}T00:00:00`) : defaultFrom
   const toDate = to ? new Date(`${to}T23:59:59`) : new Date(`${formatDateInput(now)}T23:59:59`)
 
-  const [{ data: instructorRow }, stats] = await Promise.all([
-    supabase.from('instructors').select('payout_name, payout_iban, payout_updated_at, subjects').eq('user_id', user.id).single(),
+  // Ödeme bilgisi ayrı tabloda: instructors'ın okuma politikası herkese açık
+  // ve satır görünür olunca IBAN da geliyordu (0095).
+  const [{ data: instructorRow }, { data: payoutRow }, stats] = await Promise.all([
+    supabase.from('instructors').select('subjects').eq('user_id', user.id).single(),
+    supabase.from('instructor_payout_details')
+      .select('payout_name, payout_iban, payout_updated_at')
+      .eq('user_id', user.id).maybeSingle(),
     getInstructorStats(user.id, fromDate, toDate),
   ])
 
@@ -73,9 +78,9 @@ export default async function InstructorPayoutPage({ searchParams }: InstructorP
       </div>
 
       <PayoutInfoForm
-        initialPayoutName={instructorRow?.payout_name ?? null}
-        initialPayoutIban={instructorRow?.payout_iban ?? null}
-        payoutUpdatedAt={instructorRow?.payout_updated_at ?? null}
+        initialPayoutName={payoutRow?.payout_name ?? null}
+        initialPayoutIban={payoutRow?.payout_iban ?? null}
+        payoutUpdatedAt={payoutRow?.payout_updated_at ?? null}
       />
     </DashboardPageShell>
   )

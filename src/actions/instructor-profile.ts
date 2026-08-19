@@ -96,10 +96,16 @@ export async function updateInstructorPayoutInfo(payoutName: string, payoutIban:
     return { success: false, error: 'Geçerli bir IBAN gir (TR ile başlayan, 26 haneli)' }
   }
 
+  // Odeme bilgisi instructors'ta degil ayri tabloda: o tablonun okuma
+  // politikasi herkese acik ve satir gorunur olunca IBAN da geliyordu (0095).
   const { data: updated, error } = await supabase
-    .from('instructors')
-    .update({ payout_name: trimmedName, payout_iban: normalizedIban, payout_updated_at: new Date().toISOString() })
-    .eq('user_id', user.id)
+    .from('instructor_payout_details')
+    .upsert({
+      user_id: user.id,
+      payout_name: trimmedName,
+      payout_iban: normalizedIban,
+      payout_updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' })
     .select('user_id')
     .maybeSingle()
 
