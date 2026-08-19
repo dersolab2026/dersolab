@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Trash2, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
 import { addExamResult, deleteExamResult, type ExamResultEntry } from '@/actions/exam-results'
 import { useToast } from '@/components/ui/Toast'
+import { ErrorTypeEditor } from '@/components/student/ErrorTypeEditor'
 import {
   EXAM_TYPES, EXAM_TYPE_LABELS, calculateNet, calculateTotalNet,
   estimateScore, estimatePlacementScore, supportsObp, type ExamType,
@@ -268,19 +269,25 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                 </div>
 
                 {acik && e.sections.length > 0 && (
-                  <ul className="space-y-1 border-t-2 border-[#1B2430]/10 pt-2">
-                    {e.sections.map((s) => (
-                      <li key={s.name} className="flex items-center justify-between gap-2 text-sm">
-                        <span className="font-semibold text-[#1B2430]">{s.name}</span>
-                        <span className="font-semibold text-[#1B2430]/70">
-                          {s.correctCount}D · {s.wrongCount}Y
-                          <strong className="ml-2 text-[#6FA89E]">
-                            {calculateNet(e.examType, s.correctCount, s.wrongCount)} net
-                          </strong>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="space-y-3 border-t-2 border-[#1B2430]/10 pt-2">
+                    <ul className="space-y-1">
+                      {e.sections.map((s) => (
+                        <li key={s.name} className="flex items-center justify-between gap-2 text-sm">
+                          <span className="font-semibold text-[#1B2430]">{s.name}</span>
+                          <span className="font-semibold text-[#1B2430]/70">
+                            {s.correctCount}D · {s.wrongCount}Y
+                            <strong className="ml-2 text-[#6FA89E]">
+                              {calculateNet(e.examType, s.correctCount, s.wrongCount)} net
+                            </strong>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
+                      <ErrorTypeEditor entry={e} />
+                    </div>
+                  </div>
                 )}
               </div>
             )

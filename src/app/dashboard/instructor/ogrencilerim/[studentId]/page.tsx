@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getStudentInsight } from '@/lib/students/get-student-insight'
 import { ExamAnalysis } from '@/components/student/ExamAnalysis'
+import { CoachingSessionForm } from '@/components/instructor/CoachingSessionForm'
 import { StudentHomeworkSummary } from '@/components/instructor/StudentHomeworkSummary'
 import { StudentStudyLogSummary } from '@/components/instructor/StudentStudyLogSummary'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
@@ -87,6 +88,12 @@ export default async function StudentInsightPage({
       ) : (
         <ExamAnalysis entries={veri.exams} />
       )}
+
+      <CoachingSessionForm
+        studentId={veri.studentId}
+        notes={veri.sessionNotes}
+        canWrite={veri.isCoach}
+      />
 
       <StudentHomeworkSummary items={veri.homework} />
 

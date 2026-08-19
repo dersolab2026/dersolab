@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { ExamResultEntry, ExamSectionEntry } from '@/actions/exam-results'
+import type { SessionNote } from '@/components/instructor/CoachingSessionForm'
 import type { ExamType } from '@/lib/exams/scoring'
 import type { ExamTrack } from '@/lib/exams/structure'
 
@@ -34,6 +35,11 @@ export interface StudentInsight {
   studyLogs: StudentStudyLog[]
   /** Ders bazinda toplam calisma — gunlukten turetiliyor. */
   dersToplamlari: { subject: string; saat: number; soru: number }[]
+  sessionNotes: SessionNote[]
+  /** Bu egitmenin bu ogrenciyle aktif kocluk iliskisi (varsa). */
+  coaching: { id: string; startedOn: string; weeklyRhythm: string | null } | null
+  /** Giren kisi bu ogrencinin kocu mu — oturum notu yazabilir mi. */
+  isCoach: boolean
 }
 
 /**
@@ -87,7 +93,7 @@ export async function getStudentInsight(studentId: string): Promise<StudentInsig
   const { data: sectionRows } = examIds.length
     ? await supabase
         .from('student_exam_sections')
-        .select('exam_result_id, section_name, correct_count, wrong_count, display_order')
+        .select('exam_result_id, section_name, correct_count, wrong_count, display_order, wrong_knowledge, wrong_careless, wrong_misread, wrong_timeout')
         .in('exam_result_id', examIds)
         .order('display_order')
     : { data: [] }
@@ -95,7 +101,19 @@ export async function getStudentInsight(studentId: string): Promise<StudentInsig
   const bolumlerByExam = new Map<string, ExamSectionEntry[]>()
   for (const s of sectionRows ?? []) {
     const liste = bolumlerByExam.get(s.exam_result_id) ?? []
-    liste.push({ name: s.section_name, correctCount: s.correct_count, wrongCount: s.wrong_count })
+    liste.push({
+      name: s.section_name,
+      correctCount: s.correct_count,
+      wrongCount: s.wrong_count,
+      errorTypes: (s.wrong_knowledge ?? s.wrong_careless ?? s.wrong_misread ?? s.wrong_timeout) === null
+        ? undefined
+        : {
+            knowledge: s.wrong_knowledge ?? 0,
+            careless: s.wrong_careless ?? 0,
+            misread: s.wrong_misread ?? 0,
+            timeout: s.wrong_timeout ?? 0,
+          },
+    })
     bolumlerByExam.set(s.exam_result_id, liste)
   }
 
@@ -130,6 +148,29 @@ export async function getStudentInsight(studentId: string): Promise<StudentInsig
     source: l.source,
   }))
 
+  const [{ data: noteRows }, { data: relRow }] = await Promise.all([
+    supabase
+      .from('coaching_session_notes')
+      .select('id, session_date, plan_followed, obstacle, student_commitment, coach_decisions, confidence')
+      .eq('student_id', studentId)
+      .order('session_date', { ascending: false }),
+    supabase
+      .from('coaching_relationships')
+      .select('id, started_on, weekly_rhythm')
+      .eq('student_id', studentId).eq('coach_id', user.id).eq('status', 'active')
+      .maybeSingle(),
+  ])
+
+  const sessionNotes: SessionNote[] = (noteRows ?? []).map((n) => ({
+    id: n.id,
+    sessionDate: n.session_date,
+    planFollowed: n.plan_followed,
+    obstacle: n.obstacle,
+    studentCommitment: n.student_commitment,
+    coachDecisions: n.coach_decisions,
+    confidence: n.confidence,
+  }))
+
   const toplamMap = new Map<string, { saat: number; soru: number }>()
   for (const l of studyLogs) {
     const m = toplamMap.get(l.subject) ?? { saat: 0, soru: 0 }
@@ -151,5 +192,12 @@ export async function getStudentInsight(studentId: string): Promise<StudentInsig
     homework,
     studyLogs,
     dersToplamlari,
+    sessionNotes,
+    coaching: relRow
+      ? { id: relRow.id, startedOn: relRow.started_on, weeklyRhythm: relRow.weekly_rhythm }
+      : null,
+    // Koçluk branşı olan eğitmen not yazabilir; ilişki henüz kurulmamış olsa
+    // bile (tanışma görüşmesi de bir oturum).
+    isCoach: (await supabase.rpc('is_coach', { p_user_id: user.id })).data === true,
   }
 }

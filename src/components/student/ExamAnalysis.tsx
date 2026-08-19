@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { LineChart, ListFilter } from 'lucide-react'
 import type { ExamResultEntry } from '@/actions/exam-results'
+import { ERROR_TYPE_LABELS, ERROR_TYPE_PRESCRIPTION, type ErrorTypeCounts } from '@/lib/exams/error-types'
 import {
   EXAM_TYPE_LABELS, calculateNet, calculateTotalNet, type ExamType,
 } from '@/lib/exams/scoring'
@@ -198,6 +199,8 @@ export function ExamAnalysis({ entries }: ExamAnalysisProps) {
         <NetGrafigi noktalar={noktalar} enYuksek={toplamSoru} />
       )}
 
+      <HataTipiDagilimi entries={secililer} />
+
       {dersDurumu.length > 0 && (
         <div className="space-y-2">
           <p className="text-sm font-bold text-[#1B2430]/70">
@@ -232,6 +235,72 @@ export function ExamAnalysis({ entries }: ExamAnalysisProps) {
           </p>
         </div>
       )}
+    </div>
+  )
+}
+
+/**
+ * Yanlislarin neden yapildigi. Ayni 5 net kaybinin dort farkli tedavisi var:
+ * bilgi -> konu tekrari, dikkat -> kontrol rutini, yorum -> soru okuma,
+ * sure -> tur stratejisi. Hic girilmemisse bolum hic basilmiyor.
+ */
+function HataTipiDagilimi({ entries }: { entries: ExamResultEntry[] }) {
+  const TIPLER: { anahtar: keyof ErrorTypeCounts; renk: string }[] = [
+    { anahtar: 'knowledge', renk: '#C2410C' },
+    { anahtar: 'careless', renk: '#DD7B3A' },
+    { anahtar: 'misread', renk: '#E8C468' },
+    { anahtar: 'timeout', renk: '#6FA89E' },
+  ]
+
+  const toplamlar = { knowledge: 0, careless: 0, misread: 0, timeout: 0 }
+  for (const e of entries) {
+    for (const s of e.sections) {
+      if (!s.errorTypes) continue
+      toplamlar.knowledge += s.errorTypes.knowledge
+      toplamlar.careless += s.errorTypes.careless
+      toplamlar.misread += s.errorTypes.misread
+      toplamlar.timeout += s.errorTypes.timeout
+    }
+  }
+
+  const genelToplam = TIPLER.reduce((t, x) => t + toplamlar[x.anahtar], 0)
+  if (genelToplam === 0) return null
+
+  const baskin = TIPLER.reduce((a, b) => (toplamlar[a.anahtar] >= toplamlar[b.anahtar] ? a : b))
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-bold text-[#1B2430]/70">
+        Yanlışları neden yaptın — {genelToplam} yanlış işaretlendi
+      </p>
+
+      <div className="flex h-7 overflow-hidden rounded-md border-2 border-[#1B2430]">
+        {TIPLER.map((t) => {
+          const oran = toplamlar[t.anahtar] / genelToplam
+          if (oran === 0) return null
+          return (
+            <div
+              key={t.anahtar}
+              style={{ width: `${oran * 100}%`, backgroundColor: t.renk }}
+              title={`${ERROR_TYPE_LABELS[t.anahtar]}: ${toplamlar[t.anahtar]}`}
+            />
+          )
+        })}
+      </div>
+
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {TIPLER.map((t) => (
+          <span key={t.anahtar} className="flex items-center gap-1.5 text-xs font-semibold text-[#1B2430]/80">
+            <span className="inline-block h-3 w-3 rounded-sm border border-[#1B2430]" style={{ backgroundColor: t.renk }} />
+            {ERROR_TYPE_LABELS[t.anahtar]}
+            <span className="tabular-nums text-[#1B2430]/60">
+              {toplamlar[t.anahtar]} ({Math.round((toplamlar[t.anahtar] / genelToplam) * 100)}%)
+            </span>
+          </span>
+        ))}
+      </div>
+
+      <p className="text-sm font-bold text-[#1B2430]">{ERROR_TYPE_PRESCRIPTION[baskin.anahtar]}</p>
     </div>
   )
 }

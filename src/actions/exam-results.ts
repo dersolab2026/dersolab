@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import type { ErrorTypeCounts } from '@/lib/exams/error-types'
 import { EXAM_TYPES, supportsObp, type ExamType } from '@/lib/exams/scoring'
 import { getExamSections, requiresTrack, type ExamTrack } from '@/lib/exams/structure'
 
@@ -11,7 +12,10 @@ export interface ExamSectionEntry {
   name: string
   correctCount: number
   wrongCount: number
+  /** Yanlislarin tip kirilimi — istege bagli, sonradan doldurulabiliyor. */
+  errorTypes?: ErrorTypeCounts
 }
+
 
 export interface ExamResultEntry {
   id: string
@@ -108,6 +112,63 @@ export async function addExamResult(params: AddExamResultParams): Promise<Action
   return { success: true }
 }
 
+/**
+ * Kaydedilmis bir denemenin yanlislarini tiplere bolmek.
+ *
+ * Ayri bir aksiyon olmasinin sebebi: kayit anindaki formda 7 derse 4'er kutu
+ * eklemek 28 alan demek olurdu. Ogrenci denemeyi hizlica kaydediyor, hata
+ * analizini isterse sonradan, deneme kagidi elindeyken yapiyor.
+ */
+export async function updateSectionErrorTypes(
+  examResultId: string,
+  sections: { name: string; errorTypes: ErrorTypeCounts }[],
+): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
+  const { data: kayit } = await supabase
+    .from('student_exam_results').select('id').eq('id', examResultId)
+    .eq('student_id', user.id).maybeSingle()
+  if (!kayit) return { success: false, error: 'Deneme bulunamadı' }
+
+  const { data: mevcut } = await supabase
+    .from('student_exam_sections')
+    .select('id, section_name, wrong_count')
+    .eq('exam_result_id', examResultId)
+
+  const idByName = new Map((mevcut ?? []).map((m) => [m.section_name, m]))
+
+  for (const s of sections) {
+    const bolum = idByName.get(s.name)
+    if (!bolum) continue
+
+    const t = s.errorTypes
+    const toplam = t.knowledge + t.careless + t.misread + t.timeout
+    if (toplam > bolum.wrong_count) {
+      return {
+        success: false,
+        error: `${s.name}: hata tipleri toplamı (${toplam}) yanlış sayısını (${bolum.wrong_count}) aşamaz`,
+      }
+    }
+    if ([t.knowledge, t.careless, t.misread, t.timeout].some((n) => n < 0)) {
+      return { success: false, error: `${s.name}: negatif değer girilemez` }
+    }
+
+    const { error } = await supabase.from('student_exam_sections').update({
+      wrong_knowledge: t.knowledge || null,
+      wrong_careless: t.careless || null,
+      wrong_misread: t.misread || null,
+      wrong_timeout: t.timeout || null,
+    }).eq('id', bolum.id)
+
+    if (error) return { success: false, error: error.message }
+  }
+
+  revalidatePath('/dashboard/student/netlerim')
+  return { success: true }
+}
+
 export async function deleteExamResult(id: string): Promise<ActionResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -128,7 +189,7 @@ export async function getExamResults(): Promise<ExamResultEntry[]> {
 
   const { data } = await supabase
     .from('student_exam_results')
-    .select('id, exam_name, exam_type, exam_date, track, correct_count, wrong_count, obp, student_exam_sections(section_name, correct_count, wrong_count, display_order)')
+    .select('id, exam_name, exam_type, exam_date, track, correct_count, wrong_count, obp, student_exam_sections(section_name, correct_count, wrong_count, display_order, wrong_knowledge, wrong_careless, wrong_misread, wrong_timeout)')
     .eq('student_id', user.id)
     .order('exam_date', { ascending: false })
 
@@ -144,6 +205,18 @@ export async function getExamResults(): Promise<ExamResultEntry[]> {
     sections: (r.student_exam_sections ?? [])
       .slice()
       .sort((a: any, b: any) => a.display_order - b.display_order)
-      .map((s: any) => ({ name: s.section_name, correctCount: s.correct_count, wrongCount: s.wrong_count })),
+      .map((s: any) => ({
+        name: s.section_name,
+        correctCount: s.correct_count,
+        wrongCount: s.wrong_count,
+        errorTypes: (s.wrong_knowledge ?? s.wrong_careless ?? s.wrong_misread ?? s.wrong_timeout) === null
+          ? undefined
+          : {
+              knowledge: s.wrong_knowledge ?? 0,
+              careless: s.wrong_careless ?? 0,
+              misread: s.wrong_misread ?? 0,
+              timeout: s.wrong_timeout ?? 0,
+            },
+      })),
   }))
 }
