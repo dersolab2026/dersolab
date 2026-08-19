@@ -6,6 +6,8 @@ import { Trash2, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
 import { addExamResult, deleteExamResult, type ExamResultEntry } from '@/actions/exam-results'
 import { useToast } from '@/components/ui/Toast'
 import { ErrorTypeEditor } from '@/components/student/ErrorTypeEditor'
+import { ExamReflection } from '@/components/student/ExamReflection'
+import { DENEME_YAYINLARI, DIGER_YAYIN, ZORLUK_SECENEKLERI, ZORLUK_ETIKET, ZORLUK_RENK, zorlukUyarisi, type Zorluk } from '@/lib/exams/publishers'
 import {
   EXAM_TYPES, EXAM_TYPE_LABELS, calculateNet, calculateTotalNet,
   estimateScore, estimatePlacementScore, supportsObp, type ExamType,
@@ -30,6 +32,9 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
   const [track, setTrack] = useState<ExamTrack>('sayisal')
   const [examDate, setExamDate] = useState(() => new Date().toISOString().slice(0, 10))
   const [obp, setObp] = useState('')
+  const [yayin, setYayin] = useState('')
+  const [zorluk, setZorluk] = useState<Zorluk | ''>('')
+  const [sure, setSure] = useState('')
   const [girisler, setGirisler] = useState<Record<string, SayiGirisi>>({})
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -86,9 +91,13 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
         examName, examType, examDate, track: aktifTrack,
         sections: bolumler.map((b) => ({ name: b.name, correctCount: b.correct, wrongCount: b.wrong })),
         obp: obp === '' ? null : Number(obp),
+        publisher: yayin || null,
+        difficulty: zorluk || null,
+        durationMinutes: sure ? Number(sure) : null,
       })
       if (!result.success) { setError(result.error); return }
       setExamName(''); setObp(''); setGirisler({}); setIsOpen(false)
+      setYayin(''); setZorluk(''); setSure('')
       showToast('Deneme sonucun kaydedildi.')
       router.refresh()
     })
@@ -140,6 +149,38 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                 </select>
               </div>
             )}
+            <div>
+              <label className="block text-sm font-bold text-[#1B2430] mb-1">Yayın</label>
+              <select value={yayin} onChange={(e) => setYayin(e.target.value)} className={PIXEL_INPUT}>
+                <option value="">Belirtme</option>
+                {DENEME_YAYINLARI.map((y) => <option key={y} value={y}>{y}</option>)}
+                <option value={DIGER_YAYIN}>{DIGER_YAYIN}</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-[#1B2430] mb-1">Süre (dakika)</label>
+              <input type="number" min={1} max={600} value={sure} onChange={(e) => setSure(e.target.value)}
+                placeholder="Kaç dakikada bitirdin?" className={PIXEL_INPUT} />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-[#1B2430] mb-1">Deneme sana nasıl geldi?</label>
+            <div className="flex flex-wrap gap-2">
+              {ZORLUK_SECENEKLERI.map((z) => (
+                <button key={z.deger} type="button"
+                  onClick={() => setZorluk(zorluk === z.deger ? '' : z.deger)}
+                  aria-pressed={zorluk === z.deger}
+                  className={`rounded-lg border-4 border-[#1B2430] px-3 py-1.5 text-sm font-bold transition-all ${
+                    zorluk === z.deger ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+                  }`}>
+                  {z.etiket}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-xs font-semibold text-[#1B2430]/50">
+              Zorluğu kaydedersen, farklı zorlukta denemeleri karşılaştırırken uyarı gösterilir.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -242,6 +283,14 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                     <p className="text-sm font-semibold text-[#1B2430]/70">
                       {new Date(e.examDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
                       {' · '}{e.correctCount} doğru · {e.wrongCount} yanlış
+                      {e.publisher && ` · ${e.publisher}`}
+                      {e.durationMinutes && ` · ${e.durationMinutes} dk`}
+                      {e.difficulty && (
+                        <span className="ml-2 inline-block rounded border-2 border-[#1B2430] px-1.5 text-xs font-bold text-[#1B2430]"
+                          style={{ backgroundColor: ZORLUK_RENK[e.difficulty] }}>
+                          {ZORLUK_ETIKET[e.difficulty]}
+                        </span>
+                      )}
                     </p>
                     <p className="mt-1 text-sm font-bold text-[#6FA89E]">
                       Toplam net: {net} · Tahmini puan: {estimateScore(e.examType, net, e.track)}
@@ -286,6 +335,10 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
 
                     <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
                       <ErrorTypeEditor entry={e} />
+                    </div>
+
+                    <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
+                      <ExamReflection entry={e} />
                     </div>
                   </div>
                 )}

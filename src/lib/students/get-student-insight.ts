@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { tekil } from '@/lib/exams/embed'
 import type { ExamResultEntry, ExamSectionEntry } from '@/actions/exam-results'
 import type { SessionNote } from '@/components/instructor/CoachingSessionForm'
 import type { PlanItem } from '@/lib/coaching/plan-progress'
@@ -76,7 +77,7 @@ export async function getStudentInsight(studentId: string): Promise<StudentInsig
   const [{ data: examRows }, { data: hwRows }, { data: logRows }] = await Promise.all([
     supabase
       .from('student_exam_results')
-      .select('id, exam_name, exam_type, exam_date, track, correct_count, wrong_count, obp')
+      .select('id, exam_name, exam_type, exam_date, track, correct_count, wrong_count, obp, publisher, difficulty, duration_minutes, student_exam_reflections(preparation, time_pressure_subject)')
       .eq('student_id', studentId)
       .order('exam_date', { ascending: false }),
     supabase
@@ -129,6 +130,13 @@ export async function getStudentInsight(studentId: string): Promise<StudentInsig
     correctCount: e.correct_count,
     wrongCount: e.wrong_count,
     obp: e.obp,
+    publisher: e.publisher ?? null,
+    difficulty: (e.difficulty ?? null) as ExamResultEntry['difficulty'],
+    durationMinutes: e.duration_minutes ?? null,
+    reflection: (() => {
+      const y = tekil(e.student_exam_reflections)
+      return y ? { preparation: y.preparation ?? null, timePressureSubject: y.time_pressure_subject ?? null } : null
+    })(),
     sections: bolumlerByExam.get(e.id) ?? [],
   }))
 

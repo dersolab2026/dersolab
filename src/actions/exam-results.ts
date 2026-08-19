@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { ErrorTypeCounts } from '@/lib/exams/error-types'
+import type { Zorluk } from '@/lib/exams/publishers'
+import { tekil } from '@/lib/exams/embed'
 import { EXAM_TYPES, supportsObp, type ExamType } from '@/lib/exams/scoring'
 import { getExamSections, requiresTrack, type ExamTrack } from '@/lib/exams/structure'
 
@@ -18,6 +20,10 @@ export interface ExamSectionEntry {
 
 
 export interface ExamResultEntry {
+  publisher: string | null
+  difficulty: Zorluk | null
+  durationMinutes: number | null
+  reflection: { preparation: string | null; timePressureSubject: string | null } | null
   id: string
   examName: string
   examType: ExamType
@@ -30,6 +36,9 @@ export interface ExamResultEntry {
 }
 
 interface AddExamResultParams {
+  publisher?: string | null
+  difficulty?: Zorluk | null
+  durationMinutes?: number | null
   examName: string
   examType: ExamType
   examDate: string
@@ -88,6 +97,9 @@ export async function addExamResult(params: AddExamResultParams): Promise<Action
     correct_count: toplamDogru,
     wrong_count: toplamYanlis,
     obp: supportsObp(params.examType) ? params.obp ?? null : null,
+    publisher: params.publisher?.trim() || null,
+    difficulty: params.difficulty ?? null,
+    duration_minutes: params.durationMinutes ?? null,
   }).select('id').single()
 
   if (error || !kayit) return { success: false, error: error?.message ?? 'Kayıt oluşturulamadı' }
@@ -189,7 +201,7 @@ export async function getExamResults(): Promise<ExamResultEntry[]> {
 
   const { data } = await supabase
     .from('student_exam_results')
-    .select('id, exam_name, exam_type, exam_date, track, correct_count, wrong_count, obp, student_exam_sections(section_name, correct_count, wrong_count, display_order, wrong_knowledge, wrong_careless, wrong_misread, wrong_timeout)')
+    .select('id, exam_name, exam_type, exam_date, track, correct_count, wrong_count, obp, publisher, difficulty, duration_minutes, student_exam_reflections(preparation, time_pressure_subject), student_exam_sections(section_name, correct_count, wrong_count, display_order, wrong_knowledge, wrong_careless, wrong_misread, wrong_timeout)')
     .eq('student_id', user.id)
     .order('exam_date', { ascending: false })
 
@@ -202,6 +214,13 @@ export async function getExamResults(): Promise<ExamResultEntry[]> {
     correctCount: r.correct_count,
     wrongCount: r.wrong_count,
     obp: r.obp === null ? null : Number(r.obp),
+    publisher: r.publisher ?? null,
+    difficulty: (r.difficulty ?? null) as Zorluk | null,
+    durationMinutes: r.duration_minutes ?? null,
+    reflection: (() => {
+      const y = tekil<{ preparation: string | null; time_pressure_subject: string | null }>(r.student_exam_reflections)
+      return y ? { preparation: y.preparation ?? null, timePressureSubject: y.time_pressure_subject ?? null } : null
+    })(),
     sections: (r.student_exam_sections ?? [])
       .slice()
       .sort((a: any, b: any) => a.display_order - b.display_order)
@@ -219,4 +238,31 @@ export async function getExamResults(): Promise<ExamResultEntry[]> {
             },
       })),
   }))
+}
+
+/** Deneme sonrasi kisa yansitma: hazirlik ve sure baskisi. */
+export async function saveExamReflection(
+  examResultId: string,
+  preparation: string,
+  timePressureSubject: string,
+): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
+  const { data: kayit } = await supabase
+    .from('student_exam_results').select('id').eq('id', examResultId)
+    .eq('student_id', user.id).maybeSingle()
+  if (!kayit) return { success: false, error: 'Deneme bulunamadı' }
+
+  const { error } = await supabase.from('student_exam_reflections').upsert({
+    exam_result_id: examResultId,
+    preparation: preparation.trim() || null,
+    time_pressure_subject: timePressureSubject.trim() || null,
+  }, { onConflict: 'exam_result_id' })
+
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/dashboard/student/netlerim')
+  return { success: true }
 }

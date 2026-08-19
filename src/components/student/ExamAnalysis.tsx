@@ -11,6 +11,7 @@ import {
   getExamSections, getTotalQuestions, requiresTrack, TRACK_LABELS, type ExamTrack,
 } from '@/lib/exams/structure'
 import { degerlendir, toplamHedefNet, DURUM_RENK } from '@/lib/exams/targets'
+import { zorlukUyarisi } from '@/lib/exams/publishers'
 import { PIXEL_CARD } from '@/lib/theme'
 
 /**
@@ -230,6 +231,20 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
           </div>
         </div>
       )}
+
+      {(() => {
+        // Son iki denemenin zorlugu farkliysa net karsilastirmasi sakat olur.
+        if (secililer.length < 2) return null
+        const son = secililer[secililer.length - 1]
+        const onceki = secililer[secililer.length - 2]
+        const uyari = zorlukUyarisi(onceki.difficulty, son.difficulty)
+        if (!uyari) return null
+        return (
+          <p className="rounded-xl border-4 border-[#1B2430] bg-[#F6EAD2] px-4 py-3 text-sm font-semibold text-[#1B2430]">
+            {uyari}
+          </p>
+        )
+      })()}
 
       <HataTipiDagilimi entries={secililer} />
 
