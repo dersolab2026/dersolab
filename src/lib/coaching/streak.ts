@@ -51,14 +51,6 @@ function birGunOnce(iso: string): string {
   return d.toISOString().slice(0, 10)
 }
 
-/** Hedef sınava kalan gün. Geçmiş tarihte negatif değil, null dönüyor. */
-export function kalanGun(sinavTarihi: string | null, bugun: string): number | null {
-  if (!sinavTarihi) return null
-  const fark = Math.round(
-    (Date.parse(sinavTarihi + 'T00:00:00Z') - Date.parse(bugun + 'T00:00:00Z')) / 86_400_000,
-  )
-  return fark >= 0 ? fark : null
-}
 
 /** Seriyi anlatan kısa cümle. */
 export function seriMetni(seri: number): string {

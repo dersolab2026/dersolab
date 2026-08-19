@@ -40,7 +40,6 @@ export default async function StudentGunlukPage() {
 
       <StreakBanner
         logDates={plan.studyLogs.map((l) => l.logDate)}
-        targetExamDate={targets.targetExamDate}
         bugun={bugun}
       />
 

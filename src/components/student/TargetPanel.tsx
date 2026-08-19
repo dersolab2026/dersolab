@@ -12,7 +12,7 @@ import { toplamHedefNet } from '@/lib/exams/targets'
 import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY, PIXEL_INPUT } from '@/lib/theme'
 
 /**
- * Hedef paneli: hedef program, hedef sinav tarihi ve ders bazli hedef netler.
+ * Hedef paneli: hedef program ve ders bazli hedef netler.
  *
  * Hedef netleri toplami, deneme grafigindeki hedef cizgisini belirliyor.
  * Program secimi ise ayri bir karsilastirma: tahmini yerlestirme puani ile
@@ -41,7 +41,6 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
   const [sonuclar, setSonuclar] = useState<ProgramOzet[]>([])
   const [araniyor, setAraniyor] = useState(false)
 
-  const [sinavTarihi, setSinavTarihi] = useState(targets.targetExamDate ?? '')
   const [netAcik, setNetAcik] = useState(false)
 
   const dersler = getExamSections(examType, track)
@@ -70,19 +69,10 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
 
   function programSec(kod: number | null) {
     startTransition(async () => {
-      const s = await setTargetProgram(kod, targets.targetRank, sinavTarihi || null)
+      const s = await setTargetProgram(kod, targets.targetRank, null)
       if (!s.success) { setError(s.error); return }
       setAramaAcik(false); setSorgu(''); setSonuclar([])
       showToast(kod ? 'Hedef program kaydedildi.' : 'Hedef program kaldırıldı.')
-      router.refresh()
-    })
-  }
-
-  function tarihKaydet() {
-    startTransition(async () => {
-      const s = await setTargetProgram(targets.targetProgramCode, targets.targetRank, sinavTarihi || null)
-      if (!s.success) { setError(s.error); return }
-      showToast('Sınav tarihi kaydedildi.')
       router.refresh()
     })
   }
@@ -183,21 +173,6 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
           {!araniyor && sorgu.trim().length >= 3 && sonuclar.length === 0 && (
             <p className="text-sm font-semibold text-[#1B2430]/60">Sonuç yok.</p>
           )}
-        </div>
-      )}
-
-      {/* Sinav tarihi */}
-      {!readOnly && (
-        <div className="flex flex-wrap items-end gap-2">
-          <div>
-            <label className="mb-1 block text-sm font-bold text-[#1B2430]">Hedef sınav tarihi</label>
-            <input type="date" value={sinavTarihi} onChange={(e) => setSinavTarihi(e.target.value)}
-              className={`${PIXEL_INPUT} max-w-[200px]`} />
-          </div>
-          <button type="button" onClick={tarihKaydet} disabled={isPending}
-            className="rounded-xl border-4 border-[#1B2430] bg-white px-4 py-2.5 text-sm font-bold text-[#1B2430]">
-            Kaydet
-          </button>
         </div>
       )}
 
