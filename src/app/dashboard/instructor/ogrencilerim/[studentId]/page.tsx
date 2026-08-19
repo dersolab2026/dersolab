@@ -3,6 +3,8 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getStudentInsight } from '@/lib/students/get-student-insight'
 import { getMyTargets } from '@/lib/students/get-my-targets'
+import { getIntake } from '@/lib/coaching/get-intake'
+import { StudentIntakeSummary } from '@/components/instructor/StudentIntakeSummary'
 import { TargetPanel } from '@/components/student/TargetPanel'
 import { requiresTrack } from '@/lib/exams/structure'
 import { ExamAnalysis } from '@/components/student/ExamAnalysis'
@@ -30,7 +32,7 @@ export default async function StudentInsightPage({
   const veri = await getStudentInsight(studentId)
   if (!veri) notFound()
 
-  const targets = await getMyTargets(studentId)
+  const [targets, intake] = await Promise.all([getMyTargets(studentId), getIntake(studentId)])
   const enSikTur = veri.exams.length > 0 ? veri.exams[0].examType : 'tyt'
   const enSikTrack = requiresTrack(enSikTur) ? (veri.exams[0]?.track ?? 'sayisal') : null
 
@@ -101,6 +103,8 @@ export default async function StudentInsightPage({
       {(targets.program || targets.nets.length > 0) && (
         <TargetPanel targets={targets} examType={enSikTur} track={enSikTrack} readOnly />
       )}
+
+      <StudentIntakeSummary veri={intake} />
 
       <CoachingPlanPanel
         studentId={veri.studentId}
