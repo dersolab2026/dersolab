@@ -10,6 +10,7 @@ import { requiresTrack } from '@/lib/exams/structure'
 import { ExamAnalysis } from '@/components/student/ExamAnalysis'
 import { CoachingPlanPanel } from '@/components/coaching/CoachingPlanPanel'
 import { CoachingSessionForm } from '@/components/instructor/CoachingSessionForm'
+import { WeeklyReportPanel } from '@/components/coaching/WeeklyReportPanel'
 import { StudentHomeworkSummary } from '@/components/instructor/StudentHomeworkSummary'
 import { StudentStudyLogSummary } from '@/components/instructor/StudentStudyLogSummary'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
@@ -122,6 +123,8 @@ export default async function StudentInsightPage({
         notes={veri.sessionNotes}
         canWrite={veri.isCoach}
       />
+
+      {veri.isCoach && <WeeklyReportPanel studentId={veri.studentId} />}
 
       <StudentHomeworkSummary items={veri.homework} />
 
