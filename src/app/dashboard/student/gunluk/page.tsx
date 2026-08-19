@@ -5,15 +5,18 @@ import { getBookingsForViewer } from '@/lib/bookings/get-student-bookings'
 import { getMyStudyLogs } from '@/actions/study-log'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { DailyAgenda } from '@/components/student/DailyAgenda'
+import { CoachingPlanPanel } from '@/components/coaching/CoachingPlanPanel'
+import { getMyPlan } from '@/lib/coaching/get-my-plan'
 
 export default async function StudentGunlukPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const [bookings, studyLogs] = await Promise.all([
+  const [bookings, studyLogs, plan] = await Promise.all([
     getBookingsForViewer(user.id),
     getMyStudyLogs(),
+    getMyPlan(),
   ])
 
   return (
@@ -27,6 +30,17 @@ export default async function StudentGunlukPage() {
           sana daha iyi yol gösterebilmeleri için.
         </p>
       </div>
+
+      {plan.kocVar && (
+        <CoachingPlanPanel
+          studentId={user.id}
+          planItems={plan.planItems}
+          planWeeks={plan.planWeeks}
+          studyLogs={plan.studyLogs}
+          subjects={[]}
+          canEdit={false}
+        />
+      )}
 
       <DailyAgenda bookings={bookings} studyLogs={studyLogs} />
     </DashboardPageShell>

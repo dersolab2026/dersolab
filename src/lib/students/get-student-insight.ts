@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { ExamResultEntry, ExamSectionEntry } from '@/actions/exam-results'
 import type { SessionNote } from '@/components/instructor/CoachingSessionForm'
+import type { PlanItem } from '@/lib/coaching/plan-progress'
 import type { ExamType } from '@/lib/exams/scoring'
 import type { ExamTrack } from '@/lib/exams/structure'
 
@@ -40,6 +41,8 @@ export interface StudentInsight {
   coaching: { id: string; startedOn: string; weeklyRhythm: string | null } | null
   /** Giren kisi bu ogrencinin kocu mu — oturum notu yazabilir mi. */
   isCoach: boolean
+  planItems: PlanItem[]
+  planWeeks: Record<string, string>
 }
 
 /**
@@ -148,7 +151,7 @@ export async function getStudentInsight(studentId: string): Promise<StudentInsig
     source: l.source,
   }))
 
-  const [{ data: noteRows }, { data: relRow }] = await Promise.all([
+  const [{ data: noteRows }, { data: relRow }, { data: planRows }] = await Promise.all([
     supabase
       .from('coaching_session_notes')
       .select('id, session_date, plan_followed, obstacle, student_commitment, coach_decisions, confidence')
@@ -159,7 +162,27 @@ export async function getStudentInsight(studentId: string): Promise<StudentInsig
       .select('id, started_on, weekly_rhythm')
       .eq('student_id', studentId).eq('coach_id', user.id).eq('status', 'active')
       .maybeSingle(),
+    // Hafta gezinmesi istemcide yapiliyor, bu yuzden birkac haftalik pencere
+    // bir kerede geliyor; hafta degistirmek yeni istek acmiyor.
+    supabase
+      .from('coaching_plan_items')
+      .select('id, plan_week, plan_date, plan_time, subject, topic, source, target_questions, target_minutes, status')
+      .eq('student_id', studentId)
+      .order('plan_date'),
   ])
+
+  const planItems: PlanItem[] = (planRows ?? []).map((p) => ({
+    id: p.id,
+    planDate: p.plan_date,
+    planTime: p.plan_time,
+    subject: p.subject,
+    topic: p.topic,
+    source: p.source,
+    targetQuestions: p.target_questions,
+    targetMinutes: p.target_minutes,
+    status: p.status as PlanItem['status'],
+  }))
+  const planWeeks = Object.fromEntries((planRows ?? []).map((p) => [p.id, p.plan_week]))
 
   const sessionNotes: SessionNote[] = (noteRows ?? []).map((n) => ({
     id: n.id,
@@ -198,6 +221,8 @@ export async function getStudentInsight(studentId: string): Promise<StudentInsig
       : null,
     // Koçluk branşı olan eğitmen not yazabilir; ilişki henüz kurulmamış olsa
     // bile (tanışma görüşmesi de bir oturum).
+    planItems,
+    planWeeks,
     isCoach: (await supabase.rpc('is_coach', { p_user_id: user.id })).data === true,
   }
 }

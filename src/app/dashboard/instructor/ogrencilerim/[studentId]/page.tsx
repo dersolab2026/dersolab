@@ -3,12 +3,14 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getStudentInsight } from '@/lib/students/get-student-insight'
 import { ExamAnalysis } from '@/components/student/ExamAnalysis'
+import { CoachingPlanPanel } from '@/components/coaching/CoachingPlanPanel'
 import { CoachingSessionForm } from '@/components/instructor/CoachingSessionForm'
 import { StudentHomeworkSummary } from '@/components/instructor/StudentHomeworkSummary'
 import { StudentStudyLogSummary } from '@/components/instructor/StudentStudyLogSummary'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { calculateTotalNet, EXAM_TYPE_LABELS } from '@/lib/exams/scoring'
 import { TRACK_LABELS, type ExamTrack } from '@/lib/exams/structure'
+import { LESSON_SUBJECTS } from '@/lib/constants'
 import { PIXEL_CARD } from '@/lib/theme'
 
 export default async function StudentInsightPage({
@@ -88,6 +90,17 @@ export default async function StudentInsightPage({
       ) : (
         <ExamAnalysis entries={veri.exams} />
       )}
+
+      <CoachingPlanPanel
+        studentId={veri.studentId}
+        planItems={veri.planItems}
+        planWeeks={veri.planWeeks}
+        studyLogs={veri.studyLogs.map((l) => ({
+          logDate: l.logDate, subject: l.subject, hours: l.hours, questionsSolved: l.questionsSolved,
+        }))}
+        subjects={LESSON_SUBJECTS as unknown as string[]}
+        canEdit={veri.isCoach}
+      />
 
       <CoachingSessionForm
         studentId={veri.studentId}
