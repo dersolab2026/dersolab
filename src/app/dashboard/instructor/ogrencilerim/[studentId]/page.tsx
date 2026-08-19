@@ -5,6 +5,9 @@ import { getStudentInsight } from '@/lib/students/get-student-insight'
 import { getMyTargets } from '@/lib/students/get-my-targets'
 import { getIntake } from '@/lib/coaching/get-intake'
 import { StudentIntakeSummary } from '@/components/instructor/StudentIntakeSummary'
+import { RiskSignalList } from '@/components/instructor/RiskSignalList'
+import { riskSinyalleri } from '@/lib/coaching/risk-signals'
+import { haftaninPazartesi } from '@/lib/coaching/plan-progress'
 import { TargetPanel } from '@/components/student/TargetPanel'
 import { requiresTrack } from '@/lib/exams/structure'
 import { ExamAnalysis } from '@/components/student/ExamAnalysis'
@@ -34,6 +37,16 @@ export default async function StudentInsightPage({
   if (!veri) notFound()
 
   const [targets, intake] = await Promise.all([getMyTargets(studentId), getIntake(studentId)])
+
+  // Sinyaller sunucuda hesaplaniyor; bugun de sunucudan.
+  const bugun = new Date().toISOString().slice(0, 10)
+  const sinyaller = riskSinyalleri({
+    insight: veri,
+    planItems: veri.planItems,
+    planWeeks: veri.planWeeks,
+    hafta: haftaninPazartesi(new Date()),
+    bugun,
+  })
   const enSikTur = veri.exams.length > 0 ? veri.exams[0].examType : 'tyt'
   const enSikTrack = requiresTrack(enSikTur) ? (veri.exams[0]?.track ?? 'sayisal') : null
 
@@ -92,6 +105,8 @@ export default async function StudentInsightPage({
           </p>
         </div>
       </div>
+
+      <RiskSignalList sinyaller={sinyaller} />
 
       {veri.exams.length === 0 ? (
         <p className={`${PIXEL_CARD} p-4 font-semibold text-[#1B2430]`}>
