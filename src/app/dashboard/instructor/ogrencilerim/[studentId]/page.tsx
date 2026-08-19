@@ -6,8 +6,6 @@ import { getMyTargets } from '@/lib/students/get-my-targets'
 import { getIntake } from '@/lib/coaching/get-intake'
 import { StudentIntakeSummary } from '@/components/instructor/StudentIntakeSummary'
 import { RiskSignalList } from '@/components/instructor/RiskSignalList'
-import { TopicTracker } from '@/components/student/TopicTracker'
-import { listTopics, getTopicStatuses } from '@/actions/topics'
 import { riskSinyalleri } from '@/lib/coaching/risk-signals'
 import { haftaninPazartesi } from '@/lib/coaching/plan-progress'
 import { TargetPanel } from '@/components/student/TargetPanel'
@@ -40,11 +38,6 @@ export default async function StudentInsightPage({
 
   const [targets, intake] = await Promise.all([getMyTargets(studentId), getIntake(studentId)])
 
-  const konuTuru = veri.exams.length > 0 ? veri.exams[0].examType : 'tyt'
-  const [konular, konuDurumlari] = await Promise.all([
-    listTopics(konuTuru),
-    getTopicStatuses(studentId),
-  ])
 
   // Sinyaller sunucuda hesaplaniyor; bugun de sunucudan.
   const bugun = new Date().toISOString().slice(0, 10)
@@ -148,10 +141,6 @@ export default async function StudentInsightPage({
       />
 
       {veri.isCoach && <WeeklyReportPanel studentId={veri.studentId} />}
-
-      {konular.length > 0 && (
-        <TopicTracker examType={konuTuru} konular={konular} durumlar={konuDurumlari} readOnly />
-      )}
 
       <StudentHomeworkSummary items={veri.homework} />
 
