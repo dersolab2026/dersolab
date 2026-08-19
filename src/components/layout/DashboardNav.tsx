@@ -39,6 +39,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
   instructor: [
     { href: '/dashboard/instructor', label: 'Derslerim' },
+    { href: '/dashboard/instructor/ogrencilerim', label: 'Öğrencilerim' },
     { href: '/dashboard/instructor/homework', label: 'Ödevler' },
     { href: '/dashboard/instructor/availability', label: 'Ajanda' },
     { href: '/dashboard/instructor/profile', label: 'Profilim' },
