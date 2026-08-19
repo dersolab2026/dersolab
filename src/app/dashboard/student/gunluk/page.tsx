@@ -7,17 +7,24 @@ import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { DailyAgenda } from '@/components/student/DailyAgenda'
 import { CoachingPlanPanel } from '@/components/coaching/CoachingPlanPanel'
 import { getMyPlan } from '@/lib/coaching/get-my-plan'
+import { getMyTargets } from '@/lib/students/get-my-targets'
+import { StreakBanner } from '@/components/student/StreakBanner'
 
 export default async function StudentGunlukPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const [bookings, studyLogs, plan] = await Promise.all([
+  const [bookings, studyLogs, plan, targets] = await Promise.all([
     getBookingsForViewer(user.id),
     getMyStudyLogs(),
     getMyPlan(),
+    getMyTargets(),
   ])
+
+  // Bugunu sunucuda hesapliyoruz: istemcinin saati/zaman dilimi yanlissa
+  // seri yanlis gorunur.
+  const bugun = new Date().toISOString().slice(0, 10)
 
   return (
     <DashboardPageShell title="Günlük" description="Bir gün seç, o güne ait derslerini ve çalışma notlarını gör.">
@@ -30,6 +37,12 @@ export default async function StudentGunlukPage() {
           sana daha iyi yol gösterebilmeleri için.
         </p>
       </div>
+
+      <StreakBanner
+        logDates={plan.studyLogs.map((l) => l.logDate)}
+        targetExamDate={targets.targetExamDate}
+        bugun={bugun}
+      />
 
       {plan.kocVar && (
         <CoachingPlanPanel
