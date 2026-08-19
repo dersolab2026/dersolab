@@ -40,15 +40,9 @@ export default function HomePage() {
 
       <div className="relative z-10 mx-auto max-w-5xl space-y-7 p-4 sm:p-6 py-8 sm:py-12">
 
-        {/* Logo + maskot: slaytın üstünde sabit kimlik şeridi */}
-        <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-7 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] flex items-center justify-center gap-5">
-          <img
-            src="/fox-head-open.png"
-            alt=""
-            className="h-16 w-16 sm:h-20 sm:w-20 shrink-0"
-            style={{ imageRendering: 'pixelated' }}
-          />
-          <img src="/dersolab-logo.png" alt="DersoLab" className="h-auto w-full max-w-[320px]" />
+        {/* Logo: slaytın üstünde sabit kimlik şeridi */}
+        <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-7 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] flex items-center justify-center">
+          <img src="/dersolab-logo.png" alt="DersoLab" className="h-auto w-full max-w-[360px]" />
         </div>
 
         {/* Sayfanın tek h1'i; görsel tasarımı bozmadan arama motorları ve
