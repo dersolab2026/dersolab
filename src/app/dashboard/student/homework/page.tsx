@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { ODEV_TIPI_ETIKET, odevTipi } from '@/lib/homework/types'
 import { createClient } from '@/lib/supabase/server'
 import { getHomeworkForStudent } from '@/lib/homework/get-homework-list'
 import { HomeworkSubmissionUploader } from '@/components/homework/HomeworkSubmissionUploader'
@@ -26,8 +27,40 @@ export default async function StudentHomeworkPage() {
                   {hw.status === 'completed' ? 'Onaylandı' : hw.status === 'submitted' ? 'Teslim Edildi' : 'Bekliyor'}
                 </span>
               </div>
-              <p className="text-sm font-semibold text-[#1B2430]/70">{hw.instructorName}</p>
+              <p className="text-sm font-semibold text-[#1B2430]/70">
+                {hw.instructorName}
+                {hw.homeworkType !== 'serbest' && (
+                  <span className="ml-2 inline-block rounded border-2 border-[#1B2430] bg-white px-1.5 text-xs font-bold text-[#1B2430]">
+                    {ODEV_TIPI_ETIKET[hw.homeworkType]}
+                  </span>
+                )}
+              </p>
+
+              {(hw.resourceLabel || hw.resourceRange) && (
+                <p className="text-sm font-bold text-[#1B2430]">
+                  {hw.resourceLabel}
+                  {hw.resourceLabel && hw.resourceRange ? ' · ' : ''}
+                  {hw.resourceRange}
+                </p>
+              )}
+
               {hw.description && <p className="text-sm font-semibold text-[#1B2430]">{hw.description}</p>}
+
+              {/* Tipin asil isi burada: ogrenci ne yapacagini biliyor. */}
+              {hw.homeworkType !== 'serbest' && hw.status !== 'completed' && (
+                <p className="rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] px-3 py-2 text-sm font-semibold text-[#1B2430]">
+                  {odevTipi(hw.homeworkType).ogrenciYonergesi}
+                </p>
+              )}
+
+              {hw.instructorFeedback && (
+                <div className="rounded-lg border-2 border-[#1B2430] bg-white px-3 py-2">
+                  <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">
+                    Eğitmenin geri bildirimi
+                  </p>
+                  <p className="text-sm font-semibold text-[#1B2430]">{hw.instructorFeedback}</p>
+                </div>
+              )}
               {hw.dueDate && (
                 <p className="text-xs font-semibold text-[#1B2430]/60">
                   Son tarih: {new Date(hw.dueDate).toLocaleDateString('tr-TR', { dateStyle: 'long' })}

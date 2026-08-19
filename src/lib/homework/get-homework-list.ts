@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { tekil } from '@/lib/exams/embed'
+import type { OdevTipi } from '@/lib/homework/types'
 
 export interface HomeworkListItem {
   id: string
@@ -11,6 +13,10 @@ export interface HomeworkListItem {
   description: string | null
   dueDate: string | null
   status: 'assigned' | 'submitted' | 'completed'
+  homeworkType: OdevTipi
+  resourceLabel: string | null
+  resourceRange: string | null
+  instructorFeedback: string | null
   submissions: { id: string; filePath: string; fileType: 'image' | 'video' }[]
 }
 
@@ -19,7 +25,7 @@ export async function getHomeworkForStudent(studentIds: string[]): Promise<Homew
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('homework')
-    .select('id, student_id, instructor_id, title, description, due_date, status')
+    .select('id, student_id, instructor_id, title, description, due_date, status, homework_type, resource_range, instructor_feedback, study_resources(publisher, title)')
     .in('student_id', studentIds)
     .order('created_at', { ascending: false })
   if (error) throw error
@@ -30,7 +36,7 @@ export async function getHomeworkForInstructor(instructorId: string): Promise<Ho
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('homework')
-    .select('id, student_id, instructor_id, title, description, due_date, status')
+    .select('id, student_id, instructor_id, title, description, due_date, status, homework_type, resource_range, instructor_feedback, study_resources(publisher, title)')
     .eq('instructor_id', instructorId)
     .order('created_at', { ascending: false })
   if (error) throw error
@@ -56,6 +62,14 @@ async function enrichHomework(homework: any[]): Promise<HomeworkListItem[]> {
     id: h.id, studentId: h.student_id, studentName: nameById.get(h.student_id) ?? '',
     instructorId: h.instructor_id, instructorName: nameById.get(h.instructor_id) ?? '',
     title: h.title, description: h.description, dueDate: h.due_date, status: h.status,
+    homeworkType: (h.homework_type ?? 'serbest') as OdevTipi,
+    resourceLabel: (() => {
+      const k = tekil<{ publisher: string | null; title: string }>(h.study_resources)
+      if (!k) return null
+      return k.publisher ? `${k.publisher} — ${k.title}` : k.title
+    })(),
+    resourceRange: h.resource_range ?? null,
+    instructorFeedback: h.instructor_feedback ?? null,
     submissions: (submissions ?? [])
       .filter((s: any) => s.homework_id === h.id)
       .map((s: any) => ({ id: s.id, filePath: s.file_path, fileType: s.file_type })),
