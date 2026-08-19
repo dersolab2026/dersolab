@@ -3,12 +3,18 @@ import { createClient } from '@/lib/supabase/server'
 import { getBookingsForViewer } from '@/lib/bookings/get-student-bookings'
 import { getLessonMaterialsForBookings } from '@/lib/lessons/get-lesson-materials'
 import { BookingListItem } from '@/components/booking/BookingListItem'
+import { ReferralCard } from '@/components/student/ReferralCard'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 
 export default async function StudentBookingsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  // Davet kartı ana sayfadan buraya alındı: reklamı üye olmayana değil,
+  // davet edecek kişiye yani giriş yapmış öğrenciye göstermek gerekiyor.
+  const { data: studentRow } = await supabase
+    .from('students').select('referral_code').eq('user_id', user.id).maybeSingle()
 
   const bookings = await getBookingsForViewer(user.id)
 
@@ -43,6 +49,8 @@ export default async function StudentBookingsPage() {
           </div>
         )}
       </div>
+
+      {studentRow?.referral_code && <ReferralCard referralCode={studentRow.referral_code} />}
     </DashboardPageShell>
   )
 }

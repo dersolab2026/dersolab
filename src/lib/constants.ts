@@ -28,3 +28,26 @@ export const LESSON_SUBJECTS = SUBJECT_CATEGORIES.flatMap((c) => c.subjects)
 // Eğitmenin profilinde seçebileceği branşlar — Koçluk marketplace filtresinde görünmez,
 // ayrı bir sayfadan (Koçluk) erişilir.
 export const INSTRUCTOR_SUBJECT_OPTIONS = [...LESSON_SUBJECTS, GUIDANCE_SUBJECT] as const
+
+/**
+ * Ana sayfadaki "Bizi takip edin" bolumunde gosterilen hesaplar.
+ *
+ * Liste bos oldugu surece bolum hic render edilmiyor; boylece olu link
+ * yayina cikmiyor. Hesap eklemek icin asagiya bir satir yazmak yeterli:
+ *   { platform: 'instagram', url: 'https://instagram.com/kullaniciadi' },
+ * Desteklenen platform degerleri: instagram, youtube, tiktok, x, linkedin.
+ */
+export const SOCIAL_LINKS: { platform: SocialPlatform; url: string }[] = [
+  { platform: 'instagram', url: 'https://www.instagram.com/dersolabegitim/' },
+  { platform: 'tiktok', url: 'https://www.tiktok.com/@dersolabegitim' },
+]
+
+export type SocialPlatform = 'instagram' | 'youtube' | 'tiktok' | 'x' | 'linkedin'
+
+export const SOCIAL_LABELS: Record<SocialPlatform, string> = {
+  instagram: 'Instagram',
+  youtube: 'YouTube',
+  tiktok: 'TikTok',
+  x: 'X',
+  linkedin: 'LinkedIn',
+}

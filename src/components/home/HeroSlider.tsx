@@ -19,31 +19,24 @@ interface Slide {
 const SLIDES: Slide[] = [
   {
     rozet: 'DERSOLAB',
-    baslik: 'Öğrenciler için online özel ders ve koçluk',
-    metin: 'Okul derslerinden LGS, YKS, KPSS, DGS ve ALES hazırlığına kadar — alanında deneyimli, onaylı eğitmenlerle birebir online ders al.',
-    cta: { href: '/register', label: 'Ücretsiz Kaydol' },
+    baslik: 'Öğrenciler İçin Online Özel Ders Ve Koçluk',
+    metin: 'Okul derslerinden LGS, YKS, KPSS, DGS ve ALES hazırlığına kadar, alanında deneyimli ve onaylı eğitmenlerden bire bir online ders alın.',
+    cta: { href: '/register', label: 'Ücretsiz Kaydolun' },
     arka: 'bg-[#F4F1E8]', yazi: 'text-[#1B2430]', rozetArka: 'bg-[#DD7B3A] text-[#F4F1E8]',
   },
   {
     rozet: 'ÖDEME YOK · KART YOK',
-    baslik: 'Hoş geldin paketin bizden: tanışma dersi + 1 hafta koçluk',
-    metin: 'Her öğrenciye bir kere: 20 dakikalık bir tanışma dersi ve bir hafta boyunca koçluk desteği. Beğenmezsen hiçbir şey ödemeden bırak.',
-    cta: { href: '/demo-ders', label: 'Hoş Geldin Paketini Al' },
+    baslik: 'Hoş Geldin Paketiniz Bizden',
+    metin: 'Her öğrenciye bir kere: 20 dakikalık bir tanışma dersi ve bir hafta boyunca koçluk desteği. Beğenmezseniz hiçbir ödeme yapmadan bırakabilirsiniz.',
+    cta: { href: '/demo-ders', label: 'Hoş Geldin Paketini Alın' },
     arka: 'bg-[#6FA89E]', yazi: 'text-[#F4F1E8]', rozetArka: 'bg-[#F4F1E8] text-[#1B2430]',
   },
   {
     rozet: 'NASIL ÇALIŞIR',
-    baslik: 'Dersin takvimine ve mailine düşer',
-    metin: 'Uygun saati seç, ders otomatik olarak Google Takvimine eklensin, Meet linkin mailine gelsin. Ödev ver-al, ders notlarına sonradan da eriş.',
-    cta: { href: '/register', label: 'Hemen Başla' },
+    baslik: 'Dersiniz Takviminize Ve E-posta Adresinize Düşer',
+    metin: 'Uygun saati seçin; ders Google Takviminize eklensin, Meet bağlantısı e-posta adresinize gelsin. Ödevlerinizi buradan teslim edin, ders notlarına sonradan da ulaşın.',
+    cta: { href: '/register', label: 'Hemen Başlayın' },
     arka: 'bg-[#1B2430]', yazi: 'text-[#F4F1E8]', rozetArka: 'bg-[#DD7B3A] text-[#F4F1E8]',
-  },
-  {
-    rozet: 'DAVET ET & KAZAN',
-    baslik: 'Arkadaşını getirene 1 ders bizden',
-    metin: 'Ayarlar sayfandaki davet kodunu arkadaşınla paylaş. O kayıt olurken kodu girsin, hesabını onayladığı anda ikinize de birer ders kredisi hediye edelim.',
-    cta: { href: '/register', label: 'Hemen Kaydol' },
-    arka: 'bg-[#DD7B3A]', yazi: 'text-[#F4F1E8]', rozetArka: 'bg-[#F4F1E8] text-[#1B2430]',
   },
 ]
 
@@ -73,28 +66,28 @@ export function HeroSlider() {
     >
       <div className={`rounded-2xl border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] overflow-hidden ${slide.arka}`}>
         {/* Yükseklik slaytlar arasında zıplamasın diye sabit minimum. */}
-        <div className="relative min-h-[380px] sm:min-h-[340px] p-6 sm:p-10 flex flex-col items-center justify-center text-center">
+        <div className="relative min-h-[440px] sm:min-h-[420px] p-6 sm:p-12 flex flex-col items-center justify-center text-center">
           {SLIDES.map((s, i) => (
             <div
               key={s.baslik}
               aria-hidden={i !== aktif}
-              className={`absolute inset-0 p-6 sm:p-10 flex flex-col items-center justify-center text-center transition-opacity duration-700 ease-in-out ${
+              className={`absolute inset-0 p-6 sm:p-12 flex flex-col items-center justify-center text-center transition-opacity duration-700 ease-in-out ${
                 i === aktif ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
-              <span className={`inline-block mb-3 px-3 py-1 rounded-lg border-2 border-[#1B2430] text-xs font-black ${s.rozetArka}`}>
+              <span className={`inline-block mb-4 px-3.5 py-1.5 rounded-lg border-2 border-[#1B2430] text-xs sm:text-sm font-black ${s.rozetArka}`}>
                 {s.rozet}
               </span>
-              <h2 className={`font-sans text-2xl sm:text-4xl font-black mb-3 max-w-2xl ${s.yazi}`}>
+              <h2 className={`font-sans text-3xl sm:text-5xl font-black mb-4 max-w-3xl mx-auto text-center text-balance ${s.yazi}`}>
                 {s.baslik}
               </h2>
-              <p className={`font-semibold mb-6 max-w-xl ${s.yazi} opacity-90`}>
+              <p className={`font-semibold text-base sm:text-lg mb-7 max-w-2xl mx-auto text-center ${s.yazi} opacity-90`}>
                 {s.metin}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
                   href={s.cta.href}
-                  className="py-3 px-8 bg-[#DD7B3A] text-[#F4F1E8] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
+                  className="py-3.5 px-9 text-lg bg-[#DD7B3A] text-[#F4F1E8] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
                 >
                   {s.cta.label}
                 </Link>
