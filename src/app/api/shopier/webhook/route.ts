@@ -92,37 +92,51 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, queued: true })
   }
 
-  // Krediyi kimin hesabina yazacagiz? Ogrenci kendi aliyorsa kendisine.
-  // Veli aliyorsa bagli oldugu ogrenciye — ama yalnizca TEK ogrencisi
-  // varsa. Birden fazla cocugu olan veli icin hangisine yazilacagi
-  // belirsiz oldugundan tahmin etmek yerine admin'e kuyruga birakiyoruz.
-  let creditStudentId: string | null = null
+  // VELI ALIMI: veli, panelde hangi ogrenci icin aldigini seciyor ve o
+  // secim odemeden once 'pending' bir package_purchases satiri olarak
+  // yaziliyor. Burada o satiri bulup 'completed' yapiyoruz; krediyi
+  // trg_grant_credits satirdaki student_id'ye yaziyor. Shopier'e "kredi
+  // kime" bilgisini tasiyacak bir alan gonderemedigimiz icin, birden fazla
+  // cocugu olan velide dogru kardesi bulmanin yolu bu.
+  if (buyer.role === 'parent') {
+    const { data: bekleyen } = await admin
+      .from('package_purchases')
+      .select('id')
+      .eq('purchased_by', buyer.id)
+      .eq('package_id', pkg.id)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
 
-  if (buyer.role === 'student') {
-    creditStudentId = buyer.id
-  } else if (buyer.role === 'parent') {
-    const { data: links } = await admin
-      .from('guardian_links').select('student_id').eq('guardian_id', buyer.id)
-
-    if (!links || links.length === 0) {
-      await queueUnmatched(admin, order, pkg.id, 'veliye_bagli_ogrenci_yok')
+    if (!bekleyen) {
+      // Veli paneli disindan (dogrudan Shopier linkiyle) odeme yapilmis:
+      // hangi ogrenci oldugunu bilemeyiz, admin cozsun.
+      await queueUnmatched(admin, order, pkg.id, 'veli_secim_yok')
       return NextResponse.json({ ok: true, queued: true })
     }
-    if (links.length > 1) {
-      await queueUnmatched(admin, order, pkg.id, 'veli_coklu_ogrenci')
-      return NextResponse.json({ ok: true, queued: true })
+
+    const { error: updateError } = await admin
+      .from('package_purchases')
+      .update({ status: 'completed', payment_reference: order.id })
+      .eq('id', bekleyen.id)
+
+    if (updateError) {
+      console.error('Shopier webhook: veli alimi tamamlanamadi:', updateError)
+      await queueUnmatched(admin, order, pkg.id, 'kayit_hatasi')
     }
-    creditStudentId = links[0].student_id
+
+    return NextResponse.json({ ok: true, guardianPurchase: true })
   }
 
-  if (!creditStudentId) {
+  if (buyer.role !== 'student') {
     await queueUnmatched(admin, order, pkg.id, 'gecersiz_rol')
     return NextResponse.json({ ok: true, queued: true })
   }
 
   const { error: insertError } = await admin.from('package_purchases').insert({
     package_id: pkg.id,
-    student_id: creditStudentId,
+    student_id: buyer.id,
     purchased_by: buyer.id,
     credits_granted: pkg.credit_amount,
     amount_paid: pkg.price,

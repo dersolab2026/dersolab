@@ -160,6 +160,66 @@ export async function veliyeBagliOgrenciler(): Promise<GuardianLinkRow[]> {
   }))
 }
 
+/**
+ * Veli, sectigi ogrenci adina paket alimi baslatir.
+ *
+ * Odemeden ONCE 'pending' bir package_purchases satiri aciliyor; student_id
+ * velinin sectigi ogrenci, purchased_by velinin kendisi. Shopier webhook'u
+ * odeme gelince bu satiri 'completed' yapiyor ve trg_grant_credits krediyi
+ * satirdaki ogrenciye yaziyor.
+ *
+ * Neden boyle: Shopier'e "kredi kime yazilacak" bilgisini tasiyacak bir alan
+ * gonderemiyoruz (odeme duz bir urun linki). Secim niyetini onceden
+ * veritabanina yazmak, birden fazla cocugu olan velide krediyi dogru
+ * kardese yazmanin tek guvenilir yolu.
+ */
+export async function veliPaketAlimiBaslat(
+  studentId: string,
+  packageId: string,
+): Promise<{ success: true; url: string } | { success: false; error: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
+  const { data: link } = await supabase
+    .from('guardian_links')
+    .select('id')
+    .eq('guardian_id', user.id)
+    .eq('student_id', studentId)
+    .maybeSingle()
+  if (!link) return { success: false, error: 'Bu öğrenci hesabınıza bağlı değil' }
+
+  const { data: pkg } = await supabase
+    .from('packages')
+    .select('id, credit_amount, price, shopier_product_url, is_active')
+    .eq('id', packageId)
+    .maybeSingle()
+  if (!pkg || !pkg.is_active) return { success: false, error: 'Paket bulunamadı' }
+  if (!pkg.shopier_product_url) {
+    return { success: false, error: 'Bu paket şu anda satın alınamıyor' }
+  }
+
+  // Eski bekleyen kayitlar SILINMIYOR: package_purchases'ta delete politikasi
+  // yok (silme yalnizca admin istemcisinde mumkun). Gerek de yok — webhook
+  // her zaman EN SON bekleyen kaydi esliyor, yani veli fikir degistirip
+  // baska bir cocuk secerse kredi dogru kardese gidiyor. Odenmemis eski
+  // kayitlar 'pending' olarak kaliyor ve krediye donusmuyor.
+  const { error } = await supabase.from('package_purchases').insert({
+    package_id: pkg.id,
+    student_id: studentId,
+    purchased_by: user.id,
+    credits_granted: pkg.credit_amount,
+    amount_paid: pkg.price,
+    payment_provider: 'shopier',
+    status: 'pending',
+  })
+
+  if (error) return { success: false, error: 'Satın alma başlatılamadı, lütfen tekrar dene' }
+
+  revalidatePath('/dashboard/parent')
+  return { success: true, url: pkg.shopier_product_url }
+}
+
 /** Ogrenciye bagli veliler — ogrenci gorur ama kaldiramaz. */
 export async function ogrenciyeBagliVeliler(studentId: string): Promise<GuardianLinkRow[]> {
   const supabase = await createClient()

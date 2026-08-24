@@ -39,6 +39,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
   parent: [
     { href: '/dashboard/parent', label: 'Öğrencilerim' },
+    { href: '/dashboard/parent/paketler', label: 'Paketler' },
     { href: '/dashboard/parent/settings', label: 'Ayarlar' },
   ],
   instructor: [
