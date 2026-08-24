@@ -33,8 +33,7 @@ export async function GET(
     const slots = await getAvailableSlots(instructorId, rangeStart, rangeEnd)
     return NextResponse.json({ slots })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Müsaitlik bilgisi alınamadı'
     console.error('Müsaitlik sorgusu hatası:', err)
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: 'Müsaitlik bilgisi şu anda alınamadı' }, { status: 500 })
   }
 }

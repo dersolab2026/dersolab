@@ -32,7 +32,7 @@ export default function LoginPage() {
     setError(null)
     setIsGooglePending(true)
     const isNative = Capacitor.isNativePlatform()
-    const result = await signInWithGoogle(isNative ? 'com.dersolab.app://auth/callback' : undefined)
+    const result = await signInWithGoogle(isNative)
     if ('url' in result) {
       if (isNative) {
         await Browser.open({ url: result.url })

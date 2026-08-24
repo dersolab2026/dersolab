@@ -7,6 +7,7 @@ import { Browser } from '@capacitor/browser'
 import { AuthShell } from '@/components/auth/AuthShell'
 import { PasswordInput } from '@/components/auth/PasswordInput'
 import { registerUser, signInWithGoogle } from '@/actions/auth'
+import { TERMS_VERSION } from '@/lib/legal'
 
 type Role = 'student' | 'instructor'
 type Track = 'sayisal' | 'sozel' | 'ea' | 'dil'
@@ -36,6 +37,7 @@ export function RegisterForm() {
   const [grade, setGrade] = useState('')
   const [track, setTrack] = useState<Track | ''>('')
   const [referralCode, setReferralCode] = useState('')
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [isGooglePending, setIsGooglePending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -46,9 +48,13 @@ export function RegisterForm() {
 
   async function handleGoogleRegister() {
     setError(null)
+    if (!termsAccepted) {
+      setError('Devam etmek için Kullanım Şartları’nı kabul etmelisin')
+      return
+    }
     setIsGooglePending(true)
     const isNative = Capacitor.isNativePlatform()
-    const result = await signInWithGoogle(isNative ? 'com.dersolab.app://auth/callback' : undefined)
+    const result = await signInWithGoogle(isNative)
     if ('url' in result) {
       if (isNative) {
         await Browser.open({ url: result.url })
@@ -66,6 +72,11 @@ export function RegisterForm() {
     e.preventDefault()
     setError(null)
 
+    if (!termsAccepted) {
+      setError('Devam etmek için Kullanım Şartları’nı kabul etmelisin')
+      return
+    }
+
     if (password !== passwordConfirm) {
       setError('Şifreler eşleşmiyor')
       return
@@ -81,6 +92,7 @@ export function RegisterForm() {
         grade: role === 'student' ? gradeNumber : undefined,
         track: role === 'student' && isLise && track ? track : undefined,
         referralCode: role === 'student' ? referralCode : undefined,
+        termsVersion: TERMS_VERSION,
       })
       if (!result.success) { setError(result.error); return }
       setSuccess(true)
@@ -238,6 +250,26 @@ export function RegisterForm() {
             </div>
           </>
         )}
+
+        <label className="flex items-start gap-3 rounded-xl border-2 border-[#1B2430] bg-white p-3 text-sm text-[#1B2430]">
+          <input
+            type="checkbox"
+            required
+            checked={termsAccepted}
+            onChange={(event) => setTermsAccepted(event.target.checked)}
+            className="mt-1 h-4 w-4 accent-[#DD7B3A]"
+          />
+          <span>
+            <Link href="/terms" target="_blank" className="font-bold text-[#DD7B3A] underline">
+              Kullanım Şartları’nı
+            </Link>{' '}
+            okudum ve kabul ediyorum. Kayıt bilgilerimin işlenmesiyle ilgili açıklamayı da{' '}
+            <Link href="/privacy" target="_blank" className="font-bold text-[#DD7B3A] underline">
+              KVKK Aydınlatma Metni’nde
+            </Link>{' '}
+            gördüm.
+          </span>
+        </label>
 
         {error && <p className="text-sm font-bold text-red-600">{error}</p>}
 

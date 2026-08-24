@@ -4,13 +4,23 @@ import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/layout/DashboardNav'
 import { getNotifications } from '@/actions/notifications'
 import { GUIDANCE_SUBJECT } from '@/lib/constants'
+import { TERMS_VERSION } from '@/lib/legal'
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+  const [{ data: userRow }, { data: termsAcceptance }] = await Promise.all([
+    supabase.from('users').select('role').eq('id', user.id).single(),
+    supabase
+      .from('terms_acceptances')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('terms_version', TERMS_VERSION)
+      .maybeSingle(),
+  ])
+  if (!termsAcceptance) redirect('/terms/accept')
   const role = (userRow?.role ?? 'student') as 'student' | 'instructor' | 'admin'
 
   let offersFreeTrial = false
