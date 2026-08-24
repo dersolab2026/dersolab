@@ -10,13 +10,10 @@ import type { TimeSlot } from '@/types'
 type ActionResult = { success: true } | { success: false; error: string }
 
 /**
- * Hos geldin paketi: tanisma dersi ve 1 haftalik kocluk birlikte
- * veriliyor. Ogrenci tek sefer talep ediyor, arka planda iki ayri talep
- * aciliyor cunku ikisini farkli havuzlar ustleniyor: dersi tanisma dersi
- * veren egitmenler, koclugu Koçluk bransi olan koclar.
+ * Hos geldin paketi: her ogrenciye bir kere ucretsiz tanisma dersi.
  *
- * Ogrenci haklardan birini daha once kullandiysa (ornegin eski tek hakli
- * donemden kalma) yalnizca kalan hak icin talep aciliyor.
+ * Talep havuza dusuyor, tanisma dersi veren egitmenlerden ilk ustlenen
+ * aliyor. 1 haftalik ucretsiz kocluk bu paketten cikarildi.
  */
 export async function requestDemoLesson(studentId: string): Promise<ActionResult> {
   const supabase = await createClient()
@@ -26,31 +23,22 @@ export async function requestDemoLesson(studentId: string): Promise<ActionResult
   const admin = createAdminClient()
   const { data: studentUser } = await admin.from('users').select('name').eq('id', studentId).single()
 
-  const turler = ['demo_lesson', 'coaching_week'] as const
-  const hatalar: string[] = []
-  let acilan = 0
+  const { error } = await supabase.from('demo_lesson_requests').insert({
+    student_id: studentId,
+    requested_by: user.id,
+    request_type: 'demo_lesson',
+  })
 
-  for (const tur of turler) {
-    const { error } = await supabase.from('demo_lesson_requests').insert({
-      student_id: studentId,
-      requested_by: user.id,
-      request_type: tur,
-    })
-    if (error) hatalar.push(error.message)
-    else acilan++
-  }
-
-  // Ikisi de acilamadiysa kullaniciya sebebini soyle.
-  if (acilan === 0) {
-    const hepsi = hatalar.join(' | ')
-    let message = hepsi
-    if (hepsi.includes('zaten kullanilmis')) {
+  if (error) {
+    const ham = error.message
+    let message = 'Talep oluşturulamadı, lütfen tekrar dene'
+    if (ham.includes('zaten kullanilmis')) {
       message = 'Hoş geldin paketini zaten kullandın'
-    } else if (hepsi.includes('zaten bekleyen')) {
+    } else if (ham.includes('zaten bekleyen')) {
       message = 'Zaten bekleyen bir talebin var'
-    } else if (hepsi.includes('row-level security')) {
+    } else if (ham.includes('row-level security')) {
       message = 'Bu işlem için yetkin yok'
-    } else if (hepsi.includes('violates foreign key')) {
+    } else if (ham.includes('violates foreign key')) {
       message = 'Hoş geldin paketi sadece öğrenci hesapları için geçerli'
     }
     return { success: false, error: message }

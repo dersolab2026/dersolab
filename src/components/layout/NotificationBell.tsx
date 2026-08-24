@@ -1,5 +1,6 @@
 'use client'
 
+import type { UserRole } from '@/types'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
@@ -17,7 +18,7 @@ const PANEL_GAP = 8
 
 interface NotificationBellProps {
   initialNotifications: NotificationItem[]
-  role: 'student' | 'instructor' | 'admin'
+  role: UserRole
   panelPosition?: 'up' | 'down'
 }
 

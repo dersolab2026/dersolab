@@ -27,7 +27,7 @@ const SLIDES: Slide[] = [
   {
     rozet: 'ÖDEME YOK · KART YOK',
     baslik: 'Hoş Geldin Paketiniz Bizden',
-    metin: 'Her öğrenciye bir kere: bir tanışma dersi ve bir hafta boyunca koçluk desteği. Beğenmezseniz hiçbir ödeme yapmadan bırakabilirsiniz.',
+    metin: 'Her öğrenciye bir kere ücretsiz tanışma dersi. Beğenmezseniz hiçbir ödeme yapmadan bırakabilirsiniz.',
     cta: { href: '/demo-ders', label: 'Hoş Geldin Paketini Alın' },
     arka: 'bg-[#6FA89E]', yazi: 'text-[#F4F1E8]', rozetArka: 'bg-[#F4F1E8] text-[#1B2430]',
   },

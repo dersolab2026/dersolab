@@ -31,11 +31,11 @@ export async function getIntake(studentId?: string): Promise<IntakeData> {
   return {
     form: formRow
       ? {
-          goal: formRow.goal ?? '',
-          hardSubjects: formRow.hard_subjects ?? '',
-          dailyRoutine: formRow.daily_routine ?? '',
-          triedMethods: formRow.tried_methods ?? '',
-          studyEnvironment: formRow.study_environment ?? '',
+          goal: formRow.goal ?? [],
+          hardSubjects: formRow.hard_subjects ?? [],
+          dailyRoutine: formRow.daily_routine ?? [],
+          triedMethods: formRow.tried_methods ?? [],
+          studyEnvironment: formRow.study_environment ?? [],
           whoWanted: formRow.who_wanted as IntakeInput['whoWanted'],
           notes: formRow.notes ?? '',
         }

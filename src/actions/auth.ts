@@ -11,11 +11,10 @@ interface RegisterParams {
   name: string
   email: string
   password: string
-  role: 'student' | 'instructor'
+  role: 'student' | 'instructor' | 'parent'
   schoolName?: string
   grade?: number
   track?: 'sayisal' | 'sozel' | 'ea' | 'dil'
-  referralCode?: string
   termsVersion: typeof TERMS_VERSION
 }
 
@@ -30,11 +29,10 @@ const registerSchema = z.object({
   name: z.string().trim().min(2, 'Ad soyad en az 2 karakter olmalı').max(100),
   email: emailSchema,
   password: passwordSchema,
-  role: z.enum(['student', 'instructor']),
+  role: z.enum(['student', 'instructor', 'parent']),
   schoolName: z.string().trim().min(2, 'Okul adını gir').max(120).optional(),
   grade: gradeSchema.optional(),
   track: z.enum(['sayisal', 'sozel', 'ea', 'dil']).optional(),
-  referralCode: z.string().trim().regex(/^[A-Za-z0-9]{8}$/, 'Davet kodu geçersiz').optional(),
   termsVersion: z.literal(TERMS_VERSION),
 }).superRefine((values, ctx) => {
   if (values.role !== 'student') return
@@ -80,7 +78,6 @@ export async function registerUser(params: RegisterParams): Promise<ActionResult
         school_name: values.schoolName,
         grade: values.grade,
         track: values.track,
-        referral_code: values.referralCode?.toUpperCase(),
         terms_version: TERMS_VERSION,
       },
     },

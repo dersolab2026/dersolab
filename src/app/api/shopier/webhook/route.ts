@@ -92,14 +92,37 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, queued: true })
   }
 
-  if (buyer.role !== 'student') {
+  // Krediyi kimin hesabina yazacagiz? Ogrenci kendi aliyorsa kendisine.
+  // Veli aliyorsa bagli oldugu ogrenciye — ama yalnizca TEK ogrencisi
+  // varsa. Birden fazla cocugu olan veli icin hangisine yazilacagi
+  // belirsiz oldugundan tahmin etmek yerine admin'e kuyruga birakiyoruz.
+  let creditStudentId: string | null = null
+
+  if (buyer.role === 'student') {
+    creditStudentId = buyer.id
+  } else if (buyer.role === 'parent') {
+    const { data: links } = await admin
+      .from('guardian_links').select('student_id').eq('guardian_id', buyer.id)
+
+    if (!links || links.length === 0) {
+      await queueUnmatched(admin, order, pkg.id, 'veliye_bagli_ogrenci_yok')
+      return NextResponse.json({ ok: true, queued: true })
+    }
+    if (links.length > 1) {
+      await queueUnmatched(admin, order, pkg.id, 'veli_coklu_ogrenci')
+      return NextResponse.json({ ok: true, queued: true })
+    }
+    creditStudentId = links[0].student_id
+  }
+
+  if (!creditStudentId) {
     await queueUnmatched(admin, order, pkg.id, 'gecersiz_rol')
     return NextResponse.json({ ok: true, queued: true })
   }
 
   const { error: insertError } = await admin.from('package_purchases').insert({
     package_id: pkg.id,
-    student_id: buyer.id,
+    student_id: creditStudentId,
     purchased_by: buyer.id,
     credits_granted: pkg.credit_amount,
     amount_paid: pkg.price,

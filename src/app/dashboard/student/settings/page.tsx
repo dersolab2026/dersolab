@@ -2,9 +2,10 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { StudentProfileForm } from '@/components/student/StudentProfileForm'
-import { ReferralCard } from '@/components/student/ReferralCard'
+import { GuardianLinkCard } from '@/components/student/GuardianLinkCard'
 import { ChangePasswordForm } from '@/components/account/ChangePasswordForm'
 import { DeleteAccountButton } from '@/components/instructor/DeleteAccountButton'
+import { aktifVeliKodu, ogrenciyeBagliVeliler } from '@/actions/guardian'
 import { PIXEL_CARD } from '@/lib/theme'
 
 export default async function StudentSettingsPage() {
@@ -12,9 +13,11 @@ export default async function StudentSettingsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const [{ data: userRow }, { data: studentRow }] = await Promise.all([
+  const [{ data: userRow }, { data: studentRow }, veliKodu, veliler] = await Promise.all([
     supabase.from('users').select('name').eq('id', user.id).single(),
-    supabase.from('students').select('school_name, grade, track, referral_code').eq('user_id', user.id).single(),
+    supabase.from('students').select('school_name, grade, track').eq('user_id', user.id).single(),
+    aktifVeliKodu(user.id),
+    ogrenciyeBagliVeliler(user.id),
   ])
 
   return (
@@ -26,7 +29,7 @@ export default async function StudentSettingsPage() {
         track={studentRow?.track ?? null}
       />
 
-      {studentRow?.referral_code && <ReferralCard referralCode={studentRow.referral_code} />}
+      <GuardianLinkCard mevcutKod={veliKodu} veliler={veliler} />
 
       <ChangePasswordForm />
 

@@ -1,5 +1,6 @@
 'use client'
 
+import type { UserRole } from '@/types'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -17,10 +18,8 @@ const SIDEBAR_LINK_ACTIVE = `${SIDEBAR_LINK_BASE} bg-[#DD7B3A] text-[#F4F1E8]`
 const SIDEBAR_LINK_INACTIVE = `${SIDEBAR_LINK_BASE} bg-white text-[#1B2430]`
 
 interface DashboardNavProps {
-  role: 'student' | 'instructor' | 'admin'
+  role: UserRole
   offersFreeTrial?: boolean
-  /** Koçluk branşı olan eğitmen — ücretsiz koçluk taleplerini görebilir. */
-  isCoach?: boolean
   notifications: NotificationItem[]
 }
 
@@ -37,6 +36,10 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/demo-ders', label: 'Hoş Geldin Paketi' },
     { href: '/dashboard/student/nasil-calisir', label: 'Nasıl Çalışır?' },
     { href: '/dashboard/student/settings', label: 'Ayarlar' },
+  ],
+  parent: [
+    { href: '/dashboard/parent', label: 'Öğrencilerim' },
+    { href: '/dashboard/parent/settings', label: 'Ayarlar' },
   ],
   instructor: [
     { href: '/dashboard/instructor', label: 'Derslerim' },
@@ -59,7 +62,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
 }
 
-export function DashboardNav({ role, offersFreeTrial, isCoach, notifications }: DashboardNavProps) {
+export function DashboardNav({ role, offersFreeTrial, notifications }: DashboardNavProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
@@ -87,8 +90,9 @@ export function DashboardNav({ role, offersFreeTrial, isCoach, notifications }: 
     })
   }
 
-  // Tanışma dersi verenler ve koçlar aynı talep sayfasını kullanıyor.
-  const instructorItemsWithDemo = offersFreeTrial || isCoach
+  // Talep havuzunda yalnızca tanışma dersi var; sayfayı yalnızca tanışma
+  // dersi veren eğitmenler görüyor.
+  const instructorItemsWithDemo = offersFreeTrial
     ? [...NAV_ITEMS.instructor, { href: '/dashboard/instructor/demo-talepleri', label: 'Hoş Geldin Talepleri' }]
     : NAV_ITEMS.instructor
 

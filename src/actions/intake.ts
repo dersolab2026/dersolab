@@ -2,33 +2,50 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { gecerliAnahtarlar } from '@/lib/coaching/intake-options'
 
 type ActionResult = { success: true } | { success: false; error: string }
 
+/**
+ * Form cevaplari secenek ANAHTARI dizileri.
+ *
+ * notes disindaki her alan coktan secmeli; serbest metin yalnizca
+ * "eklemek istedigin baska bir sey" sorusunda kaldi.
+ */
 export interface IntakeInput {
-  goal: string
-  hardSubjects: string
-  dailyRoutine: string
-  triedMethods: string
-  studyEnvironment: string
+  goal: string[]
+  hardSubjects: string[]
+  dailyRoutine: string[]
+  triedMethods: string[]
+  studyEnvironment: string[]
   whoWanted: 'kendim' | 'ailem' | 'ikimiz' | null
   notes: string
 }
+
+const KIM_DEGERLERI = ['kendim', 'ailem', 'ikimiz'] as const
 
 export async function saveIntakeForm(input: IntakeInput): Promise<ActionResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Giriş yapmalısın' }
 
+  // Anahtarlar katalogla dogrulaniyor: istemciden gelen tanimsiz bir deger
+  // veritabanina yazilmasin. Bos dizi null olarak saklaniyor ki "cevaplanmadi"
+  // ile "hicbiri secilmedi" ayni gorunsun.
+  const dizi = (alan: Parameters<typeof gecerliAnahtarlar>[0], v: string[]) => {
+    const temiz = gecerliAnahtarlar(alan, Array.isArray(v) ? v : [])
+    return temiz.length > 0 ? temiz : null
+  }
+
   const satir = {
     student_id: user.id,
-    goal: input.goal.trim() || null,
-    hard_subjects: input.hardSubjects.trim() || null,
-    daily_routine: input.dailyRoutine.trim() || null,
-    tried_methods: input.triedMethods.trim() || null,
-    study_environment: input.studyEnvironment.trim() || null,
-    who_wanted: input.whoWanted,
-    notes: input.notes.trim() || null,
+    goal: dizi('goal', input.goal),
+    hard_subjects: dizi('hardSubjects', input.hardSubjects),
+    daily_routine: dizi('dailyRoutine', input.dailyRoutine),
+    tried_methods: dizi('triedMethods', input.triedMethods),
+    study_environment: dizi('studyEnvironment', input.studyEnvironment),
+    who_wanted: KIM_DEGERLERI.includes(input.whoWanted as never) ? input.whoWanted : null,
+    notes: input.notes.trim().slice(0, 1000) || null,
     updated_at: new Date().toISOString(),
   }
 

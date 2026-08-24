@@ -10,7 +10,13 @@ export default async function KoclukFormuPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const veri = await getIntake()
+  // Zorlandığı dersler listesi LGS/YKS'ye göre değişiyor; öğrenciye
+  // görmeyeceği dersleri göstermemek için sınıf düzeyi okunuyor.
+  const [veri, { data: studentRow }] = await Promise.all([
+    getIntake(),
+    supabase.from('students').select('grade_track').eq('user_id', user.id).maybeSingle(),
+  ])
+  const gradeTrack = studentRow?.grade_track === 'lgs' ? 'lgs' : 'yks'
 
   return (
     <DashboardPageShell
@@ -24,7 +30,7 @@ export default async function KoclukFormuPage() {
         </p>
       </div>
 
-      <IntakeForm mevcut={veri.form} gecmisOlcumler={veri.olcumler} />
+      <IntakeForm mevcut={veri.form} gecmisOlcumler={veri.olcumler} gradeTrack={gradeTrack} />
     </DashboardPageShell>
   )
 }

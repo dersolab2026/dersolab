@@ -1,15 +1,15 @@
+import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-export default async function DashboardRedirectPage() {
+// Veli sayfaları yalnızca veli hesaplarına açık.
+export default async function ParentLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+  if (userRow?.role !== 'parent') redirect('/dashboard')
 
-  if (userRow?.role === 'instructor') redirect('/dashboard/instructor')
-  if (userRow?.role === 'admin') redirect('/dashboard/admin')
-  if (userRow?.role === 'parent') redirect('/dashboard/parent')
-  redirect('/dashboard/student/bookings')
+  return <>{children}</>
 }

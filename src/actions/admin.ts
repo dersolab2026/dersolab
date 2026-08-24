@@ -1,5 +1,6 @@
 'use server'
 
+import type { UserRole } from '@/types'
 import { revalidatePath } from 'next/cache'
 import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
@@ -270,7 +271,7 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
     channel: 'email' as const,
     title,
     body,
-    link: getCategoryLink(params.category, recipient.role as 'student' | 'instructor' | 'admin'),
+    link: getCategoryLink(params.category, recipient.role as UserRole),
     batch_id: batchId,
   }))
 

@@ -1,6 +1,7 @@
 import { ClipboardCheck, AlertTriangle } from 'lucide-react'
 import { SelfAssessmentRadar } from '@/components/coaching/SelfAssessmentRadar'
 import { zayifBoyutlar } from '@/lib/coaching/self-assessment'
+import { etiketle } from '@/lib/coaching/intake-options'
 import type { IntakeData } from '@/lib/coaching/get-intake'
 import { PIXEL_CARD } from '@/lib/theme'
 
@@ -26,15 +27,16 @@ export function StudentIntakeSummary({ veri }: { veri: IntakeData }) {
   const ilk = olcumler.length > 1 ? olcumler[olcumler.length - 1] : null
   const zayif = son ? zayifBoyutlar(son.skorlar) : []
 
-  const satirlar: { etiket: string; deger: string | null }[] = form
+  // Seçmeli cevaplar rozet olarak, serbest metin (notlar ve eski kayıtlardan
+  // taşınan cevaplar) düz metin olarak gösteriliyor.
+  const satirlar: { etiket: string; degerler: string[] }[] = form
     ? [
-        { etiket: 'Hedefi', deger: form.goal || null },
-        { etiket: 'Zorlandığı dersler', deger: form.hardSubjects || null },
-        { etiket: 'Günlük rutini', deger: form.dailyRoutine || null },
-        { etiket: 'Denediği yöntemler', deger: form.triedMethods || null },
-        { etiket: 'Çalışma ortamı', deger: form.studyEnvironment || null },
-        { etiket: 'Eklemek istediği', deger: form.notes || null },
-      ].filter((s) => s.deger)
+        { etiket: 'Hedefi', degerler: etiketle('goal', form.goal) },
+        { etiket: 'Zorlandığı dersler', degerler: etiketle('hardSubjects', form.hardSubjects) },
+        { etiket: 'Çalışma düzeni', degerler: etiketle('dailyRoutine', form.dailyRoutine) },
+        { etiket: 'Denediği yöntemler', degerler: etiketle('triedMethods', form.triedMethods) },
+        { etiket: 'Çalışma ortamı', degerler: etiketle('studyEnvironment', form.studyEnvironment) },
+      ].filter((s) => s.degerler.length > 0)
     : []
 
   return (
@@ -57,10 +59,24 @@ export function StudentIntakeSummary({ veri }: { veri: IntakeData }) {
         <div className="space-y-2">
           {satirlar.map((s) => (
             <div key={s.etiket} className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
-              <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">{s.etiket}</p>
-              <p className="text-sm font-semibold text-[#1B2430] whitespace-pre-wrap">{s.deger}</p>
+              <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">{s.etiket}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {s.degerler.map((d) => (
+                  <span key={d}
+                    className="rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] px-2 py-0.5 text-sm font-semibold text-[#1B2430]">
+                    {d}
+                  </span>
+                ))}
+              </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {form?.notes && (
+        <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">Eklemek istediği</p>
+          <p className="text-sm font-semibold text-[#1B2430] whitespace-pre-wrap">{form.notes}</p>
         </div>
       )}
 

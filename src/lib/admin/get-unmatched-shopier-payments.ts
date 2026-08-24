@@ -15,7 +15,9 @@ export interface UnmatchedShopierPayment {
 const REASON_LABELS: Record<string, string> = {
   urun_eslesmedi: 'Ürün eşleşmedi',
   kullanici_bulunamadi: 'Bu e-postayla kayıtlı hesap yok',
-  gecersiz_rol: 'Hesap öğrenci değil',
+  gecersiz_rol: 'Hesap öğrenci ya da veli değil',
+  veliye_bagli_ogrenci_yok: 'Veli hesabı, bağlı öğrencisi yok',
+  veli_coklu_ogrenci: 'Velinin birden fazla öğrencisi var — kredi kime yazılacak?',
   kayit_hatasi: 'Kayıt hatası',
 }
 

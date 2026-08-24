@@ -9,12 +9,13 @@ import { PasswordInput } from '@/components/auth/PasswordInput'
 import { registerUser, signInWithGoogle } from '@/actions/auth'
 import { TERMS_VERSION } from '@/lib/legal'
 
-type Role = 'student' | 'instructor'
+type Role = 'student' | 'instructor' | 'parent'
 type Track = 'sayisal' | 'sozel' | 'ea' | 'dil'
 
 const ROLE_LABELS: Record<Role, string> = {
   student: 'Öğrenci',
   instructor: 'Eğitmen',
+  parent: 'Veli',
 }
 
 const GRADES = [5, 6, 7, 8, 9, 10, 11, 12]
@@ -36,7 +37,6 @@ export function RegisterForm() {
   const [schoolName, setSchoolName] = useState('')
   const [grade, setGrade] = useState('')
   const [track, setTrack] = useState<Track | ''>('')
-  const [referralCode, setReferralCode] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [isGooglePending, setIsGooglePending] = useState(false)
@@ -91,7 +91,6 @@ export function RegisterForm() {
         schoolName: role === 'student' ? schoolName : undefined,
         grade: role === 'student' ? gradeNumber : undefined,
         track: role === 'student' && isLise && track ? track : undefined,
-        referralCode: role === 'student' ? referralCode : undefined,
         termsVersion: TERMS_VERSION,
       })
       if (!result.success) { setError(result.error); return }
@@ -120,8 +119,8 @@ export function RegisterForm() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[#1B2430] font-bold mb-2">Hesap Türü</label>
-          <div className="grid grid-cols-2 gap-2">
-            {(['student', 'instructor'] as const).map((r) => (
+          <div className="grid grid-cols-3 gap-2">
+            {(['student', 'instructor', 'parent'] as const).map((r) => (
               <button
                 key={r}
                 type="button"
@@ -137,6 +136,13 @@ export function RegisterForm() {
             ))}
           </div>
         </div>
+
+        {role === 'parent' && (
+          <p className="rounded-xl border-2 border-[#1B2430] bg-white p-3 text-sm font-semibold text-[#1B2430]/80">
+            Kaydolduktan sonra öğrencinizin <strong>Ayarlar</strong> sayfasından aldığı
+            8 karakterlik veli kodunu girerek hesabınızı öğrencinize bağlarsınız.
+          </p>
+        )}
 
         {role === 'student' && (
           <>
@@ -237,17 +243,6 @@ export function RegisterForm() {
               </div>
             )}
 
-            <div>
-              <label className="block text-[#1B2430] font-bold mb-2">
-                Davet Kodu <span className="font-semibold text-[#1B2430]/60">(isteğe bağlı)</span>
-              </label>
-              <input
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value)}
-                placeholder="Bir arkadaşın davet ettiyse kodunu gir"
-                className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
-              />
-            </div>
           </>
         )}
 

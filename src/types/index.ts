@@ -1,4 +1,4 @@
-export type UserRole = 'student' | 'instructor' | 'admin'
+export type UserRole = 'student' | 'instructor' | 'parent' | 'admin'
 export type GradeTrack = 'lgs' | 'yks'
 export type HomeworkStatus = 'assigned' | 'submitted' | 'completed'
 export type BookingStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show'

@@ -31,9 +31,7 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
   const [error, setError] = useState<string | null>(null)
 
   const s = initialStatus
-  const dersHareket = s.requestStatus === 'pending' || s.requestStatus === 'assigned' || s.freeTrialUsed
-  const koclukHareket = s.coachingStatus === 'pending' || s.coachingStatus === 'assigned' || s.freeCoachingUsed
-  const talepVar = dersHareket || koclukHareket
+  const talepVar = s.requestStatus === 'pending' || s.requestStatus === 'assigned' || s.freeTrialUsed
 
   function handleRequest() {
     setError(null)
@@ -49,16 +47,12 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
     const dersDurumu = s.requestStatus === 'assigned' || s.freeTrialUsed
       ? 'eğitmenin atandı, detaylar Derslerim sayfasında'
       : s.requestStatus === 'pending' ? 'uygun bir eğitmen bekleniyor' : 'talep açılmadı'
-    const koclukDurumu = s.coachingStatus === 'assigned' || s.freeCoachingUsed
-      ? 'koçun atandı, seninle iletişime geçecek'
-      : s.coachingStatus === 'pending' ? 'uygun bir koç bekleniyor' : 'talep açılmadı'
 
     return (
       <div className={`${PIXEL_CARD} p-5 space-y-3`}>
         <p className="font-bold text-[#1B2430]">Talebin alındı!</p>
         <ul className="space-y-2">
           <DurumSatiri etiket="Tanışma dersi" durum={dersDurumu} />
-          <DurumSatiri etiket="1 haftalık koçluk" durum={koclukDurumu} />
         </ul>
       </div>
     )
@@ -68,12 +62,11 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
     <div className={`${PIXEL_CARD} p-5 space-y-3`}>
       <p className="font-bold text-[#1B2430]">Hoş Geldin Paketin</p>
       <p className="text-sm font-semibold text-[#1B2430]/70">
-        Tek talep, iki hak: bir tanışma dersi ve bir hafta boyunca koçluk desteği.
+        Her öğrenciye bir kere: ücretsiz bir tanışma dersi.
         Kredi harcamıyorsun, kart bilgisi istemiyoruz.
       </p>
       <ul className="space-y-1.5 text-sm font-semibold text-[#1B2430]/80 list-disc pl-5">
         <li>Uygun bir eğitmen tanışma dersini planlar.</li>
-        <li>Bir koç seninle iletişime geçip haftalık programını kurar.</li>
       </ul>
       {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
       <button type="button" onClick={handleRequest} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>

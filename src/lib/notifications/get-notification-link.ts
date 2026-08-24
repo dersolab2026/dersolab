@@ -1,3 +1,5 @@
+import type { UserRole } from '@/types'
+
 export type AdminNotificationCategory = 'general' | 'lessons' | 'homework' | 'packages'
 
 export const ADMIN_NOTIFICATION_CATEGORY_LABELS: Record<AdminNotificationCategory, string> = {
@@ -9,8 +11,11 @@ export const ADMIN_NOTIFICATION_CATEGORY_LABELS: Record<AdminNotificationCategor
 
 export function getCategoryLink(
   category: AdminNotificationCategory,
-  role: 'student' | 'instructor' | 'admin'
+  role: UserRole
 ): string {
+  // Veli, öğrenci sayfalarını göremez; her bildirim kendi paneline gider.
+  if (role === 'parent') return '/dashboard/parent'
+
   const isInstructorLike = role === 'instructor' || role === 'admin'
 
   switch (category) {
@@ -25,9 +30,12 @@ export function getCategoryLink(
   }
 }
 
-export function getNotificationLink(type: string, role: 'student' | 'instructor' | 'admin'): string {
+export function getNotificationLink(type: string, role: UserRole): string {
   // Admin hesapları eğitmen olarak da işlev görebiliyor (ör. Egemen), bu yuzden
   // ders/ödev bildirimlerinde onlari da egitmen tarafina yönlendiriyoruz.
+  // Veli, öğrenci sayfalarını göremez; her bildirim kendi paneline gider.
+  if (role === 'parent') return '/dashboard/parent'
+
   const isInstructorLike = role === 'instructor' || role === 'admin'
 
   switch (type) {
