@@ -54,7 +54,9 @@ export function RegisterForm() {
     }
     setIsGooglePending(true)
     const isNative = Capacitor.isNativePlatform()
-    const result = await signInWithGoogle(isNative)
+    // Formda secilen hesap turu ve kabul edilen sart surumu Google
+    // donusune tasiniyor; donuste ayni sorular tekrar sorulmasin.
+    const result = await signInWithGoogle(isNative, { rol: role, sartSurumu: TERMS_VERSION })
     if ('url' in result) {
       if (isNative) {
         await Browser.open({ url: result.url })

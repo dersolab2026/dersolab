@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { OAUTH_NOT_CEREZI, notuOku, notuUygula } from '@/lib/auth/oauth-hint'
 
 /**
  * Google (OAuth) donus adresi.
@@ -35,11 +37,11 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error) {
-    // En sik sebep: PKCE dogrulayici cerezi yok/eskimis, ya da donus
-    // adresi Supabase'in izin listesinde degil.
+    // En sik sebep: PKCE dogrulayici cerezi yok/eskimis, donus adresi
+    // Supabase'in izin listesinde degil, ya da hesap banli (silinmis).
     console.error('OAuth callback: kod takasi basarisiz', {
       message: error.message,
       status: error.status,
@@ -48,5 +50,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${taban}/login?error=auth_callback_failed`)
   }
 
-  return NextResponse.redirect(`${taban}${next}`)
+  // Kayit formundaki secimi uygula: hesap turu + KVKK onayi. Boylece
+  // kullanici ayni iki soruyla ikinci kez karsilasmiyor.
+  const cerezler = await cookies()
+  const not = notuOku(cerezler.get(OAUTH_NOT_CEREZI)?.value)
+  if (not && data.user) {
+    try {
+      await notuUygula(data.user.id, not)
+    } catch (e) {
+      // Not uygulanamazsa giris yine de tamamlanir; kullanici
+      // /hesap-turu ve /terms/accept ekranlarina duser.
+      console.error('OAuth callback: not uygulanamadi', e)
+    }
+  }
+
+  const yanit = NextResponse.redirect(`${taban}${next}`)
+  if (not) yanit.cookies.delete(OAUTH_NOT_CEREZI)
+  return yanit
 }

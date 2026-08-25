@@ -1,8 +1,11 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { TERMS_VERSION } from '@/lib/legal'
+import { gecerliRolMu } from '@/lib/auth/account-type'
+import { OAUTH_NOT_CEREZI, OAUTH_NOT_OMRU, notuYaz, type OAuthNotu } from '@/lib/auth/oauth-hint'
 import { createClient } from '@/lib/supabase/server'
 
 type ActionResult = { success: true } | { success: false; error: string }
@@ -114,13 +117,39 @@ export async function logoutUser(): Promise<void> {
   redirect('/')
 }
 
-export async function signInWithGoogle(isNative = false): Promise<{ url: string } | { error: string }> {
+/**
+ * Google girisini baslatir.
+ *
+ * `not` yalnizca KAYIT formundan geliyor: kullanici orada hesap turunu
+ * secip KVKK kutusunu isaretlemis oluyor. Google bu bilgiyi tasimadigi
+ * icin kisa omurlu bir httpOnly cereze yaziyoruz; donuste callback okuyup
+ * uyguluyor. Boylece ayni iki soru ikinci kez sorulmuyor.
+ *
+ * Giris (login) sayfasindan cagrildiginda not YOK — orada bir secim
+ * yapilmiyor zaten.
+ */
+export async function signInWithGoogle(
+  isNative = false,
+  not?: OAuthNotu,
+): Promise<{ url: string } | { error: string }> {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: isNative ? 'com.dersolab.app://auth/callback' : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
   })
   if (error || !data.url) return { error: 'Google girişi başlatılamadı' }
+
+  if (not && gecerliRolMu(not.rol)) {
+    const cerezler = await cookies()
+    cerezler.set(OAUTH_NOT_CEREZI, notuYaz(not), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax', // OAuth donusu capraz siteden geliyor; 'strict' cerezi dusururdu
+      path: '/',
+      maxAge: OAUTH_NOT_OMRU,
+    })
+  }
+
   return { url: data.url }
 }
 
