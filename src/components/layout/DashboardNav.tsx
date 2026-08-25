@@ -117,13 +117,10 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
             aria-label="Menüyü aç"
             className={`${PIXEL_BUTTON_SECONDARY} p-1.5`}
           >
-            {/* Mobilde buton menü açılınca örtülüyor; sürekli uyuyan tilki durmasın diye gözler hep açık. */}
-            <img
-              src="/fox-head-open.png"
-              alt=""
-              className="h-7 w-7"
-              style={{ imageRendering: 'pixelated' }}
-            />
+            {/* Kafa kare değil (300x242); w-auto olmazsa eziliyor.
+                imageRendering:pixelated YOK — kaynak yumuşak bir çizim,
+                zorlanınca kenarlar lapa oluyordu. */}
+            <img src="/fox-head.png" alt="" className="h-7 w-auto" />
           </button>
           <Link href="/dashboard">
             <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
@@ -217,12 +214,13 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
         className={`hidden md:flex fixed top-24 z-30 h-10 w-10 items-center justify-center rounded-full border-2 border-[#1B2430] bg-white shadow-sm ${hasMounted ? 'transition-[left] duration-300 ease-in-out' : ''}`}
         style={{ left: collapsed ? 12 : SIDEBAR_WIDTH - 20 }}
       >
-        {/* Menü açıkken maskotun gözleri açık, kapalıyken uykuda. */}
+        {/* Kapalıyken tilki soluklaşıyor. Ayrı bir "uyuyan" görsel yok:
+            eski kapalı-göz dosyası da kırpıktı ve temizinden türetmek
+            gözleri bozuyordu; soluklaşma aynı geri bildirimi veriyor. */}
         <img
-          src={collapsed ? '/fox-head-closed.png' : '/fox-head-open.png'}
+          src="/fox-head.png"
           alt=""
-          className="h-8 w-8"
-          style={{ imageRendering: 'pixelated' }}
+          className={`h-8 w-auto transition-opacity ${collapsed ? 'opacity-45' : 'opacity-100'}`}
         />
       </button>
     </>

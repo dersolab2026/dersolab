@@ -59,6 +59,93 @@ export interface GuardianStudentOverview {
   purchases: GuardianPurchase[]
 }
 
+export interface GuardianStudentSummary {
+  studentId: string
+  studentName: string
+  creditBalance: number
+  /** En yakın planlanmış ders; yoksa null. */
+  siradakiDers: { instructorName: string; startTime: string } | null
+  buAyDers: number
+  /** Geçmiş derslerde katılım oranı (%); hiç ders yoksa null. */
+  katilimYuzde: number | null
+  bekleyenOdev: number
+}
+
+/**
+ * Veli ana sayfası için öğrenci özetleri.
+ *
+ * Ana sayfa eskiden yalnızca isim listesi gösteriyordu; veli tek soruya
+ * cevap arıyor — "gidiyor mu, işe yarıyor mu" — ve bunun için detay
+ * sayfasına girmek zorundaydı. Özet o cevabı ilk ekranda veriyor.
+ */
+export async function getGuardianStudentSummaries(): Promise<GuardianStudentSummary[]> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data: baglar } = await supabase
+    .from('guardian_links').select('student_id').eq('guardian_id', user.id)
+  if (!baglar || baglar.length === 0) return []
+
+  const admin = createAdminClient()
+  const ogrenciIdler = baglar.map((b) => b.student_id)
+
+  const [{ data: kisiler }, { data: ogrenciSatirlari }, { data: dersler }, { data: odevler }] =
+    await Promise.all([
+      admin.from('users').select('id, name').in('id', ogrenciIdler),
+      supabase.from('students').select('user_id, credit_balance').in('user_id', ogrenciIdler),
+      supabase
+        .from('bookings')
+        .select('student_id, instructor_id, start_time, status')
+        .in('student_id', ogrenciIdler),
+      supabase.from('homework').select('student_id, status').in('student_id', ogrenciIdler),
+    ])
+
+  const egitmenIdler = [...new Set((dersler ?? []).map((d) => d.instructor_id))]
+  const { data: egitmenler } = egitmenIdler.length > 0
+    ? await admin.from('users').select('id, name').in('id', egitmenIdler)
+    : { data: [] as { id: string; name: string }[] }
+
+  const adById = new Map((kisiler ?? []).map((u) => [u.id, u.name]))
+  const egitmenAdi = new Map((egitmenler ?? []).map((u) => [u.id, u.name]))
+  const krediById = new Map((ogrenciSatirlari ?? []).map((s) => [s.user_id, s.credit_balance]))
+
+  const simdi = new Date()
+  const ayBasi = new Date(simdi.getFullYear(), simdi.getMonth(), 1).toISOString()
+
+  return ogrenciIdler.map((id) => {
+    const kendiDersleri = (dersler ?? []).filter((d) => d.student_id === id)
+
+    const yaklasan = kendiDersleri
+      .filter((d) => d.status === 'scheduled' && new Date(d.start_time) >= simdi)
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())[0]
+
+    // Katılım: yalnızca gerçekleşmesi beklenen dersler sayılıyor.
+    // İptaller hesaba katılmıyor — iptal edilmiş ders "kaçırılmış" değil.
+    const gecmis = kendiDersleri.filter((d) => d.status === 'completed' || d.status === 'no_show')
+    const katilan = gecmis.filter((d) => d.status === 'completed').length
+
+    return {
+      studentId: id,
+      studentName: adById.get(id) ?? 'Öğrenci',
+      creditBalance: krediById.get(id) ?? 0,
+      siradakiDers: yaklasan
+        ? {
+            instructorName: egitmenAdi.get(yaklasan.instructor_id) ?? 'Eğitmen',
+            startTime: yaklasan.start_time,
+          }
+        : null,
+      buAyDers: kendiDersleri.filter(
+        (d) => d.status === 'completed' && d.start_time >= ayBasi,
+      ).length,
+      katilimYuzde: gecmis.length > 0 ? Math.round((katilan / gecmis.length) * 100) : null,
+      bekleyenOdev: (odevler ?? []).filter(
+        (o) => o.student_id === id && o.status !== 'completed',
+      ).length,
+    }
+  })
+}
+
 /**
  * Tek öğrencinin veli görünümü.
  *

@@ -10,6 +10,68 @@ async function getStudentRecipient(studentId: string) {
   return data
 }
 
+/** Ogrenciye bagli veliler. Bag yoksa bos donuyor. */
+async function getGuardianRecipients(studentId: string) {
+  const admin = createAdminClient()
+  const { data: baglar } = await admin
+    .from('guardian_links').select('guardian_id').eq('student_id', studentId)
+  if (!baglar || baglar.length === 0) return []
+
+  const { data } = await admin
+    .from('users').select('id, name, email')
+    .in('id', baglar.map((b) => b.guardian_id))
+    .is('deleted_at', null)
+  return data ?? []
+}
+
+/**
+ * Veliye DERS DUZEYINDE bildirim.
+ *
+ * Yalnizca ders olaylari: planlandi, tamamlandi, katilim olmadi. Odev ya
+ * da gunluk gibi gunluk hareketler BILEREK gonderilmiyor — velinin
+ * ihtiyaci "odedigim ders gercekten yapildi mi", gunu gunune denetim
+ * degil. Uzman gorusu de bu yonde: veli destekleyici gozlemci olmali,
+ * gunluk denetci degil.
+ *
+ * Hatalar sessiz: veliye ulasmamak ogrenciye giden bildirimi bozmamali.
+ */
+async function notifyGuardians(params: {
+  studentId: string
+  studentName: string
+  type: 'booking_created' | 'lesson_completed' | 'lesson_missed'
+  title: string
+  body: string
+  bookingId?: string
+}) {
+  const veliler = await getGuardianRecipients(params.studentId)
+  if (veliler.length === 0) return
+
+  const admin = createAdminClient()
+  for (const veli of veliler) {
+    try {
+      await admin.from('notifications').insert({
+        recipient_id: veli.id,
+        type: params.type,
+        channel: 'email',
+        title: params.title,
+        body: params.body,
+        related_booking_id: params.bookingId ?? null,
+      })
+
+      if (veli.email) {
+        await resend.emails.send({
+          from: 'DersoLab <bildirim@dersolab.com>',
+          to: veli.email,
+          subject: `${params.studentName} — ${params.title} - DersoLab`,
+          html: `<p>Merhaba ${veli.name},</p><p>${params.body}</p>`,
+        })
+      }
+    } catch (err) {
+      console.error('Veli bildirimi gonderilemedi:', err)
+    }
+  }
+}
+
 interface BookingNotificationParams {
   studentId: string
   instructorId: string
@@ -49,6 +111,15 @@ export async function notifyBookingCreated(params: BookingNotificationParams) {
       console.error('Bildirim e-postasi gonderilemedi:', err)
     }
   }
+
+  await notifyGuardians({
+    studentId: params.studentId,
+    studentName: params.studentName,
+    type: 'booking_created',
+    title: 'Ders planlandı',
+    body: `${params.studentName} için ${params.instructorName} ile ${formattedDate} tarihinde bir ders planlandı.`,
+    bookingId: params.bookingId,
+  })
 
   const { data: instructor } = await admin.from('users').select('name, email').eq('id', params.instructorId).single()
   if (instructor) {
@@ -168,6 +239,15 @@ export async function notifyLessonCompleted(params: {
       })
     } catch (err) { console.error('Ders tamamlandi bildirimi gonderilemedi:', err) }
   }
+
+  await notifyGuardians({
+    studentId: params.studentId,
+    studentName: recipient?.name ?? 'Öğrenciniz',
+    type: 'lesson_completed',
+    title: 'Ders tamamlandı',
+    body: `${params.instructorName} ile ${formattedDate} tarihindeki ders tamamlandı.`,
+    bookingId: params.bookingId,
+  })
 }
 
 export async function notifyLessonMissed(params: {
@@ -192,6 +272,16 @@ export async function notifyLessonMissed(params: {
       })
     } catch (err) { console.error('Ders kacirildi bildirimi gonderilemedi:', err) }
   }
+
+  // Velinin en cok ihtiyac duydugu bilgi bu: odenen ders yapilmadi.
+  await notifyGuardians({
+    studentId: params.studentId,
+    studentName: recipient?.name ?? 'Öğrenciniz',
+    type: 'lesson_missed',
+    title: 'Derse katılım sağlanmadı',
+    body: `${params.instructorName} ile ${formattedDate} tarihindeki derse katılım sağlanmadı.`,
+    bookingId: params.bookingId,
+  })
 }
 
 export async function notifyBookingReminder(params: {
