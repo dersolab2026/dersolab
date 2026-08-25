@@ -12,7 +12,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   if (!user) redirect('/login')
 
   const [{ data: userRow }, { data: termsAcceptance }] = await Promise.all([
-    supabase.from('users').select('role').eq('id', user.id).single(),
+    supabase.from('users').select('role, role_confirmed').eq('id', user.id).single(),
     supabase
       .from('terms_acceptances')
       .select('id')
@@ -20,7 +20,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       .eq('terms_version', TERMS_VERSION)
       .maybeSingle(),
   ])
+
+  // Once kim oldugu, sonra sartlar. Google ile gelenin rolu bilinmiyor;
+  // kim oldugunu bilmeden panel gostermek anlamsiz.
+  if (userRow?.role_confirmed === false) redirect('/hesap-turu')
   if (!termsAcceptance) redirect('/terms/accept')
+
   const role = (userRow?.role ?? 'student') as UserRole
 
   let offersFreeTrial = false
