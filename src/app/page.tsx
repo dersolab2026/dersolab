@@ -1,21 +1,26 @@
 import Link from 'next/link'
 import { HeroSlider } from '@/components/home/HeroSlider'
+import { FeatureCard, type FeatureIcon } from '@/components/home/FeatureCard'
 import { SocialLinks } from '@/components/home/SocialLinks'
 
 const FEATURES = [
   {
+    icon: 'ders' as FeatureIcon,
     title: 'Bire Bir Online Dersler',
     body: 'Google Meet üzerinden eğitmenin uygun saatlerine göre planlanan dersler. Ders bilgisi anında takviminize ve e-posta adresinize düşer.',
   },
   {
+    icon: 'kocluk' as FeatureIcon,
     title: 'Koçluk Desteği',
     body: 'Sınav hazırlığında ve bölüm tercihinde yol gösteren, derslerden ayrı bir koçluk hattı.',
   },
   {
+    icon: 'odev' as FeatureIcon,
     title: 'Ödev ve Ders Notu Takibi',
     body: 'Eğitmeninizin verdiği ödevleri teslim edin, geri bildirim alın. Ders sonrası paylaşılan notlara istediğiniz zaman ulaşın.',
   },
   {
+    icon: 'kredi' as FeatureIcon,
     title: 'Esnek Kredi Paketleri',
     body: 'İhtiyacınız kadar ders kredisi alın. Kullanmadığınız kredi yanmaz, hesabınızda kalır.',
   },
@@ -64,10 +69,7 @@ export default function HomePage() {
           <h2 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430] mb-7 text-center">Ne Sunuyoruz?</h2>
           <div className="grid gap-5 sm:grid-cols-2">
             {FEATURES.map((f) => (
-              <div key={f.title} className="rounded-xl border-4 border-[#1B2430] bg-white p-5 sm:p-6">
-                <p className="font-bold text-lg text-[#1B2430] mb-1.5">{f.title}</p>
-                <p className="text-base font-semibold text-[#1B2430]/70">{f.body}</p>
-              </div>
+              <FeatureCard key={f.title} icon={f.icon} title={f.title} body={f.body} />
             ))}
           </div>
         </div>
