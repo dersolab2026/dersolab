@@ -47,6 +47,18 @@ export async function deleteMyAccount(): Promise<ActionResult> {
     .update({ approval_status: 'rejected', bio: null, intro_video_url: null, paused: true })
     .eq('user_id', user.id)
 
+  // OAuth kimlikleri koparilmali. Aksi halde Google kimligi banli hesaba
+  // bagli kaliyor ve kisi ayni Google hesabiyla BIR DAHA kaydolamiyor —
+  // hem de sessizce, sadece login'e atilarak. Canlida yasandi.
+  // Ban ve anonimlestirme kaliyor; yalnizca saglayici bagi kopuyor.
+  const { error: kimlikHatasi } = await admin.rpc('delete_user_oauth_identities', {
+    p_user_id: user.id,
+  })
+  if (kimlikHatasi) {
+    console.error('Hesap silme: OAuth kimlikleri koparilamadi', kimlikHatasi.message)
+    return { success: false, error: 'Hesap silinemedi, lütfen tekrar dene' }
+  }
+
   const { error: authError } = await admin.auth.admin.updateUserById(user.id, {
     email: anonymizedEmail,
     ban_duration: '876000h',
