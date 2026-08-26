@@ -26,7 +26,7 @@ export function ClaimDemoLeadButton({ requestId }: { requestId: string }) {
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
         Kabul Et
       </button>
-      {error && <p className="text-xs font-bold text-red-600">{error}</p>}
+      {error && <p className="text-xs font-bold text-[var(--tehlike)]">{error}</p>}
     </div>
   )
 }

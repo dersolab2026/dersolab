@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { getAllStudentsAndInstructors } from '@/lib/admin/get-all-users'
 import { DeleteUserButton } from '@/components/admin/DeleteUserButton'
 import { ToggleFreeTrialButton } from '@/components/admin/ToggleFreeTrialButton'
+import { KatlanirBolum } from '@/components/admin/KatlanirBolum'
 
 const APPROVAL_LABELS: Record<string, string> = {
   pending: 'Onay bekliyor',
@@ -14,23 +15,25 @@ function formatDate(value: string) {
 }
 
 export default async function AdminUsersPage() {
-  const { students, instructors } = await getAllStudentsAndInstructors()
+  const { students, instructors, parents } = await getAllStudentsAndInstructors()
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Kullanıcılar</h1>
         <p className="text-muted-foreground">
-          {students.length} öğrenci · {instructors.length} eğitmen
+          {students.length} öğrenci · {instructors.length} eğitmen · {parents.length} veli
         </p>
       </div>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Eğitmenler</h2>
-        {instructors.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Kayıtlı eğitmen yok.</p>
-        ) : (
-          <div className="overflow-x-auto rounded-md border">
+      <div className="space-y-3">
+        <KatlanirBolum
+          baslik="Eğitmenler"
+          adet={instructors.length}
+          ozet={`${instructors.filter((i) => i.calendarConnected).length} / ${instructors.length} eğitmenin takvimi bağlı`}
+          bosMesaj="Kayıtlı eğitmen yok."
+        >
+          <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b bg-muted/50">
                 <tr>
@@ -68,20 +71,15 @@ export default async function AdminUsersPage() {
               </tbody>
             </table>
           </div>
-        )}
-      </section>
+        </KatlanirBolum>
 
-      <section className="space-y-3">
-        <div>
-          <h2 className="text-lg font-semibold">Öğrenciler</h2>
-          <p className="text-sm text-muted-foreground">
-            {students.filter((s) => s.freeTrialUsed).length} / {students.length} öğrenci tanışma dersini kullandı
-          </p>
-        </div>
-        {students.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Kayıtlı öğrenci yok.</p>
-        ) : (
-          <div className="overflow-x-auto rounded-md border">
+        <KatlanirBolum
+          baslik="Öğrenciler"
+          adet={students.length}
+          ozet={`${students.filter((s) => s.freeTrialUsed).length} / ${students.length} öğrenci tanışma dersini kullandı`}
+          bosMesaj="Kayıtlı öğrenci yok."
+        >
+          <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b bg-muted/50">
                 <tr>
@@ -115,8 +113,50 @@ export default async function AdminUsersPage() {
               </tbody>
             </table>
           </div>
-        )}
-      </section>
+        </KatlanirBolum>
+
+        <KatlanirBolum
+          baslik="Veliler"
+          adet={parents.length}
+          ozet={`${parents.filter((p) => p.linkedStudents.length > 0).length} / ${parents.length} velinin bağlı öğrencisi var`}
+          bosMesaj="Kayıtlı veli yok."
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b bg-muted/50">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
+                  <th className="px-3 py-2 text-left font-medium">E-posta</th>
+                  <th className="px-3 py-2 text-left font-medium">İzlediği Öğrenciler</th>
+                  <th className="px-3 py-2 text-left font-medium">Kayıt Tarihi</th>
+                  <th className="px-3 py-2 text-right font-medium">İşlemler</th>
+                </tr>
+              </thead>
+              <tbody>
+                {parents.map((u) => (
+                  <tr key={u.id} className="border-b last:border-0">
+                    <td className="px-3 py-2">{u.name || '—'}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
+                    <td className="px-3 py-2">
+                      {u.linkedStudents.length === 0 ? (
+                        // Veli hesabi acip kodu henuz girmemis olabilir; bu
+                        // normal bir ara durum, hata degil.
+                        <span className="text-muted-foreground">Bağlı öğrenci yok</span>
+                      ) : (
+                        u.linkedStudents.join(', ')
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">{formatDate(u.createdAt)}</td>
+                    <td className="px-3 py-2 text-right">
+                      <DeleteUserButton userId={u.id} userName={u.name || u.email} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </KatlanirBolum>
+      </div>
     </div>
   )
 }

@@ -112,42 +112,42 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
       className={`fixed max-h-96 w-80 overflow-y-auto z-50 ${PIXEL_CARD} p-0`}
       style={{ left: coords?.left, top: coords?.top, bottom: coords?.bottom }}
     >
-      <div className="flex items-center justify-between border-b-2 border-[#1B2430] p-3">
-        <p className="font-bold text-[#1B2430]">Bildirimler</p>
+      <div className="flex items-center justify-between border-b-2 border-[var(--cizgi)] p-3">
+        <p className="font-bold text-[var(--yazi)]">Bildirimler</p>
         <div className="flex items-center gap-3">
           {readCount > 0 && (
-            <button type="button" onClick={handleClearRead} className="text-xs font-bold text-[#1B2430]/60 underline">
+            <button type="button" onClick={handleClearRead} className="text-xs font-bold text-[var(--yazi)]/60 underline">
               Okunanları temizle
             </button>
           )}
           {unreadCount > 0 && (
-            <button type="button" onClick={handleMarkAllRead} className="text-xs font-bold text-[#DD7B3A] underline">
+            <button type="button" onClick={handleMarkAllRead} className="text-xs font-bold text-[var(--vurgu-yazi)] underline">
               Tümünü okundu işaretle
             </button>
           )}
         </div>
       </div>
       {notifications.length === 0 ? (
-        <p className="p-4 text-sm font-semibold text-[#1B2430]/60">Henüz bildirimin yok.</p>
+        <p className="p-4 text-sm font-semibold text-[var(--yazi)]/60">Henüz bildirimin yok.</p>
       ) : (
         <ul>
           {notifications.map((n) => (
-            <li key={n.id} className="relative border-b border-[#1B2430]/10">
+            <li key={n.id} className="relative border-b border-[var(--cizgi)]/10">
               <button
                 type="button"
                 onClick={() => handleItemClick(n)}
-                className={`block w-full p-3 pr-8 text-left hover:bg-[#1B2430]/5 ${n.isRead ? '' : 'bg-[#DD7B3A]/10'}`}
+                className={`block w-full p-3 pr-8 text-left hover:bg-[var(--koyu)]/5 ${n.isRead ? '' : 'bg-[var(--vurgu)]/10'}`}
               >
-                <p className="text-sm font-bold text-[#1B2430]">{n.title}</p>
-                {n.body && <p className="mt-0.5 text-xs font-semibold text-[#1B2430]/70">{n.body}</p>}
-                <p className="mt-1 text-[10px] font-semibold text-[#1B2430]/50">
+                <p className="text-sm font-bold text-[var(--yazi)]">{n.title}</p>
+                {n.body && <p className="mt-0.5 text-xs font-semibold text-[var(--yazi)]/70">{n.body}</p>}
+                <p className="mt-1 text-[10px] font-semibold text-[var(--yazi)]/50">
                   {new Date(n.createdAt).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })}
                 </p>
               </button>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleDelete(n.id) }}
-                className="absolute top-3 right-2 text-[#1B2430]/40 hover:text-[#1B2430]"
+                className="absolute top-3 right-2 text-[var(--yazi)]/40 hover:text-[var(--yazi)]"
                 aria-label="Bildirimi sil"
               >
                 <X className="h-3.5 w-3.5" />
@@ -172,17 +172,22 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
           className={`absolute top-0 left-1/2 h-5 w-5 -translate-x-1/2 transition-all ${
             unreadCount > 0
               ? 'fill-yellow-300 text-yellow-500 drop-shadow-[0_0_6px_rgba(250,204,21,0.95)] animate-pulse'
-              : 'text-[#1B2430]/25'
+              : 'text-[var(--yazi)]/25'
           }`}
         />
+        {/* 600px'lik kaynak 48px'e `imageRendering:pixelated` ile
+            kuculuyordu: en yakin komsu ornekleme piksellerin %98'ini
+            atiyor, tilkinin ince cizgileri tamamen kayboluyor ve kenarlar
+            tirtikli kaliyordu. Artik gosterim boyutuna (2x ekran icin
+            96px) lanczos ile bir kez kucultulmus surum servis ediliyor —
+            hem temiz hem 340 KB yerine 14 KB. */}
         <img
-          src="/fox-mascot-icon.png"
+          src="/fox-mascot-icon-96.png"
           alt="Bildirimler"
           className="h-12 w-12"
-          style={{ imageRendering: 'pixelated' }}
         />
         {unreadCount > 0 && (
-          <span className="absolute bottom-0 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-[#1B2430] bg-[#DD7B3A] px-1 text-[10px] font-bold text-white">
+          <span className="absolute bottom-0 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-[var(--cizgi)] bg-[var(--vurgu)] px-1 text-[10px] font-bold text-[var(--yazi-ters)]">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

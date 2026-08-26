@@ -4,10 +4,10 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen w-full bg-[#F4F1E8]">
-      <div className="mx-auto max-w-3xl px-5 py-12 text-[#1B2430]">
+    <div className="min-h-screen w-full bg-[var(--yuzey)]">
+      <div className="mx-auto max-w-3xl px-5 py-12 text-[var(--yazi)]">
         <h1 className="text-3xl font-bold mb-2">Gizlilik Politikası</h1>
-        <p className="text-sm text-[#1B2430]/60 mb-8">Son güncelleme: 9 Ağustos 2026</p>
+        <p className="text-sm text-[var(--yazi)]/60 mb-8">Son güncelleme: 9 Ağustos 2026</p>
 
         <div className="space-y-6 leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2 [&_p]:mb-3 [&_li]:mb-1 [&_ul]:list-disc [&_ul]:pl-6">
 
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
             uygulamaya aktarılması, Sınırlı Kullanım (Limited Use) şartları dahil olmak üzere{' '}
             <a
               href="https://developers.google.com/terms/api-services-user-data-policy"
-              className="underline text-[#DD7B3A] font-semibold"
+              className="underline text-[var(--vurgu-yazi)] font-semibold"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -110,7 +110,7 @@ export default function PrivacyPage() {
 
           <h2>10. İletişim</h2>
           <p>
-            Gizlilikle ilgili sorularınız için bize <a href="mailto:destek@dersolab.com" className="underline text-[#DD7B3A] font-semibold">destek@dersolab.com</a> adresinden
+            Gizlilikle ilgili sorularınız için bize <a href="mailto:destek@dersolab.com" className="underline text-[var(--vurgu-yazi)] font-semibold">destek@dersolab.com</a> adresinden
             ulaşabilirsiniz.
           </p>
 

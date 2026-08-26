@@ -35,14 +35,14 @@ export function PayoutInfoForm({ initialPayoutName, initialPayoutIban, payoutUpd
   return (
     <form onSubmit={handleSubmit} className={`${PIXEL_CARD} p-5 space-y-3`}>
       <div>
-        <p className="font-bold text-[#1B2430]">Ödeme Bilgilerim</p>
-        <p className="text-sm font-semibold text-[#1B2430]/70">
+        <p className="font-bold text-[var(--yazi)]">Ödeme Bilgilerim</p>
+        <p className="text-sm font-semibold text-[var(--yazi)]/70">
           Ders ücretlerinin yatırılacağı hesap bilgilerini buradan güncelleyebilirsin.
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-bold text-[#1B2430] mb-1">Ad Soyad (hesap sahibi)</label>
+        <label className="block text-sm font-bold text-[var(--yazi)] mb-1">Ad Soyad (hesap sahibi)</label>
         <input
           value={payoutName}
           onChange={(e) => setPayoutName(e.target.value)}
@@ -52,7 +52,7 @@ export function PayoutInfoForm({ initialPayoutName, initialPayoutIban, payoutUpd
       </div>
 
       <div>
-        <label className="block text-sm font-bold text-[#1B2430] mb-1">IBAN</label>
+        <label className="block text-sm font-bold text-[var(--yazi)] mb-1">IBAN</label>
         <input
           value={payoutIban}
           onChange={(e) => setPayoutIban(e.target.value)}
@@ -62,9 +62,9 @@ export function PayoutInfoForm({ initialPayoutName, initialPayoutIban, payoutUpd
         />
       </div>
 
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
       {payoutUpdatedAt && (
-        <p className="text-xs font-semibold text-[#1B2430]/60">
+        <p className="text-xs font-semibold text-[var(--yazi)]/60">
           Son güncelleme: {new Date(payoutUpdatedAt).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })}
         </p>
       )}

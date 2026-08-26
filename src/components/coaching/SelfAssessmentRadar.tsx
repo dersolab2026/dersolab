@@ -8,9 +8,9 @@ import type { BoyutSkoru } from '@/lib/coaching/self-assessment'
  * için harici kütüphane fazla gelirdi.
  */
 
-const TEAL = '#6FA89E'
-const TURUNCU = '#DD7B3A'
-const CIZGI = '#1B2430'
+const TEAL = 'var(--ikincil-yazi)'
+const TURUNCU = 'var(--vurgu-yazi)'
+const CIZGI = 'var(--cizgi)'
 
 interface Props {
   guncel: BoyutSkoru[]
@@ -81,7 +81,7 @@ export function SelfAssessmentRadar({ guncel, ilk, ilkTarih, guncelTarih }: Prop
       </div>
 
       {ilk && (
-        <div className="flex flex-wrap justify-center gap-4 text-xs font-semibold text-[#1B2430]/70">
+        <div className="flex flex-wrap justify-center gap-4 text-xs font-semibold text-[var(--yazi)]/70">
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-3 rounded-sm border-2" style={{ borderColor: TURUNCU, backgroundColor: `${TURUNCU}30` }} />
             İlk ölçüm{ilkTarih ? ` · ${new Date(ilkTarih).toLocaleDateString('tr-TR')}` : ''}
@@ -96,11 +96,11 @@ export function SelfAssessmentRadar({ guncel, ilk, ilkTarih, guncelTarih }: Prop
       <div className="space-y-1">
         {guncel.map((s) => (
           <div key={s.boyut} className="flex items-center gap-2 text-sm">
-            <span className="w-44 shrink-0 truncate font-bold text-[#1B2430]">{s.ad}</span>
-            <div className="h-4 flex-1 overflow-hidden rounded border-2 border-[#1B2430] bg-white">
-              <div className="h-full bg-[#6FA89E]" style={{ width: `${Math.round(s.oran * 100)}%` }} />
+            <span className="w-44 shrink-0 truncate font-bold text-[var(--yazi)]">{s.ad}</span>
+            <div className="h-4 flex-1 overflow-hidden rounded border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)]">
+              <div className="h-full bg-[var(--ikincil-zemin)]" style={{ width: `${Math.round(s.oran * 100)}%` }} />
             </div>
-            <span className="w-12 shrink-0 text-right font-bold tabular-nums text-[#1B2430]">
+            <span className="w-12 shrink-0 text-right font-bold tabular-nums text-[var(--yazi)]">
               {s.cevaplanan > 0 ? s.puan.toFixed(1) : '—'}
             </span>
           </div>

@@ -43,9 +43,9 @@ export function AvatarUploader({ userId, currentAvatarUrl, name }: AvatarUploade
 
   return (
     <div className="flex items-center gap-4">
-      <Avatar className="h-20 w-20 border-2 border-[#1B2430]">
+      <Avatar className="h-20 w-20 border-2 border-[var(--cizgi)]">
         <AvatarImage src={previewUrl ?? undefined} alt={name} />
-        <AvatarFallback className="bg-white text-[#1B2430] font-bold">{initials}</AvatarFallback>
+        <AvatarFallback className="bg-[var(--yuzey-ic)] text-[var(--yazi)] font-bold">{initials}</AvatarFallback>
       </Avatar>
       <div className="space-y-1">
         <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileChange} />
@@ -58,7 +58,7 @@ export function AvatarUploader({ userId, currentAvatarUrl, name }: AvatarUploade
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
           Fotoğraf Değiştir
         </button>
-        {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
+        {error && <p className="text-xs font-semibold text-[var(--tehlike)]">{error}</p>}
       </div>
     </div>
   )

@@ -33,13 +33,13 @@ export async function requestDemoLesson(studentId: string): Promise<ActionResult
     const ham = error.message
     let message = 'Talep oluşturulamadı, lütfen tekrar dene'
     if (ham.includes('zaten kullanilmis')) {
-      message = 'Hoş geldin paketini zaten kullandın'
+      message = 'Hoş Geldin Paketini zaten kullandın'
     } else if (ham.includes('zaten bekleyen')) {
       message = 'Zaten bekleyen bir talebin var'
     } else if (ham.includes('row-level security')) {
       message = 'Bu işlem için yetkin yok'
     } else if (ham.includes('violates foreign key')) {
-      message = 'Hoş geldin paketi sadece öğrenci hesapları için geçerli'
+      message = 'Hoş Geldin Paketi sadece öğrenci hesapları için geçerli'
     }
     return { success: false, error: message }
   }
@@ -63,7 +63,7 @@ export async function requestDemoLessonByEmail(name: string, email: string): Pro
 
   const { data: existingUser } = await admin.from('users').select('id').eq('email', trimmedEmail).maybeSingle()
   if (existingUser) {
-    return { success: false, error: 'Bu e-posta zaten kayıtlı — giriş yapıp hoş geldin paketini talep edebilirsin' }
+    return { success: false, error: 'Bu e-posta zaten kayıtlı — giriş yapıp Hoş Geldin Paketini talep edebilirsin' }
   }
 
   const { data: existingRequest } = await admin

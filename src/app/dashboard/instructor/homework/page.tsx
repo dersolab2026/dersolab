@@ -14,7 +14,7 @@ export default async function InstructorHomeworkPage() {
   return (
     <DashboardPageShell title="Verdiğim Ödevler" description="Öğrencilerin gönderdiği ödevleri incele ve onayla.">
       {homeworkList.length === 0 ? (
-        <p className="font-semibold text-[#1B2430]">Henüz ödev vermedin.</p>
+        <p className="font-semibold text-[var(--yazi)]">Henüz ödev vermedin.</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {homeworkList.map((hw) => (

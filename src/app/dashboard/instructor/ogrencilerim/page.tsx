@@ -7,8 +7,8 @@ import { PIXEL_CARD } from '@/lib/theme'
 
 const ILISKI_ETIKET: Record<string, string> = {
   ders: 'Ders',
-  kocluk: 'Koçluk',
-  'ders+kocluk': 'Ders + Koçluk',
+  tanisma: 'Tanışma Dersi',
+  'ders+tanisma': 'Ders + Tanışma',
 }
 
 export default async function InstructorStudentsPage() {
@@ -24,7 +24,7 @@ export default async function InstructorStudentsPage() {
       description="Ders verdiğin ve koçluk yaptığın öğrenciler. Deneme sonuçlarını, ödev durumunu ve çalışma günlüğünü buradan görebilirsin."
     >
       {ogrenciler.length === 0 ? (
-        <p className="font-semibold text-[#1B2430]">
+        <p className="font-semibold text-[var(--yazi)]">
           Henüz ders verdiğin ya da koçluk yaptığın bir öğrenci yok.
         </p>
       ) : (
@@ -33,21 +33,21 @@ export default async function InstructorStudentsPage() {
             <Link
               key={o.userId}
               href={`/dashboard/instructor/ogrencilerim/${o.userId}`}
-              className={`${PIXEL_CARD} flex flex-wrap items-center justify-between gap-3 p-4 transition-all hover:bg-white`}
+              className={`${PIXEL_CARD} flex flex-wrap items-center justify-between gap-3 p-4 transition-all hover:bg-[var(--yuzey-ic)]`}
             >
               <div>
-                <p className="font-bold text-[#1B2430]">
+                <p className="font-bold text-[var(--yazi)]">
                   {o.name}
-                  <span className="ml-2 inline-block rounded-lg border-2 border-[#1B2430] bg-[#6FA89E] px-2 py-0.5 text-xs text-[#F4F1E8]">
+                  <span className="ml-2 inline-block rounded-lg border-2 border-[var(--cizgi)] bg-[var(--ikincil-zemin)] px-2 py-0.5 text-xs text-[var(--yazi-ters)]">
                     {ILISKI_ETIKET[o.iliski]}
                   </span>
                 </p>
-                <p className="text-sm font-semibold text-[#1B2430]/70">
+                <p className="text-sm font-semibold text-[var(--yazi)]/70">
                   {o.dersSayisi > 0 ? `${o.dersSayisi} ders` : 'Henüz ders yok'}
                   {o.sonDers ? ` · son ders ${new Date(o.sonDers).toLocaleDateString('tr-TR')}` : ''}
                 </p>
               </div>
-              <span className="text-sm font-bold text-[#DD7B3A]">Detay →</span>
+              <span className="text-sm font-bold text-[var(--vurgu-yazi)]">Detay →</span>
             </Link>
           ))}
         </div>

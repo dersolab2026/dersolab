@@ -15,11 +15,11 @@ interface DemoLessonRequestCardProps {
 
 function DurumSatiri({ etiket, durum }: { etiket: string; durum: string }) {
   return (
-    <li className="flex items-center gap-2 text-sm font-semibold text-[#1B2430]">
-      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-[#1B2430] bg-[#6FA89E]">
-        <Check className="h-3 w-3 text-white" strokeWidth={3} />
+    <li className="flex items-center gap-2 text-sm font-semibold text-[var(--yazi)]">
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-[var(--cizgi)] bg-[var(--ikincil-zemin)]">
+        <Check className="h-3 w-3 text-[var(--yazi-ters)]" strokeWidth={3} />
       </span>
-      <span>{etiket} — <span className="text-[#1B2430]/70">{durum}</span></span>
+      <span>{etiket} — <span className="text-[var(--yazi)]/70">{durum}</span></span>
     </li>
   )
 }
@@ -50,7 +50,7 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
 
     return (
       <div className={`${PIXEL_CARD} p-5 space-y-3`}>
-        <p className="font-bold text-[#1B2430]">Talebin alındı!</p>
+        <p className="font-bold text-[var(--yazi)]">Talebin alındı!</p>
         <ul className="space-y-2">
           <DurumSatiri etiket="Tanışma dersi" durum={dersDurumu} />
         </ul>
@@ -60,15 +60,15 @@ export function DemoLessonRequestCard({ studentId, initialStatus }: DemoLessonRe
 
   return (
     <div className={`${PIXEL_CARD} p-5 space-y-3`}>
-      <p className="font-bold text-[#1B2430]">Hoş Geldin Paketin</p>
-      <p className="text-sm font-semibold text-[#1B2430]/70">
+      <p className="font-bold text-[var(--yazi)]">Hoş Geldin Paketin</p>
+      <p className="text-sm font-semibold text-[var(--yazi)]/70">
         Her öğrenciye bir kere: ücretsiz bir tanışma dersi.
         Kredi harcamıyorsun, kart bilgisi istemiyoruz.
       </p>
-      <ul className="space-y-1.5 text-sm font-semibold text-[#1B2430]/80 list-disc pl-5">
+      <ul className="space-y-1.5 text-sm font-semibold text-[var(--yazi)]/80 list-disc pl-5">
         <li>Uygun bir eğitmen tanışma dersini planlar.</li>
       </ul>
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
       <button type="button" onClick={handleRequest} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Hoş Geldin Paketini Al'}
       </button>

@@ -60,32 +60,32 @@ export function WeeklyReportPanel({ studentId }: { studentId: string }) {
     <div className={`${PIXEL_CARD} space-y-3 p-5`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Mail className="h-5 w-5 text-[#1B2430]" />
-          <p className="font-bold text-[#1B2430]">Haftalık Özet Raporu</p>
+          <Mail className="h-5 w-5 text-[var(--yazi)]" />
+          <p className="font-bold text-[var(--yazi)]">Haftalık Özet Raporu</p>
         </div>
         <div className="flex items-center gap-2">
           <button type="button" onClick={() => haftaKaydir(-1)} aria-label="Önceki hafta"
-            className="rounded-lg border-2 border-[#1B2430] bg-white px-2 py-1 text-sm font-bold">‹</button>
-          <span className="text-sm font-bold tabular-nums text-[#1B2430]">
+            className="rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-2 py-1 text-sm font-bold">‹</button>
+          <span className="text-sm font-bold tabular-nums text-[var(--yazi)]">
             {tarihKisa(gunler[0])} – {tarihKisa(gunler[6])}
           </span>
           <button type="button" onClick={() => haftaKaydir(1)} aria-label="Sonraki hafta"
-            className="rounded-lg border-2 border-[#1B2430] bg-white px-2 py-1 text-sm font-bold">›</button>
+            className="rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-2 py-1 text-sm font-bold">›</button>
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-bold text-[#1B2430]">Kendi notun (isteğe bağlı)</label>
+        <label className="mb-1 block text-sm font-bold text-[var(--yazi)]">Kendi notun (isteğe bağlı)</label>
         <textarea value={yorum} onChange={(e) => { setYorum(e.target.value); setRapor(null) }} rows={3}
           placeholder="Bu hafta öğrenciye söylemek istediğin şey"
           className={`${PIXEL_INPUT} resize-y`} />
       </div>
 
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
 
       <div className="flex flex-wrap gap-2">
         <button type="button" onClick={onizle} disabled={isPending}
-          className="flex items-center gap-1.5 rounded-xl border-4 border-[#1B2430] bg-white px-4 py-2 text-sm font-bold text-[#1B2430]">
+          className="flex items-center gap-1.5 rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-4 py-2 text-sm font-bold text-[var(--yazi)]">
           {isPending && !rapor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
           Önizle
         </button>
@@ -97,8 +97,8 @@ export function WeeklyReportPanel({ studentId }: { studentId: string }) {
       </div>
 
       {rapor && (
-        <div className="space-y-2 rounded-xl border-4 border-[#1B2430] bg-white p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">Önizleme</p>
+        <div className="space-y-2 rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-[var(--yazi)]/60">Önizleme</p>
 
           <div className="grid gap-2 sm:grid-cols-2">
             <Satir etiket="Plan tutturma" deger={
@@ -119,7 +119,7 @@ export function WeeklyReportPanel({ studentId }: { studentId: string }) {
             } />
           </div>
 
-          <p className="text-xs font-semibold text-[#1B2430]/60">
+          <p className="text-xs font-semibold text-[var(--yazi)]/60">
             Rapor öğrencinin e-posta adresine gider. Veliye doğrudan gönderim yok;
             öğrenci dilerse iletir.
           </p>
@@ -131,9 +131,9 @@ export function WeeklyReportPanel({ studentId }: { studentId: string }) {
 
 function Satir({ etiket, deger }: { etiket: string; deger: string }) {
   return (
-    <div className="rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] px-3 py-1.5">
-      <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">{etiket}</p>
-      <p className="text-sm font-bold text-[#1B2430]">{deger}</p>
+    <div className="rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey)] px-3 py-1.5">
+      <p className="text-xs font-bold uppercase tracking-wide text-[var(--yazi)]/60">{etiket}</p>
+      <p className="text-sm font-bold text-[var(--yazi)]">{deger}</p>
     </div>
   )
 }

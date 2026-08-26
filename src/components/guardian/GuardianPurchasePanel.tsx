@@ -51,7 +51,7 @@ export function GuardianPurchasePanel({ ogrenciler, paketler }: Props) {
   if (ogrenciler.length === 0) {
     return (
       <div className={`${PIXEL_CARD} p-5`}>
-        <p className="font-semibold text-[#1B2430]/70">
+        <p className="font-semibold text-[var(--yazi)]/70">
           Kredi alabilmek için önce bir öğrenci bağlamalısınız.
         </p>
       </div>
@@ -62,8 +62,8 @@ export function GuardianPurchasePanel({ ogrenciler, paketler }: Props) {
     <div className="space-y-4">
       <div className={`${PIXEL_CARD} space-y-3 p-5`}>
         <div>
-          <p className="font-bold text-[#1B2430]">Kimin için alıyorsunuz?</p>
-          <p className="text-sm font-semibold text-[#1B2430]/70">
+          <p className="font-bold text-[var(--yazi)]">Kimin için alıyorsunuz?</p>
+          <p className="text-sm font-semibold text-[var(--yazi)]/70">
             Krediler seçtiğiniz öğrencinin hesabına yüklenir.
           </p>
         </div>
@@ -74,8 +74,8 @@ export function GuardianPurchasePanel({ ogrenciler, paketler }: Props) {
               type="button"
               onClick={() => setSeciliId(o.personId)}
               aria-pressed={seciliId === o.personId}
-              className={`rounded-lg border-4 border-[#1B2430] px-3 py-1.5 text-sm font-bold transition-all ${
-                seciliId === o.personId ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+              className={`rounded-lg border-4 border-[var(--cizgi)] px-3 py-1.5 text-sm font-bold transition-all ${
+                seciliId === o.personId ? 'bg-[var(--vurgu)] text-[var(--yazi-ters)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
               }`}
             >
               {o.personName}
@@ -84,16 +84,16 @@ export function GuardianPurchasePanel({ ogrenciler, paketler }: Props) {
         </div>
       </div>
 
-      {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-bold text-[var(--tehlike)]">{error}</p>}
 
       <div className="grid gap-4 sm:grid-cols-2">
         {paketler.map((pkg) => (
           <div key={pkg.id} className={`${PIXEL_CARD} space-y-2 p-5`}>
-            <p className="font-bold text-[#1B2430]">{pkg.title}</p>
-            <p className="text-2xl font-bold text-[#1B2430]">{pkg.price.toLocaleString('tr-TR')} ₺</p>
-            <p className="text-sm font-semibold text-[#6FA89E]">{pkg.creditAmount} ders kredisi</p>
+            <p className="font-bold text-[var(--yazi)]">{pkg.title}</p>
+            <p className="text-2xl font-bold text-[var(--yazi)]">{pkg.price.toLocaleString('tr-TR')} ₺</p>
+            <p className="text-sm font-semibold text-[var(--ikincil-yazi)]">{pkg.creditAmount} ders kredisi</p>
             {pkg.description && (
-              <p className="text-sm font-semibold text-[#1B2430]/70">{pkg.description}</p>
+              <p className="text-sm font-semibold text-[var(--yazi)]/70">{pkg.description}</p>
             )}
 
             {pkg.shopierProductUrl ? (
@@ -108,13 +108,13 @@ export function GuardianPurchasePanel({ ogrenciler, paketler }: Props) {
                     ? <Loader2 className="h-4 w-4 animate-spin" />
                     : secili ? `${secili.personName} için Satın Al` : 'Satın Al'}
                 </button>
-                <p className="text-xs font-semibold text-[#1B2430]/60">
+                <p className="text-xs font-semibold text-[var(--yazi)]/60">
                   Ödeme Shopier üzerinden alınır. Shopier&apos;de <strong>bu DersoLab hesabınızla
                   aynı e-postayı</strong> kullanın; krediler {secili?.personName ?? 'seçtiğiniz öğrenci'} hesabına yüklenir.
                 </p>
               </div>
             ) : (
-              <p className="text-sm font-semibold text-red-600">
+              <p className="text-sm font-semibold text-[var(--tehlike)]">
                 Bu paket şu anda satın alınamıyor, bizi bilgilendirdik.
               </p>
             )}

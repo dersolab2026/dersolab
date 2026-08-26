@@ -50,3 +50,11 @@ next-env.d.ts
 # supabase cli local state
 supabase/.temp/
 graphify-out/
+
+# Tasarim calisma dosyalari — depoya girmiyor.
+# public/ altindakiler ayrica onemli: Next bu klasoru oldugu gibi statik
+# servis ediyor, yani commitlenirlerse inceleme sayfasi (ortak parola ve
+# test hesaplariyla birlikte) yayinda kimlik dogrulamasiz erisilebilir olur.
+design/
+public/vitrin/
+public/tasarim/

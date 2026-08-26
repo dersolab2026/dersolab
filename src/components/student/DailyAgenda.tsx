@@ -68,7 +68,7 @@ export function DailyAgenda({ bookings, studyLogs }: { bookings: StudentBookingI
         >
           ←
         </button>
-        <p className="font-bold text-[#1B2430] text-center">{rangeLabel}</p>
+        <p className="font-bold text-[var(--yazi)] text-center">{rangeLabel}</p>
         <button
           type="button"
           onClick={() => goToWeek(weekOffset + 1)}
@@ -91,16 +91,16 @@ export function DailyAgenda({ bookings, studyLogs }: { bookings: StudentBookingI
               key={i}
               type="button"
               onClick={() => setSelectedDay(day)}
-              className={`relative text-center rounded-lg border-2 border-[#1B2430] py-2 transition-all ${
-                isSelected ? 'bg-[#DD7B3A] text-[#F4F1E8]' : isToday ? 'bg-[#6FA89E]/20 text-[#1B2430]' : 'bg-white text-[#1B2430]'
+              className={`relative text-center rounded-lg border-2 border-[var(--cizgi)] py-2 transition-all ${
+                isSelected ? 'bg-[var(--vurgu)] text-[var(--yazi-ters)]' : isToday ? 'bg-[var(--ikincil-zemin)]/20 text-[var(--yazi)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
               }`}
             >
               <p className="text-[10px] sm:text-xs font-bold">{DAY_LABELS[i]}</p>
               <p className="text-xs sm:text-sm font-black">{day.getDate()}</p>
               {(hasLesson || hasStudyLog) && (
                 <span className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
-                  {hasLesson && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-[#F4F1E8]' : 'bg-[#DD7B3A]'}`} />}
-                  {hasStudyLog && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-[#F4F1E8]' : 'bg-[#6FA89E]'}`} />}
+                  {hasLesson && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-[var(--yuzey)]' : 'bg-[var(--vurgu)]'}`} />}
+                  {hasStudyLog && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-[var(--yuzey)]' : 'bg-[var(--ikincil-zemin)]'}`} />}
                 </span>
               )}
             </button>
@@ -108,22 +108,22 @@ export function DailyAgenda({ bookings, studyLogs }: { bookings: StudentBookingI
         })}
       </div>
 
-      <div className="pt-2 border-t-2 border-[#1B2430]/10 space-y-2">
-        <p className="font-bold text-[#1B2430]">
+      <div className="pt-2 border-t-2 border-[var(--cizgi)]/10 space-y-2">
+        <p className="font-bold text-[var(--yazi)]">
           {selectedDay.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' })}
         </p>
         {dayBookings.length === 0 ? (
-          <p className="text-sm font-semibold text-[#1B2430]/60">Bu tarihte ders bulunamadı.</p>
+          <p className="text-sm font-semibold text-[var(--yazi)]/60">Bu tarihte ders bulunamadı.</p>
         ) : (
           <div className="space-y-2">
             {dayBookings.map((b) => (
               <Link
                 key={b.id}
                 href="/dashboard/student/bookings"
-                className="flex items-center justify-between rounded-lg bg-[#6FA89E]/20 border-2 border-[#6FA89E] px-3 py-2"
+                className="flex items-center justify-between rounded-lg bg-[var(--ikincil-zemin)]/20 border-2 border-[var(--ikincil-yazi)] px-3 py-2"
               >
-                <span className="font-bold text-[#1B2430] text-sm">{b.instructorName}</span>
-                <span className="font-bold text-[#1B2430] text-sm">
+                <span className="font-bold text-[var(--yazi)] text-sm">{b.instructorName}</span>
+                <span className="font-bold text-[var(--yazi)] text-sm">
                   {new Date(b.startTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </Link>

@@ -43,13 +43,13 @@ export function HomeworkReviewCard({ homeworkId, title, status, submissions }: H
   return (
     <div className={`${PIXEL_CARD} p-5 space-y-3`}>
       <div className="flex items-center justify-between gap-3">
-        <p className="font-bold text-[#1B2430]">{title}</p>
+        <p className="font-bold text-[var(--yazi)]">{title}</p>
         <span className={status === 'completed' ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE}>{STATUS_LABELS[status]}</span>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
         {submissions.map((s) => (
-          <div key={s.id} className="overflow-hidden rounded-lg border-2 border-[#1B2430]">
+          <div key={s.id} className="overflow-hidden rounded-lg border-2 border-[var(--cizgi)]">
             {signedUrls[s.id] ? (
               s.fileType === 'video' ? (
                 <video src={signedUrls[s.id]} controls className="h-24 w-full object-cover" />
@@ -63,7 +63,7 @@ export function HomeworkReviewCard({ homeworkId, title, status, submissions }: H
                 </a>
               )
             ) : (
-              <div className="flex h-24 items-center justify-center bg-white">
+              <div className="flex h-24 items-center justify-center bg-[var(--yuzey-ic)]">
                 <Loader2 className="h-4 w-4 animate-spin" />
               </div>
             )}
@@ -76,7 +76,7 @@ export function HomeworkReviewCard({ homeworkId, title, status, submissions }: H
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Onayla'}
         </button>
       )}
-      {status === 'completed' && <p className="text-sm font-semibold text-[#1B2430]/70">Bu ödev onaylandı.</p>}
+      {status === 'completed' && <p className="text-sm font-semibold text-[var(--yazi)]/70">Bu ödev onaylandı.</p>}
     </div>
   )
 }

@@ -23,8 +23,8 @@ export function SubjectFilter({ activeSubject, activeCategory }: SubjectFilterPr
       <div className="flex flex-wrap gap-2">
         <Link
           href="/instructors"
-          className={`px-4 py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
-            !activeSubject && !activeCategory ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]' : 'bg-white text-[#1B2430]'
+          className={`px-4 py-2 rounded-xl border-4 border-[var(--cizgi)] font-bold text-sm transition-all ${
+            !activeSubject && !activeCategory ? 'bg-[var(--vurgu)] text-[var(--yazi-ters)] shadow-[0_4px_0_var(--golge)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
           }`}
         >
           Tümü
@@ -34,12 +34,12 @@ export function SubjectFilter({ activeSubject, activeCategory }: SubjectFilterPr
             key={category.label}
             href={`/instructors?category=${encodeURIComponent(category.label)}`}
             onClick={() => setOpenCategory((prev) => (prev === category.label ? null : category.label))}
-            className={`px-4 py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
+            className={`px-4 py-2 rounded-xl border-4 border-[var(--cizgi)] font-bold text-sm transition-all ${
               activeCategory === category.label
-                ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]'
+                ? 'bg-[var(--vurgu)] text-[var(--yazi-ters)] shadow-[0_4px_0_var(--golge)]'
                 : openCategory === category.label
-                  ? 'bg-[#6FA89E] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]'
-                  : 'bg-white text-[#1B2430]'
+                  ? 'bg-[var(--ikincil-zemin)] text-[var(--yazi-ters)] shadow-[0_4px_0_var(--golge)]'
+                  : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
             }`}
           >
             {category.label}
@@ -53,8 +53,8 @@ export function SubjectFilter({ activeSubject, activeCategory }: SubjectFilterPr
             <Link
               key={s}
               href={`/instructors?subject=${encodeURIComponent(s)}`}
-              className={`px-4 py-2 rounded-xl border-4 border-[#1B2430] font-bold text-sm transition-all ${
-                activeSubject === s ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]' : 'bg-white text-[#1B2430]'
+              className={`px-4 py-2 rounded-xl border-4 border-[var(--cizgi)] font-bold text-sm transition-all ${
+                activeSubject === s ? 'bg-[var(--vurgu)] text-[var(--yazi-ters)] shadow-[0_4px_0_var(--golge)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
               }`}
             >
               {s}

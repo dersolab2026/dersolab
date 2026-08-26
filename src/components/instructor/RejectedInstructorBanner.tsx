@@ -26,22 +26,22 @@ export function RejectedInstructorBanner({ approvalNote }: { approvalNote: strin
   if (resubmitted) {
     return (
       <div className={`${PIXEL_CARD} p-3`}>
-        <p className="text-sm font-semibold text-[#1B2430]">Profilin tekrar incelemeye gönderildi, sonucu e-posta ile bildireceğiz.</p>
+        <p className="text-sm font-semibold text-[var(--yazi)]">Profilin tekrar incelemeye gönderildi, sonucu e-posta ile bildireceğiz.</p>
       </div>
     )
   }
 
   return (
     <div className={`${PIXEL_CARD} p-4 space-y-2`}>
-      <p className="font-bold text-[#1B2430]">Profilin onaylanmadı</p>
-      <p className="text-sm font-semibold text-[#1B2430]/70">
+      <p className="font-bold text-[var(--yazi)]">Profilin onaylanmadı</p>
+      <p className="text-sm font-semibold text-[var(--yazi)]/70">
         {approvalNote || 'Profilinde düzeltilmesi gereken noktalar var. Detay için lütfen bizimle iletişime geç.'}
       </p>
-      <p className="text-sm font-semibold text-[#1B2430]/70">
-        <Link href="/dashboard/instructor/profile" className="underline text-[#DD7B3A]">Profilini düzenle</Link>,
+      <p className="text-sm font-semibold text-[var(--yazi)]/70">
+        <Link href="/dashboard/instructor/profile" className="underline text-[var(--vurgu-yazi)]">Profilini düzenle</Link>,
         {' '}sonra tekrar incelemeye gönderebilirsin.
       </p>
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
       <button type="button" onClick={handleResubmit} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Tekrar İncelemeye Gönder'}
       </button>

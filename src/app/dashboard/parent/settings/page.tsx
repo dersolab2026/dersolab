@@ -16,8 +16,8 @@ export default async function ParentSettingsPage() {
 
       <div className={`${PIXEL_CARD} p-5 space-y-4`}>
         <div>
-          <p className="font-bold text-[#1B2430]">Hesap Ayarları</p>
-          <p className="text-sm font-semibold text-[#1B2430]/70">
+          <p className="font-bold text-[var(--yazi)]">Hesap Ayarları</p>
+          <p className="text-sm font-semibold text-[var(--yazi)]/70">
             Hesabınızı tamamen silebilirsiniz. Hesabınız silinince öğrencilerinizle
             bağlantınız da kalkar; öğrencilerin hesapları etkilenmez.
           </p>

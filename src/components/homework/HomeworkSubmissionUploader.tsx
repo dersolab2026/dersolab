@@ -58,8 +58,8 @@ export function HomeworkSubmissionUploader({ homeworkId, onUploaded }: HomeworkS
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : success ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Upload className="h-4 w-4" />}
         {isPending ? 'Yükleniyor...' : success ? 'Yüklendi' : 'Fotoğraf / Video Yükle'}
       </button>
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-      <p className="text-xs font-semibold text-[#1B2430]/60">JPG, PNG, WEBP, MP4 veya MOV — en fazla 25 MB</p>
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
+      <p className="text-xs font-semibold text-[var(--yazi)]/60">JPG, PNG, WEBP, MP4 veya MOV — en fazla 25 MB</p>
     </div>
   )
 }

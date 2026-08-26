@@ -29,13 +29,13 @@ export function InstructorBookingListItem({ booking, materials }: InstructorBook
   return (
     <div className={`${PIXEL_CARD} p-4 flex flex-wrap items-center justify-between gap-3`}>
       <div>
-        <p className="font-bold text-[#1B2430]">
+        <p className="font-bold text-[var(--yazi)]">
           {booking.studentName}
-          {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#DD7B3A]">Tanışma Dersi</span>}
+          {booking.isTrial && <span className="ml-2 text-xs font-bold text-[var(--vurgu-yazi)]">Tanışma Dersi</span>}
         </p>
-        <p className="text-sm font-semibold text-[#1B2430]/70">{formattedDate}</p>
-        {booking.topicNote && <p className="mt-1 text-xs font-bold text-[#DD7B3A]">Öğrencinin sorusu: {booking.topicNote}</p>}
-        {booking.instructorNotes && <p className="mt-1 text-xs font-semibold text-[#1B2430]/60">Not: {booking.instructorNotes}</p>}
+        <p className="text-sm font-semibold text-[var(--yazi)]/70">{formattedDate}</p>
+        {booking.topicNote && <p className="mt-1 text-xs font-bold text-[var(--vurgu-yazi)]">Öğrencinin sorusu: {booking.topicNote}</p>}
+        {booking.instructorNotes && <p className="mt-1 text-xs font-semibold text-[var(--yazi)]/60">Not: {booking.instructorNotes}</p>}
         <LessonMaterials bookingId={booking.id} materials={materials} isInstructor />
       </div>
 

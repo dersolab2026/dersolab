@@ -27,6 +27,15 @@ const nextConfig: NextConfig = {
     return [
       // Rehberlik sayfasi Kocluk olarak yeniden adlandirildi; eski baglantilar kirilmasin.
       { source: '/rehberlik', destination: '/kocluk', permanent: true },
+      // 1 haftalik ucretsiz kocluk urun karariyla kaldirildi
+      // (20260824213000_remove_free_coaching_and_referral.sql), sayfasi da
+      // birlikte gitti. Eski baglantilar Hos Geldin Paketine dusuyor.
+      //
+      // Burada, app/ agacinda redirect() yapan bir page.tsx olarak degil:
+      // o yol gecici (307) yonlendirme uretiyordu ve kalici olarak kaldirilmis
+      // bir adres icin dogru sinyal kalici (308) olan. Ayrica rota agacinda
+      // durdugu surece "ayri bir sayfa var" izlenimi veriyordu.
+      { source: '/ucretsiz-kocluk', destination: '/demo-ders', permanent: true },
     ];
   },
   async headers() {

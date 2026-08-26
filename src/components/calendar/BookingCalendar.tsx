@@ -78,7 +78,7 @@ export function BookingCalendar({ instructorId, onSelectSlot }: BookingCalendarP
       </div>
 
       <div className={`${PIXEL_CARD} p-5`}>
-        <p className="font-bold text-[#1B2430] mb-3">
+        <p className="font-bold text-[var(--yazi)] mb-3">
           {selectedDate.toLocaleDateString('tr-TR', {
             day: 'numeric',
             month: 'long',
@@ -88,16 +88,16 @@ export function BookingCalendar({ instructorId, onSelectSlot }: BookingCalendarP
         </p>
 
         {isLoading && (
-          <div className="flex items-center gap-2 font-semibold text-[#1B2430]/70">
+          <div className="flex items-center gap-2 font-semibold text-[var(--yazi)]/70">
             <Loader2 className="h-4 w-4 animate-spin" />
             Yükleniyor...
           </div>
         )}
 
-        {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+        {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
 
         {!isLoading && !error && slotsForSelectedDay.length === 0 && (
-          <p className="text-sm font-semibold text-[#1B2430]/70">
+          <p className="text-sm font-semibold text-[var(--yazi)]/70">
             Bu tarihte müsait saat bulunmuyor.
           </p>
         )}

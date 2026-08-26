@@ -94,20 +94,20 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
   return (
     <div className={`${PIXEL_CARD} space-y-4 p-5`}>
       <div className="flex items-center gap-2">
-        <Target className="h-5 w-5 text-[#1B2430]" />
-        <p className="font-bold text-[#1B2430]">Hedefin</p>
+        <Target className="h-5 w-5 text-[var(--yazi)]" />
+        <p className="font-bold text-[var(--yazi)]">Hedefin</p>
       </div>
 
       {/* Hedef program */}
       {targets.program ? (
-        <div className="rounded-xl border-4 border-[#1B2430] bg-white p-4">
-          <p className="font-bold text-[#1B2430]">{targets.program.birimAdi}</p>
-          <p className="text-sm font-semibold text-[#1B2430]/70">
+        <div className="rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] p-4">
+          <p className="font-bold text-[var(--yazi)]">{targets.program.birimAdi}</p>
+          <p className="text-sm font-semibold text-[var(--yazi)]/70">
             {targets.program.universiteAdi}
             {targets.program.ilAdi ? ` · ${targets.program.ilAdi}` : ''}
             {targets.program.ogrenimTuruAdi ? ` · ${targets.program.ogrenimTuruAdi}` : ''}
           </p>
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm font-bold tabular-nums text-[#1B2430]">
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm font-bold tabular-nums text-[var(--yazi)]">
             {targets.program.puanTuru && <span>Puan türü: {targets.program.puanTuru}</span>}
             {targets.program.minPuan !== null && <span>Taban puan: {targets.program.minPuan.toFixed(2)}</span>}
             {targets.program.basariSirasi !== null && (
@@ -116,13 +116,13 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
           </div>
           {!readOnly && (
             <button type="button" onClick={() => programSec(null)} disabled={isPending}
-              className="mt-2 text-xs font-bold text-[#1B2430]/50 hover:text-red-600">
+              className="mt-2 text-xs font-bold text-[var(--yazi)]/50 hover:text-[var(--tehlike)]">
               Hedefi kaldır
             </button>
           )}
         </div>
       ) : targets.targetProgramCode ? (
-        <p className="text-sm font-semibold text-[#DD7B3A]">
+        <p className="text-sm font-semibold text-[var(--vurgu-yazi)]">
           Seçtiğin program güncel kılavuzda bulunamadı — yeniden seçmen gerekiyor.
         </p>
       ) : (
@@ -135,7 +135,7 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
       )}
 
       {aramaAcik && !readOnly && (
-        <div className="space-y-2 rounded-xl border-4 border-[#1B2430] bg-white p-4">
+        <div className="space-y-2 rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] p-4">
           <div className="flex gap-2">
             <input
               value={sorgu}
@@ -146,11 +146,11 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
             />
             <button type="button" onClick={ara} disabled={isPending || sorgu.trim().length < 3}
               aria-label="Ara"
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-4 border-[#1B2430] bg-[#DD7B3A] text-[#F4F1E8]">
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-4 border-[var(--cizgi)] bg-[var(--vurgu)] text-[var(--yazi-ters)]">
               {araniyor ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
             </button>
             <button type="button" onClick={() => { setAramaAcik(false); setSonuclar([]) }} aria-label="Kapat"
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-4 border-[#1B2430] bg-white">
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)]">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -159,9 +159,9 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
             <div className="max-h-72 space-y-1.5 overflow-y-auto pr-1">
               {sonuclar.map((p) => (
                 <button key={p.kilavuzKodu} type="button" onClick={() => programSec(p.kilavuzKodu)}
-                  className="w-full rounded-lg border-2 border-[#1B2430] bg-white p-2 text-left transition-colors hover:bg-[#F4F1E8]">
-                  <p className="text-sm font-bold text-[#1B2430]">{p.birimAdi}</p>
-                  <p className="text-xs font-semibold text-[#1B2430]/70">
+                  className="w-full rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] p-2 text-left transition-colors hover:bg-[var(--yuzey)]">
+                  <p className="text-sm font-bold text-[var(--yazi)]">{p.birimAdi}</p>
+                  <p className="text-xs font-semibold text-[var(--yazi)]/70">
                     {p.universiteAdi}{p.ilAdi ? ` · ${p.ilAdi}` : ''}
                     {p.puanTuru ? ` · ${p.puanTuru}` : ''}
                     {p.basariSirasi !== null ? ` · sıra ${p.basariSirasi.toLocaleString('tr-TR')}` : ''}
@@ -171,7 +171,7 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
             </div>
           )}
           {!araniyor && sorgu.trim().length >= 3 && sonuclar.length === 0 && (
-            <p className="text-sm font-semibold text-[#1B2430]/60">Sonuç yok.</p>
+            <p className="text-sm font-semibold text-[var(--yazi)]/60">Sonuç yok.</p>
           )}
         </div>
       )}
@@ -179,54 +179,54 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
       {/* Ders bazli hedef netler */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-bold text-[#1B2430]/70">
+          <p className="text-sm font-bold text-[var(--yazi)]/70">
             {EXAM_TYPE_LABELS[examType]}
             {track ? ` · ${TRACK_LABELS[track]}` : ''} hedef netlerin
-            {toplam !== null && <span className="ml-2 text-[#6FA89E]">toplam {toplam}</span>}
+            {toplam !== null && <span className="ml-2 text-[var(--ikincil-yazi)]">toplam {toplam}</span>}
           </p>
           {!readOnly && !netAcik && (
             <button type="button" onClick={() => setNetAcik(true)}
-              className="text-sm font-bold text-[#DD7B3A] hover:underline">
+              className="text-sm font-bold text-[var(--vurgu-yazi)] hover:underline">
               {mevcutHedefler.length > 0 ? 'Düzenle' : 'Hedef Net Gir'}
             </button>
           )}
         </div>
 
         {netAcik && !readOnly ? (
-          <div className="space-y-2 rounded-xl border-4 border-[#1B2430] bg-white p-4">
+          <div className="space-y-2 rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] p-4">
             {dersler.map((d) => (
               <div key={d.name} className="flex items-center gap-3">
-                <span className="flex-1 truncate text-sm font-bold text-[#1B2430]">{d.name}</span>
+                <span className="flex-1 truncate text-sm font-bold text-[var(--yazi)]">{d.name}</span>
                 <input
                   type="number" min={0} max={d.questionCount} step="0.25"
                   value={hedefNetler[d.name] ?? ''}
                   onChange={(e) => setHedefNetler((p) => ({ ...p, [d.name]: e.target.value }))}
                   aria-label={`${d.name} hedef net`}
-                  className="w-24 rounded-lg border-2 border-[#1B2430] bg-white px-2 py-1 text-center font-bold text-[#1B2430]"
+                  className="w-24 rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-2 py-1 text-center font-bold text-[var(--yazi)]"
                 />
-                <span className="w-12 shrink-0 text-sm font-semibold text-[#1B2430]/50">/{d.questionCount}</span>
+                <span className="w-12 shrink-0 text-sm font-semibold text-[var(--yazi)]/50">/{d.questionCount}</span>
               </div>
             ))}
-            {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+            {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
             <div className="flex gap-2 pt-1">
               <button type="button" onClick={netleriKaydet} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
                 {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
               </button>
               <button type="button" onClick={() => setNetAcik(false)}
-                className="rounded-xl border-4 border-[#1B2430] bg-white px-4 py-2 text-sm font-bold text-[#1B2430]">
+                className="rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-4 py-2 text-sm font-bold text-[var(--yazi)]">
                 Vazgeç
               </button>
             </div>
           </div>
         ) : mevcutHedefler.length === 0 ? (
-          <p className="text-sm font-semibold text-[#1B2430]/60">
+          <p className="text-sm font-semibold text-[var(--yazi)]/60">
             Ders bazında hedef net girersen deneme grafiğinde hedef çizgin görünür.
           </p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {mevcutHedefler.map((h) => (
               <span key={h.sectionName}
-                className="rounded-lg border-2 border-[#1B2430] bg-white px-2.5 py-1 text-xs font-bold text-[#1B2430]">
+                className="rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-2.5 py-1 text-xs font-bold text-[var(--yazi)]">
                 {h.sectionName}: {h.targetNet}
               </span>
             ))}

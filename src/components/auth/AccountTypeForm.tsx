@@ -50,7 +50,7 @@ export function AccountTypeForm() {
 
   return (
     <div className={`${PIXEL_CARD} space-y-4 p-6`}>
-      <p className="text-[#1B2430] leading-relaxed">
+      <p className="text-[var(--yazi)] leading-relaxed">
         Google hesabınla giriş yaptın. DersoLab&apos;ı nasıl kullanacağını seç.
       </p>
 
@@ -61,25 +61,25 @@ export function AccountTypeForm() {
             type="button"
             onClick={() => setSecili(s.deger)}
             aria-pressed={secili === s.deger}
-            className={`rounded-xl border-4 border-[#1B2430] p-4 text-left transition-all ${
+            className={`rounded-xl border-4 border-[var(--cizgi)] p-4 text-left transition-all ${
               secili === s.deger
-                ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_4px_0_#1B2430]'
-                : 'bg-white text-[#1B2430]'
+                ? 'bg-[var(--vurgu)] text-[var(--yazi-ters)] shadow-[0_4px_0_var(--golge)]'
+                : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
             }`}
           >
             <p className="font-bold">{s.baslik}</p>
-            <p className={`text-sm font-semibold ${secili === s.deger ? 'text-[#F4F1E8]/85' : 'text-[#1B2430]/70'}`}>
+            <p className={`text-sm font-semibold ${secili === s.deger ? 'text-[var(--yazi-ters)]/85' : 'text-[var(--yazi)]/70'}`}>
               {s.aciklama}
             </p>
           </button>
         ))}
       </div>
 
-      <p className="text-xs font-semibold text-[#1B2430]/60">
+      <p className="text-xs font-semibold text-[var(--yazi)]/60">
         Bu seçimi sonradan kendin değiştiremezsin; yanlış seçersen bize yazman gerekir.
       </p>
 
-      {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-bold text-[var(--tehlike)]">{error}</p>}
 
       <button
         type="button"

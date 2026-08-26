@@ -1,7 +1,10 @@
 'use client'
 
 import { useRef } from 'react'
-import { Video, Compass, ClipboardCheck, Coins } from 'lucide-react'
+import {
+  Video, Compass, ClipboardCheck, Coins,
+  CalendarCheck, Wallet, ShieldCheck, Eye, BellRing,
+} from 'lucide-react'
 
 /**
  * Ana sayfadaki ozellik karti.
@@ -33,6 +36,11 @@ const IKONLAR = {
   kocluk: Compass,
   odev: ClipboardCheck,
   kredi: Coins,
+  takvim: CalendarCheck,
+  odeme: Wallet,
+  onay: ShieldCheck,
+  gorunum: Eye,
+  bildirim: BellRing,
 } as const
 
 export type FeatureIcon = keyof typeof IKONLAR
@@ -59,7 +67,7 @@ export function FeatureCard({ title, body, icon }: FeatureCardProps) {
     <div
       ref={ref}
       onMouseMove={imlecTakip}
-      className="group relative overflow-hidden rounded-xl border-4 border-[#1B2430] bg-white p-5 transition-transform duration-200 ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-6"
+      className="group relative overflow-hidden rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] p-5 transition-transform duration-200 ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-6"
     >
       {/* Imleci takip eden isik */}
       <div
@@ -72,11 +80,11 @@ export function FeatureCard({ title, body, icon }: FeatureCardProps) {
       />
 
       <div className="relative">
-        <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border-2 border-[#1B2430] bg-[#D5EAE3]">
-          <Icon className="h-5 w-5 text-[#1B2430]" strokeWidth={2.2} aria-hidden />
+        <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border-2 border-[var(--cizgi)] bg-[var(--zemin)]">
+          <Icon className="h-5 w-5 text-[var(--yazi)]" strokeWidth={2.2} aria-hidden />
         </div>
-        <p className="mb-1.5 text-lg font-bold text-[#1B2430]">{title}</p>
-        <p className="text-base font-semibold leading-relaxed text-[#1B2430]/70">{body}</p>
+        <p className="dl-kart-basligi mb-1.5 text-lg font-bold text-[var(--yazi)]">{title}</p>
+        <p className="text-base font-semibold leading-relaxed text-[var(--yazi)]/70">{body}</p>
       </div>
     </div>
   )

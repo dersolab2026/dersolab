@@ -20,9 +20,9 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
 
   return (
     <DashboardPageShell title="Ayarlar" description="Google Takvim bağlantını buradan yönet.">
-      {calendar_connected && <p className="text-sm font-semibold text-[#6FA89E]">Google Takvimin başarıyla bağlandı.</p>}
+      {calendar_connected && <p className="text-sm font-semibold text-[var(--ikincil-yazi)]">Google Takvimin başarıyla bağlandı.</p>}
       {calendar_error === 'missing_refresh_token' && (
-        <p className="text-sm font-semibold text-red-600">
+        <p className="text-sm font-semibold text-[var(--tehlike)]">
           Google bu hesap için gerekli izni döndürmedi. Lütfen{' '}
           <a
             href="https://myaccount.google.com/permissions"
@@ -36,18 +36,18 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
         </p>
       )}
       {calendar_error && calendar_error !== 'missing_refresh_token' && (
-        <p className="text-sm font-semibold text-red-600">Bağlantı sırasında bir sorun oluştu, tekrar dener misin?</p>
+        <p className="text-sm font-semibold text-[var(--tehlike)]">Bağlantı sırasında bir sorun oluştu, tekrar dener misin?</p>
       )}
 
       <ConnectGoogleCalendarButton isConnected={instructorRow?.calendar_connected ?? false} />
 
       <div className={`${PIXEL_CARD} p-5 space-y-4`}>
         <div>
-          <p className="font-bold text-[#1B2430]">Hesap Ayarları</p>
-          <p className="text-sm font-semibold text-[#1B2430]/70">Profilini dondurabilir ya da hesabını tamamen silebilirsin.</p>
+          <p className="font-bold text-[var(--yazi)]">Hesap Ayarları</p>
+          <p className="text-sm font-semibold text-[var(--yazi)]/70">Profilini dondurabilir ya da hesabını tamamen silebilirsin.</p>
         </div>
         <PauseProfileButton paused={instructorRow?.paused ?? false} />
-        <div className="pt-2 border-t-2 border-[#1B2430]/10">
+        <div className="pt-2 border-t-2 border-[var(--cizgi)]/10">
           <DeleteAccountButton />
         </div>
       </div>

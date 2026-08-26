@@ -86,7 +86,7 @@ export function LessonMaterials({ bookingId, materials, isInstructor }: LessonMa
               {isPending && pendingDeleteId === m.id ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <X className="h-3.5 w-3.5 text-[#1B2430]/60" />
+                <X className="h-3.5 w-3.5 text-[var(--yazi)]/60" />
               )}
             </button>
           )}
@@ -108,7 +108,7 @@ export function LessonMaterials({ bookingId, materials, isInstructor }: LessonMa
         </>
       )}
 
-      {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-xs font-semibold text-[var(--tehlike)]">{error}</p>}
     </div>
   )
 }

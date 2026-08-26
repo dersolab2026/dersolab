@@ -128,3 +128,433 @@
     @apply font-sans;
   }
 }
+/* =====================================================================
+   DersoLab tasarim jetonlari
+   ---------------------------------------------------------------------
+   Sayfalarda renkler artik sabit degil, kullanim AMACINA gore bir
+   degiskene bagli. Boylece tek bir `data-tema` niteligi butun sayfayi
+   bastan giydiriyor; 45 sayfayi tek tek elden gecirmeye gerek kalmiyor.
+
+   Jetonlar renge gore degil ISE gore ayrilmis. Ornegin #6FA89E hem dolgu
+   hem yazi rengiydi; koyu temada dolgunun koyulasmasi, yazinin ise
+   parlamasi gerekiyor — o yuzden ikisi ayri jeton.
+
+   --yazi-ters uc zeminin (--koyu, --ikincil-zemin, --vurgu) uzerinde
+   birden okunmak zorunda; her temada bu ucu ayni tarafta (hepsi koyu ya
+   da hepsi acik) tutmak sart.
+   ===================================================================== */
+:root{
+  --cizgi:#1B2430;        /* cerceve */
+  --yazi:#1B2430;         /* ana yazi */
+  --yazi-ters:#F4F1E8;    /* koyu/renkli zemin uzerindeki yazi */
+  --yuzey:#F4F1E8;        /* kart yuzeyi */
+  --yuzey-ic:#FFFFFF;     /* ic kart yuzeyi */
+  --koyu:#1B2430;         /* koyu cip zemini */
+  --vurgu:#DD7B3A;        /* vurgu DOLGUSU */
+  --vurgu-yazi:#DD7B3A;   /* vurgu rengi YAZI olarak */
+  --ikincil-zemin:#6FA89E;/* ikincil dolgu */
+  --ikincil-yazi:#6FA89E; /* ikincil renk yazi/halka olarak */
+  --zemin:#D5EAE3;        /* sayfa zemini */
+  --golge:#1B2430;        /* sert golge */
+  --desen:#6FA89E;        /* zemindeki dama deseni */
+
+  --dugme-zemin:#DD7B3A;  /* birincil dugme */
+  --dugme-yazi:#F4F1E8;
+  --tehlike:#DC2626;
+}
+
+/* ---- D · ÖĞRENCİ — Matrix terminali ---- */
+[data-tema="ogrenci"]{
+  --cizgi:rgba(0,255,65,.32);
+  --yazi:#B8F7CE;
+  --yazi-ters:#DFFFEB;
+  --yuzey:#0A1A11;
+  --yuzey-ic:#07120C;
+  --koyu:#04140A;
+  --vurgu:#00641C;
+  --vurgu-yazi:#00FF41;
+  --ikincil-zemin:#0E2E1C;
+  --ikincil-yazi:#00FF41;
+  --zemin:#07120C;
+  --golge:rgba(0,255,65,.22);
+  --desen:#0E2E1C;
+
+  --dugme-zemin:#00FF41;
+  --dugme-yazi:#04140A;
+  --tehlike:#FF6B6B;
+}
+
+/* ---- C · VELİ — sicak ---- */
+[data-tema="veli"]{
+  --cizgi:#24303C;
+  /* #24303C idi. Ikincil yazilar /60 saydamlikla ciziliyor ve orada
+     3.8:1e dusuyordu; bir tik koyulastirinca varsayilan temayla ayni
+     4.1:1e cikiyor. Asil sinir saydamligin kendisi, o ayri bir karar. */
+  --yazi:#1A242E;
+  --yazi-ters:#FFFFFF;
+  --yuzey:#FAF6EC;
+  --yuzey-ic:#FFFFFF;
+  --koyu:#24303C;
+  /* #7FB3A8 idi: beyaz yazi orada 2.4:1 kaliyordu. Koyulastirildi. */
+  --ikincil-zemin:#3D6E63;
+  --ikincil-yazi:#2F6055;
+  --vurgu:#1E4A43;
+  --vurgu-yazi:#1E4A43;
+  --zemin:#F2EBDC;
+  --golge:#24303C;
+  --desen:#CFC4AC;
+
+  --dugme-zemin:#1E4A43;
+  --dugme-yazi:#FFFFFF;
+  --tehlike:#C0392B;
+
+  /* Varlik jetonlari HER temada yeniden tanimlanmali: ic ice tema
+     kullaniminda tanimsiz birakilan jeton ustteki temadan miras
+     aliniyor ve yanlis gorsel geliyor. */
+  --logo:url('/dersolab-logo.png');
+  --maskot:url('/fox-mascot-420.png');
+}
+
+/* ---- A · EĞİTMEN — sakin otorite ---- */
+[data-tema="egitmen"]{
+  --cizgi:#1A2028;
+  --yazi:#1A2028;
+  --yazi-ters:#FFFFFF;
+  --yuzey:#FBFAF7;
+  --yuzey-ic:#FFFFFF;
+  --koyu:#1A2028;
+  --ikincil-zemin:#2E6E62;
+  --ikincil-yazi:#2E6E62;
+  --vurgu:#2E6E62;
+  --vurgu-yazi:#2E6E62;
+  --zemin:#F4F2EC;
+  --golge:#1A2028;
+  --desen:#D6DCD3;
+
+  --dugme-zemin:#2E6E62;
+  --dugme-yazi:#FFFFFF;
+  --tehlike:#C0392B;
+
+  --logo:url('/dersolab-logo.png');
+  --maskot:url('/fox-mascot-420.png');
+}
+
+/* ---------------------------------------------------------------------
+   Form alanlari
+   Tarayici <input>/<select>/<textarea> ogelerinin yazi rengini body'den
+   MIRAS ALMIYOR; kendi varsayilanini (siyah) kullaniyor. Koyu temada bu
+   "yazi gorunmuyor" demek. Utility siniflari bu taban kuralini yine de
+   ezebiliyor, yani text-[...] yazan yerler etkilenmiyor.
+
+   color-scheme: yerli acilir listeyi, kaydirma cubugunu ve tarih
+   secicisini de temaya uyduruyor — <option> kutusu isletim sisteminin
+   cizdigi bir yuzey, CSS ile tek basina duzeltilemiyor.
+   ------------------------------------------------------------------ */
+@layer base {
+  input, select, textarea { color: var(--yazi); }
+  input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--yazi) 45%, transparent); }
+  option { color: var(--yazi); background-color: var(--yuzey-ic); }
+}
+:root, [data-tema="veli"], [data-tema="egitmen"] { color-scheme: light; }
+[data-tema="ogrenci"] { color-scheme: dark; }
+
+/* ---------------------------------------------------------------------
+   Sayfa zemini deseni
+   Varsayilan dilde capraz dama. Ogrenci temasinda dama Matrix'e ait
+   degil; onun yerine vitrindeki kod akisi geliyor: ince dikey sutunlar
+   ve yavasca asagi inen fosfor parlamasi.
+   ------------------------------------------------------------------ */
+.sayfa-deseni{
+  position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.4;
+  background-image:
+    linear-gradient(45deg, var(--desen) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--desen) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--desen) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--desen) 75%);
+  background-size:40px 40px;
+  background-position:0 0, 0 20px, 20px -20px, -20px 0px;
+}
+[data-tema="ogrenci"] .sayfa-deseni{
+  opacity:1;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,255,65,.05) 0 1px, transparent 1px 16px),
+    linear-gradient(180deg, rgba(0,255,65,0), rgba(0,255,65,.10) 45%, rgba(0,255,65,0));
+  background-size:100% 100%, 100% 55%;
+  background-repeat:repeat, no-repeat;
+  background-position:0 0, 0 -60%;
+  animation:kod-akisi 14s linear infinite;
+}
+@keyframes kod-akisi{
+  0%{background-position:0 0, 0 -60%}
+  100%{background-position:0 0, 0 160%}
+}
+@media (prefers-reduced-motion:reduce){
+  [data-tema="ogrenci"] .sayfa-deseni{animation:none}
+}
+
+/* ---------------------------------------------------------------------
+   Marka logosu
+   src yerine jeton: logo temayi kendiliginden takip ediyor, hicbir
+   bilesene rol/tema bilgisi tasimak gerekmiyor. Kayit ekraninda rol
+   secimi istemci tarafinda temayi degistirdiginde logo da aninda
+   degisiyor — <img src> ile bunun icin durum tasimak gerekirdi.
+   Ogrenci temasinin yuzeyi neredeyse siyah; orijinal logonun
+   piksellerinin %59.6'si orada 3:1 altinda kaliyordu.
+   ------------------------------------------------------------------ */
+:root{ --logo:url('/dersolab-logo.png'); }
+[data-tema="ogrenci"]{ --logo:url('/dersolab-logo-fosfor.png'); }
+.logo-marka{
+  display:block;
+  aspect-ratio:1812/486;
+  background-image:var(--logo);
+  background-repeat:no-repeat;
+  background-position:left center;
+  background-size:contain;
+}
+
+/* Govde zemini de temaya bagli. shadcn taban katmani body'ye beyaz
+   veriyordu; koyu temada sayfanin kendi kutusu disinda kalan her yer
+   (asiri kaydirma, kisa sayfalarin alti) beyaz parliyordu. */
+body{ background-color:var(--zemin); color:var(--yazi); }
+
+/* Maskot da logo gibi jetona bagli. fox-mascot.png acik zemin icin
+   cizilmis: piksellerinin %34.6'si neredeyse siyah kontur ve koyu
+   zeminde %35.7'si 2:1 altinda kaliyordu — cizgiler eriyip geriye kopuk
+   lekeler kaliyordu. Fosfor surumunde kontur yesile tasindi, govde
+   turuncu kaldi; ayni zeminde 2:1 altinda kalan piksel %0. */
+:root{ --maskot:url('/fox-mascot-420.png'); }
+[data-tema="ogrenci"]{ --maskot:url('/fox-mascot-fosfor.png'); }
+.maskot-marka{
+  display:block;
+  aspect-ratio:1293/1217;
+  background-image:var(--maskot);
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+}
+
+/* ---------------------------------------------------------------------
+   Akan ders adlari (yalnizca ogrenci temasi)
+   writing-mode:vertical-rl + text-orientation:upright — harfler dik durup
+   asagi diziliyor, sutunlar bir karakter genisliginde kaliyor. Yatay
+   yazsaydik "Türk Dili ve Edebiyatı" ~176px yer kaplar, sutunlar ust uste
+   binerdi. Icerik iki kez yazildigi icin -%50 -> 0 hareketi dikissiz
+   donuyor. Ust ve alttaki maske akisi keserek degil soldurarak bitiriyor.
+   ------------------------------------------------------------------ */
+.kod-yagmuru{ display:none }
+[data-tema="ogrenci"] .kod-yagmuru{
+  display:block; position:absolute; inset:0; overflow:hidden; pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 12%,#000 78%,transparent);
+  mask-image:linear-gradient(180deg,transparent,#000 12%,#000 78%,transparent);
+}
+.kod-sutun{
+  position:absolute; top:0; white-space:nowrap;
+  writing-mode:vertical-rl; text-orientation:upright;
+  font-family:var(--font-sans),monospace; font-size:11px; letter-spacing:.24em;
+  color:#00FF41; opacity:.15;
+  animation-name:kavram-aksin; animation-timing-function:linear; animation-iteration-count:infinite;
+  will-change:transform;
+}
+@keyframes kavram-aksin{ from{transform:translateY(-50%)} to{transform:translateY(0)} }
+
+/* ---------------------------------------------------------------------
+   CRT titremesi (yalnizca ogrenci temasi)
+   Dokuz saniyenin yalnizca ~0.6 saniyesinde oluyor. Surekli titreyen yazi
+   okunmuyor ve ucuz duruyor; gercek tup ekran da arada bir kirpiyor.
+
+   Iki dislama var:
+   - Ic ice yaziyi iki kez soldurmamak icin, titreyen bir atasi olan oge
+     yeniden titremiyor (yoksa 0.62 x 0.62 = 0.38'e duserdi).
+   - Icinde form alani olan etiketler haric: tiklanacak/yazilacak seyin
+     soluklasmasi hem okunurlugu bozuyor hem "bozuk mu" hissi veriyor.
+   ------------------------------------------------------------------ */
+@keyframes ekran-titre-yazi{
+  0%,37.9%{opacity:1}
+  38%{opacity:.62}
+  38.7%{opacity:1}
+  39.4%{opacity:.84}
+  40.1%{opacity:1}
+  71.9%{opacity:1}
+  72%{opacity:.68}
+  72.8%{opacity:1}
+  100%{opacity:1}
+}
+/* TEK SATIR olmali: parcalar arasina konan satir sonu bosluk sayiliyor
+   ve secici "su ogenin ICINDEKI su oge" haline geliyor. Ilk denemede tam
+   bu oldu, hicbir oge eslesmedi. */
+:is(h1,h2,h3,h4,p,li,td,th,dt,dd,label):not(:is(h1,h2,h3,h4,p,li,td,th,dt,dd,label) *):not(:has(input,select,textarea)){animation:var(--titreme)}
+
+@media (prefers-reduced-motion:reduce){
+  .kod-sutun{animation:none}
+  :is(h1,h2,h3,h4,p,li,td,th,dt,dd,label){animation:none!important}
+}
+
+
+/* =====================================================================
+   Tipografi jetonlari
+   ---------------------------------------------------------------------
+   NEDEN JETON, NEDEN SECICI DEGIL:
+   Ilk surumde kurallar `[data-tema="ogrenci"] h2 {...}` seklindeydi.
+   Bu bir SOY seciciydi; ana sayfada kok <html data-tema="ogrenci"> iken
+   icindeki "Veliyim" sekmesi de bu kurala giriyordu ve pixel font veli
+   panelinde de cikiyordu. Tersi de mumkundu: veli oturumunda ogrenci
+   sekmesi pixel fontu kaybediyordu.
+
+   Custom property'ler MIRAS aliniyor ve en yakin tanim kazaniyor. Her
+   tema butun jetonlari yeniden tanimladigi surece ic ice temalar dogru
+   calisiyor — renklerde zaten boyle yapmistik.
+   ===================================================================== */
+:root{
+  --baslik-font:var(--font-sans),system-ui,sans-serif;
+  --baslik-agirlik:inherit;
+  --baslik-donusum:none;
+  --baslik-golge:none;
+  --etiket-font:var(--font-sans),system-ui,sans-serif;
+  --dugme-font:var(--font-sans),system-ui,sans-serif;
+  --dugme-punto:inherit;
+  --kart-baslik-font:var(--font-sans),system-ui,sans-serif;
+  --kart-baslik-punto:1.125rem;
+  --titreme:none;
+}
+[data-tema="veli"], [data-tema="egitmen"]{
+  --baslik-agirlik:inherit;
+  --baslik-font:var(--font-sans),system-ui,sans-serif;
+  --baslik-donusum:none;
+  --baslik-golge:none;
+  --etiket-font:var(--font-sans),system-ui,sans-serif;
+  --dugme-font:var(--font-sans),system-ui,sans-serif;
+  --dugme-punto:inherit;
+  --kart-baslik-font:var(--font-sans),system-ui,sans-serif;
+  --kart-baslik-punto:1.125rem;
+  --titreme:none;
+}
+/* Arcade kimligi renkten once TIPOGRAFI. Govde yazisi Inter kaliyor:
+   Press Start 2P paragraf icin okunmuyor, vitrinde de govde Chivo'ydu. */
+[data-tema="ogrenci"]{
+  --baslik-font:var(--font-ekran),ui-monospace,monospace;
+  --baslik-agirlik:700;
+  --baslik-aralik:.02em;
+  --baslik-donusum:uppercase;
+  /* Sert 2px siyah kopya YOK: harflerin ic bosluklarini dolduruyordu.
+     Olculdu — S %34, S %36, K %17 daha fazla murekkep. Geriye yalnizca
+     bulanik fosfor parlamasi kaldi, o konturu bozmuyor. */
+  --baslik-golge:0 0 18px rgba(0,255,65,.3);
+  /* Etiket ve menu Inter: monospace o boyutta cok genis, menu ogeleri
+     tasardi. */
+  --etiket-font:var(--font-sans),system-ui,sans-serif;
+  --dugme-font:var(--font-ekran),ui-monospace,monospace;
+  --dugme-punto:.9rem;
+  --kart-baslik-font:var(--font-ekran),ui-monospace,monospace;
+  --kart-baslik-punto:1.05rem;
+  --titreme:ekran-titre-yazi 9s steps(1) infinite;
+}
+
+:is(h1,h2,h3){
+  font-family:var(--baslik-font);
+  line-height:1.35;
+  font-weight:var(--baslik-agirlik);
+  text-transform:var(--baslik-donusum);
+  text-shadow:var(--baslik-golge);
+  letter-spacing:var(--baslik-aralik,0);
+}
+:is(label,legend,th),.dl-rozet,.dl-gezinme{ font-family:var(--etiket-font) }
+.dl-dugme{ font-family:var(--dugme-font); font-size:var(--dugme-punto); font-weight:var(--baslik-agirlik); line-height:1.6 }
+.dl-kart-basligi{ font-family:var(--kart-baslik-font); font-size:var(--kart-baslik-punto); line-height:1.6 }
+
+/* Panel kabugunun basligi: pixel font dar ekranda tasiyor, kuculuyor.
+   Sayfalarin kendi olcegini TOPTAN ezmiyoruz — ilk surumde oyle yapilmis
+   ve vitrin hero basligi 36px'ten 15px'e dusmustu. */
+[data-tema="ogrenci"] .dl-sayfa-basligi{ font-size:1.55rem; line-height:1.35 }
+
+/* CRT cami: icerigin USTUNDE ince tarama cizgileri. */
+[data-tema="ogrenci"] body::after{
+  content:"";
+  position:fixed; inset:0; z-index:9999; pointer-events:none;
+  background:repeating-linear-gradient(180deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px);
+  mix-blend-mode:multiply;
+}
+
+/* ---------------------------------------------------------------------
+   Kitle motifleri (ana sayfa hero'su)
+   Uc panel ayni iskelette; ayrimi renkten degil HAREKETTEN de alsin.
+   ------------------------------------------------------------------ */
+
+/* VELİ — sakin suzulen baloncuklar.
+   Sureler bilerek farkli (15sn / 21sn) ve aralarinda tam kat iliskisi
+   yok; boylece hicbir noktada senkrona girmiyorlar, hareket mekanik
+   degil dogal duruyor. ease-in-out: uclarda yavaslayip ortada hizlanma. */
+/* Hangi motifin gorunecegini CSS seciyor: bilesen temayi bilmiyor,
+   boylece hem ana sayfada hem sunucu tarafinda calisan panel kabugunda
+   ayni sekilde kullanilabiliyor. */
+.dl-baloncuk-kap,.dl-takvim-kap{ display:none }
+[data-tema="veli"] .dl-baloncuk-kap{
+  display:block; position:absolute; inset:0; overflow:hidden;
+  border-radius:inherit; pointer-events:none;
+}
+[data-tema="egitmen"] .dl-takvim-kap{
+  display:none; position:absolute; right:24px; top:50%; width:200px;
+  transform:translateY(-50%); pointer-events:none;
+}
+@media (min-width:1024px){ [data-tema="egitmen"] .dl-takvim-kap{ display:block } }
+
+.dl-baloncuk{
+  position:absolute; border-radius:999px;
+  background:rgba(255,255,255,.10); will-change:transform;
+}
+.dl-baloncuk-1{ right:-50px; top:-50px; width:220px; height:220px; animation:dl-suzul-1 15s ease-in-out infinite }
+.dl-baloncuk-2{ right:40px; bottom:-70px; width:150px; height:150px; background:rgba(255,255,255,.07); animation:dl-suzul-2 21s ease-in-out infinite }
+@keyframes dl-suzul-1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-22px,16px) scale(1.07)}}
+@keyframes dl-suzul-2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(16px,-20px) scale(.93)}}
+
+/* EĞİTMEN — haftalik takvim izgarasi, hucreler sirayla doluyor.
+   Uzerinde saat/gun YAZMIYOR: olmayan bir takvimi varmis gibi
+   gostermek olurdu. Hero'nun metni zaten "musait saatlerinizi girin"
+   diyor; hareket o cumleyi anlatiyor, sus olsun diye degil. */
+.dl-izgara{ display:grid; grid-template-columns:repeat(7,1fr); gap:7px }
+.dl-hucre{ aspect-ratio:1; border-radius:5px; background:rgba(255,255,255,.14) }
+.dl-hucre.dolu{ background:rgba(255,255,255,.24); animation:dl-hucre-dolsun 9s ease-in-out infinite; will-change:transform }
+@keyframes dl-hucre-dolsun{
+  0%,10%{background:rgba(255,255,255,.20); transform:scale(1)}
+  20%,64%{background:#FFFFFF; transform:scale(1.08)}
+  78%,100%{background:rgba(255,255,255,.20); transform:scale(1)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .dl-baloncuk,.dl-hucre.dolu{animation:none}
+}
+
+/* Motif tonu zemine gore. Ayni bilesen hem koyu hero'da (ana sayfa)
+   hem acik baslik kartinda (panel) kullaniliyor; beyaz baloncuk krem
+   zeminde gorunmuyordu. */
+.dl-motif-acik{ --motif:rgba(255,255,255,.10); --motif-guclu:rgba(255,255,255,.24); --motif-dolu:#FFFFFF }
+.dl-motif-koyu{ --motif:color-mix(in srgb, var(--yazi) 7%, transparent);
+                --motif-guclu:color-mix(in srgb, var(--yazi) 13%, transparent);
+                --motif-dolu:var(--ikincil-zemin) }
+.dl-baloncuk{ background:var(--motif) }
+.dl-baloncuk-2{ background:var(--motif) }
+.dl-hucre{ background:var(--motif) }
+.dl-hucre.dolu{ background:var(--motif-guclu) }
+@keyframes dl-hucre-dolsun{
+  0%,10%{background:var(--motif-guclu); transform:scale(1)}
+  20%,64%{background:var(--motif-dolu); transform:scale(1.08)}
+  78%,100%{background:var(--motif-guclu); transform:scale(1)}
+}
+
+/* Kaydirilabilir ama cubugu gorunmeyen kap.
+ *
+ * Kenar cubugu gezinme listesi icin: menu uzun oldugunda (ozellikle
+ * egitmen rolunde) yanda ince bir kaydirma cubugu beliriyor ve dar
+ * sutunda butonlarin uzerine biniyordu. Tekerlek, dokunma ve klavye ile
+ * kaydirma aynen calisiyor; yalnizca cubuk cizilmiyor.
+ *
+ * Yalnizca boyle "acikca liste oldugu belli" kaplarda kullanilmali:
+ * genis bir tabloda cubugu gizlemek kaydirilabildigini saklardi.
+ */
+.gizli-kaydirma {
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* eski Edge */
+}
+.gizli-kaydirma::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

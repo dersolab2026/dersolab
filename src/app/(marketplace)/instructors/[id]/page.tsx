@@ -6,6 +6,7 @@ import { getInstructorById, getInstructorEducation } from '@/lib/marketplace/get
 import { InstructorBookingSection } from '@/components/booking/InstructorBookingSection'
 import { EducationList } from '@/components/marketplace/EducationList'
 import { IntroVideoPlayer } from '@/components/marketplace/IntroVideoPlayer'
+import { SayfaDeseni } from '@/components/layout/SayfaDeseni'
 
 interface InstructorDetailPageProps {
   params: Promise<{ id: string }>
@@ -33,30 +34,24 @@ export default async function InstructorDetailPage({ params, searchParams }: Ins
   const initials = instructor.name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
 
   return (
-    <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
-      <div
-        className="absolute inset-0 z-0 opacity-40 pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(45deg, #6FA89E 25%, transparent 25%), linear-gradient(-45deg, #6FA89E 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #6FA89E 75%), linear-gradient(-45deg, transparent 75%, #6FA89E 75%)',
-          backgroundSize: '40px 40px', backgroundPosition: '0 0, 0 20px, 20px -20px, -20px 0px'
-        }}
-      />
+    <div className="min-h-screen w-full bg-[var(--zemin)] relative overflow-hidden">
+      <SayfaDeseni />
 
       <div className="relative z-10 mx-auto max-w-3xl space-y-6 p-5 py-10">
-        <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] space-y-4">
+        <div className="bg-[var(--yuzey)] rounded-2xl p-6 sm:p-8 border-4 border-[var(--cizgi)] shadow-[0_8px_0_var(--golge)] space-y-4">
           <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 border-2 border-[#1B2430]">
+            <Avatar className="h-16 w-16 border-2 border-[var(--cizgi)]">
               <AvatarImage src={instructor.avatarUrl ?? undefined} alt={instructor.name} />
-              <AvatarFallback className="bg-white text-[#1B2430] font-bold">{initials}</AvatarFallback>
+              <AvatarFallback className="bg-[var(--yuzey-ic)] text-[var(--yazi)] font-bold">{initials}</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-bold text-[#1B2430]">{instructor.name}</h1>
+              <h1 className="text-2xl font-bold text-[var(--yazi)]">{instructor.name}</h1>
               {instructor.completedLessonCount > 0 && (
-                <p className="text-sm font-bold text-[#6FA89E]">{instructor.completedLessonCount} ders tamamladı</p>
+                <p className="text-sm font-bold text-[var(--ikincil-yazi)]">{instructor.completedLessonCount} ders tamamladı</p>
               )}
               <div className="mt-1 flex flex-wrap gap-1">
                 {instructor.subjects.map((s) => (
-                  <span key={s} className="px-2 py-0.5 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-xs font-bold">
+                  <span key={s} className="px-2 py-0.5 rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] text-[var(--yazi)] text-xs font-bold">
                     {s}
                   </span>
                 ))}
@@ -64,13 +59,13 @@ export default async function InstructorDetailPage({ params, searchParams }: Ins
             </div>
           </div>
 
-          {instructor.bio && <p className="font-semibold text-[#1B2430]/70">{instructor.bio}</p>}
+          {instructor.bio && <p className="font-semibold text-[var(--yazi)]/70">{instructor.bio}</p>}
 
           <IntroVideoPlayer videoUrl={instructor.introVideoUrl} />
           <EducationList entries={education} />
         </div>
 
-        <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
+        <div className="bg-[var(--yuzey)] rounded-2xl p-6 sm:p-8 border-4 border-[var(--cizgi)] shadow-[0_8px_0_var(--golge)]">
           {instructor.isCalendarConnected ? (
             <InstructorBookingSection
               instructorId={instructor.userId}
@@ -80,7 +75,7 @@ export default async function InstructorDetailPage({ params, searchParams }: Ins
               defaultSessionType={defaultSessionType}
             />
           ) : (
-            <p className="font-semibold text-[#1B2430]">
+            <p className="font-semibold text-[var(--yazi)]">
               Bu eğitmen henüz takvimini bağlamadı, rezervasyon şu anda açık değil.
             </p>
           )}

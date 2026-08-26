@@ -61,9 +61,9 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
   }
 
   return (
-    <div className="pt-2 border-t-2 border-[#1B2430]/10 space-y-2">
+    <div className="pt-2 border-t-2 border-[var(--cizgi)]/10 space-y-2">
       <div className="flex items-center justify-between">
-        <p className="font-bold text-[#1B2430]">Çalışma Notlarım</p>
+        <p className="font-bold text-[var(--yazi)]">Çalışma Notlarım</p>
         <button
           type="button"
           onClick={() => setIsOpen((v) => !v)}
@@ -74,19 +74,19 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
       </div>
 
       {entries.length === 0 && !isOpen && (
-        <p className="text-sm font-semibold text-[#1B2430]/60">Bu gün için henüz bir çalışma notu yok.</p>
+        <p className="text-sm font-semibold text-[var(--yazi)]/60">Bu gün için henüz bir çalışma notu yok.</p>
       )}
 
       {entries.length > 0 && (
         <div className="space-y-2">
           {entries.map((entry) => (
-            <div key={entry.id} className="flex items-start justify-between gap-2 rounded-lg bg-[#DD7B3A]/10 border-2 border-[#DD7B3A] px-3 py-2">
-              <div className="text-sm text-[#1B2430]">
+            <div key={entry.id} className="flex items-start justify-between gap-2 rounded-lg bg-[var(--vurgu)]/10 border-2 border-[var(--vurgu-yazi)] px-3 py-2">
+              <div className="text-sm text-[var(--yazi)]">
                 <p className="font-bold">
                   {entry.subject}
                   {entry.topic && <span className="font-semibold"> · {entry.topic}</span>}
                 </p>
-                <p className="font-semibold text-[#1B2430]/70">
+                <p className="font-semibold text-[var(--yazi)]/70">
                   {[
                     entry.hours ? `${entry.hours} saat çalıştım` : null,
                     entry.questionsSolved ? `${entry.questionsSolved} soru çözdüm` : null,
@@ -98,7 +98,7 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
                 type="button"
                 onClick={() => handleDelete(entry.id)}
                 disabled={isPending}
-                className="text-[#1B2430]/40 hover:text-red-600 shrink-0"
+                className="text-[var(--yazi)]/40 hover:text-[var(--tehlike)] shrink-0"
                 aria-label="Notu sil"
               >
                 <Trash2 className="h-4 w-4" />
@@ -109,13 +109,13 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
       )}
 
       {isOpen && (
-        <form onSubmit={handleSubmit} className="space-y-3 rounded-lg bg-white border-2 border-[#1B2430] p-3">
+        <form onSubmit={handleSubmit} className="space-y-3 rounded-lg bg-[var(--yuzey-ic)] border-2 border-[var(--cizgi)] p-3">
           <div>
-            <label className="block text-xs font-bold text-[#1B2430] mb-1">Ders</label>
+            <label className="block text-xs font-bold text-[var(--yazi)] mb-1">Ders</label>
             <select
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+              className="w-full p-2 rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] text-sm outline-none"
             >
               <option value="" disabled>Seç</option>
               {LESSON_SUBJECTS.map((s) => (
@@ -125,47 +125,47 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#1B2430] mb-1">Konu (isteğe bağlı)</label>
+            <label className="block text-xs font-bold text-[var(--yazi)] mb-1">Konu (isteğe bağlı)</label>
             <input
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="ör. Türev"
-              className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+              className="w-full p-2 rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] text-sm outline-none"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-bold text-[#1B2430] mb-1">Kaç Saat Çalıştım</label>
+              <label className="block text-xs font-bold text-[var(--yazi)] mb-1">Kaç Saat Çalıştım</label>
               <input
                 type="number" min="0" step="0.5"
                 value={hours}
                 onChange={(e) => setHours(e.target.value)}
-                className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+                className="w-full p-2 rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] text-sm outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#1B2430] mb-1">Kaç Soru Çözdüm</label>
+              <label className="block text-xs font-bold text-[var(--yazi)] mb-1">Kaç Soru Çözdüm</label>
               <input
                 type="number" min="0"
                 value={questionsSolved}
                 onChange={(e) => setQuestionsSolved(e.target.value)}
-                className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+                className="w-full p-2 rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] text-sm outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#1B2430] mb-1">Kaynak (isteğe bağlı)</label>
+            <label className="block text-xs font-bold text-[var(--yazi)] mb-1">Kaynak (isteğe bağlı)</label>
             <input
               value={source}
               onChange={(e) => setSource(e.target.value)}
               placeholder="ör. 3D Yayınları TYT Matematik"
-              className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+              className="w-full p-2 rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] text-sm outline-none"
             />
           </div>
 
-          {error && <p className="text-xs font-bold text-red-600">{error}</p>}
+          {error && <p className="text-xs font-bold text-[var(--tehlike)]">{error}</p>}
 
           <button type="submit" disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-1.5 text-sm w-full`}>
             {isPending ? 'Kaydediliyor...' : 'Kaydet'}

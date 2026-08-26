@@ -67,7 +67,7 @@ export function ErrorTypeEditor({ entry }: { entry: ExamResultEntry }) {
 
   if (yanlisiOlanlar.length === 0) {
     return (
-      <p className="text-sm font-semibold text-[#1B2430]/60">
+      <p className="text-sm font-semibold text-[var(--yazi)]/60">
         Bu denemede yanlışın yok, girilecek hata tipi de yok.
       </p>
     )
@@ -75,7 +75,7 @@ export function ErrorTypeEditor({ entry }: { entry: ExamResultEntry }) {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-semibold text-[#1B2430]/70">
+      <p className="text-sm font-semibold text-[var(--yazi)]/70">
         Yanlışlarını tiplere böl — hangi dersten kaç net kaybettiğin değil,
         <strong> neden</strong> kaybettiğin önemli. İstersen boş bırakabilirsin.
       </p>
@@ -83,11 +83,11 @@ export function ErrorTypeEditor({ entry }: { entry: ExamResultEntry }) {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[520px] text-sm">
           <thead>
-            <tr className="border-b-2 border-[#1B2430]">
-              <th className="py-1.5 pr-2 text-left font-bold text-[#1B2430]">Ders</th>
-              <th className="py-1.5 px-1 text-center font-bold text-[#1B2430]/60">Yanlış</th>
+            <tr className="border-b-2 border-[var(--cizgi)]">
+              <th className="py-1.5 pr-2 text-left font-bold text-[var(--yazi)]">Ders</th>
+              <th className="py-1.5 px-1 text-center font-bold text-[var(--yazi)]/60">Yanlış</th>
               {TIPLER.map((t) => (
-                <th key={t} className="py-1.5 px-1 text-center text-xs font-bold text-[#1B2430]">
+                <th key={t} className="py-1.5 px-1 text-center text-xs font-bold text-[var(--yazi)]">
                   {ERROR_TYPE_LABELS[t]}
                 </th>
               ))}
@@ -98,9 +98,9 @@ export function ErrorTypeEditor({ entry }: { entry: ExamResultEntry }) {
               const girilen = TIPLER.reduce((t, tip) => t + (Number(degerler[s.name]?.[tip]) || 0), 0)
               const asim = girilen > s.wrongCount
               return (
-                <tr key={s.name} className="border-b border-[#1B2430]/15">
-                  <td className="py-1.5 pr-2 font-bold text-[#1B2430]">{s.name}</td>
-                  <td className={`py-1.5 px-1 text-center font-bold tabular-nums ${asim ? 'text-red-600' : 'text-[#1B2430]/60'}`}>
+                <tr key={s.name} className="border-b border-[var(--cizgi)]/15">
+                  <td className="py-1.5 pr-2 font-bold text-[var(--yazi)]">{s.name}</td>
+                  <td className={`py-1.5 px-1 text-center font-bold tabular-nums ${asim ? 'text-[var(--tehlike)]' : 'text-[var(--yazi)]/60'}`}>
                     {girilen}/{s.wrongCount}
                   </td>
                   {TIPLER.map((t) => (
@@ -110,7 +110,7 @@ export function ErrorTypeEditor({ entry }: { entry: ExamResultEntry }) {
                         value={degerler[s.name]?.[t] ?? ''}
                         onChange={(e) => setDeger(s.name, t, e.target.value)}
                         aria-label={`${s.name} — ${ERROR_TYPE_LABELS[t]}`}
-                        className="w-full min-w-[52px] rounded-lg border-2 border-[#1B2430] bg-white px-1.5 py-1 text-center font-bold text-[#1B2430]"
+                        className="w-full min-w-[52px] rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-1.5 py-1 text-center font-bold text-[var(--yazi)]"
                       />
                     </td>
                   ))}
@@ -121,7 +121,7 @@ export function ErrorTypeEditor({ entry }: { entry: ExamResultEntry }) {
         </table>
       </div>
 
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
 
       <button type="button" onClick={kaydet} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Hata Tiplerini Kaydet'}

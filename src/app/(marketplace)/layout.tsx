@@ -23,7 +23,7 @@ export default async function MarketplaceLayout({ children }: { children: ReactN
   const notifications = await getNotifications()
 
   return (
-    <div className="md:flex">
+    <div className="md:flex min-h-screen bg-[var(--zemin)]">
       <DashboardNav role={role} offersFreeTrial={offersFreeTrial} notifications={notifications} />
       <div className="md:flex-1 md:min-w-0">{children}</div>
     </div>

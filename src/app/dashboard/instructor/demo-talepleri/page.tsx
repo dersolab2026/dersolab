@@ -24,25 +24,25 @@ export default async function DemoRequestsPage() {
   return (
     <DashboardPageShell
       title="Hoş Geldin Talepleri"
-      description="Hoş geldin paketi talepleri: ücretsiz tanışma dersi — ilk üstlenen alır."
+      description="Hoş Geldin Paketi talepleri: kredisiz tanışma dersi — ilk üstlenen alır."
     >
       {requests.length === 0 ? (
-        <p className="font-semibold text-[#1B2430]">Şu anda bekleyen talep yok.</p>
+        <p className="font-semibold text-[var(--yazi)]">Şu anda bekleyen talep yok.</p>
       ) : (
         <div className="space-y-3">
           {requests.map((r) => (
             <div key={r.id} className={`${PIXEL_CARD} p-4 flex flex-wrap items-center justify-between gap-3`}>
               <div>
-                <p className="font-bold text-[#1B2430]">
+                <p className="font-bold text-[var(--yazi)]">
                   {r.studentName}
-                  <span className="ml-2 inline-block px-2 py-0.5 rounded-lg border-2 border-[#1B2430] bg-white text-xs text-[#1B2430]">
+                  <span className="ml-2 inline-block px-2 py-0.5 rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] text-xs text-[var(--yazi)]">
                     Tanışma Dersi
                   </span>
                 </p>
                 {r.leadEmail && (
-                  <p className="text-sm font-semibold text-[#1B2430]/70">{r.leadEmail}</p>
+                  <p className="text-sm font-semibold text-[var(--yazi)]/70">{r.leadEmail}</p>
                 )}
-                <p className="text-sm font-semibold text-[#1B2430]/70">
+                <p className="text-sm font-semibold text-[var(--yazi)]/70">
                   {kisaTarihSaat(r.createdAt)} tarihinde talep edildi
                   {!r.studentId && ' · hesapsız, kabul edince e-posta ile iletişime geç'}
                 </p>

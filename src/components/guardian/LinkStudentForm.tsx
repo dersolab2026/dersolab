@@ -36,8 +36,8 @@ export function LinkStudentForm() {
   return (
     <form onSubmit={handleSubmit} className={`${PIXEL_CARD} space-y-3 p-5`}>
       <div>
-        <p className="font-bold text-[#1B2430]">Öğrenci Bağla</p>
-        <p className="text-sm font-semibold text-[#1B2430]/70">
+        <p className="font-bold text-[var(--yazi)]">Öğrenci Bağla</p>
+        <p className="text-sm font-semibold text-[var(--yazi)]/70">
           Öğrenciniz kendi hesabında <strong>Ayarlar &rsaquo; Veli Bağlantısı</strong> bölümünden
           bir kod üretsin ve size versin. Kod tek kullanımlıktır ve 7 gün geçerlidir.
         </p>
@@ -59,7 +59,7 @@ export function LinkStudentForm() {
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Bağla'}
         </button>
       </div>
-      {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-bold text-[var(--tehlike)]">{error}</p>}
     </form>
   )
 }

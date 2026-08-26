@@ -104,14 +104,14 @@ function saatMetni(dakika: number): string {
 export function raporHtml(r: HaftalikRapor, appUrl: string): string {
   const satir = (etiket: string, deger: string) =>
     `<tr><td style="padding:6px 12px 6px 0;color:#61757B;">${etiket}</td>` +
-    `<td style="padding:6px 0;font-weight:700;color:#1B2430;">${deger}</td></tr>`
+    `<td style="padding:6px 0;font-weight:700;color:var(--yazi);">${deger}</td></tr>`
 
   const denemeSatirlari = r.denemeler.length > 0
     ? r.denemeler.map((d) => `<li>${kacis(d.ad)} — <strong>${d.net.toFixed(2)} net</strong> (${tarihTr(d.tarih)})</li>`).join('')
     : '<li>Bu hafta deneme kaydı yok.</li>'
 
   return `
-    <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#1B2430;max-width:600px;">
+    <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--yazi);max-width:600px;">
       <h2 style="margin:0 0 4px;">Haftalık Özet</h2>
       <p style="margin:0 0 16px;color:#61757B;">
         ${kacis(r.ogrenciAdi)} · ${tarihTr(r.haftaBasi)} – ${tarihTr(r.haftaSonu)}

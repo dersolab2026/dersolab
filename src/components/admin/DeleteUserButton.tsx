@@ -53,7 +53,7 @@ export function DeleteUserButton({ userId, userName }: { userId: string; userNam
         {error && <p className="text-sm text-destructive">{error}</p>}
         <AlertDialogFooter>
           <AlertDialogCancel>Vazgeç</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm} disabled={isPending} className="bg-destructive text-white hover:bg-destructive/90">
+          <AlertDialogAction onClick={handleConfirm} disabled={isPending} className="bg-destructive text-[var(--yazi-ters)] hover:bg-destructive/90">
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Hesabı Sil'}
           </AlertDialogAction>
         </AlertDialogFooter>

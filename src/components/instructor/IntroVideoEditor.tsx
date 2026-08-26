@@ -81,7 +81,7 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-semibold text-[#1B2430]/60">veya</span>
+        <span className="text-xs font-semibold text-[var(--yazi)]/60">veya</span>
         <input ref={inputRef} type="file" accept="video/mp4,video/quicktime,video/webm" className="hidden" onChange={handleFileChange} />
         <button
           type="button"
@@ -92,23 +92,23 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
           {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
           {isUploading ? 'Yükleniyor...' : 'Video Dosyası Yükle'}
         </button>
-        <span className="text-xs font-semibold text-[#1B2430]/60">en fazla 200 MB</span>
+        <span className="text-xs font-semibold text-[var(--yazi)]/60">en fazla 200 MB</span>
       </div>
 
       {url.trim() && !embedPreview && !isDirectFile && (
-        <p className="text-sm font-semibold text-red-600">Bu link tanınmadı — YouTube/Vimeo linki ya da dosya yükle</p>
+        <p className="text-sm font-semibold text-[var(--tehlike)]">Bu link tanınmadı — YouTube/Vimeo linki ya da dosya yükle</p>
       )}
 
       {embedPreview && (
-        <div className="aspect-video w-full max-w-md overflow-hidden rounded-xl border-4 border-[#1B2430]">
+        <div className="aspect-video w-full max-w-md overflow-hidden rounded-xl border-4 border-[var(--cizgi)]">
           <iframe src={embedPreview.embedUrl} className="h-full w-full" allowFullScreen />
         </div>
       )}
       {isDirectFile && (
-        <video src={url} controls className="aspect-video w-full max-w-md rounded-xl border-4 border-[#1B2430]" />
+        <video src={url} controls className="aspect-video w-full max-w-md rounded-xl border-4 border-[var(--cizgi)]" />
       )}
 
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
     </div>
   )
 }

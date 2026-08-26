@@ -12,8 +12,8 @@ export function RiskSignalList({ sinyaller }: { sinyaller: RiskSinyali[] }) {
   if (sinyaller.length === 0) {
     return (
       <div className={`${PIXEL_CARD} flex items-center gap-2 p-4`}>
-        <CheckCircle2 className="h-5 w-5 shrink-0 text-[#6FA89E]" />
-        <p className="text-sm font-bold text-[#1B2430]">
+        <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--ikincil-yazi)]" />
+        <p className="text-sm font-bold text-[var(--yazi)]">
           Dikkat çeken bir durum yok.
         </p>
       </div>
@@ -24,26 +24,26 @@ export function RiskSignalList({ sinyaller }: { sinyaller: RiskSinyali[] }) {
     <div className={`${PIXEL_CARD} space-y-3 p-5`}>
       <div className="flex items-center gap-2">
         <AlertTriangle className="h-5 w-5 text-[#C2410C]" />
-        <p className="font-bold text-[#1B2430]">
+        <p className="font-bold text-[var(--yazi)]">
           Dikkat Edilecekler
-          <span className="ml-2 text-sm font-semibold text-[#1B2430]/60">{sinyaller.length} sinyal</span>
+          <span className="ml-2 text-sm font-semibold text-[var(--yazi)]/60">{sinyaller.length} sinyal</span>
         </p>
       </div>
 
       <div className="space-y-2">
         {sinyaller.map((s) => (
-          <div key={s.kod} className="flex items-start gap-2.5 rounded-xl border-2 border-[#1B2430] bg-white p-3">
-            <span className="mt-1 inline-block h-3 w-3 shrink-0 rounded-full border-2 border-[#1B2430]"
+          <div key={s.kod} className="flex items-start gap-2.5 rounded-xl border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] p-3">
+            <span className="mt-1 inline-block h-3 w-3 shrink-0 rounded-full border-2 border-[var(--cizgi)]"
               style={{ backgroundColor: AGIRLIK_RENK[s.agirlik] }} />
             <div className="min-w-0">
-              <p className="text-sm font-bold text-[#1B2430]">{s.baslik}</p>
-              <p className="text-xs font-semibold text-[#1B2430]/70">{s.neden}</p>
+              <p className="text-sm font-bold text-[var(--yazi)]">{s.baslik}</p>
+              <p className="text-xs font-semibold text-[var(--yazi)]/70">{s.neden}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <p className="text-xs font-semibold text-[#1B2430]/60">
+      <p className="text-xs font-semibold text-[var(--yazi)]/60">
         Sinyaller sabit kurallardan üretiliyor, bir tahmin ya da puanlama değil.
         Eşikler bilerek geniş tutuldu; yanlış alarm üreten bir liste bir süre
         sonra hiç okunmuyor.

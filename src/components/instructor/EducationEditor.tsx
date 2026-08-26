@@ -52,13 +52,13 @@ export function EducationEditor({ initialEntries }: EducationEditorProps) {
       {initialEntries.map((entry) => (
         <div key={entry.id} className={`${PIXEL_CARD} p-3 flex items-center justify-between`}>
           <div>
-            <p className="font-bold text-[#1B2430]">{entry.institution}</p>
-            <p className="text-sm font-semibold text-[#1B2430]/70">
+            <p className="font-bold text-[var(--yazi)]">{entry.institution}</p>
+            <p className="text-sm font-semibold text-[var(--yazi)]/70">
               {[entry.degree, entry.fieldOfStudy].filter(Boolean).join(' — ')}
             </p>
           </div>
           <button onClick={() => handleRemove(entry.id)} disabled={isPending} aria-label="Kaldır">
-            <X className="h-4 w-4 text-[#1B2430]/60" />
+            <X className="h-4 w-4 text-[var(--yazi)]/60" />
           </button>
         </div>
       ))}
@@ -68,7 +68,7 @@ export function EducationEditor({ initialEntries }: EducationEditorProps) {
           <input placeholder="Kurum (örn. Boğaziçi Üniversitesi)" value={institution} onChange={(e) => setInstitution(e.target.value)} className={`${PIXEL_INPUT} py-2`} />
           <input placeholder="Derece (örn. Lisans)" value={degree} onChange={(e) => setDegree(e.target.value)} className={`${PIXEL_INPUT} py-2`} />
           <input placeholder="Bölüm (örn. Matematik Mühendisliği)" value={fieldOfStudy} onChange={(e) => setFieldOfStudy(e.target.value)} className={`${PIXEL_INPUT} py-2`} />
-          {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+          {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
           <div className="flex gap-2">
             <button onClick={handleAdd} disabled={isPending || !institution.trim()} className={`${PIXEL_BUTTON_PRIMARY} px-3 py-1.5 text-sm`}>
               {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}

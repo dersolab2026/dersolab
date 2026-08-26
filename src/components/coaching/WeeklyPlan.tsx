@@ -107,8 +107,8 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
     <div className={`${PIXEL_CARD} space-y-4 p-5`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <CalendarDays className="h-5 w-5 text-[#1B2430]" />
-          <p className="font-bold text-[#1B2430]">Haftalık Plan</p>
+          <CalendarDays className="h-5 w-5 text-[var(--yazi)]" />
+          <p className="font-bold text-[var(--yazi)]">Haftalık Plan</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -116,13 +116,13 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
             <>
               <button type="button" onClick={() => onWeekChange(haftaKaydir(planWeek, -1))}
                 aria-label="Önceki hafta"
-                className="rounded-lg border-2 border-[#1B2430] bg-white px-2 py-1 text-sm font-bold">‹</button>
-              <span className="text-sm font-bold tabular-nums text-[#1B2430]">
+                className="rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-2 py-1 text-sm font-bold">‹</button>
+              <span className="text-sm font-bold tabular-nums text-[var(--yazi)]">
                 {tarihEtiket(gunler[0])} – {tarihEtiket(gunler[6])}
               </span>
               <button type="button" onClick={() => onWeekChange(haftaKaydir(planWeek, 1))}
                 aria-label="Sonraki hafta"
-                className="rounded-lg border-2 border-[#1B2430] bg-white px-2 py-1 text-sm font-bold">›</button>
+                className="rounded-lg border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-2 py-1 text-sm font-bold">›</button>
             </>
           )}
         </div>
@@ -130,7 +130,7 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
 
       {items.length > 0 && (
         <div className="flex items-center gap-3">
-          <div className="h-6 flex-1 overflow-hidden rounded-md border-2 border-[#1B2430] bg-white">
+          <div className="h-6 flex-1 overflow-hidden rounded-md border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)]">
             <div
               className="h-full transition-all"
               style={{
@@ -139,14 +139,14 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
               }}
             />
           </div>
-          <span className="shrink-0 text-sm font-black tabular-nums text-[#1B2430]">
+          <span className="shrink-0 text-sm font-black tabular-nums text-[var(--yazi)]">
             %{tutturma.yuzde}
           </span>
         </div>
       )}
 
       {items.length === 0 ? (
-        <p className="text-sm font-semibold text-[#1B2430]/70">
+        <p className="text-sm font-semibold text-[var(--yazi)]/70">
           {canEdit ? 'Bu hafta için henüz plan yok.' : 'Koçun bu hafta için plan girmemiş.'}
         </p>
       ) : (
@@ -156,7 +156,7 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
             if (gunun.length === 0) return null
             return (
               <div key={g}>
-                <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">
+                <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[var(--yazi)]/60">
                   {GUN_ADLARI[i]} · {tarihEtiket(g)}
                 </p>
                 <div className="space-y-1.5">
@@ -165,19 +165,19 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
                     const kismi = !tam && (it.eslesti || (it.oran !== null && it.oran > 0))
                     return (
                       <div key={it.id}
-                        className={`flex flex-wrap items-center gap-2 rounded-xl border-2 border-[#1B2430] px-3 py-2 ${
-                          it.status === 'skipped' ? 'bg-[#1B2430]/5 opacity-60'
-                            : tam ? 'bg-[#6FA89E]/15' : kismi ? 'bg-[#E8C468]/20' : 'bg-white'
+                        className={`flex flex-wrap items-center gap-2 rounded-xl border-2 border-[var(--cizgi)] px-3 py-2 ${
+                          it.status === 'skipped' ? 'bg-[var(--koyu)]/5 opacity-60'
+                            : tam ? 'bg-[var(--ikincil-zemin)]/15' : kismi ? 'bg-[#E8C468]/20' : 'bg-[var(--yuzey-ic)]'
                         }`}
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-[#1B2430]">
-                            {it.planTime && <span className="mr-1.5 tabular-nums text-[#1B2430]/60">{it.planTime.slice(0, 5)}</span>}
+                          <p className="text-sm font-bold text-[var(--yazi)]">
+                            {it.planTime && <span className="mr-1.5 tabular-nums text-[var(--yazi)]/60">{it.planTime.slice(0, 5)}</span>}
                             {it.subject}
-                            {it.topic && <span className="font-semibold text-[#1B2430]/70"> — {it.topic}</span>}
+                            {it.topic && <span className="font-semibold text-[var(--yazi)]/70"> — {it.topic}</span>}
                             {it.status === 'skipped' && <span className="ml-2 text-xs">(atlandı)</span>}
                           </p>
-                          <p className="text-xs font-semibold text-[#1B2430]/60">
+                          <p className="text-xs font-semibold text-[var(--yazi)]/60">
                             {it.source && <span>{it.source} · </span>}
                             {it.targetQuestions ? `${it.gerceklesenSoru}/${it.targetQuestions} soru` : null}
                             {it.targetQuestions && it.targetMinutes ? ' · ' : null}
@@ -191,16 +191,16 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
                           <div className="flex shrink-0 items-center gap-1">
                             <button type="button" onClick={() => durum(it.id, it.status === 'done' ? 'planned' : 'done')}
                               aria-label="Tamamlandı işaretle" title="Tamamlandı"
-                              className={`rounded-lg border-2 border-[#1B2430] p-1 ${it.status === 'done' ? 'bg-[#6FA89E] text-white' : 'bg-white text-[#1B2430]'}`}>
+                              className={`rounded-lg border-2 border-[var(--cizgi)] p-1 ${it.status === 'done' ? 'bg-[var(--ikincil-zemin)] text-[var(--yazi-ters)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'}`}>
                               <Check className="h-3.5 w-3.5" />
                             </button>
                             <button type="button" onClick={() => durum(it.id, it.status === 'skipped' ? 'planned' : 'skipped')}
                               aria-label="Atlandı işaretle" title="Atlandı"
-                              className={`rounded-lg border-2 border-[#1B2430] p-1 ${it.status === 'skipped' ? 'bg-[#1B2430] text-white' : 'bg-white text-[#1B2430]'}`}>
+                              className={`rounded-lg border-2 border-[var(--cizgi)] p-1 ${it.status === 'skipped' ? 'bg-[var(--koyu)] text-[var(--yazi-ters)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'}`}>
                               <SkipForward className="h-3.5 w-3.5" />
                             </button>
                             <button type="button" onClick={() => sil(it.id)} aria-label="Satırı sil"
-                              className="p-1 text-[#1B2430]/40 hover:text-red-600">
+                              className="p-1 text-[var(--yazi)]/40 hover:text-[var(--tehlike)]">
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           </div>
@@ -225,7 +225,7 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
           )}
           {items.length === 0 && (
             <button type="button" onClick={kopyala} disabled={isPending}
-              className="flex items-center gap-1.5 rounded-xl border-4 border-[#1B2430] bg-white px-4 py-2 text-sm font-bold text-[#1B2430]">
+              className="flex items-center gap-1.5 rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-4 py-2 text-sm font-bold text-[var(--yazi)]">
               <Copy className="h-4 w-4" /> Geçen Haftayı Kopyala
             </button>
           )}
@@ -233,10 +233,10 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
       )}
 
       {acik && canEdit && (
-        <div className="space-y-3 rounded-xl border-4 border-[#1B2430] bg-white p-4">
+        <div className="space-y-3 rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-bold text-[#1B2430]">Gün</label>
+              <label className="mb-1 block text-sm font-bold text-[var(--yazi)]">Gün</label>
               <select value={gun} onChange={(e) => setGun(e.target.value)} className={PIXEL_INPUT}>
                 {gunler.map((g, i) => (
                   <option key={g} value={g}>{GUN_ADLARI[i]} · {tarihEtiket(g)}</option>
@@ -244,43 +244,43 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-[#1B2430]">Saat (isteğe bağlı)</label>
+              <label className="mb-1 block text-sm font-bold text-[var(--yazi)]">Saat (isteğe bağlı)</label>
               <input type="time" value={saat} onChange={(e) => setSaat(e.target.value)} className={PIXEL_INPUT} />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-[#1B2430]">Ders</label>
+              <label className="mb-1 block text-sm font-bold text-[var(--yazi)]">Ders</label>
               <select value={ders} onChange={(e) => setDers(e.target.value)} className={PIXEL_INPUT}>
                 {subjects.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-[#1B2430]">Konu</label>
+              <label className="mb-1 block text-sm font-bold text-[var(--yazi)]">Konu</label>
               <input value={konu} onChange={(e) => setKonu(e.target.value)} placeholder="Örn. Türev" className={PIXEL_INPUT} />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-[#1B2430]">Kaynak</label>
+              <label className="mb-1 block text-sm font-bold text-[var(--yazi)]">Kaynak</label>
               <input value={kaynak} onChange={(e) => setKaynak(e.target.value)} placeholder="Örn. 3D Soru Bankası" className={PIXEL_INPUT} />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="mb-1 block text-sm font-bold text-[#1B2430]">Hedef soru</label>
+                <label className="mb-1 block text-sm font-bold text-[var(--yazi)]">Hedef soru</label>
                 <input type="number" min={0} value={hedefSoru} onChange={(e) => setHedefSoru(e.target.value)} className={PIXEL_INPUT} />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-bold text-[#1B2430]">Hedef dk</label>
+                <label className="mb-1 block text-sm font-bold text-[var(--yazi)]">Hedef dk</label>
                 <input type="number" min={0} value={hedefDakika} onChange={(e) => setHedefDakika(e.target.value)} className={PIXEL_INPUT} />
               </div>
             </div>
           </div>
 
-          {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+          {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
 
           <div className="flex gap-2">
             <button type="button" onClick={ekle} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
               {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ekle'}
             </button>
             <button type="button" onClick={() => { setAcik(false); setError(null) }}
-              className="rounded-xl border-4 border-[#1B2430] bg-white px-4 py-2 text-sm font-bold text-[#1B2430]">
+              className="rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-4 py-2 text-sm font-bold text-[var(--yazi)]">
               Kapat
             </button>
           </div>
@@ -288,7 +288,7 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
       )}
 
       {items.length > 0 && (
-        <p className="text-xs font-semibold text-[#1B2430]/60">
+        <p className="text-xs font-semibold text-[var(--yazi)]/60">
           Satırlar öğrencinin Günlük kayıtlarıyla aynı gün ve aynı ders üzerinden
           kendiliğinden eşleşiyor; öğrencinin ayrıca bir şey işaretlemesi gerekmiyor.
         </p>

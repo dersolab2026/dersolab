@@ -25,16 +25,16 @@ export default function ResetPasswordPage() {
     <AuthShell subtitle="Yeni Şifre Belirle">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-[#1B2430] font-bold mb-2">Yeni Şifre</label>
+          <label className="block text-[var(--yazi)] font-bold mb-2">Yeni Şifre</label>
           <PasswordInput required minLength={8} value={password} onChange={setPassword} placeholder="••••••••" />
         </div>
 
-        {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+        {error && <p className="text-sm font-bold text-[var(--tehlike)]">{error}</p>}
 
         <button
           type="submit"
           disabled={isPending}
-          className="mt-2 w-full py-4 bg-[#DD7B3A] text-[#F4F1E8] font-bold text-lg rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all disabled:opacity-60"
+          className="mt-2 w-full py-4 bg-[var(--vurgu)] text-[var(--yazi-ters)] font-bold text-lg rounded-xl border-4 border-[var(--cizgi)] shadow-[0_4px_0_var(--golge)] active:translate-y-1 active:shadow-none transition-all disabled:opacity-60"
         >
           {isPending ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
         </button>

@@ -35,10 +35,10 @@ export function ExamReflection({ entry }: { entry: ExamResultEntry }) {
 
   return (
     <div className="space-y-2">
-      <p className="text-sm font-bold text-[#1B2430]/70">Deneme sonrası notların</p>
+      <p className="text-sm font-bold text-[var(--yazi)]/70">Deneme sonrası notların</p>
 
       <div>
-        <label className="mb-1 block text-xs font-bold text-[#1B2430]">
+        <label className="mb-1 block text-xs font-bold text-[var(--yazi)]">
           Bu denemeye nasıl hazırlandın?
         </label>
         <textarea value={hazirlik} onChange={(e) => setHazirlik(e.target.value)} rows={2}
@@ -47,14 +47,14 @@ export function ExamReflection({ entry }: { entry: ExamResultEntry }) {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-bold text-[#1B2430]">
+        <label className="mb-1 block text-xs font-bold text-[var(--yazi)]">
           Hangi derste süre yetmedi?
         </label>
         <input value={sureDersi} onChange={(e) => setSureDersi(e.target.value)}
           placeholder="Örn. Temel Matematik" className={`${PIXEL_INPUT} text-sm`} />
       </div>
 
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
 
       <button type="button" onClick={kaydet} disabled={isPending}
         className={`${PIXEL_BUTTON_PRIMARY} px-3 py-1.5 text-sm`}>

@@ -32,29 +32,29 @@ export function TermsAcceptanceForm() {
 
   return (
     <form onSubmit={handleSubmit} className={`${PIXEL_CARD} space-y-5 p-6`}>
-      <p className="leading-relaxed text-[#1B2430]">
+      <p className="leading-relaxed text-[var(--yazi)]">
         DersoLab&apos;ı kullanmaya devam etmek için güncel Kullanım Şartları&apos;nı kabul etmelisin.
       </p>
-      <label className="flex items-start gap-3 text-sm leading-relaxed text-[#1B2430]">
+      <label className="flex items-start gap-3 text-sm leading-relaxed text-[var(--yazi)]">
         <input
           type="checkbox"
           required
           checked={accepted}
           onChange={(event) => setAccepted(event.target.checked)}
-          className="mt-1 h-4 w-4 accent-[#DD7B3A]"
+          className="mt-1 h-4 w-4 accent-[var(--vurgu-yazi)]"
         />
         <span>
-          <Link href="/terms" target="_blank" className="font-bold text-[#DD7B3A] underline">
+          <Link href="/terms" target="_blank" className="font-bold text-[var(--vurgu-yazi)] underline">
             Kullanım Şartları’nı
           </Link>{' '}
           okudum ve kabul ediyorum.{' '}
-          <Link href="/privacy" target="_blank" className="font-bold text-[#DD7B3A] underline">
+          <Link href="/privacy" target="_blank" className="font-bold text-[var(--vurgu-yazi)] underline">
             KVKK Aydınlatma Metni
           </Link>{' '}
           hakkında da bilgilendirildim.
         </span>
       </label>
-      {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-bold text-[var(--tehlike)]">{error}</p>}
       <button type="submit" disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} w-full px-4 py-3`}>
         {isPending ? 'Kaydediliyor...' : 'Kabul Et ve Devam Et'}
       </button>

@@ -102,10 +102,10 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
       {/* Tanisma formu */}
       <div className={`${PIXEL_CARD} space-y-4 p-5`}>
         <div className="flex items-center gap-2">
-          <ClipboardCheck className="h-5 w-5 text-[#1B2430]" />
-          <p className="font-bold text-[#1B2430]">Tanışma Formu</p>
+          <ClipboardCheck className="h-5 w-5 text-[var(--yazi)]" />
+          <p className="font-bold text-[var(--yazi)]">Tanışma Formu</p>
         </div>
-        <p className="text-sm font-semibold text-[#1B2430]/70">
+        <p className="text-sm font-semibold text-[var(--yazi)]/70">
           Koçun seni tanımadan ilk görüşmeye başlamasın diye. Sadece sana uyanlara tıkla —
           birden fazla seçebilirsin, hepsini doldurmak zorunda değilsin.
         </p>
@@ -147,7 +147,7 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
           />
 
           <div>
-            <label className="mb-2 block text-sm font-bold text-[#1B2430]">
+            <label className="mb-2 block text-sm font-bold text-[var(--yazi)]">
               Koçluk almak kimin fikriydi?
             </label>
             <div className="flex flex-wrap gap-2">
@@ -157,8 +157,8 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
                     ...p, whoWanted: p.whoWanted === s.deger ? null : s.deger,
                   }))}
                   aria-pressed={form.whoWanted === s.deger}
-                  className={`rounded-lg border-4 border-[#1B2430] px-3 py-1.5 text-sm font-bold transition-all ${
-                    form.whoWanted === s.deger ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+                  className={`rounded-lg border-4 border-[var(--cizgi)] px-3 py-1.5 text-sm font-bold transition-all ${
+                    form.whoWanted === s.deger ? 'bg-[var(--vurgu)] text-[var(--yazi-ters)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
                   }`}>
                   {s.etiket}
                 </button>
@@ -167,10 +167,10 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-bold text-[#1B2430]">
+            <label className="mb-1 block text-sm font-bold text-[var(--yazi)]">
               Koçunun bilmesini istediğin başka bir şey?
             </label>
-            <p className="mb-1 text-xs font-semibold text-[#1B2430]/50">
+            <p className="mb-1 text-xs font-semibold text-[var(--yazi)]/50">
               İsteğe bağlı — boş bırakabilirsin.
             </p>
             <textarea
@@ -183,7 +183,7 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
           </div>
         </div>
 
-        {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+        {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
 
         <button type="button" onClick={formuKaydet} disabled={isPending}
           className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
@@ -194,7 +194,7 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
       {/* Olcek */}
       <div className={`${PIXEL_CARD} space-y-3 p-5`}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="font-bold text-[#1B2430]">Çalışma Alışkanlıkların</p>
+          <p className="font-bold text-[var(--yazi)]">Çalışma Alışkanlıkların</p>
           {!olcekAcik && (
             <button type="button" onClick={() => setOlcekAcik(true)}
               className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
@@ -203,9 +203,9 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
           )}
         </div>
 
-        <div className="flex items-start gap-2 rounded-xl border-2 border-[#1B2430] bg-[#F4F1E8] px-3 py-2">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#1B2430]/70" />
-          <p className="text-xs font-semibold text-[#1B2430]/80">
+        <div className="flex items-start gap-2 rounded-xl border-2 border-[var(--cizgi)] bg-[var(--yuzey)] px-3 py-2">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--yazi)]/70" />
+          <p className="text-xs font-semibold text-[var(--yazi)]/80">
             Bu bilimsel bir test değil, doğru ya da yanlış cevabı yok. Amacı koçunla
             ilk görüşmede nereden başlayacağınızı bulmak. Birkaç hafta sonra tekrar
             ölçüp değişimi görebilirsin.
@@ -214,13 +214,13 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
 
         {olcekAcik ? (
           <div className="space-y-4">
-            <p className="text-sm font-bold text-[#1B2430]/70">
+            <p className="text-sm font-bold text-[var(--yazi)]/70">
               {cevaplanan}/{MADDELER.length} cevaplandı
             </p>
             {MADDELER.map((m, i) => (
-              <div key={m.id} className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
-                <p className="mb-2 text-sm font-bold text-[#1B2430]">
-                  <span className="mr-1.5 text-[#1B2430]/50">{i + 1}.</span>{m.metin}
+              <div key={m.id} className="rounded-xl border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)] p-3">
+                <p className="mb-2 text-sm font-bold text-[var(--yazi)]">
+                  <span className="mr-1.5 text-[var(--yazi)]/50">{i + 1}.</span>{m.metin}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {OLCEK_ETIKETLERI.map((etiket, idx) => {
@@ -231,21 +231,21 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
                         onClick={() => setCevaplar((p) => ({ ...p, [m.id]: deger }))}
                         aria-pressed={secili}
                         title={etiket}
-                        className={`min-w-[38px] rounded-lg border-2 border-[#1B2430] px-2 py-1 text-xs font-bold transition-all ${
-                          secili ? 'bg-[#6FA89E] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+                        className={`min-w-[38px] rounded-lg border-2 border-[var(--cizgi)] px-2 py-1 text-xs font-bold transition-all ${
+                          secili ? 'bg-[var(--ikincil-zemin)] text-[var(--yazi-ters)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
                         }`}>
                         {deger}
                       </button>
                     )
                   })}
-                  <span className="self-center pl-1 text-xs font-semibold text-[#1B2430]/50">
+                  <span className="self-center pl-1 text-xs font-semibold text-[var(--yazi)]/50">
                     1 = hiç katılmıyorum · 5 = tamamen katılıyorum
                   </span>
                 </div>
               </div>
             ))}
 
-            {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+            {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
 
             <div className="flex gap-2">
               <button type="button" onClick={olcegiKaydet} disabled={isPending || cevaplanan === 0}
@@ -253,7 +253,7 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
                 {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
               </button>
               <button type="button" onClick={() => { setOlcekAcik(false); setCevaplar({}) }}
-                className="rounded-xl border-4 border-[#1B2430] bg-white px-4 py-2 text-sm font-bold text-[#1B2430]">
+                className="rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-4 py-2 text-sm font-bold text-[var(--yazi)]">
                 Vazgeç
               </button>
             </div>
@@ -266,7 +266,7 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
             guncelTarih={sonOlcum.takenOn}
           />
         ) : (
-          <p className="text-sm font-semibold text-[#1B2430]/60">
+          <p className="text-sm font-semibold text-[var(--yazi)]/60">
             Henüz değerlendirme yapmadın. 20 kısa soru, birkaç dakika sürüyor.
           </p>
         )}
@@ -298,13 +298,13 @@ function SecimGrubu({ etiket, secenekler, secili, onSec }: {
 
   return (
     <div>
-      <p className="mb-2 text-sm font-bold text-[#1B2430]">{etiket}</p>
+      <p className="mb-2 text-sm font-bold text-[var(--yazi)]">{etiket}</p>
 
       <div className="space-y-2">
         {gruplar.map((g) => (
           <div key={g}>
             {g && (
-              <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[#1B2430]/50">{g}</p>
+              <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[var(--yazi)]/50">{g}</p>
             )}
             <div className="flex flex-wrap gap-1.5">
               {secenekler.filter((s) => (s.grup ?? '') === g).map((s) => {
@@ -312,8 +312,8 @@ function SecimGrubu({ etiket, secenekler, secili, onSec }: {
                 return (
                   <button key={s.key} type="button" onClick={() => onSec(s.key)}
                     aria-pressed={isaretli}
-                    className={`rounded-lg border-2 border-[#1B2430] px-2.5 py-1 text-sm font-bold transition-all ${
-                      isaretli ? 'bg-[#6FA89E] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+                    className={`rounded-lg border-2 border-[var(--cizgi)] px-2.5 py-1 text-sm font-bold transition-all ${
+                      isaretli ? 'bg-[var(--ikincil-zemin)] text-[var(--yazi-ters)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
                     }`}>
                     {s.label}
                   </button>
@@ -326,13 +326,13 @@ function SecimGrubu({ etiket, secenekler, secili, onSec }: {
 
       {eskiCevaplar.length > 0 && (
         <div className="mt-2 space-y-1">
-          <p className="text-xs font-semibold text-[#1B2430]/50">Daha önce yazdığın cevap:</p>
+          <p className="text-xs font-semibold text-[var(--yazi)]/50">Daha önce yazdığın cevap:</p>
           {eskiCevaplar.map((c) => (
             <span key={c}
-              className="mr-1.5 inline-flex items-center gap-1.5 rounded-lg border-2 border-dashed border-[#1B2430]/40 bg-[#F4F1E8] px-2 py-1 text-sm font-semibold text-[#1B2430]">
+              className="mr-1.5 inline-flex items-center gap-1.5 rounded-lg border-2 border-dashed border-[var(--cizgi)]/40 bg-[var(--yuzey)] px-2 py-1 text-sm font-semibold text-[var(--yazi)]">
               {c}
               <button type="button" onClick={() => onSec(c)} aria-label={`"${c}" cevabını kaldır`}
-                className="text-[#1B2430]/50 hover:text-red-600">
+                className="text-[var(--yazi)]/50 hover:text-[var(--tehlike)]">
                 <X className="h-3.5 w-3.5" />
               </button>
             </span>

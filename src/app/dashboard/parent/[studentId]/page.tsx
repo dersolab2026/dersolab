@@ -22,8 +22,8 @@ const HOMEWORK_LABELS: Record<string, string> = {
 function Rozet({ metin, vurgu }: { metin: string; vurgu?: boolean }) {
   return (
     <span
-      className={`inline-block rounded-lg border-2 border-[#1B2430] px-2 py-0.5 text-xs font-bold ${
-        vurgu ? 'bg-[#6FA89E] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+      className={`inline-block rounded-lg border-2 border-[var(--cizgi)] px-2 py-0.5 text-xs font-bold ${
+        vurgu ? 'bg-[var(--ikincil-zemin)] text-[var(--yazi-ters)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
       }`}
     >
       {metin}
@@ -34,8 +34,8 @@ function Rozet({ metin, vurgu }: { metin: string; vurgu?: boolean }) {
 function Bolum({ baslik, bos, children }: { baslik: string; bos: string; children: React.ReactNode }) {
   return (
     <div className={`${PIXEL_CARD} space-y-3 p-5`}>
-      <p className="font-bold text-[#1B2430]">{baslik}</p>
-      {children ?? <p className="text-sm font-semibold text-[#1B2430]/60">{bos}</p>}
+      <p className="font-bold text-[var(--yazi)]">{baslik}</p>
+      {children ?? <p className="text-sm font-semibold text-[var(--yazi)]/60">{bos}</p>}
     </div>
   )
 }
@@ -58,7 +58,7 @@ export default async function ParentStudentDetailPage({
       title={veri.studentName}
       description={`${veri.studentEmail} · ${veri.creditBalance} ders kredisi`}
     >
-      <Link href="/dashboard/parent" className="text-sm font-bold text-[#1B2430]/60 hover:underline">
+      <Link href="/dashboard/parent" className="text-sm font-bold text-[var(--yazi)]/60 hover:underline">
         &larr; Öğrencilerim
       </Link>
 
@@ -66,8 +66,8 @@ export default async function ParentStudentDetailPage({
         {yaklasan.length > 0 ? (
           <ul className="space-y-2">
             {yaklasan.map((b) => (
-              <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1B2430]/10 pb-2 last:border-0">
-                <span className="text-sm font-semibold text-[#1B2430]">
+              <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--cizgi)]/10 pb-2 last:border-0">
+                <span className="text-sm font-semibold text-[var(--yazi)]">
                   {b.instructorName} · {kisaTarihSaat(b.startTime)}
                 </span>
                 {b.isTrial && <Rozet metin="Tanışma Dersi" vurgu />}
@@ -81,11 +81,11 @@ export default async function ParentStudentDetailPage({
         {bekleyenOdev.length > 0 ? (
           <ul className="space-y-2">
             {bekleyenOdev.map((h) => (
-              <li key={h.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1B2430]/10 pb-2 last:border-0">
-                <span className="text-sm font-semibold text-[#1B2430]">
+              <li key={h.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--cizgi)]/10 pb-2 last:border-0">
+                <span className="text-sm font-semibold text-[var(--yazi)]">
                   {h.title}
                   {h.dueDate && (
-                    <span className="text-[#1B2430]/60">
+                    <span className="text-[var(--yazi)]/60">
                       {' '}· son tarih {new Date(h.dueDate).toLocaleDateString('tr-TR', { dateStyle: 'medium' })}
                     </span>
                   )}
@@ -102,22 +102,22 @@ export default async function ParentStudentDetailPage({
           <div className="overflow-x-auto">
             <table className="w-full min-w-[420px] text-sm">
               <thead>
-                <tr className="border-b-2 border-[#1B2430] text-left">
-                  <th className="py-1.5 pr-2 font-bold text-[#1B2430]">Deneme</th>
-                  <th className="py-1.5 px-2 font-bold text-[#1B2430]">Tür</th>
-                  <th className="py-1.5 px-2 font-bold text-[#1B2430]">Tarih</th>
-                  <th className="py-1.5 pl-2 text-right font-bold text-[#1B2430]">Net</th>
+                <tr className="border-b-2 border-[var(--cizgi)] text-left">
+                  <th className="py-1.5 pr-2 font-bold text-[var(--yazi)]">Deneme</th>
+                  <th className="py-1.5 px-2 font-bold text-[var(--yazi)]">Tür</th>
+                  <th className="py-1.5 px-2 font-bold text-[var(--yazi)]">Tarih</th>
+                  <th className="py-1.5 pl-2 text-right font-bold text-[var(--yazi)]">Net</th>
                 </tr>
               </thead>
               <tbody>
                 {veri.examResults.slice(0, 10).map((e) => (
-                  <tr key={e.id} className="border-b border-[#1B2430]/15">
-                    <td className="py-1.5 pr-2 font-semibold text-[#1B2430]">{e.examName}</td>
-                    <td className="py-1.5 px-2 font-semibold text-[#1B2430]/70">{EXAM_TYPE_LABELS[e.examType]}</td>
-                    <td className="py-1.5 px-2 font-semibold text-[#1B2430]/70">
+                  <tr key={e.id} className="border-b border-[var(--cizgi)]/15">
+                    <td className="py-1.5 pr-2 font-semibold text-[var(--yazi)]">{e.examName}</td>
+                    <td className="py-1.5 px-2 font-semibold text-[var(--yazi)]/70">{EXAM_TYPE_LABELS[e.examType]}</td>
+                    <td className="py-1.5 px-2 font-semibold text-[var(--yazi)]/70">
                       {new Date(e.examDate).toLocaleDateString('tr-TR', { dateStyle: 'medium' })}
                     </td>
-                    <td className="py-1.5 pl-2 text-right font-bold tabular-nums text-[#1B2430]">
+                    <td className="py-1.5 pl-2 text-right font-bold tabular-nums text-[var(--yazi)]">
                       {e.net.toFixed(2)}
                     </td>
                   </tr>
@@ -132,8 +132,8 @@ export default async function ParentStudentDetailPage({
         {gecmis.length > 0 ? (
           <ul className="space-y-2">
             {gecmis.map((b) => (
-              <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1B2430]/10 pb-2 last:border-0">
-                <span className="text-sm font-semibold text-[#1B2430]">
+              <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--cizgi)]/10 pb-2 last:border-0">
+                <span className="text-sm font-semibold text-[var(--yazi)]">
                   {b.instructorName} · {kisaTarihSaat(b.startTime)}
                 </span>
                 <Rozet metin={BOOKING_LABELS[b.status] ?? b.status} />
@@ -147,11 +147,11 @@ export default async function ParentStudentDetailPage({
         {veri.purchases.length > 0 ? (
           <ul className="space-y-2">
             {veri.purchases.map((p) => (
-              <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1B2430]/10 pb-2 last:border-0">
-                <span className="text-sm font-semibold text-[#1B2430]">
+              <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--cizgi)]/10 pb-2 last:border-0">
+                <span className="text-sm font-semibold text-[var(--yazi)]">
                   {kisaTarihSaat(p.createdAt)} · {p.creditsGranted} kredi
                   {p.amountPaid !== null && (
-                    <span className="text-[#1B2430]/60"> · {p.amountPaid.toLocaleString('tr-TR')} ₺</span>
+                    <span className="text-[var(--yazi)]/60"> · {p.amountPaid.toLocaleString('tr-TR')} ₺</span>
                   )}
                 </span>
                 <Rozet metin={p.status === 'completed' ? 'Tamamlandı' : p.status} />

@@ -44,7 +44,7 @@ export function SubjectsEditor({ initialSubjects }: SubjectsEditorProps) {
           </button>
         ))}
       </div>
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
       <button type="button" onClick={handleSave} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-1.5 text-sm`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
       </button>

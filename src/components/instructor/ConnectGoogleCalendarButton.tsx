@@ -38,7 +38,7 @@ export function ConnectGoogleCalendarButton({ isConnected }: ConnectGoogleCalend
           <Check className="h-4 w-4" />
           Google Takvimi bağlı
         </span>
-        <a href="/api/google/authorize" onClick={handleClick} className="text-sm font-bold underline text-[#1B2430]">
+        <a href="/api/google/authorize" onClick={handleClick} className="text-sm font-bold underline text-[var(--yazi)]">
           Yeniden Bağla
         </a>
       </div>

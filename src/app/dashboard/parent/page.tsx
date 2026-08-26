@@ -8,10 +8,10 @@ import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { PIXEL_CARD } from '@/lib/theme'
 
 function Kutu({ etiket, deger, vurgu }: { etiket: string; deger: string; vurgu?: 'iyi' | 'dikkat' }) {
-  const renk = vurgu === 'iyi' ? 'text-[#2F8570]' : vurgu === 'dikkat' ? 'text-[#C2682F]' : 'text-[#1B2430]'
+  const renk = vurgu === 'iyi' ? 'text-[#2F8570]' : vurgu === 'dikkat' ? 'text-[#C2682F]' : 'text-[var(--yazi)]'
   return (
-    <div className="rounded-xl border-2 border-[#1B2430]/15 bg-white px-3 py-2">
-      <p className="text-xs font-semibold text-[#1B2430]/55">{etiket}</p>
+    <div className="rounded-xl border-2 border-[var(--cizgi)]/15 bg-[var(--yuzey-ic)] px-3 py-2">
+      <p className="text-xs font-semibold text-[var(--yazi)]/55">{etiket}</p>
       <p className={`text-lg font-bold tabular-nums ${renk}`}>{deger}</p>
     </div>
   )
@@ -33,7 +33,7 @@ export default async function ParentHomePage() {
         <>
           <LinkStudentForm />
           <div className={`${PIXEL_CARD} p-5`}>
-            <p className="font-semibold text-[#1B2430]/70">
+            <p className="font-semibold text-[var(--yazi)]/70">
               Henüz bağlı bir öğrenciniz yok. Yukarıdaki alana öğrencinizden aldığınız kodu girin.
             </p>
           </div>
@@ -48,27 +48,27 @@ export default async function ParentHomePage() {
                   <div>
                     <Link
                       href={`/dashboard/parent/${o.personId}`}
-                      className="text-lg font-bold text-[#1B2430] underline decoration-2 underline-offset-2"
+                      className="text-lg font-bold text-[var(--yazi)] underline decoration-2 underline-offset-2"
                     >
                       {o.personName}
                     </Link>
-                    <p className="text-sm font-semibold text-[#1B2430]/60">{o.personEmail}</p>
+                    <p className="text-sm font-semibold text-[var(--yazi)]/60">{o.personEmail}</p>
                   </div>
                   <UnlinkStudentButton studentId={o.personId} studentName={o.personName} />
                 </div>
 
                 {z?.siradakiDers ? (
-                  <div className="rounded-xl border-2 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/55">Sıradaki ders</p>
-                    <p className="font-bold text-[#1B2430]">
+                  <div className="rounded-xl border-2 border-[var(--cizgi)] bg-[var(--yuzey)] px-4 py-3">
+                    <p className="text-xs font-bold uppercase tracking-wide text-[var(--yazi)]/55">Sıradaki ders</p>
+                    <p className="font-bold text-[var(--yazi)]">
                       {z.siradakiDers.instructorName}
-                      <span className="font-semibold text-[#1B2430]/70">
+                      <span className="font-semibold text-[var(--yazi)]/70">
                         {' · '}{kisaTarihSaat(z.siradakiDers.startTime)}
                       </span>
                     </p>
                   </div>
                 ) : (
-                  <p className="text-sm font-semibold text-[#1B2430]/55">Planlanmış ders yok.</p>
+                  <p className="text-sm font-semibold text-[var(--yazi)]/55">Planlanmış ders yok.</p>
                 )}
 
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -92,7 +92,7 @@ export default async function ParentHomePage() {
 
                 <Link
                   href={`/dashboard/parent/${o.personId}`}
-                  className="inline-block text-sm font-bold text-[#DD7B3A] hover:underline"
+                  className="inline-block text-sm font-bold text-[var(--vurgu-yazi)] hover:underline"
                 >
                   Ayrıntıya bak →
                 </Link>
@@ -105,12 +105,12 @@ export default async function ParentHomePage() {
       )}
 
       <div className={`${PIXEL_CARD} p-5`}>
-        <p className="font-bold text-[#1B2430]">Neyi görebilirsiniz?</p>
-        <p className="mt-1 text-sm font-semibold text-[#1B2430]/70">
+        <p className="font-bold text-[var(--yazi)]">Neyi görebilirsiniz?</p>
+        <p className="mt-1 text-sm font-semibold text-[var(--yazi)]/70">
           Ders takvimi ve katılım, ödev durumu, deneme netleri, kredi bakiyesi ve ödeme geçmişi.
           Ders planlandığında, tamamlandığında ya da katılım olmadığında size de bildirim gelir.
         </p>
-        <p className="mt-2 text-sm font-semibold text-[#1B2430]/70">
+        <p className="mt-2 text-sm font-semibold text-[var(--yazi)]/70">
           Öğrencinizin günlüğü ve koçluk formu cevapları size kapalıdır — bunlar öğrencinin
           koçuyla arasındaki alandır. Açık olsaydı öğrenci dürüst cevap veremezdi.
         </p>

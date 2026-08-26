@@ -3,6 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import { getDemoLessonStatus } from '@/lib/demo-lessons/get-demo-lesson-status'
 import { DemoLessonRequestCard } from '@/components/demo-lessons/DemoLessonRequestCard'
 import { DemoLessonEmailForm } from '@/components/demo-lessons/DemoLessonEmailForm'
+import { SayfaDeseni } from '@/components/layout/SayfaDeseni'
+import { oturumTemasi } from '@/lib/tema-sunucu'
+import { TEMA_ACIK } from '@/lib/tema'
 
 export default async function DemoLessonPage() {
   const supabase = await createClient()
@@ -12,22 +15,25 @@ export default async function DemoLessonPage() {
     ? await supabase.from('users').select('role').eq('id', user.id).single()
     : { data: null }
 
+  // Hoş geldin paketi öğrenciye ait bir sayfa; içeriği de bunu söylüyor
+  // ("sadece öğrenci hesapları için geçerli"). Kök düzen temayı zaten
+  // oturumdan ya da ziyaretçinin vitrindeki seçiminden koyuyor; burada
+  // yalnızca hiçbiri yoksa öğrenciye düşüyoruz. Koşulsuz yazınca kök ile
+  // bu sayfa ayrı temalarda kalıyor ve biri diğerinin jetonlarını miras
+  // alıyordu.
+  const kokTema = await oturumTemasi()
+  const tema = TEMA_ACIK && !kokTema ? 'ogrenci' : undefined
+
   return (
-    <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
-      <div
-        className="absolute inset-0 z-0 opacity-40 pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(45deg, #6FA89E 25%, transparent 25%), linear-gradient(-45deg, #6FA89E 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #6FA89E 75%), linear-gradient(-45deg, transparent 75%, #6FA89E 75%)',
-          backgroundSize: '40px 40px', backgroundPosition: '0 0, 0 20px, 20px -20px, -20px 0px'
-        }}
-      />
+    <div className="min-h-screen w-full bg-[var(--zemin)] relative overflow-hidden" data-tema={tema}>
+      <SayfaDeseni />
 
       <div className="relative z-10 mx-auto max-w-2xl space-y-6 p-5 py-10">
-        <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
-          <h1 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430] leading-snug">
+        <div className="bg-[var(--yuzey)] rounded-2xl p-6 sm:p-8 border-4 border-[var(--cizgi)] shadow-[0_8px_0_var(--golge)]">
+          <h1 className="font-sans text-2xl sm:text-3xl font-black text-[var(--yazi)] leading-snug">
             Hoş Geldin Paketi
           </h1>
-          <p className="mt-2 font-sans font-semibold text-[#1B2430]">
+          <p className="mt-2 font-sans font-semibold text-[var(--yazi)]">
             Ücretsiz tanışma dersi. Her öğrenciye bir kere, tamamen ücretsiz.
           </p>
         </div>
@@ -35,17 +41,17 @@ export default async function DemoLessonPage() {
         {!user ? (
           <>
             <DemoLessonEmailForm />
-            <p className="text-center text-sm font-semibold text-[#1B2430]">
+            <p className="text-center text-sm font-semibold text-[var(--yazi)]">
               Zaten hesabın var mı?{' '}
-              <Link href="/login" className="text-[#DD7B3A] font-bold underline">Giriş Yap</Link>
+              <Link href={`/login?kitle=${kokTema ?? 'ogrenci'}`} className="text-[var(--vurgu-yazi)] font-bold underline">Giriş Yap</Link>
             </p>
           </>
         ) : userRecord?.role === 'student' ? (
           <DemoLessonRequestCard studentId={user.id} initialStatus={await getDemoLessonStatus(user.id)} />
         ) : (
-          <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
-            <p className="font-sans font-semibold text-[#1B2430]">
-              Hoş geldin paketi sadece öğrenci hesapları için geçerli.
+          <div className="bg-[var(--yuzey)] rounded-2xl p-6 sm:p-8 border-4 border-[var(--cizgi)] shadow-[0_8px_0_var(--golge)]">
+            <p className="font-sans font-semibold text-[var(--yazi)]">
+              Hoş Geldin Paketi sadece öğrenci hesapları için geçerli.
             </p>
           </div>
         )}

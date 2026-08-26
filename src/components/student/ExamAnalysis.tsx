@@ -40,9 +40,9 @@ interface Nokta {
   net: number
 }
 
-const CIZGI = '#1B2430'
-const TEAL = '#6FA89E'
-const TURUNCU = '#DD7B3A'
+const CIZGI = 'var(--cizgi)'
+const TEAL = 'var(--ikincil-yazi)'
+const TURUNCU = 'var(--vurgu-yazi)'
 
 function tarihKisa(iso: string): string {
   const d = new Date(iso)
@@ -155,8 +155,8 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
   return (
     <div className={`${PIXEL_CARD} p-5 space-y-5`}>
       <div className="flex items-center gap-2">
-        <LineChart className="h-5 w-5 text-[#1B2430]" />
-        <p className="font-bold text-[#1B2430]">Deneme Analizi</p>
+        <LineChart className="h-5 w-5 text-[var(--yazi)]" />
+        <p className="font-bold text-[var(--yazi)]">Deneme Analizi</p>
       </div>
 
       {/* Sinav turu secimi */}
@@ -167,10 +167,10 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
               key={g.anahtar}
               type="button"
               onClick={() => { setSeciliGrup(g.anahtar); setHaricTutulan(new Set()) }}
-              className={`rounded-lg border-4 border-[#1B2430] px-3 py-1.5 text-sm font-bold transition-all ${
+              className={`rounded-lg border-4 border-[var(--cizgi)] px-3 py-1.5 text-sm font-bold transition-all ${
                 g.anahtar === grup.anahtar
-                  ? 'bg-[#DD7B3A] text-[#F4F1E8]'
-                  : 'bg-white text-[#1B2430]'
+                  ? 'bg-[var(--vurgu)] text-[var(--yazi-ters)]'
+                  : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]'
               }`}
             >
               {EXAM_TYPE_LABELS[g.examType]}
@@ -184,8 +184,8 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
       {/* Grafige hangi denemeler girsin */}
       <div>
         <div className="mb-2 flex items-center gap-1.5">
-          <ListFilter className="h-4 w-4 text-[#1B2430]/60" />
-          <p className="text-sm font-bold text-[#1B2430]/70">
+          <ListFilter className="h-4 w-4 text-[var(--yazi)]/60" />
+          <p className="text-sm font-bold text-[var(--yazi)]/70">
             Grafiğe girecek denemeler ({secililer.length}/{grubunDenemeleri.length})
           </p>
         </div>
@@ -198,8 +198,8 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
                 type="button"
                 onClick={() => toggle(e.id)}
                 aria-pressed={secili}
-                className={`rounded-lg border-2 border-[#1B2430] px-2.5 py-1 text-xs font-bold transition-all ${
-                  secili ? 'bg-[#6FA89E] text-[#F4F1E8]' : 'bg-white text-[#1B2430]/50 line-through'
+                className={`rounded-lg border-2 border-[var(--cizgi)] px-2.5 py-1 text-xs font-bold transition-all ${
+                  secili ? 'bg-[var(--ikincil-zemin)] text-[var(--yazi-ters)]' : 'bg-[var(--yuzey-ic)] text-[var(--yazi)]/50 line-through'
                 }`}
               >
                 {e.examName}
@@ -210,7 +210,7 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
       </div>
 
       {secililer.length < 2 ? (
-        <p className="text-sm font-semibold text-[#1B2430]/60">
+        <p className="text-sm font-semibold text-[var(--yazi)]/60">
           Gelişim grafiği için en az iki deneme seçmelisin.
         </p>
       ) : (
@@ -218,13 +218,13 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
       )}
 
       {hedefNet !== null && (
-        <div className="flex items-start gap-2 rounded-xl border-4 border-[#1B2430] bg-white px-4 py-3">
-          <span className="mt-1 inline-block h-3 w-3 shrink-0 rounded-full border-2 border-[#1B2430]"
+        <div className="flex items-start gap-2 rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)] px-4 py-3">
+          <span className="mt-1 inline-block h-3 w-3 shrink-0 rounded-full border-2 border-[var(--cizgi)]"
             style={{ backgroundColor: DURUM_RENK[degerlendirme.durum] }} />
           <div>
-            <p className="text-sm font-bold text-[#1B2430]">{degerlendirme.mesaj}</p>
+            <p className="text-sm font-bold text-[var(--yazi)]">{degerlendirme.mesaj}</p>
             {degerlendirme.fark !== null && (
-              <p className="text-xs font-semibold text-[#1B2430]/60">
+              <p className="text-xs font-semibold text-[var(--yazi)]/60">
                 Hedef {hedefNet} net · son deneme {degerlendirme.fark >= 0 ? '+' : ''}{degerlendirme.fark}
               </p>
             )}
@@ -240,7 +240,7 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
         const uyari = zorlukUyarisi(onceki.difficulty, son.difficulty)
         if (!uyari) return null
         return (
-          <p className="rounded-xl border-4 border-[#1B2430] bg-[#F6EAD2] px-4 py-3 text-sm font-semibold text-[#1B2430]">
+          <p className="rounded-xl border-4 border-[var(--cizgi)] bg-[#F6EAD2] px-4 py-3 text-sm font-semibold text-[var(--yazi)]">
             {uyari}
           </p>
         )
@@ -250,7 +250,7 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
 
       {dersDurumu.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-bold text-[#1B2430]/70">
+          <p className="text-sm font-bold text-[var(--yazi)]/70">
             Ders ders durumun — {secililer.length} denemenin ortalaması
           </p>
           {dersDurumu.map((d) => {
@@ -262,10 +262,10 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
             const zayif = d.oran < 0.40
             return (
               <div key={d.ad} className="flex items-center gap-3">
-                <span className="w-40 shrink-0 truncate text-sm font-bold text-[#1B2430]" title={d.ad}>
+                <span className="w-40 shrink-0 truncate text-sm font-bold text-[var(--yazi)]" title={d.ad}>
                   {d.ad}
                 </span>
-                <div className="h-6 flex-1 overflow-hidden rounded-md border-2 border-[#1B2430] bg-white">
+                <div className="h-6 flex-1 overflow-hidden rounded-md border-2 border-[var(--cizgi)] bg-[var(--yuzey-ic)]">
                   <div
                     className="h-full transition-all"
                     style={{
@@ -274,13 +274,13 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
                     }}
                   />
                 </div>
-                <span className="w-24 shrink-0 text-right text-sm font-bold tabular-nums text-[#1B2430]">
+                <span className="w-24 shrink-0 text-right text-sm font-bold tabular-nums text-[var(--yazi)]">
                   {d.ortalamaNet.toFixed(1)}/{d.soru}
                 </span>
               </div>
             )
           })}
-          <p className="pt-1 text-xs font-semibold text-[#1B2430]/60">
+          <p className="pt-1 text-xs font-semibold text-[var(--yazi)]/60">
             Sayı, o dersteki ortalama netinin dersin kendi soru sayısına oranı.
             Yeşil: %65 ve üstü · Gri: %40–65 · Turuncu: %40 altı. Dersler en
             yüksekten en düşüğe sıralı.
@@ -299,9 +299,9 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
 function HataTipiDagilimi({ entries }: { entries: ExamResultEntry[] }) {
   const TIPLER: { anahtar: keyof ErrorTypeCounts; renk: string }[] = [
     { anahtar: 'knowledge', renk: '#C2410C' },
-    { anahtar: 'careless', renk: '#DD7B3A' },
+    { anahtar: 'careless', renk: 'var(--vurgu-yazi)' },
     { anahtar: 'misread', renk: '#E8C468' },
-    { anahtar: 'timeout', renk: '#6FA89E' },
+    { anahtar: 'timeout', renk: 'var(--ikincil-yazi)' },
   ]
 
   const toplamlar = { knowledge: 0, careless: 0, misread: 0, timeout: 0 }
@@ -322,11 +322,11 @@ function HataTipiDagilimi({ entries }: { entries: ExamResultEntry[] }) {
 
   return (
     <div className="space-y-2">
-      <p className="text-sm font-bold text-[#1B2430]/70">
+      <p className="text-sm font-bold text-[var(--yazi)]/70">
         Yanlışları neden yaptın — {genelToplam} yanlış işaretlendi
       </p>
 
-      <div className="flex h-7 overflow-hidden rounded-md border-2 border-[#1B2430]">
+      <div className="flex h-7 overflow-hidden rounded-md border-2 border-[var(--cizgi)]">
         {TIPLER.map((t) => {
           const oran = toplamlar[t.anahtar] / genelToplam
           if (oran === 0) return null
@@ -342,17 +342,17 @@ function HataTipiDagilimi({ entries }: { entries: ExamResultEntry[] }) {
 
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         {TIPLER.map((t) => (
-          <span key={t.anahtar} className="flex items-center gap-1.5 text-xs font-semibold text-[#1B2430]/80">
-            <span className="inline-block h-3 w-3 rounded-sm border border-[#1B2430]" style={{ backgroundColor: t.renk }} />
+          <span key={t.anahtar} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--yazi)]/80">
+            <span className="inline-block h-3 w-3 rounded-sm border border-[var(--cizgi)]" style={{ backgroundColor: t.renk }} />
             {ERROR_TYPE_LABELS[t.anahtar]}
-            <span className="tabular-nums text-[#1B2430]/60">
+            <span className="tabular-nums text-[var(--yazi)]/60">
               {toplamlar[t.anahtar]} ({Math.round((toplamlar[t.anahtar] / genelToplam) * 100)}%)
             </span>
           </span>
         ))}
       </div>
 
-      <p className="text-sm font-bold text-[#1B2430]">{ERROR_TYPE_PRESCRIPTION[baskin.anahtar]}</p>
+      <p className="text-sm font-bold text-[var(--yazi)]">{ERROR_TYPE_PRESCRIPTION[baskin.anahtar]}</p>
     </div>
   )
 }
@@ -391,13 +391,13 @@ function NetGrafigi({ noktalar, enYuksek, hedefNet }: { noktalar: Nokta[]; enYuk
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between">
-        <p className="text-sm font-bold text-[#1B2430]/70">Net gelişimi</p>
+        <p className="text-sm font-bold text-[var(--yazi)]/70">Net gelişimi</p>
         <p className="text-sm font-bold tabular-nums" style={{ color: fark >= 0 ? TEAL : TURUNCU }}>
           {fark >= 0 ? '▲' : '▼'} {Math.abs(fark).toFixed(2)} net
         </p>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border-4 border-[#1B2430] bg-white">
+      <div className="overflow-x-auto rounded-xl border-4 border-[var(--cizgi)] bg-[var(--yuzey-ic)]">
         <svg
           viewBox={`0 0 ${G} ${Y}`}
           className="h-auto w-full min-w-[520px]"
@@ -442,7 +442,7 @@ function NetGrafigi({ noktalar, enYuksek, hedefNet }: { noktalar: Nokta[]; enYuk
             <g key={n.id}>
               <rect
                 x={x(i) - 6} y={y(n.net) - 6} width="12" height="12"
-                fill="#F4F1E8" stroke={CIZGI} strokeWidth="3"
+                fill="var(--yuzey)" stroke={CIZGI} strokeWidth="3"
               />
               <text
                 x={x(i)} y={Y - 10} textAnchor="middle"

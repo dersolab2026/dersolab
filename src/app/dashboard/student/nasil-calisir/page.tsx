@@ -10,9 +10,9 @@ const ITEMS: { question: string; answer: string }[] = [
       '1 ders kredisi, 40 dakikalık bir derse karşılık gelir. "Paketler" sayfasından bir kredi paketi satın alarak kredi kazanırsın; ödeme Shopier üzerinden alınır.',
   },
   {
-    question: 'Hoş geldin paketi nedir?',
+    question: 'Hoş Geldin Paketi nedir?',
     answer:
-      'Her öğrenci platformda bir kere ücretsiz hoş geldin paketi alır: kredi harcamayan bir tanışma dersi ve bir hafta boyunca koçluk desteği. "Hoş Geldin Paketi" sayfasından tek seferde talep edersin; uygun bir eğitmen dersini planlar, bir koç da haftalık programını kurmak için seninle iletişime geçer.',
+      'Her öğrenci platformda bir kere ücretsiz Hoş Geldin Paketi alır: kredi harcamayan bir tanışma dersi. "Hoş Geldin Paketi" sayfasından talep edersin, uygun bir eğitmen dersini planlar. Kart bilgisi istemiyoruz.',
   },
   {
     question: 'Bir eğitmenden nasıl ders alırım?',
@@ -41,8 +41,8 @@ export default async function StudentHowItWorksPage() {
       <div className="space-y-4">
         {ITEMS.map((item) => (
           <div key={item.question} className={`${PIXEL_CARD} p-5 space-y-1.5`}>
-            <p className="font-bold text-[#1B2430]">{item.question}</p>
-            <p className="text-sm font-semibold text-[#1B2430]/70">{item.answer}</p>
+            <p className="font-bold text-[var(--yazi)]">{item.question}</p>
+            <p className="text-sm font-semibold text-[var(--yazi)]/70">{item.answer}</p>
           </div>
         ))}
       </div>

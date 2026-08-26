@@ -61,12 +61,12 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
 
   return (
     <div className="space-y-4">
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-[var(--tehlike)]">{error}</p>}
 
       {DISPLAY_ORDER.map((day) => (
         <div key={day} className={`${PIXEL_CARD} p-4 space-y-3`}>
           <div className="flex items-center justify-between">
-            <p className="font-bold text-[#1B2430]">{DAY_NAMES[day]}</p>
+            <p className="font-bold text-[var(--yazi)]">{DAY_NAMES[day]}</p>
             <button
               type="button"
               onClick={() => setOpenDayForm(openDayForm === day ? null : day)}
@@ -79,7 +79,7 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
 
           <div className="flex flex-wrap items-center gap-2">
             {rulesByDay[day].length === 0 && openDayForm !== day && (
-              <p className="text-sm font-semibold text-[#1B2430]/60">Bu gün için tanımlı saat yok</p>
+              <p className="text-sm font-semibold text-[var(--yazi)]/60">Bu gün için tanımlı saat yok</p>
             )}
 
             {rulesByDay[day].map((rule) => (
@@ -104,7 +104,7 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
                 onChange={(e) => setStartTime(e.target.value)}
                 className={`${PIXEL_INPUT} w-32 py-1.5`}
               />
-              <span className="font-bold text-[#1B2430]">-</span>
+              <span className="font-bold text-[var(--yazi)]">-</span>
               <input
                 type="time"
                 value={endTime}
