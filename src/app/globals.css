@@ -128,3 +128,21 @@
     @apply font-sans;
   }
 }
+/* Kaydirilabilir ama cubugu gorunmeyen kap.
+ *
+ * Kenar cubugu gezinme listesi icin: menu uzun oldugunda (ozellikle
+ * egitmen rolunde) yanda ince bir kaydirma cubugu beliriyor ve dar
+ * sutunda butonlarin uzerine biniyordu. Tekerlek, dokunma ve klavye ile
+ * kaydirma aynen calisiyor; yalnizca cubuk cizilmiyor.
+ *
+ * Yalnizca boyle "acikca liste oldugu belli" kaplarda kullanilmali:
+ * genis bir tabloda cubugu gizlemek kaydirilabildigini saklardi.
+ */
+.gizli-kaydirma {
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* eski Edge */
+}
+.gizli-kaydirma::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

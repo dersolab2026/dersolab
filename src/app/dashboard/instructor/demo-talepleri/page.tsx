@@ -24,7 +24,7 @@ export default async function DemoRequestsPage() {
   return (
     <DashboardPageShell
       title="Hoş Geldin Talepleri"
-      description="Hoş geldin paketi talepleri: ücretsiz tanışma dersi — ilk üstlenen alır."
+      description="Hoş Geldin Paketi talepleri: kredisiz tanışma dersi — ilk üstlenen alır."
     >
       {requests.length === 0 ? (
         <p className="font-semibold text-[#1B2430]">Şu anda bekleyen talep yok.</p>

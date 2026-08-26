@@ -4,8 +4,16 @@ import { createAdminClient } from '@/lib/supabase/admin'
 export interface InstructorStudent {
   userId: string
   name: string
-  /** Bu ogrenciyle iliski nasil kuruldu: ders mi, kocluk mu, ikisi de mi. */
-  iliski: 'ders' | 'kocluk' | 'ders+kocluk'
+  /**
+   * Bu ogrenciyle iliski nasil kuruldu: ders mi, tanisma dersi mi, ikisi de mi.
+   *
+   * Eskiden 'kocluk' deniyordu ve yanlisti: kume tamamen
+   * demo_lesson_requests'ten kuruluyor, o tablo ise 1 haftalik ucretsiz
+   * kocluk kaldirildiktan sonra yalnizca tanisma dersi taleplerini tutuyor.
+   * Yani yalnizca hos geldin paketi talebi olan ogrenci ekranda 'Koçluk'
+   * rozetiyle gorunuyordu. Ucretli kocluk iliskisi bu kaynaktan gelmiyor.
+   */
+  iliski: 'ders' | 'tanisma' | 'ders+tanisma'
   dersSayisi: number
   sonDers: string | null
 }
@@ -36,7 +44,7 @@ export async function getInstructorStudents(): Promise<InstructorStudent[]> {
   if (!adminMi) dersSorgusu.eq('instructor_id', user.id)
   const { data: tumDersler } = await dersSorgusu
 
-  // Kocluk / tanisma dersi iliskisi
+  // Tanisma dersi iliskisi (hos geldin paketi talebi bu egitmene atanmis)
   const talepSorgusu = admin
     .from('demo_lesson_requests')
     .select('student_id')
@@ -53,12 +61,12 @@ export async function getInstructorStudents(): Promise<InstructorStudent[]> {
     dersVar.set(b.student_id, m)
   }
 
-  const koclukVar = new Set<string>()
+  const tanismaVar = new Set<string>()
   for (const t of talepler ?? []) {
-    if (t.student_id) koclukVar.add(t.student_id)
+    if (t.student_id) tanismaVar.add(t.student_id)
   }
 
-  const tumIdler = [...new Set([...dersVar.keys(), ...koclukVar])]
+  const tumIdler = [...new Set([...dersVar.keys(), ...tanismaVar])]
   if (tumIdler.length === 0) return []
 
   const { data: kisiler } = await admin
@@ -70,9 +78,9 @@ export async function getInstructorStudents(): Promise<InstructorStudent[]> {
     .filter((id) => adById.has(id))
     .map((id) => {
       const d = dersVar.get(id)
-      const k = koclukVar.has(id)
+      const t = tanismaVar.has(id)
       const iliski: InstructorStudent['iliski'] =
-        d && k ? 'ders+kocluk' : d ? 'ders' : 'kocluk'
+        d && t ? 'ders+tanisma' : d ? 'ders' : 'tanisma'
       return {
         userId: id,
         name: adById.get(id) ?? 'Öğrenci',

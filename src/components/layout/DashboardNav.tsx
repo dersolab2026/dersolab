@@ -149,7 +149,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
             <X className="h-5 w-5 text-[#1B2430]" />
           </button>
         </div>
-        <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+        <div className="flex-1 flex flex-col gap-2 overflow-y-auto gizli-kaydirma">
           {items.map((item, i) => (
             <div key={item.href}>
               {i === dividerIndex && <div className="my-2 border-t-2 border-[#1B2430]/10" />}
@@ -185,7 +185,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
           <Link href="/dashboard" className="mb-6 block shrink-0">
             <img src="/dersolab-logo.png" alt="DersoLab" className="h-8 w-auto" />
           </Link>
-          <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+          <div className="flex-1 flex flex-col gap-2 overflow-y-auto gizli-kaydirma">
             {items.map((item, i) => (
               <div key={item.href}>
                 {i === dividerIndex && <div className="my-2 border-t-2 border-[#1B2430]/10" />}

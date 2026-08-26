@@ -24,9 +24,19 @@ export interface AdminInstructorRow {
   payoutUpdatedAt: string | null
 }
 
+export interface AdminParentRow {
+  id: string
+  name: string
+  email: string
+  createdAt: string
+  /** Bu velinin izledigi ogrencilerin adlari (guardian_links uzerinden). */
+  linkedStudents: string[]
+}
+
 export interface AdminUsersData {
   students: AdminStudentRow[]
   instructors: AdminInstructorRow[]
+  parents: AdminParentRow[]
 }
 
 /**
@@ -44,18 +54,19 @@ export interface AdminUsersData {
 export async function getAllStudentsAndInstructors(): Promise<AdminUsersData> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { students: [], instructors: [] }
+  if (!user) return { students: [], instructors: [], parents: [] }
 
   const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
-  if (userRow?.role !== 'admin') return { students: [], instructors: [] }
+  if (userRow?.role !== 'admin') return { students: [], instructors: [], parents: [] }
 
   const admin = createAdminClient()
 
-  const [{ data: users }, { data: students }, { data: instructors }, { data: payouts }] = await Promise.all([
-    admin.from('users').select('id, name, email, role, created_at').in('role', ['student', 'instructor', 'admin']).is('deleted_at', null),
+  const [{ data: users }, { data: students }, { data: instructors }, { data: payouts }, { data: baglar }] = await Promise.all([
+    admin.from('users').select('id, name, email, role, created_at').in('role', ['student', 'instructor', 'parent', 'admin']).is('deleted_at', null),
     admin.from('students').select('user_id, grade_track, credit_balance, free_trial_used'),
     admin.from('instructors').select('user_id, approval_status, calendar_connected, offers_free_trial'),
     admin.from('instructor_payout_details').select('user_id, payout_name, payout_iban, payout_updated_at'),
+    admin.from('guardian_links').select('guardian_id, student_id'),
   ])
 
   const studentByUserId = new Map((students ?? []).map((s) => [s.user_id, s]))
@@ -94,5 +105,32 @@ export async function getAllStudentsAndInstructors(): Promise<AdminUsersData> {
     }))
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
-  return { students: studentRows, instructors: instructorRows }
+  // Veli -> izledigi ogrencilerin adlari.
+  //
+  // Ad, yukarida zaten cektigimiz users listesinden okunuyor; bagli ogrenci
+  // icin ayrica sorgu atmiyoruz. Silinmis ogrenciler users sorgusunda
+  // (deleted_at is null) elendigi icin haritada bulunmuyor ve listeye de
+  // girmiyor: admin ekraninda olu bir isim gostermenin anlami yok.
+  const adById = new Map((users ?? []).map((u) => [u.id, u.name || u.email]))
+  const ogrencilerByGuardian = new Map<string, string[]>()
+  for (const b of baglar ?? []) {
+    const ad = adById.get(b.student_id)
+    if (!ad) continue
+    const mevcut = ogrencilerByGuardian.get(b.guardian_id)
+    if (mevcut) mevcut.push(ad)
+    else ogrencilerByGuardian.set(b.guardian_id, [ad])
+  }
+
+  const parentRows: AdminParentRow[] = (users ?? [])
+    .filter((u) => u.role === 'parent')
+    .map((u) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      createdAt: u.created_at,
+      linkedStudents: (ogrencilerByGuardian.get(u.id) ?? []).sort((a, b) => a.localeCompare(b, 'tr')),
+    }))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+  return { students: studentRows, instructors: instructorRows, parents: parentRows }
 }

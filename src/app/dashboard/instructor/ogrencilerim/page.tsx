@@ -7,8 +7,8 @@ import { PIXEL_CARD } from '@/lib/theme'
 
 const ILISKI_ETIKET: Record<string, string> = {
   ders: 'Ders',
-  kocluk: 'Koçluk',
-  'ders+kocluk': 'Ders + Koçluk',
+  tanisma: 'Tanışma Dersi',
+  'ders+tanisma': 'Ders + Tanışma',
 }
 
 export default async function InstructorStudentsPage() {

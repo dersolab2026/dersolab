@@ -45,7 +45,7 @@ export default async function DemoLessonPage() {
         ) : (
           <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
             <p className="font-sans font-semibold text-[#1B2430]">
-              Hoş geldin paketi sadece öğrenci hesapları için geçerli.
+              Hoş Geldin Paketi sadece öğrenci hesapları için geçerli.
             </p>
           </div>
         )}
