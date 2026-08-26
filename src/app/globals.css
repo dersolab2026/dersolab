@@ -342,6 +342,9 @@ body{ background-color:var(--zemin); color:var(--yazi); }
    donuyor. Ust ve alttaki maske akisi keserek degil soldurarak bitiriyor.
    ------------------------------------------------------------------ */
 .kod-yagmuru{ display:none }
+/* [hidden] niteligini bilerek eziyoruz: nitelik, stil hic yuklenmezse
+   sutunlarin ders adi duvari olarak akmasini engellemek icin duruyor. */
+[data-tema="ogrenci"] .kod-yagmuru[hidden],
 [data-tema="ogrenci"] .kod-yagmuru{
   display:block; position:absolute; inset:0; overflow:hidden; pointer-events:none;
   -webkit-mask-image:linear-gradient(180deg,transparent,#000 12%,#000 78%,transparent);

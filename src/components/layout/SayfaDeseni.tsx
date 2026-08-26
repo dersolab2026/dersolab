@@ -1,4 +1,5 @@
 import { LESSON_SUBJECTS, GUIDANCE_SUBJECT } from '@/lib/constants'
+import { TEMA_ACIK } from '@/lib/tema'
 
 /**
  * Sayfa zemini.
@@ -48,10 +49,17 @@ const SUTUNLAR = Array.from({ length: SUTUN_SAYISI }, (_, i) => {
  * kosulunu ekliyor.
  */
 export function SayfaDeseni({ kelimeAkisi = false }: { kelimeAkisi?: boolean }) {
+  // TEMA_ACIK sarti YALNIZCA performans/dayaniklilik icin degil:
+  // sutunlar GERCEK METIN. Stil gelmeden once (ya da hic gelmezse)
+  // sayfanin en ustunde dokuz satirlik bir ders adi duvari olarak
+  // akiyorlar — canli onizlemede tam olarak bu goruldu. Tema kapaliyken
+  // zaten hicbir kosulda gorunemiyorlar, o yuzden DOM'a hic girmiyorlar.
+  const yagmurVar = kelimeAkisi && TEMA_ACIK
+
   return (
     <div className="sayfa-deseni" aria-hidden>
-      {kelimeAkisi && (
-      <div className="kod-yagmuru">
+      {yagmurVar && (
+      <div className="kod-yagmuru" hidden>
         {SUTUNLAR.map((s, i) => (
           <span
             key={i}
