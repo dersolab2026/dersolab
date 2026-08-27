@@ -66,9 +66,27 @@ export async function createBooking({
     .single()
 
   if (bookingError || !booking) {
-    const message = bookingError?.message.includes('zaten kullanilmis')
-      ? 'Ücretsiz tanışma dersi hakkını zaten kullandın'
-      : bookingError?.message ?? 'Rezervasyon oluşturulamadı'
+    const ham = bookingError?.message ?? ''
+
+    // Cakisma kisitlari veritabaninda (20260827120000). Kontrolu burada
+    // yapmiyoruz cunku uygulama katmanindaki "once bak sonra yaz" yarisi
+    // cozmuyor: iki istek ayni anda kontrolu gecip ikisi de yaziyor.
+    // Kisit tek islemde, kilitle cozuyor; bize dusen ham Postgres
+    // hatasini kullanicinin anlayacagi cumleye cevirmek.
+    let message: string
+    if (ham.includes('zaten kullanilmis')) {
+      message = 'Ücretsiz tanışma dersi hakkını zaten kullandın'
+    } else if (ham.includes('bookings_egitmen_cakisma')) {
+      message = 'Bu saat az önce başka bir öğrenci tarafından alındı. Lütfen başka bir saat seç.'
+    } else if (ham.includes('bookings_ogrenci_cakisma')) {
+      message = 'Aynı saatte zaten planlanmış bir dersin var. Lütfen başka bir saat seç.'
+    } else if (ham.includes('credit_balance')) {
+      // check (credit_balance >= 0) kisiti: es zamanli iki rezervasyon
+      // kontrolu birlikte gecip ikinci dusme bakiyeyi eksiye indirirse.
+      message = 'Kredin bu ders için yetmiyor. Bakiyeni kontrol et.'
+    } else {
+      message = ham || 'Rezervasyon oluşturulamadı'
+    }
     return { success: false, error: message }
   }
 
@@ -107,7 +125,18 @@ export async function createBooking({
     return { success: true, bookingId: booking.id, meetLink }
   } catch (err) {
     console.error('Google Calendar event oluşturma hatası:', err)
-    await admin.from('bookings').update({ status: 'cancelled' }).eq('id', booking.id)
+
+    // cancelled_by BILEREK 'admin': refund_credit_on_cancel yalnizca
+    // cancelled_by IN ('instructor','admin') ise ya da derse 24 saatten
+    // fazla varsa krediyi iade ediyor (0017). Burasi yalnizca status
+    // yaziyordu, cancelled_by NULL kaliyordu — yani derse 24 saatten az
+    // kala takvim hatasi olursa kredi YANIYORDU, ekranda ise "kredin
+    // iade edildi" yaziyordu. Iptali sistem yapiyor, ogrencinin kusuru
+    // yok; iade her durumda dogru olan.
+    await admin
+      .from('bookings')
+      .update({ status: 'cancelled', cancelled_by: 'admin' })
+      .eq('id', booking.id)
 
     if (isTrial) {
       await admin.from('students').update({ free_trial_used: false }).eq('user_id', studentId)
