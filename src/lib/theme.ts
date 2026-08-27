@@ -1,7 +1,12 @@
 export const PIXEL_CARD = 'bg-[#F4F1E8] rounded-2xl border-4 border-[#1B2430] shadow-[0_6px_0_#1B2430]'
 
+// Yazi rengi krem DEGIL murekkep: krem #F4F1E8 marka turuncusu #DD7B3A
+// uzerinde 2.67:1 kaliyordu, esik 4.5. Sitedeki her ana eylem dugmesi
+// bundan etkileniyordu. Murekkep ayni turuncu uzerinde 5.19:1 veriyor —
+// yani marka rengi degismeden esik asiliyor. Alternatif turuncuyu
+// koyultmakti (#A85210 ile 4.79) ama o marka rengini degistirmek olurdu.
 export const PIXEL_BUTTON_PRIMARY =
-  'inline-flex items-center justify-center bg-[#DD7B3A] text-[#F4F1E8] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all disabled:opacity-60'
+  'inline-flex items-center justify-center bg-[#DD7B3A] text-[#1B2430] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all disabled:opacity-60'
 
 export const PIXEL_BUTTON_SECONDARY =
   'inline-flex items-center justify-center bg-white text-[#1B2430] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all disabled:opacity-60'

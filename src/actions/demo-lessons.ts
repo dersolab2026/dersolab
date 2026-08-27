@@ -153,10 +153,31 @@ export async function acceptDemoLessonRequest(
   })
 
   if (!bookingResult.success) {
-    await supabase
+    // GERI ALMA ADMIN ISTEMCISIYLE. Onceden RLS'e saygili istemci
+    // kullaniliyordu ve HER ZAMAN sessizce basarisiz oluyordu:
+    // demo_requests_update_claim politikasi USING'de status='pending'
+    // ariyor — talep bu noktada zaten 'assigned', yani satir guncelleme
+    // icin gorunmuyor bile. WITH CHECK de yeni satirin 'assigned' olmasini
+    // sart kosuyor, geri alma ise 'pending' yazmaya calisiyor. Iki
+    // katmandan da gecemiyordu ve donen hata hic okunmuyordu.
+    //
+    // Sonuc: rezervasyon olusmazsa talep kalici olarak 'assigned'
+    // kilitleniyordu — havuzda gorunmuyor (havuz 'pending' suzuyor), ders
+    // de yok. Ogrencinin hos geldin paketi olu kaliyordu.
+    //
+    // Bu bir SISTEM telafisi, kullanici islemi degil; createBooking'in
+    // takvim hatasinda yaptigi gibi admin istemcisi dogru arac.
+    const admin = createAdminClient()
+    const { error: geriAlmaHatasi } = await admin
       .from('demo_lesson_requests')
       .update({ status: 'pending', assigned_instructor_id: null, resolved_at: null })
       .eq('id', requestId)
+
+    if (geriAlmaHatasi) {
+      // Sessiz kalmiyoruz: talep kilitli kaldiysa admin elle acmali.
+      console.error('Tanışma dersi talebi geri alınamadı, elle açılmalı:', requestId, geriAlmaHatasi)
+    }
+
     return { success: false, error: bookingResult.error }
   }
 
