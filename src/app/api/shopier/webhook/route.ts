@@ -32,17 +32,24 @@ async function queueUnmatched(
 }
 
 export async function POST(request: NextRequest) {
-  let payload: unknown
+  let rawBody: string
   try {
-    payload = await request.json()
+    rawBody = await request.text()
   } catch {
-    return NextResponse.json({ error: 'invalid json' }, { status: 400 })
+    return NextResponse.json({ error: 'invalid body' }, { status: 400 })
   }
 
   const signature = request.headers.get('shopier-signature')
-  if (!verifyShopierWebhookSignature(payload, signature)) {
+  if (!verifyShopierWebhookSignature(rawBody, signature)) {
     console.error('Shopier webhook: geçersiz imza')
     return NextResponse.json({ error: 'invalid signature' }, { status: 401 })
+  }
+
+  let payload: unknown
+  try {
+    payload = JSON.parse(rawBody)
+  } catch {
+    return NextResponse.json({ error: 'invalid json' }, { status: 400 })
   }
 
   const event = request.headers.get('shopier-event')

@@ -20,7 +20,7 @@ export interface ProgramOzet {
 /** Hedef program ararken kullanilan liste; yok_atlas_programs herkese acik. */
 export async function searchPrograms(query: string): Promise<ProgramOzet[]> {
   const supabase = await createClient()
-  const temiz = query.trim()
+  const temiz = query.trim().replace(/[%_(),.[\]\\]/g, '')
   if (temiz.length < 3) return []
 
   const { data } = await supabase

@@ -101,13 +101,15 @@ export async function deleteShopierWebhook(id: string): Promise<void> {
   await shopierRequest<void>('DELETE', `/webhooks/${id}`)
 }
 
-// Shopier'in resmi Node.js tarifi: HMAC-SHA256(webhookToken, JSON.stringify(payload)), hex.
+// Shopier'in resmi Node.js tarifi: HMAC-SHA256(webhookToken, rawRequestBody), hex.
 // Bkz. developer.shopier.com/v1.0/recipes/webhook-handler-nodejs-1
-export function verifyShopierWebhookSignature(payload: unknown, signatureHeader: string | null): boolean {
+// Not: JSON.stringify yerine ham istek metni (rawBody) kullanılmalıdır,
+// aksi halde alan sıralaması veya boşluk farkları geçerli imzaların reddedilmesine yol açabilir.
+export function verifyShopierWebhookSignature(rawBody: string, signatureHeader: string | null): boolean {
   const token = process.env.SHOPIER_WEBHOOK_TOKEN
   if (!token || !signatureHeader) return false
 
-  const expected = crypto.createHmac('sha256', token).update(JSON.stringify(payload)).digest('hex')
+  const expected = crypto.createHmac('sha256', token).update(rawBody).digest('hex')
 
   const expectedBuf = Buffer.from(expected, 'hex')
   const actualBuf = Buffer.from(signatureHeader, 'hex')

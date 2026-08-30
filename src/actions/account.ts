@@ -37,6 +37,7 @@ export async function deleteMyAccount(): Promise<ActionResult> {
       identity_number: null,
       address: null,
       city: null,
+      deleted_at: new Date().toISOString(),
     })
     .eq('id', user.id)
 

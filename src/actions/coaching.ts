@@ -23,8 +23,20 @@ export async function getOrCreateCoachInviteCode(): Promise<
   if (!user) return { success: false, error: 'Giriş yapmalısın' }
 
   const admin = createAdminClient()
-  const { data: mevcut } = await admin
-    .from('instructors').select('coach_invite_code').eq('user_id', user.id).maybeSingle()
+  let { data: mevcut, error: coachCodeErr } = await admin
+    .from('instructor_coach_codes')
+    .select('coach_invite_code')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (coachCodeErr) {
+    const { data: fallback } = await admin
+      .from('instructors')
+      .select('coach_invite_code')
+      .eq('user_id', user.id)
+      .maybeSingle()
+    mevcut = fallback
+  }
 
   if (mevcut?.coach_invite_code) return { success: true, code: mevcut.coach_invite_code }
 
@@ -35,8 +47,19 @@ export async function getOrCreateCoachInviteCode(): Promise<
     let kod = 'KOC-'
     for (let i = 0; i < 5; i++) kod += ALFABE[Math.floor(Math.random() * ALFABE.length)]
 
-    const { error } = await admin
-      .from('instructors').update({ coach_invite_code: kod }).eq('user_id', user.id)
+    let { error } = await admin
+      .from('instructor_coach_codes')
+      .upsert({ user_id: user.id, coach_invite_code: kod }, { onConflict: 'user_id' })
+
+    if (error) {
+      // Tablo henuz olusturulmadiysa fallback
+      const { error: fallbackErr } = await admin
+        .from('instructors')
+        .update({ coach_invite_code: kod })
+        .eq('user_id', user.id)
+      error = fallbackErr
+    }
+
     if (!error) return { success: true, code: kod }
     // unique ihlali disinda bir hata varsa tekrar denemenin anlami yok
     if (!error.message.includes('duplicate') && !error.message.includes('unique')) {
@@ -56,8 +79,21 @@ export async function joinCoachByCode(code: string): Promise<ActionResult> {
   if (!temiz) return { success: false, error: 'Kod boş olamaz' }
 
   const admin = createAdminClient()
-  const { data: koc } = await admin
-    .from('instructors').select('user_id').eq('coach_invite_code', temiz).maybeSingle()
+  let { data: koc } = await admin
+    .from('instructor_coach_codes')
+    .select('user_id')
+    .eq('coach_invite_code', temiz)
+    .maybeSingle()
+
+  if (!koc) {
+    const { data: fallback } = await admin
+      .from('instructors')
+      .select('user_id')
+      .eq('coach_invite_code', temiz)
+      .maybeSingle()
+    koc = fallback
+  }
+
   if (!koc) return { success: false, error: 'Böyle bir koç kodu bulunamadı' }
 
   const { data: zaten } = await admin
