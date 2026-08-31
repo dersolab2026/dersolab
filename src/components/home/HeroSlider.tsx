@@ -47,8 +47,6 @@ export function HeroSlider() {
     return () => clearInterval(t)
   }, [duraklat])
 
-  const slide = SLIDES[aktif]
-
   return (
     <div
       className="relative"
@@ -57,14 +55,28 @@ export function HeroSlider() {
       aria-roledescription="carousel"
       aria-label="Öne çıkan fırsatlar"
     >
-      <div className={`rounded-2xl border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] overflow-hidden ${slide.arka}`}>
+      {/* Zemin rengi KAPTA DEGIL, her slaytin kendi panelinde.
+          Onceden buradaydi ve gecisi yoktu: slayt degisince kart rengi
+          aninda zipliyor, icerik ise 700ms boyunca soluyordu. Yani gecis
+          suresince CIKAN slaytin koyu yazisi GIREN slaytin turkuaz
+          zemininde duruyor, iki metin ust uste biniyordu — "donuyor"
+          gorunmesinin sebebi buydu, yavaslik degil.
+          Zemin panele tasininca renk ve icerik birlikte cozuluyor. */}
+      <div className="rounded-2xl border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] overflow-hidden bg-[#F4F1E8]">
         {/* Yükseklik slaytlar arasında zıplamasın diye sabit minimum. */}
         <div className="relative min-h-[440px] sm:min-h-[420px] p-6 sm:p-12 flex flex-col items-center justify-center text-center">
           {SLIDES.map((s, i) => (
             <div
               key={s.baslik}
               aria-hidden={i !== aktif}
-              className={`absolute inset-0 p-6 sm:p-12 flex flex-col items-center justify-center text-center transition-opacity duration-700 ease-in-out ${
+              // 700ms cok uzundu: iki metnin ust uste bindigi pencere o
+              // kadar uzun surunce gecis akici degil kararsiz goruyordu.
+              // 400ms hem net hem hizli. motion-reduce: hareket azaltma
+              // acikken gecis hic calismiyor, slayt aninda degisiyor.
+              // will-change: tarayici katmani onceden ayirsin diye —
+              // opaklik animasyonu boylece yeniden boyama gerektirmiyor.
+              style={{ willChange: 'opacity' }}
+              className={`absolute inset-0 p-6 sm:p-12 flex flex-col items-center justify-center text-center transition-opacity duration-[400ms] ease-in-out motion-reduce:transition-none ${s.arka} ${
                 i === aktif ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
