@@ -37,7 +37,7 @@ const ITEMS: { question: string; answer: string }[] = [
   {
     question: 'Profilimi geçici olarak kapatabilir miyim?',
     answer:
-      '"Ayarlar" sayfasından profilini dondurabilirsin — pazar yerinden geçici olarak kalkar, yeni rezervasyon alamazsın, dilediğinde tekrar aktifleştirebilirsin. Hesabını tamamen silmek istersen aynı sayfadan yapabilirsin.',
+      '"Ayarlar" sayfasından profilini dondurabilirsin — pazar yerinden geçici olarak kalkar, yeni rezervasyon alamazsın, dilediğinde tekrar aktifleştirebilirsin. Hesabını kapatmak istersen aynı sayfadan yapabilirsin: kişisel bilgilerin kaldırılır, ders ve hakediş kayıtları yasal saklama gereği kimliksizleştirilerek durur.',
   },
 ]
 

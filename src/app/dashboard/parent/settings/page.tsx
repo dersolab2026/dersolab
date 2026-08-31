@@ -18,8 +18,9 @@ export default async function ParentSettingsPage() {
         <div>
           <p className="font-bold text-[#1B2430]">Hesap Ayarları</p>
           <p className="text-sm font-semibold text-[#1B2430]/70">
-            Hesabınızı tamamen silebilirsiniz. Hesabınız silinince öğrencilerinizle
-            bağlantınız da kalkar; öğrencilerin hesapları etkilenmez.
+            Hesabınızı kapatabilirsiniz. Kişisel bilgileriniz kaldırılır ve tekrar giriş
+            yapılamaz; ödeme kayıtları yasal saklama gereği kimliksizleştirilerek durur.
+            Öğrencilerinizle bağlantınız kalkar, öğrencilerin hesapları etkilenmez.
           </p>
         </div>
         <DeleteAccountButton />

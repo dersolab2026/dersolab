@@ -263,9 +263,9 @@ export function RegisterForm() {
             <Link href="/terms" target="_blank" className="font-bold text-[#9C4A0C] underline">
               Kullanım Şartları’nı
             </Link>{' '}
-            okudum ve kabul ediyorum. Kayıt bilgilerimin işlenmesiyle ilgili açıklamayı da{' '}
+            okudum ve kabul ediyorum. Verilerimin nasıl işlendiğini{' '}
             <Link href="/privacy" target="_blank" className="font-bold text-[#9C4A0C] underline">
-              KVKK Aydınlatma Metni’nde
+              Gizlilik Politikası’nda
             </Link>{' '}
             gördüm.
           </span>

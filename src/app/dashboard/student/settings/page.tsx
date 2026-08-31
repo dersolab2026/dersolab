@@ -36,7 +36,7 @@ export default async function StudentSettingsPage() {
       <div className={`${PIXEL_CARD} p-5 space-y-4`}>
         <div>
           <p className="font-bold text-[#1B2430]">Hesap Ayarları</p>
-          <p className="text-sm font-semibold text-[#1B2430]/70">Hesabını tamamen silebilirsin.</p>
+          <p className="text-sm font-semibold text-[#1B2430]/70">Hesabını kapatabilirsin. Kişisel bilgilerin kaldırılır ve tekrar giriş yapılamaz; ders ve ödeme kayıtları yasal saklama gereği kimliksizleştirilerek durur.</p>
         </div>
         <DeleteAccountButton />
       </div>

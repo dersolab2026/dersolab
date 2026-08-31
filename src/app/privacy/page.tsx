@@ -20,7 +20,10 @@ export default function PrivacyPage() {
           <h2>1. Topladığımız Veriler</h2>
           <p>Hesabınızı oluşturduğunuzda ve platformu kullandığınızda aşağıdaki verileri toplarız:</p>
           <ul>
-            <li><strong>Hesap Bilgileri:</strong> Ad soyad, e-posta adresi, şifre (şifrelenmiş olarak), rol (öğrenci, eğitmen), sınav türü (LGS/YKS)</li>
+            <li><strong>Hesap Bilgileri:</strong> Ad soyad, e-posta adresi, şifre (şifrelenmiş olarak), rol (öğrenci, veli, eğitmen), sınav türü (LGS/YKS), telefon ve doğum tarihi (girdiyseniz)</li>
+            <li><strong>Fatura Bilgileri:</strong> Kimlik numarası, adres ve şehir — yalnızca fatura düzenlenmesi gerektiğinde ve siz girdiyseniz</li>
+            <li><strong>Çalışma ve Gelişim Verileri:</strong> Günlük kayıtlarınız, deneme sonuçlarınız ve net analizleriniz, hedefleriniz, Koçluk Formu cevaplarınız, koçunuzun tuttuğu seans notları ve haftalık plan</li>
+            <li><strong>Veli Bağlantıları:</strong> Bir veli hesabına bağlıysanız bu bağ ve bağlantı kodları</li>
             <li><strong>Profil Bilgileri:</strong> Profil fotoğrafı, eğitmenler için branşlar, biyografi, eğitim geçmişi, tanıtım videosu</li>
             <li><strong>Rezervasyon ve Ders Verileri:</strong> Planlanan/tamamlanan dersler, ödev içerikleri ve gönderimleri (fotoğraf/video)</li>
             <li><strong>Ödeme Verileri:</strong> Satın alınan paketler ve tutarlar; kart bilgileriniz bizde saklanmaz, ödeme işlemi doğrudan Shopier üzerinden gerçekleştirilir</li>
@@ -38,7 +41,33 @@ export default function PrivacyPage() {
           </ul>
 
           <h2>3. Verilerin Paylaşılması</h2>
-          <p>Verilerinizi aşağıdaki hizmet sağlayıcılarla, yalnızca hizmeti sunabilmek için gerekli ölçüde paylaşırız:</p>
+
+          <p>
+            <strong>Platform içinde:</strong> Öğrenci verilerinin bir kısmı, hizmetin
+            işleyebilmesi için platformdaki diğer kullanıcılara açılır.
+          </p>
+          <ul>
+            <li>
+              <strong>Eğitmenler ve koçlar:</strong> Bir eğitmenle dersiniz olduğunda ya da
+              koçluk ilişkiniz kurulduğunda; adınız, ders geçmişiniz, ödevleriniz ve
+              teslimleriniz, deneme sonuçlarınız ve hedefleriniz o eğitmene görünür. Koçunuz
+              ayrıca Günlük kayıtlarınızı ve Koçluk Formu cevaplarınızı görebilir.
+            </li>
+            <li>
+              <strong>Veliler:</strong> Öğrenci kendi verdiği bağlantı koduyla bir veli hesabı
+              bağlarsa; o veli ders takvimini, katılım durumunu, ödev durumunu, deneme
+              netlerini, kredi bakiyesini ve ödeme geçmişini görür.{' '}
+              <strong>
+                Günlük, Koçluk Formu, öz değerlendirme ve koç seans notları veliye kapalıdır.
+              </strong>{' '}
+              Bağı veli koparabilir; öğrenci kimlerin bağlı olduğunu görür.
+            </li>
+          </ul>
+
+          <p>
+            <strong>Hizmet sağlayıcılarla:</strong> yalnızca hizmeti sunabilmek için gerekli
+            ölçüde paylaşılır.
+          </p>
           <ul>
             <li><strong>Supabase:</strong> Veritabanı ve kimlik doğrulama altyapısı</li>
             <li><strong>Google:</strong> Google ile giriş ve Google Takvim/Meet entegrasyonu</li>
@@ -88,8 +117,15 @@ export default function PrivacyPage() {
           <h2>7. Veri Saklama</h2>
           <p>
             Verileriniz, hesabınız aktif olduğu sürece ve yasal yükümlülüklerimizi yerine getirmek için
-            gerekli olduğu müddetçe saklanır. Hesap silme talebinde bulunduğunuzda verileriniz makul bir
-            süre içinde silinir veya anonimleştirilir.
+            gerekli olduğu müddetçe saklanır.
+          </p>
+          <p>
+            <strong>Hesap silme ne yapıyor:</strong> Hesabınızı sildiğinizde adınız, e-posta
+            adresiniz, telefonunuz, doğum tarihiniz, profil fotoğrafınız ve fatura bilgileriniz
+            (kimlik numarası, adres, şehir) kaldırılır ve hesabınız kapatılır — tekrar giriş
+            yapılamaz. Ders, ödeme ve fatura kayıtları ise, yasal saklama yükümlülükleri ve
+            eğitmenlerin hakediş kayıtları gerektirdiği için, sizinle bağı koparılmış biçimde
+            saklanmaya devam eder. Yani işlem tamamen silme değil, kimliksizleştirmedir.
           </p>
 
           <h2>8. Haklarınız</h2>
