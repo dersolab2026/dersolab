@@ -47,7 +47,7 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthShell>
+    <AuthShell baslik="Giriş Yap">
       <button
         type="button"
         onClick={handleGoogleLogin}

@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <AuthShell subtitle="Şifreni mi unuttun?">
+    <AuthShell baslik="Şifremi Unuttum" subtitle="Şifreni mi unuttun?">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[#1B2430] font-bold mb-2">E-posta</label>

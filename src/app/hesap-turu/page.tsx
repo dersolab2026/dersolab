@@ -23,7 +23,7 @@ export default async function AccountTypePage() {
   if (satir?.role_confirmed !== false) redirect('/dashboard')
 
   return (
-    <AuthShell subtitle="Bir adım kaldı — hesap türünü seç">
+    <AuthShell baslik="Hesap Türünü Seç" subtitle="Bir adım kaldı">
       <AccountTypeForm />
     </AuthShell>
   )

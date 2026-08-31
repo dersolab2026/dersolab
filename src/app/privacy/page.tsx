@@ -80,7 +80,7 @@ export default function PrivacyPage() {
 
           <h2>6. Reşit Olmayan Kullanıcılar</h2>
           <p>
-            Platform LGS, YKS, DGS, ALES ve KPSS öğrencilerine yönelik hizmet verdiği için reşit olmayan
+            Platform LGS ve YKS öğrencilerine yönelik hizmet verdiği için reşit olmayan
             kullanıcılar bulunabilir. Bir eğitim platformu olarak, reşit olmayan kullanıcılar kendi
             rızalarıyla platforma kayıt olup hizmetlerimizi kullanabilir.
           </p>

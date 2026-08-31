@@ -22,7 +22,7 @@ export default async function AcceptTermsPage() {
   if (acceptance) redirect('/dashboard')
 
   return (
-    <AuthShell subtitle="Bir adım kaldı — devam etmeden önce şartları onayla">
+    <AuthShell baslik="Kullanım Şartları" subtitle="Devam etmeden önce şartları onayla">
       <TermsAcceptanceForm />
     </AuthShell>
   )

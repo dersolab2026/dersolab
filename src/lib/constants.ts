@@ -7,11 +7,11 @@ export const GUIDANCE_SUBJECT = 'Koçluk'
 export const SUBJECT_CATEGORIES = [
   {
     label: 'Sözel',
-    subjects: ['Lise Türkçe', 'Ortaokul Türkçe', 'KPSS Türkçe', 'Türk Dili ve Edebiyatı', 'Tarih', 'Coğrafya', 'Sosyal Bilgiler'],
+    subjects: ['Lise Türkçe', 'Ortaokul Türkçe', 'Türk Dili ve Edebiyatı', 'Tarih', 'Coğrafya', 'Sosyal Bilgiler'],
   },
   {
     label: 'Sayısal',
-    subjects: ['Lise Matematik', 'Ortaokul Matematik', 'KPSS Matematik', 'Geometri', 'Fen Bilimleri', 'Fizik', 'Kimya', 'Biyoloji'],
+    subjects: ['Lise Matematik', 'Ortaokul Matematik', 'Geometri', 'Fen Bilimleri', 'Fizik', 'Kimya', 'Biyoloji'],
   },
   {
     label: 'Dil',

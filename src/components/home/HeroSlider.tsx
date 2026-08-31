@@ -20,7 +20,7 @@ const SLIDES: Slide[] = [
   {
     rozet: 'DERSOLAB',
     baslik: 'Öğrenciler İçin Online Özel Ders ve Koçluk',
-    metin: 'Okul derslerinden LGS, YKS, KPSS, DGS ve ALES hazırlığına kadar, alanında deneyimli ve onaylı eğitmenlerden bire bir online ders alın.',
+    metin: 'Okul derslerinden LGS ve YKS hazırlığına kadar, alanında deneyimli ve onaylı eğitmenlerden bire bir online ders alın.',
     cta: { href: '/register', label: 'Ücretsiz Kaydolun' },
     arka: 'bg-[#F4F1E8]', yazi: 'text-[#1B2430]', rozetArka: 'bg-[#DD7B3A] text-[#F4F1E8]',
   },

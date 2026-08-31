@@ -102,7 +102,7 @@ export function RegisterForm() {
 
   if (success) {
     return (
-      <AuthShell subtitle="Kaydın alındı!">
+      <AuthShell baslik="Kaydın Alındı">
         <p className="text-center text-[#1B2430]">
           E-postana gönderdiğimiz onay linkine tıklayınca giriş yapabilirsin.
         </p>
@@ -117,7 +117,7 @@ export function RegisterForm() {
   }
 
   return (
-    <AuthShell>
+    <AuthShell baslik="Kaydol">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[#1B2430] font-bold mb-2">Hesap Türü</label>

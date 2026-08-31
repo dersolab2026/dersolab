@@ -1,6 +1,8 @@
 import Link from 'next/link'
 
 interface AuthShellProps {
+  /** Sayfanın tek h1'i. Arama motoru ve ekran okuyucu bunu okuyor. */
+  baslik?: string
   subtitle?: string
   cardMaxWidth?: string
   mascotMaxWidth?: string
@@ -9,6 +11,7 @@ interface AuthShellProps {
 }
 
 export function AuthShell({
+  baslik,
   subtitle,
   cardMaxWidth = '460px',
   mascotMaxWidth = '260px',
@@ -36,14 +39,28 @@ export function AuthShell({
           <img src="/dersolab-logo-560.png" alt="DersoLab" className="h-auto w-full" />
         </Link>
 
+        {/* Maskot SUS. alt="" ve aria-hidden bilerek: ustundeki logo zaten
+            "DersoLab" diyor, maskot bilgi tasimiyor.
+            Onceden alt="DersoLab Fox Mascot" yaziyordu ve sonucu Google'da
+            goruldu: bu sayfalarin h1'i olmadigi icin arama motoru baslik
+            arayip en belirgin metni almis, "DersoLab Fox Mascot" adiyla
+            bir site baglantisi olusturmustu. Aciklamayi da giris formundan
+            cekmisti ("Google ile Giris. VEYA. E-posta. Sifre"). */}
         <div className="flex justify-center mb-6">
           <img
             src="/fox-mascot-520.png"
-            alt="DersoLab Fox Mascot"
+            alt=""
+            aria-hidden
             className={`${mascotWidthClass} h-auto`}
             style={{ imageRendering: 'pixelated', maxWidth: mascotMaxWidth }}
           />
         </div>
+
+        {/* Sayfanin tek h1'i. Hem ekran okuyucu hem arama motoru buradan
+            okuyor; yoksa baslik yerine rastgele bir metin secilyor. */}
+        {baslik && (
+          <h1 className="font-sans text-xl font-black text-[#1B2430] mb-2">{baslik}</h1>
+        )}
 
         {subtitle && (
           <p className="font-sans font-semibold text-[#1B2430] mb-6">{subtitle}</p>

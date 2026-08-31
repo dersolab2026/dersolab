@@ -53,7 +53,14 @@ export async function addExamResult(params: AddExamResultParams): Promise<Action
   if (!user) return { success: false, error: 'Giriş yapmalısın' }
 
   if (!params.examName.trim()) return { success: false, error: 'Deneme adı boş olamaz' }
-  if (!EXAM_TYPES.includes(params.examType)) return { success: false, error: 'Geçersiz deneme türü' }
+  // EXAM_TYPES artik yalnizca SUNULAN turleri iceriyor (lgs/tyt/ayt/ydt);
+  // ExamType ise eski kayitlar okunabilsin diye kpss/dgs/ales'i de
+  // taniyor. Bu kontrol ikisinin arasindaki siniri koruyor: emekli bir
+  // turu dogrudan istekle gondermek de reddediliyor, yalnizca acilir
+  // listede gizlemis olmuyoruz.
+  if (!(EXAM_TYPES as readonly ExamType[]).includes(params.examType)) {
+    return { success: false, error: 'Geçersiz deneme türü' }
+  }
 
   const track = requiresTrack(params.examType) ? (params.track ?? null) : null
   if (requiresTrack(params.examType) && !track) {

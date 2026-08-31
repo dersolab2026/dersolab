@@ -1,13 +1,33 @@
 import { getTotalQuestions, type ExamTrack } from './structure'
 
-export const EXAM_TYPES = ['lgs', 'tyt', 'ayt', 'ydt', 'kpss', 'dgs', 'ales'] as const
-export type ExamType = (typeof EXAM_TYPES)[number]
+/**
+ * SUNULAN ve TANINAN sinav turleri BILEREK AYRI.
+ *
+ * Urun kararı: site yalnizca LGS ve YKS'ye hazirlaniyor. KPSS, DGS ve
+ * ALES artik yeni kayit icin sunulmuyor — zaten `students.grade_track`
+ * enum'u da yalnizca ('lgs','yks') kabul ediyordu, yani o sinavlar
+ * bastan beri ogrenci profiliyle tutarsizdi.
+ *
+ * Ama ETIKETLER kaldirilmiyor: 0079'daki check kisiti eski kayitlara
+ * izin veriyor ve EXAM_TYPE_LABELS bes ekranda kayitli sonuclari
+ * yazdirmak icin kullaniliyor (ogrenci, veli ve egitmen gorunumleri).
+ * Silseydim gecmiste KPSS denemesi girmis bir ogrencinin ekraninda
+ * "undefined" cikardi.
+ *
+ * Yani: yeni secilemez, eskisi okunur.
+ */
+const TANINAN_TURLER = ['lgs', 'tyt', 'ayt', 'ydt', 'kpss', 'dgs', 'ales'] as const
+export type ExamType = (typeof TANINAN_TURLER)[number]
+
+/** Kullanicinin secebilecegi turler. Acilir listeyi bu besliyor. */
+export const EXAM_TYPES = ['lgs', 'tyt', 'ayt', 'ydt'] as const satisfies readonly ExamType[]
 
 export const EXAM_TYPE_LABELS: Record<ExamType, string> = {
   lgs: 'LGS',
   tyt: 'TYT',
   ayt: 'AYT',
   ydt: 'YDT (Yabancı Dil)',
+  // Asagidakiler artik sunulmuyor; yalnizca eski kayitlari yazdirmak icin.
   kpss: 'KPSS',
   dgs: 'DGS',
   ales: 'ALES',

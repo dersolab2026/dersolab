@@ -12,8 +12,8 @@ export default function AboutPage() {
         <div className="space-y-6 leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2 [&_p]:mb-3 [&_li]:mb-1 [&_ul]:list-disc [&_ul]:pl-6">
 
           <p>
-            DersoLab, okul derslerinde desteğe ihtiyacı olan öğrencilerden LGS, YKS, KPSS, DGS ve ALES
-            gibi sınavlara hazırlananlara kadar geniş bir kitleyi alanında deneyimli eğitmenlerle bir
+            DersoLab, okul derslerinde desteğe ihtiyacı olan öğrencilerden LGS ve YKS
+            sınavlarına hazırlananlara kadar geniş bir kitleyi alanında deneyimli eğitmenlerle bir
             araya getiren online bir özel ders ve koçluk platformudur. Amacımız, kaliteli birebir
             eğitime coğrafi sınır olmadan esnek ve şeffaf bir şekilde erişebilmeni sağlamak.
           </p>
@@ -29,8 +29,8 @@ export default function AboutPage() {
 
           <h2>Kimler İçin?</h2>
           <p>
-            Ortaokul ve lise öğrencileri, LGS/YKS&apos;ye hazırlanan öğrenciler, KPSS/DGS/ALES gibi sınavlara
-            çalışanlara ve çocuklarının eğitim sürecini takip etmek isteyen veliler için
+            Ortaokul ve lise öğrencileri, LGS ve YKS&apos;ye hazırlanan öğrenciler ile
+            çocuklarının eğitim sürecini takip etmek isteyen veliler için
             tasarlandı.
           </p>
 

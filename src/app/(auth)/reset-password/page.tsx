@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <AuthShell subtitle="Yeni Şifre Belirle">
+    <AuthShell baslik="Yeni Şifre Belirle">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[#1B2430] font-bold mb-2">Yeni Şifre</label>
