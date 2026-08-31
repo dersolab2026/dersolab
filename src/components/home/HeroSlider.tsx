@@ -55,14 +55,26 @@ export function HeroSlider() {
       aria-roledescription="carousel"
       aria-label="Öne çıkan fırsatlar"
     >
-      {/* Zemin rengi KAPTA DEGIL, her slaytin kendi panelinde.
-          Onceden buradaydi ve gecisi yoktu: slayt degisince kart rengi
-          aninda zipliyor, icerik ise 700ms boyunca soluyordu. Yani gecis
-          suresince CIKAN slaytin koyu yazisi GIREN slaytin turkuaz
-          zemininde duruyor, iki metin ust uste biniyordu — "donuyor"
-          gorunmesinin sebebi buydu, yavaslik degil.
-          Zemin panele tasininca renk ve icerik birlikte cozuluyor. */}
-      <div className="rounded-2xl border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] overflow-hidden bg-[#F4F1E8]">
+      {/* ZEMIN IKI YERDE, IKISI DE AYNI SUREDE.
+
+          Onceden yalnizca burada duruyordu ve hic gecisi yoktu: slayt
+          degisince kart rengi aninda zipliyor, icerik 700ms soluyordu.
+          Sonucu videoda goruldu: kart kreme donmus ama uzerinde hala
+          slayt 1'in rozeti ve dugmesi duruyor. Slayt 1'in YAZI RENGI DE
+          KREM oldugu icin basligi ve paragrafi krem zeminde TAMAMEN
+          kayboluyordu — ekran bir an bosaliyor, sonra doluyor. "Donma"
+          hissi bundandi; iki metnin ust uste binmesinden degil, birinin
+          gorunmez olmasindan.
+
+          1) Her panel kendi zeminini tasiyor: krem yazi her zaman kendi
+             turkuaz zemininin uzerinde kaliyor, hicbir an kaybolmuyor.
+          2) Kap da ayni sureyle renk degistiriyor: gecisin ortasinda iki
+             panel de %50 opaklikta oldugu icin altindaki kap %25 siziyor.
+             Sabit biraksaydim turkuaza gecerken bir anlik soluklasma
+             kalirdi. */}
+      <div
+        className={`rounded-2xl border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] overflow-hidden transition-colors duration-[400ms] ease-in-out motion-reduce:transition-none ${SLIDES[aktif].arka}`}
+      >
         {/* Yükseklik slaytlar arasında zıplamasın diye sabit minimum. */}
         <div className="relative min-h-[440px] sm:min-h-[420px] p-6 sm:p-12 flex flex-col items-center justify-center text-center">
           {SLIDES.map((s, i) => (
