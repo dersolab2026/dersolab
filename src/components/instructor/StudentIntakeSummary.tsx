@@ -59,7 +59,7 @@ export function StudentIntakeSummary({ veri }: { veri: IntakeData }) {
         <div className="space-y-2">
           {satirlar.map((s) => (
             <div key={s.etiket} className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
-              <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">{s.etiket}</p>
+              <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">{s.etiket}</p>
               <div className="flex flex-wrap gap-1.5">
                 {s.degerler.map((d) => (
                   <span key={d}
@@ -75,7 +75,7 @@ export function StudentIntakeSummary({ veri }: { veri: IntakeData }) {
 
       {form?.notes && (
         <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">Eklemek istediği</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Eklemek istediği</p>
           <p className="text-sm font-semibold text-[#1B2430] whitespace-pre-wrap">{form.notes}</p>
         </div>
       )}
@@ -89,7 +89,7 @@ export function StudentIntakeSummary({ veri }: { veri: IntakeData }) {
 
           {zayif.length > 0 && (
             <p className="text-sm font-bold text-[#1B2430]">
-              En zayıf iki alan: <span className="text-[#DD7B3A]">{zayif.map((z) => z.ad).join(' ve ')}</span>
+              En zayıf iki alan: <span className="text-[#9C4A0C]">{zayif.map((z) => z.ad).join(' ve ')}</span>
             </p>
           )}
 
@@ -100,7 +100,7 @@ export function StudentIntakeSummary({ veri }: { veri: IntakeData }) {
             guncelTarih={son.takenOn}
           />
 
-          <p className="text-xs font-semibold text-[#1B2430]/60">
+          <p className="text-xs font-semibold text-[#1B2430]/70">
             Bu ölçek doğrulanmış bir psikometrik test değil; öğrencinin kendi
             beyanı. Tanı aracı olarak değil, görüşmede nereden başlanacağını
             belirlemek için kullanın.

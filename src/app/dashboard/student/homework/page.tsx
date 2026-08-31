@@ -55,14 +55,14 @@ export default async function StudentHomeworkPage() {
 
               {hw.instructorFeedback && (
                 <div className="rounded-lg border-2 border-[#1B2430] bg-white px-3 py-2">
-                  <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">
+                  <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">
                     Eğitmenin geri bildirimi
                   </p>
                   <p className="text-sm font-semibold text-[#1B2430]">{hw.instructorFeedback}</p>
                 </div>
               )}
               {hw.dueDate && (
-                <p className="text-xs font-semibold text-[#1B2430]/60">
+                <p className="text-xs font-semibold text-[#1B2430]/70">
                   Son tarih: {new Date(hw.dueDate).toLocaleDateString('tr-TR', { dateStyle: 'long' })}
                 </p>
               )}

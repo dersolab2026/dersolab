@@ -44,7 +44,7 @@ export default function AboutPage() {
           <h2>Bize Ulaşın</h2>
           <p>
             Sorularınız, önerileriniz ya da iş birliği talepleriniz için{' '}
-            <a href="mailto:destek@dersolab.com" className="underline text-[#DD7B3A] font-semibold">destek@dersolab.com</a> adresinden
+            <a href="mailto:destek@dersolab.com" className="underline text-[#9C4A0C] font-semibold">destek@dersolab.com</a> adresinden
             bize ulaşabilirsiniz.
           </p>
         </div>

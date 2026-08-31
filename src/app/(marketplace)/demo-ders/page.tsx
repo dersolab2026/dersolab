@@ -37,7 +37,7 @@ export default async function DemoLessonPage() {
             <DemoLessonEmailForm />
             <p className="text-center text-sm font-semibold text-[#1B2430]">
               Zaten hesabın var mı?{' '}
-              <Link href="/login" className="text-[#DD7B3A] font-bold underline">Giriş Yap</Link>
+              <Link href="/login" className="text-[#9C4A0C] font-bold underline">Giriş Yap</Link>
             </p>
           </>
         ) : userRecord?.role === 'student' ? (

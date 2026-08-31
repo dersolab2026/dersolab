@@ -104,7 +104,7 @@ export function CoachingSessionForm({ studentId, notes, canWrite }: Props) {
       {/* Bir onceki taahhut, yeni gorusmenin acilis sorusu olsun diye en ustte */}
       {sonTaahhut && (
         <div className="rounded-xl border-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">
+          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">
             Geçen görüşmedeki taahhüdü
           </p>
           <p className="text-sm font-semibold text-[#1B2430]">{sonTaahhut}</p>
@@ -203,14 +203,14 @@ export function CoachingSessionForm({ studentId, notes, canWrite }: Props) {
                     </span>
                   )}
                   {n.confidence !== null && (
-                    <span className="ml-2 text-xs font-bold text-[#1B2430]/60">
+                    <span className="ml-2 text-xs font-bold text-[#1B2430]/70">
                       özgüven {n.confidence}/10
                     </span>
                   )}
                 </p>
                 {canWrite && (
                   <button type="button" onClick={() => sil(n.id)} aria-label="Notu sil"
-                    className="text-[#1B2430]/40 transition-colors hover:text-red-600">
+                    className="text-[#1B2430]/55 transition-colors hover:text-red-600">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 )}

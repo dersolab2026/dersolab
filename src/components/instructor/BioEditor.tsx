@@ -44,7 +44,7 @@ export function BioEditor({ initialBio }: BioEditorProps) {
         className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white text-sm outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all resize-none"
       />
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-semibold text-[#1B2430]/50">{bio.length} / {MAX_LENGTH}</span>
+        <span className="text-xs font-semibold text-[#1B2430]/70">{bio.length} / {MAX_LENGTH}</span>
         <button type="button" onClick={handleSave} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-1.5 text-sm`}>
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
         </button>

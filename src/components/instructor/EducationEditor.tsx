@@ -58,7 +58,7 @@ export function EducationEditor({ initialEntries }: EducationEditorProps) {
             </p>
           </div>
           <button onClick={() => handleRemove(entry.id)} disabled={isPending} aria-label="Kaldır">
-            <X className="h-4 w-4 text-[#1B2430]/60" />
+            <X className="h-4 w-4 text-[#1B2430]/70" />
           </button>
         </div>
       ))}

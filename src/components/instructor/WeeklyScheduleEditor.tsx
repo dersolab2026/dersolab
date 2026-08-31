@@ -79,7 +79,7 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
 
           <div className="flex flex-wrap items-center gap-2">
             {rulesByDay[day].length === 0 && openDayForm !== day && (
-              <p className="text-sm font-semibold text-[#1B2430]/60">Bu gün için tanımlı saat yok</p>
+              <p className="text-sm font-semibold text-[#1B2430]/70">Bu gün için tanımlı saat yok</p>
             )}
 
             {rulesByDay[day].map((rule) => (

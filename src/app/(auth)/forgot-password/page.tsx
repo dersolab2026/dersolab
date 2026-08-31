@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {message && (
-          <p className={`text-sm font-bold ${message.ok ? 'text-[#6FA89E]' : 'text-red-600'}`}>{message.text}</p>
+          <p className={`text-sm font-bold ${message.ok ? 'text-[#3F6E66]' : 'text-red-600'}`}>{message.text}</p>
         )}
 
         <button
@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
       </form>
 
       <div className="mt-6 text-center">
-        <Link href="/login" className="text-[#DD7B3A] font-bold hover:underline">
+        <Link href="/login" className="text-[#9C4A0C] font-bold hover:underline">
           Giriş sayfasına dön
         </Link>
       </div>

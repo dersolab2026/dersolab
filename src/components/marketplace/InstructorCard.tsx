@@ -65,7 +65,7 @@ export function InstructorCard({ instructor, sessionTypeHint, nextSlot }: Instru
           <div>
             <p className="font-bold text-[#1B2430]">{instructor.name}</p>
             {instructor.completedLessonCount > 0 && (
-              <span className="flex items-center gap-1 text-xs font-bold text-[#6FA89E]">
+              <span className="flex items-center gap-1 text-xs font-bold text-[#3F6E66]">
                 <GraduationCap className="h-3.5 w-3.5" />
                 {instructor.completedLessonCount} ders tamamladı
               </span>

@@ -156,7 +156,7 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
             if (gunun.length === 0) return null
             return (
               <div key={g}>
-                <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">
+                <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">
                   {GUN_ADLARI[i]} · {tarihEtiket(g)}
                 </p>
                 <div className="space-y-1.5">
@@ -172,12 +172,12 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
                       >
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-bold text-[#1B2430]">
-                            {it.planTime && <span className="mr-1.5 tabular-nums text-[#1B2430]/60">{it.planTime.slice(0, 5)}</span>}
+                            {it.planTime && <span className="mr-1.5 tabular-nums text-[#1B2430]/70">{it.planTime.slice(0, 5)}</span>}
                             {it.subject}
                             {it.topic && <span className="font-semibold text-[#1B2430]/70"> — {it.topic}</span>}
                             {it.status === 'skipped' && <span className="ml-2 text-xs">(atlandı)</span>}
                           </p>
-                          <p className="text-xs font-semibold text-[#1B2430]/60">
+                          <p className="text-xs font-semibold text-[#1B2430]/70">
                             {it.source && <span>{it.source} · </span>}
                             {it.targetQuestions ? `${it.gerceklesenSoru}/${it.targetQuestions} soru` : null}
                             {it.targetQuestions && it.targetMinutes ? ' · ' : null}
@@ -200,7 +200,7 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
                               <SkipForward className="h-3.5 w-3.5" />
                             </button>
                             <button type="button" onClick={() => sil(it.id)} aria-label="Satırı sil"
-                              className="p-1 text-[#1B2430]/40 hover:text-red-600">
+                              className="p-1 text-[#1B2430]/55 hover:text-red-600">
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           </div>
@@ -288,7 +288,7 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
       )}
 
       {items.length > 0 && (
-        <p className="text-xs font-semibold text-[#1B2430]/60">
+        <p className="text-xs font-semibold text-[#1B2430]/70">
           Satırlar öğrencinin Günlük kayıtlarıyla aynı gün ve aynı ders üzerinden
           kendiliğinden eşleşiyor; öğrencinin ayrıca bir şey işaretlemesi gerekmiyor.
         </p>

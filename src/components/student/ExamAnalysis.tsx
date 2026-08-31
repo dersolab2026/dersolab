@@ -184,7 +184,7 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
       {/* Grafige hangi denemeler girsin */}
       <div>
         <div className="mb-2 flex items-center gap-1.5">
-          <ListFilter className="h-4 w-4 text-[#1B2430]/60" />
+          <ListFilter className="h-4 w-4 text-[#1B2430]/70" />
           <p className="text-sm font-bold text-[#1B2430]/70">
             Grafiğe girecek denemeler ({secililer.length}/{grubunDenemeleri.length})
           </p>
@@ -199,7 +199,7 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
                 onClick={() => toggle(e.id)}
                 aria-pressed={secili}
                 className={`rounded-lg border-2 border-[#1B2430] px-2.5 py-1 text-xs font-bold transition-all ${
-                  secili ? 'bg-[#6FA89E] text-[#F4F1E8]' : 'bg-white text-[#1B2430]/50 line-through'
+                  secili ? 'bg-[#6FA89E] text-[#F4F1E8]' : 'bg-white text-[#1B2430]/70 line-through'
                 }`}
               >
                 {e.examName}
@@ -210,7 +210,7 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
       </div>
 
       {secililer.length < 2 ? (
-        <p className="text-sm font-semibold text-[#1B2430]/60">
+        <p className="text-sm font-semibold text-[#1B2430]/70">
           Gelişim grafiği için en az iki deneme seçmelisin.
         </p>
       ) : (
@@ -224,7 +224,7 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
           <div>
             <p className="text-sm font-bold text-[#1B2430]">{degerlendirme.mesaj}</p>
             {degerlendirme.fark !== null && (
-              <p className="text-xs font-semibold text-[#1B2430]/60">
+              <p className="text-xs font-semibold text-[#1B2430]/70">
                 Hedef {hedefNet} net · son deneme {degerlendirme.fark >= 0 ? '+' : ''}{degerlendirme.fark}
               </p>
             )}
@@ -280,7 +280,7 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
               </div>
             )
           })}
-          <p className="pt-1 text-xs font-semibold text-[#1B2430]/60">
+          <p className="pt-1 text-xs font-semibold text-[#1B2430]/70">
             Sayı, o dersteki ortalama netinin dersin kendi soru sayısına oranı.
             Yeşil: %65 ve üstü · Gri: %40–65 · Turuncu: %40 altı. Dersler en
             yüksekten en düşüğe sıralı.
@@ -345,7 +345,7 @@ function HataTipiDagilimi({ entries }: { entries: ExamResultEntry[] }) {
           <span key={t.anahtar} className="flex items-center gap-1.5 text-xs font-semibold text-[#1B2430]/80">
             <span className="inline-block h-3 w-3 rounded-sm border border-[#1B2430]" style={{ backgroundColor: t.renk }} />
             {ERROR_TYPE_LABELS[t.anahtar]}
-            <span className="tabular-nums text-[#1B2430]/60">
+            <span className="tabular-nums text-[#1B2430]/70">
               {toplamlar[t.anahtar]} ({Math.round((toplamlar[t.anahtar] / genelToplam) * 100)}%)
             </span>
           </span>

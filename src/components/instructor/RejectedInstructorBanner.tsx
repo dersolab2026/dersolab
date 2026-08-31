@@ -38,7 +38,7 @@ export function RejectedInstructorBanner({ approvalNote }: { approvalNote: strin
         {approvalNote || 'Profilinde düzeltilmesi gereken noktalar var. Detay için lütfen bizimle iletişime geç.'}
       </p>
       <p className="text-sm font-semibold text-[#1B2430]/70">
-        <Link href="/dashboard/instructor/profile" className="underline text-[#DD7B3A]">Profilini düzenle</Link>,
+        <Link href="/dashboard/instructor/profile" className="underline text-[#9C4A0C]">Profilini düzenle</Link>,
         {' '}sonra tekrar incelemeye gönderebilirsin.
       </p>
       {error && <p className="text-sm font-semibold text-red-600">{error}</p>}

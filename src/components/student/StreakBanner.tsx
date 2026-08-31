@@ -28,7 +28,7 @@ export function StreakBanner({ logDates, bugun }: Props) {
           <div className="min-w-0">
             <p className="text-2xl font-black leading-none text-[#1B2430]">
               {seri}
-              <span className="ml-1 text-sm font-bold text-[#1B2430]/60">gün</span>
+              <span className="ml-1 text-sm font-bold text-[#1B2430]/70">gün</span>
             </p>
             <p className="truncate text-xs font-semibold text-[#1B2430]/70">
               {seriMetni(seri)}

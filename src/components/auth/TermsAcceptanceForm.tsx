@@ -44,11 +44,11 @@ export function TermsAcceptanceForm() {
           className="mt-1 h-4 w-4 accent-[#DD7B3A]"
         />
         <span>
-          <Link href="/terms" target="_blank" className="font-bold text-[#DD7B3A] underline">
+          <Link href="/terms" target="_blank" className="font-bold text-[#9C4A0C] underline">
             Kullanım Şartları’nı
           </Link>{' '}
           okudum ve kabul ediyorum.{' '}
-          <Link href="/privacy" target="_blank" className="font-bold text-[#DD7B3A] underline">
+          <Link href="/privacy" target="_blank" className="font-bold text-[#9C4A0C] underline">
             KVKK Aydınlatma Metni
           </Link>{' '}
           hakkında da bilgilendirildim.

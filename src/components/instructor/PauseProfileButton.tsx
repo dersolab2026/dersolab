@@ -28,7 +28,7 @@ export function PauseProfileButton({ paused }: { paused: boolean }) {
       <button type="button" onClick={handleClick} disabled={isPending} className={`${PIXEL_BUTTON_SECONDARY} gap-2 px-4 py-2`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : paused ? 'Profili Aktifleştir' : 'Profili Dondur'}
       </button>
-      <p className="text-xs font-semibold text-[#1B2430]/60">
+      <p className="text-xs font-semibold text-[#1B2430]/70">
         {paused
           ? 'Profilin şu anda dondurulmuş — pazar yerinde görünmüyor ve yeni rezervasyon alamıyorsun.'
           : 'Dondurunca profilin pazar yerinden geçici olarak kalkar, yeni rezervasyon alamazsın. Dilediğinde tekrar aktifleştirebilirsin.'}

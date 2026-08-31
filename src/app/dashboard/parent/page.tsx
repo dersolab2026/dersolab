@@ -11,7 +11,7 @@ function Kutu({ etiket, deger, vurgu }: { etiket: string; deger: string; vurgu?:
   const renk = vurgu === 'iyi' ? 'text-[#2F8570]' : vurgu === 'dikkat' ? 'text-[#C2682F]' : 'text-[#1B2430]'
   return (
     <div className="rounded-xl border-2 border-[#1B2430]/15 bg-white px-3 py-2">
-      <p className="text-xs font-semibold text-[#1B2430]/55">{etiket}</p>
+      <p className="text-xs font-semibold text-[#1B2430]/70">{etiket}</p>
       <p className={`text-lg font-bold tabular-nums ${renk}`}>{deger}</p>
     </div>
   )
@@ -52,14 +52,14 @@ export default async function ParentHomePage() {
                     >
                       {o.personName}
                     </Link>
-                    <p className="text-sm font-semibold text-[#1B2430]/60">{o.personEmail}</p>
+                    <p className="text-sm font-semibold text-[#1B2430]/70">{o.personEmail}</p>
                   </div>
                   <UnlinkStudentButton studentId={o.personId} studentName={o.personName} />
                 </div>
 
                 {z?.siradakiDers ? (
                   <div className="rounded-xl border-2 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/55">Sıradaki ders</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Sıradaki ders</p>
                     <p className="font-bold text-[#1B2430]">
                       {z.siradakiDers.instructorName}
                       <span className="font-semibold text-[#1B2430]/70">
@@ -68,7 +68,7 @@ export default async function ParentHomePage() {
                     </p>
                   </div>
                 ) : (
-                  <p className="text-sm font-semibold text-[#1B2430]/55">Planlanmış ders yok.</p>
+                  <p className="text-sm font-semibold text-[#1B2430]/70">Planlanmış ders yok.</p>
                 )}
 
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -92,7 +92,7 @@ export default async function ParentHomePage() {
 
                 <Link
                   href={`/dashboard/parent/${o.personId}`}
-                  className="inline-block text-sm font-bold text-[#DD7B3A] hover:underline"
+                  className="inline-block text-sm font-bold text-[#9C4A0C] hover:underline"
                 >
                   Ayrıntıya bak →
                 </Link>

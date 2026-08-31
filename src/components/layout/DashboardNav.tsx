@@ -123,7 +123,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
             <img src="/fox-head.png" alt="" className="h-7 w-auto" />
           </button>
           <Link href="/dashboard">
-            <img src="/dersolab-logo.png" alt="DersoLab" className="h-7 w-auto" />
+            <img src="/dersolab-logo-560.png" alt="DersoLab" className="h-7 w-auto" />
           </Link>
         </div>
         <NotificationBell initialNotifications={notifications} role={role} />
@@ -143,7 +143,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
       >
         <div className="flex items-center justify-between mb-6 shrink-0">
           <Link href="/dashboard">
-            <img src="/dersolab-logo.png" alt="DersoLab" className="h-8 w-auto" />
+            <img src="/dersolab-logo-560.png" alt="DersoLab" className="h-8 w-auto" />
           </Link>
           <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Menüyü kapat" className="p-1">
             <X className="h-5 w-5 text-[#1B2430]" />
@@ -183,7 +183,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
       >
         <div className="flex flex-col h-full" style={{ width: SIDEBAR_WIDTH - 32 }}>
           <Link href="/dashboard" className="mb-6 block shrink-0">
-            <img src="/dersolab-logo.png" alt="DersoLab" className="h-8 w-auto" />
+            <img src="/dersolab-logo-560.png" alt="DersoLab" className="h-8 w-auto" />
           </Link>
           <div className="flex-1 flex flex-col gap-2 overflow-y-auto gizli-kaydirma">
             {items.map((item, i) => (

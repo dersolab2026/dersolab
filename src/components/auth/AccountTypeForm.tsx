@@ -75,7 +75,7 @@ export function AccountTypeForm() {
         ))}
       </div>
 
-      <p className="text-xs font-semibold text-[#1B2430]/60">
+      <p className="text-xs font-semibold text-[#1B2430]/70">
         Bu seçimi sonradan kendin değiştiremezsin; yanlış seçersen bize yazman gerekir.
       </p>
 

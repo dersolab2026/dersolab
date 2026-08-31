@@ -81,7 +81,7 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-semibold text-[#1B2430]/60">veya</span>
+        <span className="text-xs font-semibold text-[#1B2430]/70">veya</span>
         <input ref={inputRef} type="file" accept="video/mp4,video/quicktime,video/webm" className="hidden" onChange={handleFileChange} />
         <button
           type="button"
@@ -92,7 +92,7 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
           {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
           {isUploading ? 'Yükleniyor...' : 'Video Dosyası Yükle'}
         </button>
-        <span className="text-xs font-semibold text-[#1B2430]/60">en fazla 200 MB</span>
+        <span className="text-xs font-semibold text-[#1B2430]/70">en fazla 200 MB</span>
       </div>
 
       {url.trim() && !embedPreview && !isDirectFile && (

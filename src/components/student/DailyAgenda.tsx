@@ -113,7 +113,7 @@ export function DailyAgenda({ bookings, studyLogs }: { bookings: StudentBookingI
           {selectedDay.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' })}
         </p>
         {dayBookings.length === 0 ? (
-          <p className="text-sm font-semibold text-[#1B2430]/60">Bu tarihte ders bulunamadı.</p>
+          <p className="text-sm font-semibold text-[#1B2430]/70">Bu tarihte ders bulunamadı.</p>
         ) : (
           <div className="space-y-2">
             {dayBookings.map((b) => (

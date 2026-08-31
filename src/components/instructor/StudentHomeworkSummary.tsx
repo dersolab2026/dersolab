@@ -57,22 +57,22 @@ export function StudentHomeworkSummary({ items }: { items: StudentHomework[] }) 
             >
               <div className="flex min-w-0 items-center gap-2">
                 {h.status === 'completed' ? (
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-[#6FA89E]" />
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-[#3F6E66]" />
                 ) : gecikti ? (
                   <AlertTriangle className="h-4 w-4 shrink-0 text-[#C2410C]" />
                 ) : (
-                  <Clock className="h-4 w-4 shrink-0 text-[#1B2430]/50" />
+                  <Clock className="h-4 w-4 shrink-0 text-[#1B2430]/70" />
                 )}
                 <span className="truncate text-sm font-bold text-[#1B2430]">{h.title}</span>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 {h.dueDate && (
-                  <span className={`text-xs font-semibold ${gecikti ? 'text-[#C2410C]' : 'text-[#1B2430]/60'}`}>
+                  <span className={`text-xs font-semibold ${gecikti ? 'text-[#C2410C]' : 'text-[#1B2430]/70'}`}>
                     {new Date(h.dueDate).toLocaleDateString('tr-TR')}
                   </span>
                 )}
                 {h.teslimSayisi > 0 && (
-                  <span className="text-xs font-semibold text-[#1B2430]/60">
+                  <span className="text-xs font-semibold text-[#1B2430]/70">
                     {h.teslimSayisi} dosya
                   </span>
                 )}

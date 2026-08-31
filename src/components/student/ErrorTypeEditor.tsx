@@ -67,7 +67,7 @@ export function ErrorTypeEditor({ entry }: { entry: ExamResultEntry }) {
 
   if (yanlisiOlanlar.length === 0) {
     return (
-      <p className="text-sm font-semibold text-[#1B2430]/60">
+      <p className="text-sm font-semibold text-[#1B2430]/70">
         Bu denemede yanlışın yok, girilecek hata tipi de yok.
       </p>
     )
@@ -85,7 +85,7 @@ export function ErrorTypeEditor({ entry }: { entry: ExamResultEntry }) {
           <thead>
             <tr className="border-b-2 border-[#1B2430]">
               <th className="py-1.5 pr-2 text-left font-bold text-[#1B2430]">Ders</th>
-              <th className="py-1.5 px-1 text-center font-bold text-[#1B2430]/60">Yanlış</th>
+              <th className="py-1.5 px-1 text-center font-bold text-[#1B2430]/70">Yanlış</th>
               {TIPLER.map((t) => (
                 <th key={t} className="py-1.5 px-1 text-center text-xs font-bold text-[#1B2430]">
                   {ERROR_TYPE_LABELS[t]}
@@ -100,7 +100,7 @@ export function ErrorTypeEditor({ entry }: { entry: ExamResultEntry }) {
               return (
                 <tr key={s.name} className="border-b border-[#1B2430]/15">
                   <td className="py-1.5 pr-2 font-bold text-[#1B2430]">{s.name}</td>
-                  <td className={`py-1.5 px-1 text-center font-bold tabular-nums ${asim ? 'text-red-600' : 'text-[#1B2430]/60'}`}>
+                  <td className={`py-1.5 px-1 text-center font-bold tabular-nums ${asim ? 'text-red-600' : 'text-[#1B2430]/70'}`}>
                     {girilen}/{s.wrongCount}
                   </td>
                   {TIPLER.map((t) => (

@@ -31,11 +31,11 @@ export function InstructorBookingListItem({ booking, materials }: InstructorBook
       <div>
         <p className="font-bold text-[#1B2430]">
           {booking.studentName}
-          {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#DD7B3A]">Tanışma Dersi</span>}
+          {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#9C4A0C]">Tanışma Dersi</span>}
         </p>
         <p className="text-sm font-semibold text-[#1B2430]/70">{formattedDate}</p>
-        {booking.topicNote && <p className="mt-1 text-xs font-bold text-[#DD7B3A]">Öğrencinin sorusu: {booking.topicNote}</p>}
-        {booking.instructorNotes && <p className="mt-1 text-xs font-semibold text-[#1B2430]/60">Not: {booking.instructorNotes}</p>}
+        {booking.topicNote && <p className="mt-1 text-xs font-bold text-[#9C4A0C]">Öğrencinin sorusu: {booking.topicNote}</p>}
+        {booking.instructorNotes && <p className="mt-1 text-xs font-semibold text-[#1B2430]/70">Not: {booking.instructorNotes}</p>}
         <LessonMaterials bookingId={booking.id} materials={materials} isInstructor />
       </div>
 

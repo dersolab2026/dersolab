@@ -47,7 +47,7 @@ export default async function InstructorStudentsPage() {
                   {o.sonDers ? ` · son ders ${new Date(o.sonDers).toLocaleDateString('tr-TR')}` : ''}
                 </p>
               </div>
-              <span className="text-sm font-bold text-[#DD7B3A]">Detay →</span>
+              <span className="text-sm font-bold text-[#9C4A0C]">Detay →</span>
             </Link>
           ))}
         </div>

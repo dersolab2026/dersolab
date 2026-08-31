@@ -71,7 +71,7 @@ export default async function StudentInsightPage({
     >
       <Link
         href="/dashboard/instructor/ogrencilerim"
-        className="text-sm font-bold text-[#DD7B3A] hover:underline"
+        className="text-sm font-bold text-[#9C4A0C] hover:underline"
       >
         ← Öğrencilerim
       </Link>
@@ -79,7 +79,7 @@ export default async function StudentInsightPage({
       {/* Ozet serit */}
       <div className="grid gap-3 sm:grid-cols-3">
         <div className={`${PIXEL_CARD} p-4`}>
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">Kayıtlı deneme</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Kayıtlı deneme</p>
           <p className="text-2xl font-black text-[#1B2430]">{veri.exams.length}</p>
           {sonDeneme && sonNet !== null && (
             <p className="text-xs font-semibold text-[#1B2430]/70">
@@ -88,18 +88,18 @@ export default async function StudentInsightPage({
           )}
         </div>
         <div className={`${PIXEL_CARD} p-4`}>
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">Ödev</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Ödev</p>
           <p className="text-2xl font-black text-[#1B2430]">
             {veri.homework.filter((h) => h.status === 'completed').length}
-            <span className="text-base text-[#1B2430]/50">/{veri.homework.length}</span>
+            <span className="text-base text-[#1B2430]/70">/{veri.homework.length}</span>
           </p>
           <p className="text-xs font-semibold text-[#1B2430]/70">tamamlanan</p>
         </div>
         <div className={`${PIXEL_CARD} p-4`}>
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">Kayıtlı çalışma</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Kayıtlı çalışma</p>
           <p className="text-2xl font-black text-[#1B2430]">
             {veri.dersToplamlari.reduce((t, d) => t + d.saat, 0).toFixed(1)}
-            <span className="text-base text-[#1B2430]/50"> sa</span>
+            <span className="text-base text-[#1B2430]/70"> sa</span>
           </p>
           <p className="text-xs font-semibold text-[#1B2430]/70">
             {veri.dersToplamlari.reduce((t, d) => t + d.soru, 0)} soru

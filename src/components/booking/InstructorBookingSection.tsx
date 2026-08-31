@@ -84,7 +84,7 @@ export function InstructorBookingSection({
 
           <div>
             <label className="block text-sm font-bold text-[#1B2430] mb-1">
-              Hangi konuda yardım istiyorsun? <span className="font-semibold text-[#1B2430]/60">(isteğe bağlı)</span>
+              Hangi konuda yardım istiyorsun? <span className="font-semibold text-[#1B2430]/70">(isteğe bağlı)</span>
             </label>
             <textarea
               value={topicNote}
@@ -103,7 +103,7 @@ export function InstructorBookingSection({
       )}
 
       {result && (
-        <p className={`text-sm font-semibold ${result.success ? 'text-[#6FA89E]' : 'text-red-600'}`}>{result.message}</p>
+        <p className={`text-sm font-semibold ${result.success ? 'text-[#3F6E66]' : 'text-red-600'}`}>{result.message}</p>
       )}
     </div>
   )

@@ -33,12 +33,12 @@ export function AuthShell({
       >
 
         <Link href="/" className="block mx-auto mb-6 w-full max-w-[280px]">
-          <img src="/dersolab-logo.png" alt="DersoLab" className="h-auto w-full" />
+          <img src="/dersolab-logo-560.png" alt="DersoLab" className="h-auto w-full" />
         </Link>
 
         <div className="flex justify-center mb-6">
           <img
-            src="/fox-mascot.png"
+            src="/fox-mascot-520.png"
             alt="DersoLab Fox Mascot"
             className={`${mascotWidthClass} h-auto`}
             style={{ imageRendering: 'pixelated', maxWidth: mascotMaxWidth }}
@@ -53,7 +53,7 @@ export function AuthShell({
           {children}
         </div>
 
-        <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs font-sans text-[#1B2430]/60">
+        <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs font-sans text-[#1B2430]/70">
           <a href="/hakkimizda" className="hover:underline">Hakkımızda</a>
           <a href="/privacy" className="hover:underline">Gizlilik Politikası</a>
           <a href="/terms" className="hover:underline">Kullanım Şartları</a>

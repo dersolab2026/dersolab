@@ -35,7 +35,7 @@ function Bolum({ baslik, bos, children }: { baslik: string; bos: string; childre
   return (
     <div className={`${PIXEL_CARD} space-y-3 p-5`}>
       <p className="font-bold text-[#1B2430]">{baslik}</p>
-      {children ?? <p className="text-sm font-semibold text-[#1B2430]/60">{bos}</p>}
+      {children ?? <p className="text-sm font-semibold text-[#1B2430]/70">{bos}</p>}
     </div>
   )
 }
@@ -58,7 +58,7 @@ export default async function ParentStudentDetailPage({
       title={veri.studentName}
       description={`${veri.studentEmail} · ${veri.creditBalance} ders kredisi`}
     >
-      <Link href="/dashboard/parent" className="text-sm font-bold text-[#1B2430]/60 hover:underline">
+      <Link href="/dashboard/parent" className="text-sm font-bold text-[#1B2430]/70 hover:underline">
         &larr; Öğrencilerim
       </Link>
 
@@ -85,7 +85,7 @@ export default async function ParentStudentDetailPage({
                 <span className="text-sm font-semibold text-[#1B2430]">
                   {h.title}
                   {h.dueDate && (
-                    <span className="text-[#1B2430]/60">
+                    <span className="text-[#1B2430]/70">
                       {' '}· son tarih {new Date(h.dueDate).toLocaleDateString('tr-TR', { dateStyle: 'medium' })}
                     </span>
                   )}
@@ -151,7 +151,7 @@ export default async function ParentStudentDetailPage({
                 <span className="text-sm font-semibold text-[#1B2430]">
                   {kisaTarihSaat(p.createdAt)} · {p.creditsGranted} kredi
                   {p.amountPaid !== null && (
-                    <span className="text-[#1B2430]/60"> · {p.amountPaid.toLocaleString('tr-TR')} ₺</span>
+                    <span className="text-[#1B2430]/70"> · {p.amountPaid.toLocaleString('tr-TR')} ₺</span>
                   )}
                 </span>
                 <Rozet metin={p.status === 'completed' ? 'Tamamlandı' : p.status} />

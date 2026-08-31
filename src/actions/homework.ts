@@ -56,8 +56,33 @@ export async function assignHomework(params: AssignHomeworkParams): Promise<Acti
 
 export async function notifyHomeworkSubmitted(homeworkId: string): Promise<void> {
   const supabase = await createClient()
-  const { data: homework } = await supabase.from('homework').select('title, instructor_id').eq('id', homeworkId).single()
+
+  // Bu bir sunucu eylemi, yani HTTP ucu — arayuzde yalnizca yukleme
+  // bittikten sonra cagriliyor olmasi kimseyi baglamiyor. Onceden tek
+  // kapi RLS'in okuma izniydi: odevi OKUYABILEN herkes (ogrencinin
+  // kendisi, hatta velisi) bildirimi tetikleyebiliyordu. Yani hic teslim
+  // yapmadan egitmene "odev teslim edildi" dusurmek mumkundu.
+  //
+  // Artik gonderen, odevin SAHIBI ogrenci olmali ve teslim GERCEKTEN
+  // kaydedilmis olmali. Ikisi de dogrulanmadan bildirim gitmiyor.
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  const { data: homework } = await supabase
+    .from('homework')
+    .select('title, instructor_id, student_id')
+    .eq('id', homeworkId)
+    .single()
   if (!homework) return
+  if (homework.student_id !== user.id) return
+
+  const { data: teslim } = await supabase
+    .from('homework_submissions')
+    .select('id')
+    .eq('homework_id', homeworkId)
+    .limit(1)
+    .maybeSingle()
+  if (!teslim) return
 
   await sendHomeworkSubmittedNotification({
     homeworkId, instructorId: homework.instructor_id, title: homework.title,

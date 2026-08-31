@@ -40,7 +40,7 @@ export default async function InstructorDashboardPage() {
         <div className={`${PIXEL_CARD} p-3`}>
           <p className="text-sm font-semibold text-[#1B2430]">
             Öğrenciler rezervasyon yapabilsin diye önce{' '}
-            <Link href="/dashboard/instructor/settings" className="underline text-[#DD7B3A]">Google Takvimini bağlaman</Link> gerekiyor.
+            <Link href="/dashboard/instructor/settings" className="underline text-[#9C4A0C]">Google Takvimini bağlaman</Link> gerekiyor.
           </p>
         </div>
       )}

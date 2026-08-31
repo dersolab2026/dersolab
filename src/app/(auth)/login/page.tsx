@@ -83,7 +83,7 @@ export default function LoginPage() {
           <label className="block text-[#1B2430] font-bold mb-2">Şifre</label>
           <PasswordInput required value={password} onChange={setPassword} placeholder="••••••••" />
           <div className="text-right mt-2">
-            <Link href="/forgot-password" className="text-sm font-bold text-[#6FA89E] hover:underline">
+            <Link href="/forgot-password" className="text-sm font-bold text-[#3F6E66] hover:underline">
               Şifremi Unuttum
             </Link>
           </div>
@@ -102,7 +102,7 @@ export default function LoginPage() {
 
       <div className="mt-6 text-center">
         <span className="text-[#1B2430]">Hesabın yok mu? </span>
-        <Link href="/register" className="text-[#DD7B3A] font-bold hover:underline">
+        <Link href="/register" className="text-[#9C4A0C] font-bold hover:underline">
           Kaydol
         </Link>
       </div>

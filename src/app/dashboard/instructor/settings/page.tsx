@@ -20,7 +20,7 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
 
   return (
     <DashboardPageShell title="Ayarlar" description="Google Takvim bağlantını buradan yönet.">
-      {calendar_connected && <p className="text-sm font-semibold text-[#6FA89E]">Google Takvimin başarıyla bağlandı.</p>}
+      {calendar_connected && <p className="text-sm font-semibold text-[#3F6E66]">Google Takvimin başarıyla bağlandı.</p>}
       {calendar_error === 'missing_refresh_token' && (
         <p className="text-sm font-semibold text-red-600">
           Google bu hesap için gerekli izni döndürmedi. Lütfen{' '}

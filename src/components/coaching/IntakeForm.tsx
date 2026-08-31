@@ -170,7 +170,7 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
             <label className="mb-1 block text-sm font-bold text-[#1B2430]">
               Koçunun bilmesini istediğin başka bir şey?
             </label>
-            <p className="mb-1 text-xs font-semibold text-[#1B2430]/50">
+            <p className="mb-1 text-xs font-semibold text-[#1B2430]/70">
               İsteğe bağlı — boş bırakabilirsin.
             </p>
             <textarea
@@ -220,7 +220,7 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
             {MADDELER.map((m, i) => (
               <div key={m.id} className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
                 <p className="mb-2 text-sm font-bold text-[#1B2430]">
-                  <span className="mr-1.5 text-[#1B2430]/50">{i + 1}.</span>{m.metin}
+                  <span className="mr-1.5 text-[#1B2430]/70">{i + 1}.</span>{m.metin}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {OLCEK_ETIKETLERI.map((etiket, idx) => {
@@ -238,7 +238,7 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
                       </button>
                     )
                   })}
-                  <span className="self-center pl-1 text-xs font-semibold text-[#1B2430]/50">
+                  <span className="self-center pl-1 text-xs font-semibold text-[#1B2430]/70">
                     1 = hiç katılmıyorum · 5 = tamamen katılıyorum
                   </span>
                 </div>
@@ -266,7 +266,7 @@ export function IntakeForm({ mevcut, gecmisOlcumler, gradeTrack }: Props) {
             guncelTarih={sonOlcum.takenOn}
           />
         ) : (
-          <p className="text-sm font-semibold text-[#1B2430]/60">
+          <p className="text-sm font-semibold text-[#1B2430]/70">
             Henüz değerlendirme yapmadın. 20 kısa soru, birkaç dakika sürüyor.
           </p>
         )}
@@ -304,7 +304,7 @@ function SecimGrubu({ etiket, secenekler, secili, onSec }: {
         {gruplar.map((g) => (
           <div key={g}>
             {g && (
-              <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[#1B2430]/50">{g}</p>
+              <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">{g}</p>
             )}
             <div className="flex flex-wrap gap-1.5">
               {secenekler.filter((s) => (s.grup ?? '') === g).map((s) => {
@@ -326,13 +326,13 @@ function SecimGrubu({ etiket, secenekler, secili, onSec }: {
 
       {eskiCevaplar.length > 0 && (
         <div className="mt-2 space-y-1">
-          <p className="text-xs font-semibold text-[#1B2430]/50">Daha önce yazdığın cevap:</p>
+          <p className="text-xs font-semibold text-[#1B2430]/70">Daha önce yazdığın cevap:</p>
           {eskiCevaplar.map((c) => (
             <span key={c}
               className="mr-1.5 inline-flex items-center gap-1.5 rounded-lg border-2 border-dashed border-[#1B2430]/40 bg-[#F4F1E8] px-2 py-1 text-sm font-semibold text-[#1B2430]">
               {c}
               <button type="button" onClick={() => onSec(c)} aria-label={`"${c}" cevabını kaldır`}
-                className="text-[#1B2430]/50 hover:text-red-600">
+                className="text-[#1B2430]/70 hover:text-red-600">
                 <X className="h-3.5 w-3.5" />
               </button>
             </span>

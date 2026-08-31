@@ -116,13 +116,13 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
           </div>
           {!readOnly && (
             <button type="button" onClick={() => programSec(null)} disabled={isPending}
-              className="mt-2 text-xs font-bold text-[#1B2430]/50 hover:text-red-600">
+              className="mt-2 text-xs font-bold text-[#1B2430]/70 hover:text-red-600">
               Hedefi kaldır
             </button>
           )}
         </div>
       ) : targets.targetProgramCode ? (
-        <p className="text-sm font-semibold text-[#DD7B3A]">
+        <p className="text-sm font-semibold text-[#9C4A0C]">
           Seçtiğin program güncel kılavuzda bulunamadı — yeniden seçmen gerekiyor.
         </p>
       ) : (
@@ -171,7 +171,7 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
             </div>
           )}
           {!araniyor && sorgu.trim().length >= 3 && sonuclar.length === 0 && (
-            <p className="text-sm font-semibold text-[#1B2430]/60">Sonuç yok.</p>
+            <p className="text-sm font-semibold text-[#1B2430]/70">Sonuç yok.</p>
           )}
         </div>
       )}
@@ -182,11 +182,11 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
           <p className="text-sm font-bold text-[#1B2430]/70">
             {EXAM_TYPE_LABELS[examType]}
             {track ? ` · ${TRACK_LABELS[track]}` : ''} hedef netlerin
-            {toplam !== null && <span className="ml-2 text-[#6FA89E]">toplam {toplam}</span>}
+            {toplam !== null && <span className="ml-2 text-[#3F6E66]">toplam {toplam}</span>}
           </p>
           {!readOnly && !netAcik && (
             <button type="button" onClick={() => setNetAcik(true)}
-              className="text-sm font-bold text-[#DD7B3A] hover:underline">
+              className="text-sm font-bold text-[#9C4A0C] hover:underline">
               {mevcutHedefler.length > 0 ? 'Düzenle' : 'Hedef Net Gir'}
             </button>
           )}
@@ -204,7 +204,7 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
                   aria-label={`${d.name} hedef net`}
                   className="w-24 rounded-lg border-2 border-[#1B2430] bg-white px-2 py-1 text-center font-bold text-[#1B2430]"
                 />
-                <span className="w-12 shrink-0 text-sm font-semibold text-[#1B2430]/50">/{d.questionCount}</span>
+                <span className="w-12 shrink-0 text-sm font-semibold text-[#1B2430]/70">/{d.questionCount}</span>
               </div>
             ))}
             {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
@@ -219,7 +219,7 @@ export function TargetPanel({ targets, examType, track, readOnly = false }: Prop
             </div>
           </div>
         ) : mevcutHedefler.length === 0 ? (
-          <p className="text-sm font-semibold text-[#1B2430]/60">
+          <p className="text-sm font-semibold text-[#1B2430]/70">
             Ders bazında hedef net girersen deneme grafiğinde hedef çizgin görünür.
           </p>
         ) : (

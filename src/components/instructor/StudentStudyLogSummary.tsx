@@ -51,7 +51,7 @@ export function StudentStudyLogSummary({ logs, dersToplamlari }: Props) {
             </div>
             <span className="w-28 shrink-0 text-right text-sm font-bold tabular-nums text-[#1B2430]">
               {d.saat} sa
-              {d.soru > 0 && <span className="text-[#1B2430]/60"> · {d.soru} soru</span>}
+              {d.soru > 0 && <span className="text-[#1B2430]/70"> · {d.soru} soru</span>}
             </span>
           </div>
         ))}
@@ -65,7 +65,7 @@ export function StudentStudyLogSummary({ logs, dersToplamlari }: Props) {
               key={l.id}
               className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-lg border-2 border-[#1B2430] bg-white px-3 py-1.5 text-sm"
             >
-              <span className="font-bold tabular-nums text-[#1B2430]/60">
+              <span className="font-bold tabular-nums text-[#1B2430]/70">
                 {new Date(l.logDate).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })}
               </span>
               <span className="font-bold text-[#1B2430]">{l.subject}</span>
@@ -79,7 +79,7 @@ export function StudentStudyLogSummary({ logs, dersToplamlari }: Props) {
           ))}
         </div>
         {logs.length > 40 && (
-          <p className="text-xs font-semibold text-[#1B2430]/60">
+          <p className="text-xs font-semibold text-[#1B2430]/70">
             Son 40 kayıt gösteriliyor.
           </p>
         )}

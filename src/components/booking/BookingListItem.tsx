@@ -28,7 +28,7 @@ export function BookingListItem({ booking, materials }: BookingListItemProps) {
       <div>
         <p className="font-bold text-[#1B2430]">
           {booking.instructorName}
-          {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#DD7B3A]">Tanışma Dersi</span>}
+          {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#9C4A0C]">Tanışma Dersi</span>}
         </p>
         <p className="text-sm font-semibold text-[#1B2430]/70">{formattedDate}</p>
         {booking.status === 'cancelled' && (

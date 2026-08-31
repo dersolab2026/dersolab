@@ -72,7 +72,7 @@ export default async function InstructorPayoutPage({ searchParams }: InstructorP
         </form>
 
         <div className="pt-2 border-t-2 border-[#1B2430]/10">
-          <p className="text-xs font-semibold text-[#1B2430]/60">{isGuidance ? 'Seans Sayısı' : 'Ders Sayısı'}</p>
+          <p className="text-xs font-semibold text-[#1B2430]/70">{isGuidance ? 'Seans Sayısı' : 'Ders Sayısı'}</p>
           <p className="text-2xl font-bold text-[#1B2430]">{stats.lessonCount}</p>
         </div>
       </div>

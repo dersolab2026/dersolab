@@ -64,10 +64,10 @@ export function GuardianLinkCard({ mevcutKod, veliler }: Props) {
               aria-label="Veli kodunu kopyala"
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-4 border-[#1B2430] bg-white shadow-[0_3px_0_#1B2430] active:translate-y-0.5 active:shadow-none transition-all"
             >
-              {kopyalandi ? <Check className="h-5 w-5 text-[#6FA89E]" /> : <Copy className="h-5 w-5 text-[#1B2430]" />}
+              {kopyalandi ? <Check className="h-5 w-5 text-[#3F6E66]" /> : <Copy className="h-5 w-5 text-[#1B2430]" />}
             </button>
           </div>
-          <p className="text-xs font-semibold text-[#1B2430]/60">
+          <p className="text-xs font-semibold text-[#1B2430]/70">
             Son kullanma: {new Date(mevcutKod.expiresAt).toLocaleDateString('tr-TR', { dateStyle: 'medium' })}
           </p>
         </div>
@@ -83,11 +83,11 @@ export function GuardianLinkCard({ mevcutKod, veliler }: Props) {
           <ul className="space-y-1">
             {veliler.map((v) => (
               <li key={v.id} className="text-sm font-semibold text-[#1B2430]">
-                {v.personName} <span className="text-[#1B2430]/60">· {v.personEmail}</span>
+                {v.personName} <span className="text-[#1B2430]/70">· {v.personEmail}</span>
               </li>
             ))}
           </ul>
-          <p className="text-xs font-semibold text-[#1B2430]/60">
+          <p className="text-xs font-semibold text-[#1B2430]/70">
             Bağlantıyı yalnızca velin kaldırabilir. Bir yanlışlık olduğunu düşünüyorsan bize yaz.
           </p>
         </div>

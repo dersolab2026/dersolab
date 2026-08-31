@@ -116,19 +116,19 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
         <p className="font-bold text-[#1B2430]">Bildirimler</p>
         <div className="flex items-center gap-3">
           {readCount > 0 && (
-            <button type="button" onClick={handleClearRead} className="text-xs font-bold text-[#1B2430]/60 underline">
+            <button type="button" onClick={handleClearRead} className="text-xs font-bold text-[#1B2430]/70 underline">
               Okunanları temizle
             </button>
           )}
           {unreadCount > 0 && (
-            <button type="button" onClick={handleMarkAllRead} className="text-xs font-bold text-[#DD7B3A] underline">
+            <button type="button" onClick={handleMarkAllRead} className="text-xs font-bold text-[#9C4A0C] underline">
               Tümünü okundu işaretle
             </button>
           )}
         </div>
       </div>
       {notifications.length === 0 ? (
-        <p className="p-4 text-sm font-semibold text-[#1B2430]/60">Henüz bildirimin yok.</p>
+        <p className="p-4 text-sm font-semibold text-[#1B2430]/70">Henüz bildirimin yok.</p>
       ) : (
         <ul>
           {notifications.map((n) => (
@@ -140,14 +140,14 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
               >
                 <p className="text-sm font-bold text-[#1B2430]">{n.title}</p>
                 {n.body && <p className="mt-0.5 text-xs font-semibold text-[#1B2430]/70">{n.body}</p>}
-                <p className="mt-1 text-[10px] font-semibold text-[#1B2430]/50">
+                <p className="mt-1 text-[10px] font-semibold text-[#1B2430]/70">
                   {new Date(n.createdAt).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })}
                 </p>
               </button>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleDelete(n.id) }}
-                className="absolute top-3 right-2 text-[#1B2430]/40 hover:text-[#1B2430]"
+                className="absolute top-3 right-2 text-[#1B2430]/55 hover:text-[#1B2430]"
                 aria-label="Bildirimi sil"
               >
                 <X className="h-3.5 w-3.5" />
@@ -172,11 +172,11 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
           className={`absolute top-0 left-1/2 h-5 w-5 -translate-x-1/2 transition-all ${
             unreadCount > 0
               ? 'fill-yellow-300 text-yellow-500 drop-shadow-[0_0_6px_rgba(250,204,21,0.95)] animate-pulse'
-              : 'text-[#1B2430]/25'
+              : 'text-[#1B2430]/55'
           }`}
         />
         <img
-          src="/fox-mascot-icon.png"
+          src="/fox-mascot-icon-96.png"
           alt="Bildirimler"
           className="h-12 w-12"
           style={{ imageRendering: 'pixelated' }}

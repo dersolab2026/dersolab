@@ -160,7 +160,7 @@ export function RegisterForm() {
             </svg>
             {isGooglePending ? 'Yönlendiriliyor...' : 'Google ile Kaydol'}
           </button>
-          <p className="text-xs font-semibold text-[#1B2430]/60">
+          <p className="text-xs font-semibold text-[#1B2430]/70">
             Google ile devam edersen hesap türünü bir sonraki adımda onaylarsın.
           </p>
         </div>
@@ -260,11 +260,11 @@ export function RegisterForm() {
             className="mt-1 h-4 w-4 accent-[#DD7B3A]"
           />
           <span>
-            <Link href="/terms" target="_blank" className="font-bold text-[#DD7B3A] underline">
+            <Link href="/terms" target="_blank" className="font-bold text-[#9C4A0C] underline">
               Kullanım Şartları’nı
             </Link>{' '}
             okudum ve kabul ediyorum. Kayıt bilgilerimin işlenmesiyle ilgili açıklamayı da{' '}
-            <Link href="/privacy" target="_blank" className="font-bold text-[#DD7B3A] underline">
+            <Link href="/privacy" target="_blank" className="font-bold text-[#9C4A0C] underline">
               KVKK Aydınlatma Metni’nde
             </Link>{' '}
             gördüm.
@@ -284,7 +284,7 @@ export function RegisterForm() {
 
       <div className="mt-6 text-center">
         <span className="text-[#1B2430]">Zaten hesabın var mı? </span>
-        <Link href="/login" className="text-[#DD7B3A] font-bold hover:underline">
+        <Link href="/login" className="text-[#9C4A0C] font-bold hover:underline">
           Giriş Yap
         </Link>
       </div>

@@ -59,7 +59,7 @@ export function HomeworkSubmissionUploader({ homeworkId, onUploaded }: HomeworkS
         {isPending ? 'Yükleniyor...' : success ? 'Yüklendi' : 'Fotoğraf / Video Yükle'}
       </button>
       {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-      <p className="text-xs font-semibold text-[#1B2430]/60">JPG, PNG, WEBP, MP4 veya MOV — en fazla 25 MB</p>
+      <p className="text-xs font-semibold text-[#1B2430]/70">JPG, PNG, WEBP, MP4 veya MOV — en fazla 25 MB</p>
     </div>
   )
 }

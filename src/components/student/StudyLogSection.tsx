@@ -74,7 +74,7 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
       </div>
 
       {entries.length === 0 && !isOpen && (
-        <p className="text-sm font-semibold text-[#1B2430]/60">Bu gün için henüz bir çalışma notu yok.</p>
+        <p className="text-sm font-semibold text-[#1B2430]/70">Bu gün için henüz bir çalışma notu yok.</p>
       )}
 
       {entries.length > 0 && (
@@ -98,7 +98,7 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
                 type="button"
                 onClick={() => handleDelete(entry.id)}
                 disabled={isPending}
-                className="text-[#1B2430]/40 hover:text-red-600 shrink-0"
+                className="text-[#1B2430]/55 hover:text-red-600 shrink-0"
                 aria-label="Notu sil"
               >
                 <Trash2 className="h-4 w-4" />

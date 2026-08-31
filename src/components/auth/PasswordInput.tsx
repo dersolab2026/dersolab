@@ -29,7 +29,7 @@ export function PasswordInput({ value, onChange, required, minLength, placeholde
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1B2430]/60 hover:text-[#1B2430]"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1B2430]/70 hover:text-[#1B2430]"
         aria-label={visible ? 'Şifreyi gizle' : 'Şifreyi göster'}
       >
         {visible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

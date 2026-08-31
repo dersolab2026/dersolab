@@ -98,7 +98,7 @@ export function WeeklyReportPanel({ studentId }: { studentId: string }) {
 
       {rapor && (
         <div className="space-y-2 rounded-xl border-4 border-[#1B2430] bg-white p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">Önizleme</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Önizleme</p>
 
           <div className="grid gap-2 sm:grid-cols-2">
             <Satir etiket="Plan tutturma" deger={
@@ -119,7 +119,7 @@ export function WeeklyReportPanel({ studentId }: { studentId: string }) {
             } />
           </div>
 
-          <p className="text-xs font-semibold text-[#1B2430]/60">
+          <p className="text-xs font-semibold text-[#1B2430]/70">
             Rapor öğrencinin e-posta adresine gider. Veliye doğrudan gönderim yok;
             öğrenci dilerse iletir.
           </p>
@@ -132,7 +132,7 @@ export function WeeklyReportPanel({ studentId }: { studentId: string }) {
 function Satir({ etiket, deger }: { etiket: string; deger: string }) {
   return (
     <div className="rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] px-3 py-1.5">
-      <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/60">{etiket}</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">{etiket}</p>
       <p className="text-sm font-bold text-[#1B2430]">{deger}</p>
     </div>
   )

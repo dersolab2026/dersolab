@@ -178,7 +178,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                 </button>
               ))}
             </div>
-            <p className="mt-1 text-xs font-semibold text-[#1B2430]/50">
+            <p className="mt-1 text-xs font-semibold text-[#1B2430]/70">
               Zorluğu kaydedersen, farklı zorlukta denemeleri karşılaştırırken uyarı gösterilir.
             </p>
           </div>
@@ -186,7 +186,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
           <div className="space-y-2">
             <p className="text-sm font-bold text-[#1B2430]">
               Ders Ders Doğru / Yanlış
-              <span className="ml-2 font-semibold text-[#1B2430]/60">
+              <span className="ml-2 font-semibold text-[#1B2430]/70">
                 toplam {getTotalQuestions(examType, aktifTrack)} soru
               </span>
             </p>
@@ -201,7 +201,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                   <div key={d.name} className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-2">
                     <span className="min-w-0 truncate text-sm font-bold text-[#1B2430]" title={d.name}>
                       {d.name}
-                      <span className="ml-1 font-semibold text-[#1B2430]/50">({d.questionCount})</span>
+                      <span className="ml-1 font-semibold text-[#1B2430]/70">({d.questionCount})</span>
                     </span>
                     <input
                       type="number" min={0} max={d.questionCount} placeholder="D"
@@ -215,7 +215,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                       aria-label={`${d.name} yanlış`}
                       className={`w-16 p-2 rounded-lg border-2 bg-white text-sm text-center outline-none focus:ring-2 focus:ring-[#6FA89E]/50 ${asiyor ? 'border-red-500' : 'border-[#1B2430]'}`}
                     />
-                    <span className="w-16 text-right text-sm font-bold text-[#6FA89E]">
+                    <span className="w-16 text-right text-sm font-bold text-[#3F6E66]">
                       {dogru || yanlis ? net : '—'}
                     </span>
                   </div>
@@ -227,7 +227,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
           {supportsObp(examType) && (
             <div>
               <label className="block text-sm font-bold text-[#1B2430] mb-1">
-                OBP <span className="font-semibold text-[#1B2430]/60">(isteğe bağlı — girersen yerleştirme puanı da hesaplanır)</span>
+                OBP <span className="font-semibold text-[#1B2430]/70">(isteğe bağlı — girersen yerleştirme puanı da hesaplanır)</span>
               </label>
               <input
                 type="number" min={100} max={500} step="0.01"
@@ -238,7 +238,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
           )}
 
           {birSeyGirildi && (
-            <p className="text-sm font-bold text-[#6FA89E]">
+            <p className="text-sm font-bold text-[#3F6E66]">
               Toplam net: {toplamNet}
               {' · '}Tahmini puan: {estimateScore(examType, toplamNet, aktifTrack)}
               {obp !== '' && supportsObp(examType) &&
@@ -292,7 +292,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                         </span>
                       )}
                     </p>
-                    <p className="mt-1 text-sm font-bold text-[#6FA89E]">
+                    <p className="mt-1 text-sm font-bold text-[#3F6E66]">
                       Toplam net: {net} · Tahmini puan: {estimateScore(e.examType, net, e.track)}
                       {yerlestirme !== null && ` · Tahmini yerleştirme: ${yerlestirme}`}
                     </p>
@@ -303,14 +303,14 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                         type="button"
                         onClick={() => setAcikKayit(acik ? null : e.id)}
                         aria-label={acik ? 'Ders detayını gizle' : 'Ders detayını göster'}
-                        className="text-[#1B2430]/60 hover:text-[#1B2430]"
+                        className="text-[#1B2430]/70 hover:text-[#1B2430]"
                       >
                         {acik ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                       </button>
                     )}
                     <button
                       type="button" onClick={() => handleDelete(e.id)}
-                      aria-label="Denemeyi sil" className="text-[#1B2430]/40 hover:text-red-600"
+                      aria-label="Denemeyi sil" className="text-[#1B2430]/55 hover:text-red-600"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -325,7 +325,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                           <span className="font-semibold text-[#1B2430]">{s.name}</span>
                           <span className="font-semibold text-[#1B2430]/70">
                             {s.correctCount}D · {s.wrongCount}Y
-                            <strong className="ml-2 text-[#6FA89E]">
+                            <strong className="ml-2 text-[#3F6E66]">
                               {calculateNet(e.examType, s.correctCount, s.wrongCount)} net
                             </strong>
                           </span>

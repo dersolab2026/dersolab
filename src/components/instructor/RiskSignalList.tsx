@@ -12,7 +12,7 @@ export function RiskSignalList({ sinyaller }: { sinyaller: RiskSinyali[] }) {
   if (sinyaller.length === 0) {
     return (
       <div className={`${PIXEL_CARD} flex items-center gap-2 p-4`}>
-        <CheckCircle2 className="h-5 w-5 shrink-0 text-[#6FA89E]" />
+        <CheckCircle2 className="h-5 w-5 shrink-0 text-[#3F6E66]" />
         <p className="text-sm font-bold text-[#1B2430]">
           Dikkat çeken bir durum yok.
         </p>
@@ -26,7 +26,7 @@ export function RiskSignalList({ sinyaller }: { sinyaller: RiskSinyali[] }) {
         <AlertTriangle className="h-5 w-5 text-[#C2410C]" />
         <p className="font-bold text-[#1B2430]">
           Dikkat Edilecekler
-          <span className="ml-2 text-sm font-semibold text-[#1B2430]/60">{sinyaller.length} sinyal</span>
+          <span className="ml-2 text-sm font-semibold text-[#1B2430]/70">{sinyaller.length} sinyal</span>
         </p>
       </div>
 
@@ -43,7 +43,7 @@ export function RiskSignalList({ sinyaller }: { sinyaller: RiskSinyali[] }) {
         ))}
       </div>
 
-      <p className="text-xs font-semibold text-[#1B2430]/60">
+      <p className="text-xs font-semibold text-[#1B2430]/70">
         Sinyaller sabit kurallardan üretiliyor, bir tahmin ya da puanlama değil.
         Eşikler bilerek geniş tutuldu; yanlış alarm üreten bir liste bir süre
         sonra hiç okunmuyor.

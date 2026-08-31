@@ -91,7 +91,7 @@ export function GuardianPurchasePanel({ ogrenciler, paketler }: Props) {
           <div key={pkg.id} className={`${PIXEL_CARD} space-y-2 p-5`}>
             <p className="font-bold text-[#1B2430]">{pkg.title}</p>
             <p className="text-2xl font-bold text-[#1B2430]">{pkg.price.toLocaleString('tr-TR')} ₺</p>
-            <p className="text-sm font-semibold text-[#6FA89E]">{pkg.creditAmount} ders kredisi</p>
+            <p className="text-sm font-semibold text-[#3F6E66]">{pkg.creditAmount} ders kredisi</p>
             {pkg.description && (
               <p className="text-sm font-semibold text-[#1B2430]/70">{pkg.description}</p>
             )}
@@ -108,7 +108,7 @@ export function GuardianPurchasePanel({ ogrenciler, paketler }: Props) {
                     ? <Loader2 className="h-4 w-4 animate-spin" />
                     : secili ? `${secili.personName} için Satın Al` : 'Satın Al'}
                 </button>
-                <p className="text-xs font-semibold text-[#1B2430]/60">
+                <p className="text-xs font-semibold text-[#1B2430]/70">
                   Ödeme Shopier üzerinden alınır. Shopier&apos;de <strong>bu DersoLab hesabınızla
                   aynı e-postayı</strong> kullanın; krediler {secili?.personName ?? 'seçtiğiniz öğrenci'} hesabına yüklenir.
                 </p>

@@ -64,7 +64,7 @@ export function PayoutInfoForm({ initialPayoutName, initialPayoutIban, payoutUpd
 
       {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
       {payoutUpdatedAt && (
-        <p className="text-xs font-semibold text-[#1B2430]/60">
+        <p className="text-xs font-semibold text-[#1B2430]/70">
           Son güncelleme: {new Date(payoutUpdatedAt).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })}
         </p>
       )}
