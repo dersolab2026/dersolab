@@ -117,16 +117,17 @@ export function AIAsistanClient() {
     >
       <div className="max-w-2xl mx-auto space-y-6">
 
-        {/* Powered by badge */}
-        <div className="flex items-center gap-3">
-          <div className={`${PIXEL_BADGE} flex items-center gap-1.5 text-xs`}>
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+        {/* Powered by badges */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-xs font-bold whitespace-nowrap">
+            <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#4285F4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Google Gemini AI
-          </div>
-          <span className={`${PIXEL_BADGE} bg-[#D5EAE3] text-[#1B2430]`}>
-            ♾️ Sınırsız Soru Çözümü Aktif
+          </span>
+          <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border-2 border-[#1B2430] bg-[#D5EAE3] text-[#1B2430] text-xs font-bold whitespace-nowrap">
+            <span>♾️</span>
+            <span>Sınırsız Soru Çözümü Aktif</span>
           </span>
         </div>
 
@@ -237,10 +238,10 @@ export function AIAsistanClient() {
                 Yeni Soru
               </button>
               <Link
-                href="/dashboard/student/bookings"
-                className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm`}
+                href="/instructors"
+                className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm flex items-center gap-1.5`}
               >
-                Eğitmene Danış
+                <span>👨‍🏫 Eğitmene Danış (Ders Al)</span>
               </Link>
             </div>
           </div>
