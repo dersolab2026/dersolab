@@ -1,16 +1,5 @@
 import { SOCIAL_LINKS, SOCIAL_LABELS, type SocialPlatform } from '@/lib/constants'
 
-/**
- * Ana sayfanin alt kismindaki "Bizi takip edin" seridi.
- *
- * Hesaplar src/lib/constants.ts icindeki SOCIAL_LINKS listesinden geliyor.
- * Liste bos oldugu surece bolum hic basilmiyor — yarim kalmis bir bolum ya da
- * olu link yayina cikmasin diye.
- *
- * lucide-react bu surumde marka ikonlarini artik gondermedigi icin ikonlar
- * satir ici SVG; sitenin kalin cizgili gorunumune uysun diye stroke 2.
- */
-
 const IKONLAR: Record<SocialPlatform, React.ReactNode> = {
   instagram: (
     <>
@@ -48,11 +37,11 @@ export function SocialLinks() {
   if (SOCIAL_LINKS.length === 0) return null
 
   return (
-    <div className="bg-[#F4F1E8] rounded-2xl p-7 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center">
-      <p className="font-sans text-lg sm:text-xl font-bold text-[#1B2430] mb-5">
-        Bizi sosyal medya hesaplarımızdan da takip edebilirsiniz.
+    <div className="rounded-2xl bg-white/70 backdrop-blur-md border border-slate-200/80 p-6 sm:p-8 text-center shadow-[0_4px_20px_-4px_rgba(15,23,42,0.03)]">
+      <p className="text-sm sm:text-base font-semibold text-slate-800 mb-4">
+        DersoLab topluluğuna katılın, eğitim ve sınav ipuçlarını kaçırmayın.
       </p>
-      <div className="flex flex-wrap items-center justify-center gap-4">
+      <div className="flex flex-wrap items-center justify-center gap-3">
         {SOCIAL_LINKS.map(({ platform, url }) => (
           <a
             key={platform}
@@ -61,14 +50,14 @@ export function SocialLinks() {
             rel="noopener noreferrer"
             aria-label={`DersoLab ${SOCIAL_LABELS[platform]} hesabı`}
             title={SOCIAL_LABELS[platform]}
-            className="flex h-14 w-14 items-center justify-center rounded-xl border-4 border-[#1B2430] bg-white text-[#1B2430] shadow-[0_4px_0_#1B2430] transition-all hover:bg-[#DD7B3A] hover:text-[#F4F1E8] active:translate-y-1 active:shadow-none"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-all hover:border-slate-400 hover:text-slate-950 hover:scale-105 active:scale-95"
           >
             <svg
               viewBox="0 0 24 24"
-              className="h-7 w-7"
+              className="h-5 w-5"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
               aria-hidden="true"

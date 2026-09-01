@@ -1,115 +1,92 @@
 import Link from 'next/link'
-import { HeroSlider } from '@/components/home/HeroSlider'
-import { FeatureCard, type FeatureIcon } from '@/components/home/FeatureCard'
-import { SocialLinks } from '@/components/home/SocialLinks'
+import { createClient } from '@/lib/supabase/server'
+import type { UserRole } from '@/types'
+import { MinimalLuxuryHeader } from '@/components/home/MinimalLuxuryHeader'
+import { AuthenticatedWelcomeBanner } from '@/components/home/AuthenticatedWelcomeBanner'
+import { HomePersonaView } from '@/components/home/HomePersonaView'
+import type { PersonaType } from '@/components/home/PersonaSwitcher'
 
-const FEATURES = [
-  {
-    icon: 'ders' as FeatureIcon,
-    title: 'Bire Bir Online Dersler',
-    body: 'Google Meet üzerinden eğitmenin uygun saatlerine göre planlanan dersler. Ders bilgisi anında takviminize ve e-posta adresinize düşer.',
-  },
-  {
-    icon: 'kocluk' as FeatureIcon,
-    title: 'Koçluk Desteği',
-    body: 'Sınav hazırlığında ve bölüm tercihinde yol gösteren, derslerden ayrı bir koçluk hattı.',
-  },
-  {
-    icon: 'odev' as FeatureIcon,
-    title: 'Ödev ve Ders Notu Takibi',
-    body: 'Eğitmeninizin verdiği ödevleri teslim edin, geri bildirim alın. Ders sonrası paylaşılan notlara istediğiniz zaman ulaşın.',
-  },
-  {
-    icon: 'kredi' as FeatureIcon,
-    title: 'Esnek Kredi Paketleri',
-    body: 'İhtiyacınız kadar ders kredisi alın. Kullanmadığınız kredi yanmaz, hesabınızda kalır.',
-  },
-]
+interface HomePageProps {
+  searchParams?: Promise<{ role?: string }>
+}
 
-const STEPS = [
-  { step: '1', title: 'Kaydolun', body: 'Birkaç saniyede ücretsiz hesabınızı oluşturun.' },
-  { step: '2', title: 'Eğitmen Bulun ya da Hoş Geldin Paketini Alın', body: 'Branşınıza uygun eğitmeni inceleyin, isterseniz önce ücretsiz hoş geldin paketinizle başlayın.' },
-  { step: '3', title: 'Dersinizi Planlayın', body: 'Uygun saati seçin; ders takviminize, Google Meet bağlantısı e-posta adresinize gelsin.' },
-]
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-export default function HomePage() {
+  let userProfile: { name: string; role: UserRole } | null = null
+
+  if (user) {
+    const { data: userRow } = await supabase.from('users').select('name, role').eq('id', user.id).maybeSingle()
+    if (userRow) {
+      userProfile = {
+        name: userRow.name || 'Kullanıcı',
+        role: userRow.role as UserRole,
+      }
+    }
+  }
+
+  const resolvedParams = searchParams ? await searchParams : undefined
+  const roleParam = resolvedParams?.role as PersonaType | undefined
+  const initialPersona: PersonaType =
+    roleParam && ['student', 'parent', 'instructor'].includes(roleParam)
+      ? roleParam
+      : userProfile?.role === 'parent'
+      ? 'parent'
+      : userProfile?.role === 'instructor'
+      ? 'instructor'
+      : 'student'
+
+  const dashboardHref =
+    userProfile?.role === 'student'
+      ? '/dashboard/student'
+      : userProfile?.role === 'instructor'
+      ? '/dashboard/instructor'
+      : userProfile?.role === 'parent'
+      ? '/dashboard/parent'
+      : '/dashboard'
+
   return (
-    <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
-      <div
-        className="absolute inset-0 z-0 opacity-40 pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(45deg, #6FA89E 25%, transparent 25%), linear-gradient(-45deg, #6FA89E 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #6FA89E 75%), linear-gradient(-45deg, transparent 75%, #6FA89E 75%)',
-          backgroundSize: '40px 40px', backgroundPosition: '0 0, 0 20px, 20px -20px, -20px 0px'
-        }}
-      />
+    <div className="min-h-screen w-full bg-[#080B11] text-slate-100 relative overflow-hidden selection:bg-emerald-500 selection:text-slate-950 font-sans">
+      {/* High-End Ambient Gradient Lighting (Dark Obsidian Mesh) */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute -top-[25%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-emerald-500/[0.08] rounded-full blur-[140px] animate-pulse-glow" />
+        <div className="absolute top-[40%] -left-[15%] w-[700px] h-[600px] bg-teal-500/[0.05] rounded-full blur-[160px]" />
+        <div className="absolute top-[70%] -right-[15%] w-[600px] h-[600px] bg-indigo-500/[0.04] rounded-full blur-[150px]" />
+      </div>
 
-      <div className="relative z-10 mx-auto max-w-5xl space-y-7 p-4 sm:p-6 py-8 sm:py-12">
+      <div className="relative z-10 mx-auto max-w-5xl space-y-8 px-4 sm:px-6 py-4 sm:py-8">
+        {/* Minimal Luxury Navigation Header */}
+        <MinimalLuxuryHeader isLoggedIn={!!userProfile} dashboardHref={dashboardHref} />
 
-        {/* Logo: slaytın üstünde sabit kimlik şeridi */}
-        <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-7 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] flex items-center justify-center">
-          <img src="/dersolab-logo.png" alt="DersoLab" className="h-auto w-full max-w-[360px]" />
-        </div>
-
-        {/* Sayfanın tek h1'i; görsel tasarımı bozmadan arama motorları ve
-            ekran okuyucular için başlığı taşıyor. */}
+        {/* Hidden SEO H1 */}
         <h1 className="sr-only">
-          DersoLab — Öğrenciler İçin Online Özel Ders ve Koçluk Platformu
+          DersoLab — Bire Bir Canlı Online Özel Ders ve Koçluk Platformu
         </h1>
 
-        {/* Fırsatlar: aşağı inmeden görünsün diye slayt gösterisi */}
-        <HeroSlider />
+        {/* Authenticated Welcome Banner */}
+        {userProfile && <AuthenticatedWelcomeBanner userName={userProfile.name} role={userProfile.role} />}
 
-        <p className="text-center text-base font-bold text-[#1B2430]">
-          Zaten hesabınız var mı?{' '}
-          <Link href="/login" className="underline">Giriş Yapın</Link>
-        </p>
+        {/* Dynamic Minimalist Luxury Persona Experience */}
+        <HomePersonaView initialPersona={initialPersona} />
 
-        {/* Features */}
-        <div className="bg-[#F4F1E8] rounded-2xl p-7 sm:p-10 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
-          <h2 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430] mb-7 text-center">Ne Sunuyoruz?</h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {FEATURES.map((f) => (
-              <FeatureCard key={f.title} icon={f.icon} title={f.title} body={f.body} />
-            ))}
+        {/* Minimalist Ultra-Clean Luxury Footer */}
+        <footer className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 pt-10 pb-8 border-t border-white/[0.08]">
+          <p>© {new Date().getFullYear()} DersoLab Platformu. Tüm hakları saklıdır.</p>
+          <div className="flex items-center gap-6">
+            <Link href="/hakkimizda" className="hover:text-slate-300 transition-colors">
+              Hakkımızda
+            </Link>
+            <Link href="/privacy" className="hover:text-slate-300 transition-colors">
+              Gizlilik Politikası
+            </Link>
+            <Link href="/terms" className="hover:text-slate-300 transition-colors">
+              Kullanım Şartları
+            </Link>
           </div>
-        </div>
-
-        {/* How it works */}
-        <div className="bg-[#F4F1E8] rounded-2xl p-7 sm:p-10 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
-          <h2 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430] mb-7 text-center">Nasıl Çalışır?</h2>
-          <div className="grid gap-5 sm:grid-cols-3">
-            {STEPS.map((s) => (
-              <div key={s.step} className="rounded-xl border-4 border-[#1B2430] bg-white p-5 sm:p-6 text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#DD7B3A] text-[#F4F1E8] text-lg font-black border-4 border-[#1B2430]">
-                  {s.step}
-                </div>
-                <p className="font-bold text-lg text-[#1B2430] mb-1.5">{s.title}</p>
-                <p className="text-base font-semibold text-[#1B2430]/70">{s.body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Final CTA */}
-        <div className="bg-[#F4F1E8] rounded-2xl p-7 sm:p-10 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center">
-          <p className="font-sans text-xl sm:text-2xl font-bold text-[#1B2430] mb-6">
-            Ücretsiz hesabınızı açın, branşınıza uygun eğitmenleri incelemeye başlayın.
-          </p>
-          <Link
-            href="/register"
-            className="inline-block py-3.5 px-9 text-lg bg-[#DD7B3A] text-[#F4F1E8] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
-          >
-            Ücretsiz Kaydolun
-          </Link>
-        </div>
-
-        <SocialLinks />
-
-        <div className="flex flex-wrap justify-center gap-5 text-sm font-sans font-semibold text-[#1B2430]/60 pb-4">
-          <Link href="/hakkimizda" className="hover:underline">Hakkımızda</Link>
-          <Link href="/privacy" className="hover:underline">Gizlilik Politikası</Link>
-          <Link href="/terms" className="hover:underline">Kullanım Şartları</Link>
-        </div>
+        </footer>
       </div>
     </div>
   )
