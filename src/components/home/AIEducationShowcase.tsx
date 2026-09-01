@@ -106,16 +106,15 @@ export function AIEducationShowcase() {
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
           </svg>
-          <span>Google AI × DersoLab Eğitim Seferberliği</span>
+          <span>Google AI × DersoLab | Yapay Zeka Çağında Yeni Nesil Eğitim</span>
         </div>
 
         <h2 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430]">
-          Google Destekli 7/24 AI Soru Çözüm Asistanı
+          Yapay Zeka Çağını Yakalayın: 7/24 Sınırsız AI Soru Çözüm Asistanı
         </h2>
 
         <p className="text-base font-semibold text-[#1B2430]/75 max-w-2xl mx-auto">
-          Eğitimde fırsat eşitliği için DersoLab’a kayıtlı tüm öğrencilerimize her gün{' '}
-          <strong className="text-[#DD7B3A] underline decoration-2">ücretsiz 15 soru</strong> Google Gemini AI destekli adım adım pedagojik çözüm hediye!
+          DersoLab’a kayıtlı tüm öğrencilerimiz için 7/24 sınırsız, adım adım ve mantığını kavratan Google Gemini AI soru çözüm desteği!
         </p>
       </div>
 
@@ -126,15 +125,15 @@ export function AIEducationShowcase() {
             <Zap className="w-4 h-4" />
           </div>
           <p className="font-bold text-xs text-[#1B2430]">Google Gemini 3.6</p>
-          <p className="text-[11px] text-[#1B2430]/70 font-semibold mt-0.5">Anında akıllı çözüm</p>
+          <p className="text-[11px] text-[#1B2430]/70 font-semibold mt-0.5">Saniyeler içinde çözüm</p>
         </div>
 
         <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3.5 text-center">
           <div className="w-8 h-8 rounded-lg bg-[#D5EAE3] border-2 border-[#1B2430] flex items-center justify-center mx-auto mb-1.5 text-[#1B2430]">
             <BookOpen className="w-4 h-4" />
           </div>
-          <p className="font-bold text-xs text-[#1B2430]">Pedagojik Anlatım</p>
-          <p className="text-[11px] text-[#1B2430]/70 font-semibold mt-0.5">Ezberletmez, öğretir</p>
+          <p className="font-bold text-xs text-[#1B2430]">Mantığını Öğretir</p>
+          <p className="text-[11px] text-[#1B2430]/70 font-semibold mt-0.5">Adım adım detaylı anlatım</p>
         </div>
 
         <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3.5 text-center">
@@ -149,7 +148,7 @@ export function AIEducationShowcase() {
           <div className="w-8 h-8 rounded-lg bg-[#D5EAE3] border-2 border-[#1B2430] flex items-center justify-center mx-auto mb-1.5 text-[#1B2430]">
             <Gift className="w-4 h-4" />
           </div>
-          <p className="font-bold text-xs text-[#1B2430]">Her Gün Ücretsiz</p>
+          <p className="font-bold text-xs text-[#1B2430]">Sınırsız Soru Desteği</p>
           <p className="text-[11px] text-[#1B2430]/70 font-semibold mt-0.5">Kayıtlı öğrencilere özel</p>
         </div>
       </div>
@@ -194,7 +193,7 @@ export function AIEducationShowcase() {
             </p>
             <div className="flex items-center gap-1 text-[11px] text-[#1B2430]/60 font-semibold pt-1">
               <Lock className="w-3 h-3 text-[#DD7B3A]" />
-              <span>Giriş yapan öğrenciler panelden sınırsız soru sorabilir.</span>
+              <span>Giriş yapan öğrenciler panelden 7/24 sınırsız soru sorabilir.</span>
             </div>
           </div>
 
@@ -205,7 +204,7 @@ export function AIEducationShowcase() {
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Google Gemini AI Adım Adım Çözüm
               </span>
-              <span className="text-[10px] text-[#D5EAE3] font-mono">DersoLab Pedagoji Formatı</span>
+              <span className="text-[10px] text-[#D5EAE3] font-mono">DersoLab Çözüm Formatı</span>
             </div>
 
             <div className="space-y-2 text-xs">

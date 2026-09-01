@@ -123,13 +123,11 @@ export function AIAsistanClient() {
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#4285F4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            Powered by Google Gemini
+            Google Gemini AI
           </div>
-          {remaining !== null && (
-            <span className={PIXEL_BADGE}>
-              {remaining} soru hakkı kaldı {isAnon ? '(günlük)' : '(bugün)'}
-            </span>
-          )}
+          <span className={`${PIXEL_BADGE} bg-[#D5EAE3] text-[#1B2430]`}>
+            ♾️ Sınırsız Soru Çözümü Aktif
+          </span>
         </div>
 
         {/* Soru formu */}
@@ -249,9 +247,9 @@ export function AIAsistanClient() {
         )}
 
         {/* Bilgi notu */}
-        <div className="p-4 rounded-xl border-2 border-[#1B2430]/20 bg-[#F4F1E8]/50 text-xs text-[#1B2430]/60 font-semibold">
-          💡 AI asistan bazen hata yapabilir. Kritik sorularda eğitmenine danışmayı unutma.
-          Günlük 15 soru hakkın var. Soru fotoğrafı yükleme yakında geliyor!
+        <div className="p-4 rounded-xl border-2 border-[#1B2430]/20 bg-[#F4F1E8]/50 text-xs text-[#1B2430]/80 font-semibold space-y-1">
+          <p>💡 <strong>DersoLab Branş Kapsamı:</strong> AI Soru Asistanı sadece platformumuzdaki resmi LGS ve YKS (Matematik, Fizik, Kimya, Biyoloji, Türkçe, Tarih vb.) ders soruları için eğitilmiştir.</p>
+          <p className="text-[#1B2430]/60">DersoLab öğrencisi olarak 7/24 sınırsız soru sorabilir ve adım adım çözümlerle sınavlara eksiksiz hazırlanabilirsiniz.</p>
         </div>
 
       </div>
