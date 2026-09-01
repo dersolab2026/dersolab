@@ -14,8 +14,9 @@ export default async function InstructorDashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: userRow } = await supabase.from('users').select('avatar_url').eq('id', user.id).single()
   const { data: instructorRow } = await supabase
-    .from('instructors').select('approval_status, calendar_connected, approval_note, subjects').eq('user_id', user.id).single()
+    .from('instructors').select('approval_status, calendar_connected, approval_note, subjects, bio, intro_video_url').eq('user_id', user.id).single()
   const { count: availabilityCount } = await supabase
     .from('instructor_availability').select('id', { count: 'exact', head: true })
     .eq('instructor_id', user.id).eq('is_active', true)
@@ -48,9 +49,11 @@ export default async function InstructorDashboardPage() {
       {instructorRow?.approval_status === 'approved' && (
         <OnboardingChecklist
           steps={[
-            { label: 'Google Takvimini bağla', href: '/dashboard/instructor/settings', done: instructorRow.calendar_connected },
-            { label: 'Ajandanı doldur (müsait olduğun saatler)', href: '/dashboard/instructor/availability', done: (availabilityCount ?? 0) > 0 },
-            { label: 'Profilini tamamla (branş, eğitim, tanıtım videosu)', href: '/dashboard/instructor/profile', done: (instructorRow.subjects ?? []).length > 0 },
+            { label: 'Google Takvimini Bağla', tip: 'Rezervasyon alabilmek için zorunludur', href: '/dashboard/instructor/settings', done: !!instructorRow.calendar_connected },
+            { label: 'Müsaitlik Saatlerini Belirle', tip: 'Haftalık ders verebileceğin saatler', href: '/dashboard/instructor/availability', done: (availabilityCount ?? 0) > 0 },
+            { label: 'Tanıtım Yazısı / Bio Ekle', tip: 'Deneyimlerini ve tarzını anlatan 2-3 cümle', href: '/dashboard/instructor/profile', done: !!instructorRow.bio?.trim() },
+            { label: 'Branşlarını Belirle', tip: 'LGS, YKS, TYT, AYT derslerin', href: '/dashboard/instructor/profile', done: (instructorRow.subjects ?? []).length > 0 },
+            { label: 'Profil Fotoğrafı Yükle', tip: 'Güven veren profesyonel bir fotoğraf', href: '/dashboard/instructor/profile', done: !!userRow?.avatar_url },
           ]}
         />
       )}

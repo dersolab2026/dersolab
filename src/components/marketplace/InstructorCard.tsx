@@ -90,18 +90,22 @@ export function InstructorCard({ instructor, sessionTypeHint, nextSlot }: Instru
           )}
         </div>
 
-        {/* Takvimi bağlı olup ajanda saati girmemiş eğitmen de rezervasyon
-            alamıyor; ilk müsait saat çıkmıyorsa "Yakında müsait" gösteriyoruz. */}
-        {nextSlot ? (
-          <span className="mt-3 inline-flex w-fit items-center gap-1.5 px-2 py-1 rounded-lg border-2 border-[#1B2430] bg-[#6FA89E] text-[#F4F1E8] text-xs font-bold">
-            <CalendarClock className="h-3.5 w-3.5" />
-            İlk müsait: {formatNextSlot(nextSlot)}
+        {/* Alt bilgi ve buton */}
+        <div className="mt-4 pt-3 border-t-2 border-[#1B2430]/10 flex items-center justify-between gap-2">
+          {nextSlot ? (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border-2 border-[#1B2430] bg-[#6FA89E] text-[#F4F1E8] text-[11px] font-bold shrink-0">
+              <CalendarClock className="h-3 w-3 shrink-0" />
+              <span>{formatNextSlot(nextSlot)}</span>
+            </span>
+          ) : (
+            <span className="inline-block px-2 py-0.5 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-[11px] font-bold shrink-0">
+              Yakında müsait
+            </span>
+          )}
+          <span className="text-xs font-black text-[#DD7B3A] group-hover:underline">
+            Profili İncele →
           </span>
-        ) : (
-          <span className="mt-3 inline-block w-fit px-2 py-0.5 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-xs font-bold">
-            Yakında müsait
-          </span>
-        )}
+        </div>
       </div>
     </Link>
   )

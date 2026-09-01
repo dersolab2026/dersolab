@@ -36,6 +36,28 @@ export default async function InstructorsPage({ searchParams }: InstructorsPageP
           <h1 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430] leading-snug">
             Eğitmenler
           </h1>
+          <p className="text-sm font-semibold text-[#1B2430]/70 mt-1">
+            Alanında uzman eğitmenleri inceleyin, hedeflerinize uygun dersi hemen başlatın.
+          </p>
+        </div>
+
+        {/* Hoş Geldin Paketi Vurgusu */}
+        <div className="bg-[#6FA89E] rounded-2xl p-6 sm:p-7 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-[#F4F1E8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <span className="inline-block px-2.5 py-0.5 rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] text-[#1B2430] text-xs font-black">
+              🎁 HOŞ GELDİN PAKETİ
+            </span>
+            <h2 className="text-xl sm:text-2xl font-black text-[#F4F1E8]">İlk Tanışma Dersiniz Bizden Hediye</h2>
+            <p className="text-sm font-semibold text-[#F4F1E8]/90 max-w-xl">
+              Kredi harcamadan ve hiçbir kart bilgisi girmeden eğitmeninizle tanışın, hedeflerinizi birlikte planlayın.
+            </p>
+          </div>
+          <a
+            href="/demo-ders"
+            className="shrink-0 inline-flex items-center justify-center bg-[#DD7B3A] text-[#1B2430] font-black rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] px-5 py-3 text-sm hover:-translate-y-0.5 active:translate-y-1 active:shadow-none transition-all"
+          >
+            Ücretsiz Dersi Başlat →
+          </a>
         </div>
 
         <SubjectFilter activeSubject={subject} activeCategory={category} />
