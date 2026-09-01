@@ -48,7 +48,7 @@ export default function HomePage() {
 
         {/* Logo: slaytın üstünde sabit kimlik şeridi */}
         <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-7 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] flex items-center justify-center">
-          <img src="/dersolab-logo.png" alt="DersoLab" className="h-auto w-full max-w-[360px]" />
+          <img src="/dersolab-logo-560.png" alt="DersoLab" className="h-auto w-full max-w-[360px]" />
         </div>
 
         {/* Sayfanın tek h1'i; görsel tasarımı bozmadan arama motorları ve
