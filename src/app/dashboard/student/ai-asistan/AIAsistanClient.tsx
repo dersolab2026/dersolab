@@ -125,7 +125,7 @@ export function AIAsistanClient() {
             </svg>
             Google Gemini AI
           </span>
-          <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border-2 border-[#1B2430] bg-[#D5EAE3] text-[#1B2430] text-xs font-bold whitespace-nowrap">
+          <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-xs font-bold whitespace-nowrap">
             <span>♾️</span>
             <span>Sınırsız Soru Çözümü Aktif</span>
           </span>
@@ -239,9 +239,9 @@ export function AIAsistanClient() {
               </button>
               <Link
                 href="/instructors"
-                className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm flex items-center gap-1.5`}
+                className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm`}
               >
-                <span>👨‍🏫 Eğitmene Danış (Ders Al)</span>
+                Eğitmene Danış
               </Link>
             </div>
           </div>
