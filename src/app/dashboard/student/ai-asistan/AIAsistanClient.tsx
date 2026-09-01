@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT, PIXEL_BADGE } from '@/lib/theme'
 import Link from 'next/link'
+import { Camera, Image as ImageIcon, X, Sparkles } from 'lucide-react'
 
 const SUBJECTS = [
   'TYT Matematik',
@@ -45,14 +46,16 @@ function parseMarkdown(text: string): string {
 export function AIAsistanClient() {
   const [subject, setSubject] = useState('TYT Matematik')
   const [question, setQuestion] = useState('')
+  const [imageBase64, setImageBase64] = useState<string | null>(null)
+  const [imageName, setImageName] = useState<string | null>(null)
   const [solution, setSolution] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [remaining, setRemaining] = useState<number | null>(null)
-  const [isAnon, setIsAnon] = useState(false)
   const [charCount, setCharCount] = useState(0)
+
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const solutionRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setCharCount(question.length)
@@ -63,9 +66,54 @@ export function AIAsistanClient() {
     setQuestion(ex)
   }
 
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) processFile(file)
+  }
+
+  function processFile(file: File) {
+    if (!file.type.startsWith('image/')) {
+      setError('Lütfen yalnızca resim dosyası (JPG, PNG, WEBP) seçiniz.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Fotoğraf boyutu en fazla 5 MB olabilir.')
+      return
+    }
+    setError('')
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      setImageBase64(event.target?.result as string)
+      setImageName(file.name)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function handleRemoveImage() {
+    setImageBase64(null)
+    setImageName(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  function handlePaste(e: React.ClipboardEvent) {
+    const items = e.clipboardData.items
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        const file = items[i].getAsFile()
+        if (file) {
+          processFile(file)
+          break
+        }
+      }
+    }
+  }
+
   async function handleSolve() {
-    if (!question.trim() || question.length < 5) {
-      setError('Lütfen geçerli bir soru yazın.')
+    const trimmed = question.trim()
+    if (!trimmed && !imageBase64) {
+      setError('Lütfen bir soru yazın veya soru fotoğrafı yükleyin.')
       return
     }
     setError('')
@@ -76,28 +124,20 @@ export function AIAsistanClient() {
       const res = await fetch('/api/ai/solve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, subject }),
+        body: JSON.stringify({ question: trimmed, subject, imageBase64 }),
       })
 
       const data = await res.json() as {
         solution?: string
         error?: string
-        remaining?: number
-        isAnon?: boolean
-        limitReached?: boolean
       }
 
       if (!res.ok) {
         setError(data.error ?? 'Bir hata oluştu.')
-        if (data.limitReached) {
-          setIsAnon(data.isAnon ?? false)
-        }
         return
       }
 
       setSolution(data.solution ?? '')
-      setRemaining(data.remaining ?? null)
-      setIsAnon(data.isAnon ?? false)
 
       // Çözüme kaydır
       setTimeout(() => {
@@ -155,42 +195,87 @@ export function AIAsistanClient() {
               <label className="block text-sm font-black text-[#1B2430]">
                 Sorun
               </label>
-              <button
-                type="button"
-                onClick={loadExample}
-                className="text-xs font-bold text-[#DD7B3A] underline underline-offset-2 hover:opacity-70 transition-opacity"
-              >
-                Örnek soru yükle
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-xs font-bold text-[#1B2430] hover:text-[#DD7B3A] flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>Fotoğraf Yükle</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={loadExample}
+                  className="text-xs font-bold text-[#DD7B3A] underline underline-offset-2 hover:opacity-70 transition-opacity"
+                >
+                  Örnek soru
+                </button>
+              </div>
             </div>
+
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
+
             <textarea
               ref={textareaRef}
               value={question}
               onChange={e => setQuestion(e.target.value)}
-              placeholder="Sorunuzu buraya yazın... Formüller, sayılar, bağlamı dahil edebilirsiniz."
-              rows={5}
+              onPaste={handlePaste}
+              placeholder="Sorunuzu buraya yazın veya fotoğrafını ekleyin... (Pano görselini Ctrl+V ile yapıştırabilirsiniz)"
+              rows={4}
               maxLength={2000}
               className={`${PIXEL_INPUT} resize-none`}
               onKeyDown={e => {
                 if (e.key === 'Enter' && e.ctrlKey) handleSolve()
               }}
             />
-            <p className="text-xs text-[#1B2430]/50 text-right mt-1 font-semibold">
-              {charCount}/2000 · Ctrl+Enter ile gönder
-            </p>
+
+            {/* Uploaded Image Preview */}
+            {imageBase64 && (
+              <div className="mt-3 p-3 rounded-xl border-2 border-[#1B2430] bg-[#D5EAE3]/40 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imageBase64}
+                    alt="Soru görseli"
+                    className="w-14 h-14 object-cover rounded-lg border-2 border-[#1B2430] bg-white shrink-0"
+                  />
+                  <div className="text-xs truncate">
+                    <p className="font-bold text-[#1B2430] truncate">{imageName ?? 'Soru Fotoğrafı'}</p>
+                    <p className="text-[11px] text-[#1B2430]/70">Görsel eklendi (Gemini analiz edecek)</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="p-1.5 rounded-lg border-2 border-[#1B2430] bg-white hover:bg-red-50 text-red-600 transition-colors shrink-0"
+                  title="Fotoğrafı kaldır"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between text-xs text-[#1B2430]/60 mt-1 font-semibold">
+              <span className="flex items-center gap-1">
+                <ImageIcon className="w-3.5 h-3.5" />
+                Fotoğraf desteği: JPG, PNG, WEBP (Max 5MB)
+              </span>
+              <span>{charCount}/2000 · Ctrl+Enter</span>
+            </div>
           </div>
 
           {/* Error */}
           {error && (
             <div className="p-3 rounded-xl border-2 border-red-400 bg-red-50 text-red-700 text-sm font-bold">
               {error}
-              {isAnon && (
-                <div className="mt-2">
-                  <Link href="/register" className={`${PIXEL_BUTTON_PRIMARY} px-4 py-1.5 text-xs`}>
-                    Kayıt Ol — Günlük 15 Soru
-                  </Link>
-                </div>
-              )}
             </div>
           )}
 
@@ -198,8 +283,8 @@ export function AIAsistanClient() {
           <button
             type="button"
             onClick={handleSolve}
-            disabled={loading || !question.trim()}
-            className={`${PIXEL_BUTTON_PRIMARY} w-full py-3.5 text-base`}
+            disabled={loading || (!question.trim() && !imageBase64)}
+            className={`${PIXEL_BUTTON_PRIMARY} w-full py-3.5 text-base cursor-pointer`}
           >
             {loading ? (
               <span className="flex items-center gap-2">
@@ -232,14 +317,14 @@ export function AIAsistanClient() {
             <div className="mt-6 pt-4 border-t-2 border-[#1B2430]/10 flex gap-3">
               <button
                 type="button"
-                onClick={() => { setSolution(''); setQuestion('') }}
-                className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm`}
+                onClick={() => { setSolution(''); setQuestion(''); handleRemoveImage(); }}
+                className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm cursor-pointer`}
               >
                 Yeni Soru
               </button>
               <Link
                 href="/instructors"
-                className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm`}
+                className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm cursor-pointer`}
               >
                 Eğitmene Danış
               </Link>

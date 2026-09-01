@@ -109,25 +109,29 @@ export async function POST(request: NextRequest) {
       imageBase64?: string
     }
 
-    if (!question || question.trim().length < 5) {
-      return NextResponse.json({ error: 'Lütfen geçerli bir soru yazın.' }, { status: 400 })
+    const effectiveQuestion = question?.trim() || (imageBase64 ? 'Görseldeki soruyu adım adım detaylı şekilde çözünüz.' : '')
+
+    if (!effectiveQuestion || effectiveQuestion.length < 3) {
+      return NextResponse.json({ error: 'Lütfen geçerli bir soru yazın veya bir soru fotoğrafı yükleyin.' }, { status: 400 })
     }
 
-    if (question.length > 2000) {
+    if (effectiveQuestion.length > 2000) {
       return NextResponse.json({ error: 'Soru çok uzun. Maksimum 2000 karakter.' }, { status: 400 })
     }
 
     const ai = new GoogleGenAI({ apiKey })
 
     const userPrompt = subject
-      ? `Branş: ${subject}\n\nSoru:\n${question}`
-      : `Soru:\n${question}`
+      ? `Branş: ${subject}\n\nSoru:\n${effectiveQuestion}`
+      : `Soru:\n${effectiveQuestion}`
 
     // Görsel varsa multimodal, yoksa sadece metin
     let contents: Parameters<typeof ai.models.generateContent>[0]['contents']
 
     if (imageBase64) {
-      const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '')
+      const mimeMatch = imageBase64.match(/^data:(image\/[a-zA-Z0-9.+_-]+);base64,/)
+      const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg'
+      const base64Data = imageBase64.replace(/^data:image\/[a-zA-Z0-9.+_-]+;base64,/, '')
       contents = [
         {
           role: 'user',
@@ -135,7 +139,7 @@ export async function POST(request: NextRequest) {
             { text: userPrompt },
             {
               inlineData: {
-                mimeType: 'image/jpeg',
+                mimeType,
                 data: base64Data,
               },
             },
