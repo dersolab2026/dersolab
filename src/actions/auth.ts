@@ -132,10 +132,19 @@ export async function signInWithGoogle(
   isNative = false,
   not?: OAuthNotu,
 ): Promise<{ url: string } | { error: string }> {
+  const requestHeaders = await headers()
+  let appUrl = requestHeaders.get('origin')
+  if (!appUrl) {
+    const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host')
+    const protocol = requestHeaders.get('x-forwarded-proto') || (process.env.NODE_ENV === 'development' ? 'http' : 'https')
+    appUrl = host ? `${protocol}://${host}` : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  }
+  appUrl = appUrl.replace(/\/$/, '')
+
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: isNative ? 'com.dersolab.app://auth/callback' : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
+    options: { redirectTo: isNative ? 'com.dersolab.app://auth/callback' : `${appUrl}/auth/callback` },
   })
   if (error || !data.url) return { error: 'Google girişi başlatılamadı' }
 
