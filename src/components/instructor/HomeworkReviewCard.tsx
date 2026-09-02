@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { getSubmissionSignedUrl } from '@/lib/storage/upload-homework-submission'
 import { markHomeworkCompleted } from '@/actions/homework'
 import type { HomeworkSubmission } from '@/types'
-import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
+import { PIXEL_CARD, PIXEL_BADGE, INSTRUCTOR_BADGE_ACTIVE, INSTRUCTOR_BUTTON_PRIMARY } from '@/lib/theme'
 
 interface HomeworkReviewCardProps {
   homeworkId: string
@@ -43,13 +43,13 @@ export function HomeworkReviewCard({ homeworkId, title, status, submissions }: H
   return (
     <div className={`${PIXEL_CARD} p-5 space-y-3`}>
       <div className="flex items-center justify-between gap-3">
-        <p className="font-bold text-[#1B2430]">{title}</p>
-        <span className={status === 'completed' ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE}>{STATUS_LABELS[status]}</span>
+        <p className="font-bold text-slate-200">{title}</p>
+        <span className={status === 'completed' ? INSTRUCTOR_BADGE_ACTIVE : PIXEL_BADGE}>{STATUS_LABELS[status]}</span>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
         {submissions.map((s) => (
-          <div key={s.id} className="overflow-hidden rounded-lg border-2 border-[#1B2430]">
+          <div key={s.id} className="overflow-hidden rounded-lg border border-white/5">
             {signedUrls[s.id] ? (
               s.fileType === 'video' ? (
                 <video src={signedUrls[s.id]} controls className="h-24 w-full object-cover" />
@@ -72,11 +72,11 @@ export function HomeworkReviewCard({ homeworkId, title, status, submissions }: H
       </div>
 
       {status === 'submitted' && (
-        <button type="button" onClick={handleApprove} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-3 py-1.5 text-sm`}>
+        <button type="button" onClick={handleApprove} disabled={isPending} className={`${INSTRUCTOR_BUTTON_PRIMARY} px-3 py-1.5 text-sm`}>
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Onayla'}
         </button>
       )}
-      {status === 'completed' && <p className="text-sm font-semibold text-[#1B2430]/70">Bu ödev onaylandı.</p>}
+      {status === 'completed' && <p className="text-sm font-semibold text-slate-400">Bu ödev onaylandı.</p>}
     </div>
   )
 }

@@ -36,8 +36,8 @@ export function LinkStudentForm() {
   return (
     <form onSubmit={handleSubmit} className={`${PIXEL_CARD} space-y-3 p-5`}>
       <div>
-        <p className="font-bold text-[#1B2430]">Öğrenci Bağla</p>
-        <p className="text-sm font-semibold text-[#1B2430]/70">
+        <p className="font-bold text-slate-200">Öğrenci Bağla</p>
+        <p className="text-sm font-semibold text-slate-400">
           Öğrenciniz kendi hesabında <strong>Ayarlar &rsaquo; Veli Bağlantısı</strong> bölümünden
           bir kod üretsin ve size versin. Kod tek kullanımlıktır ve 7 gün geçerlidir.
         </p>

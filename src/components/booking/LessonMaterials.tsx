@@ -86,7 +86,7 @@ export function LessonMaterials({ bookingId, materials, isInstructor }: LessonMa
               {isPending && pendingDeleteId === m.id ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <X className="h-3.5 w-3.5 text-[#1B2430]/70" />
+                <X className="h-3.5 w-3.5 text-slate-400" />
               )}
             </button>
           )}

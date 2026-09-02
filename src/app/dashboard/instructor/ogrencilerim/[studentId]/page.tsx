@@ -79,29 +79,29 @@ export default async function StudentInsightPage({
       {/* Ozet serit */}
       <div className="grid gap-3 sm:grid-cols-3">
         <div className={`${PIXEL_CARD} p-4`}>
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Kayıtlı deneme</p>
-          <p className="text-2xl font-black text-[#1B2430]">{veri.exams.length}</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Kayıtlı deneme</p>
+          <p className="text-2xl font-black text-slate-200">{veri.exams.length}</p>
           {sonDeneme && sonNet !== null && (
-            <p className="text-xs font-semibold text-[#1B2430]/70">
+            <p className="text-xs font-semibold text-slate-400">
               Son: {EXAM_TYPE_LABELS[sonDeneme.examType]} · {sonNet.toFixed(2)} net
             </p>
           )}
         </div>
         <div className={`${PIXEL_CARD} p-4`}>
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Ödev</p>
-          <p className="text-2xl font-black text-[#1B2430]">
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Ödev</p>
+          <p className="text-2xl font-black text-slate-200">
             {veri.homework.filter((h) => h.status === 'completed').length}
-            <span className="text-base text-[#1B2430]/70">/{veri.homework.length}</span>
+            <span className="text-base text-slate-400">/{veri.homework.length}</span>
           </p>
-          <p className="text-xs font-semibold text-[#1B2430]/70">tamamlanan</p>
+          <p className="text-xs font-semibold text-slate-400">tamamlanan</p>
         </div>
         <div className={`${PIXEL_CARD} p-4`}>
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Kayıtlı çalışma</p>
-          <p className="text-2xl font-black text-[#1B2430]">
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Kayıtlı çalışma</p>
+          <p className="text-2xl font-black text-slate-200">
             {veri.dersToplamlari.reduce((t, d) => t + d.saat, 0).toFixed(1)}
-            <span className="text-base text-[#1B2430]/70"> sa</span>
+            <span className="text-base text-slate-400"> sa</span>
           </p>
-          <p className="text-xs font-semibold text-[#1B2430]/70">
+          <p className="text-xs font-semibold text-slate-400">
             {veri.dersToplamlari.reduce((t, d) => t + d.soru, 0)} soru
           </p>
         </div>
@@ -110,7 +110,7 @@ export default async function StudentInsightPage({
       <RiskSignalList sinyaller={sinyaller} />
 
       {veri.exams.length === 0 ? (
-        <p className={`${PIXEL_CARD} p-4 font-semibold text-[#1B2430]`}>
+        <p className={`${PIXEL_CARD} p-4 font-semibold text-slate-200`}>
           Öğrenci henüz deneme sonucu kaydetmemiş.
         </p>
       ) : (

@@ -6,7 +6,7 @@ import { Plus, X, Loader2 } from 'lucide-react'
 import { addAvailabilityRule, removeAvailabilityRule } from '@/actions/availability'
 import { useToast } from '@/components/ui/Toast'
 import type { AvailabilityRule } from '@/types'
-import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
+import { PIXEL_CARD, PIXEL_BADGE, INSTRUCTOR_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
 
 const DAY_NAMES: Record<number, string> = {
   0: 'Pazar', 1: 'Pazartesi', 2: 'Salı', 3: 'Çarşamba', 4: 'Perşembe', 5: 'Cuma', 6: 'Cumartesi',
@@ -66,7 +66,7 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
       {DISPLAY_ORDER.map((day) => (
         <div key={day} className={`${PIXEL_CARD} p-4 space-y-3`}>
           <div className="flex items-center justify-between">
-            <p className="font-bold text-[#1B2430]">{DAY_NAMES[day]}</p>
+            <p className="font-bold text-slate-200">{DAY_NAMES[day]}</p>
             <button
               type="button"
               onClick={() => setOpenDayForm(openDayForm === day ? null : day)}
@@ -79,7 +79,7 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
 
           <div className="flex flex-wrap items-center gap-2">
             {rulesByDay[day].length === 0 && openDayForm !== day && (
-              <p className="text-sm font-semibold text-[#1B2430]/70">Bu gün için tanımlı saat yok</p>
+              <p className="text-sm font-semibold text-slate-400">Bu gün için tanımlı saat yok</p>
             )}
 
             {rulesByDay[day].map((rule) => (
@@ -104,7 +104,7 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
                 onChange={(e) => setStartTime(e.target.value)}
                 className={`${PIXEL_INPUT} w-32 py-1.5`}
               />
-              <span className="font-bold text-[#1B2430]">-</span>
+              <span className="font-bold text-slate-200">-</span>
               <input
                 type="time"
                 value={endTime}
@@ -115,7 +115,7 @@ export function WeeklyScheduleEditor({ initialRules }: WeeklyScheduleEditorProps
                 type="button"
                 onClick={() => handleAdd(day)}
                 disabled={isPending}
-                className={`${PIXEL_BUTTON_PRIMARY} px-3 py-1.5 text-sm`}
+                className={`${INSTRUCTOR_BUTTON_PRIMARY} px-3 py-1.5 text-sm`}
               >
                 {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
               </button>

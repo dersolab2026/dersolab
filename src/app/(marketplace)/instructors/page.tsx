@@ -22,39 +22,33 @@ export default async function InstructorsPage({ searchParams }: InstructorsPageP
   )
 
   return (
-    <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
-      <div
-        className="absolute inset-0 z-0 opacity-40 pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(45deg, #6FA89E 25%, transparent 25%), linear-gradient(-45deg, #6FA89E 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #6FA89E 75%), linear-gradient(-45deg, transparent 75%, #6FA89E 75%)',
-          backgroundSize: '40px 40px', backgroundPosition: '0 0, 0 20px, 20px -20px, -20px 0px'
-        }}
-      />
-
+    <div className="min-h-[calc(100vh-57px)] md:min-h-screen w-full relative">
       <div className="relative z-10 mx-auto max-w-5xl space-y-6 p-5 py-10">
-        <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
-          <h1 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430] leading-snug">
+        <div className="bg-white/[0.02] rounded-2xl p-6 sm:p-8 border border-white/5 backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+          <h1 className="font-sans text-2xl sm:text-3xl font-black text-white leading-snug">
             Eğitmenler
           </h1>
-          <p className="text-sm font-semibold text-[#1B2430]/70 mt-1">
+          <p className="text-sm font-semibold text-slate-400 mt-1">
             Alanında uzman eğitmenleri inceleyin, hedeflerinize uygun dersi hemen başlatın.
           </p>
         </div>
 
         {/* Hoş Geldin Paketi Vurgusu */}
-        <div className="bg-[#6FA89E] rounded-2xl p-6 sm:p-7 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-[#F4F1E8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <span className="inline-block px-2.5 py-0.5 rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] text-[#1B2430] text-xs font-black">
+        <div className="bg-white/[0.02] rounded-2xl p-6 sm:p-7 border border-white/5 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#6FA89E]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+          
+          <div className="space-y-2 relative z-10">
+            <span className="inline-block px-2.5 py-0.5 rounded-lg bg-[#6FA89E]/20 text-[#6FA89E] border border-[#6FA89E]/30 text-xs font-bold">
               🎁 HOŞ GELDİN PAKETİ
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-[#F4F1E8]">İlk Tanışma Dersiniz Bizden Hediye</h2>
-            <p className="text-sm font-semibold text-[#F4F1E8]/90 max-w-xl">
+            <h2 className="text-xl sm:text-2xl font-black text-white">İlk Tanışma Dersiniz Bizden Hediye</h2>
+            <p className="text-sm font-semibold text-slate-400 max-w-xl">
               Kredi harcamadan ve hiçbir kart bilgisi girmeden eğitmeninizle tanışın, hedeflerinizi birlikte planlayın.
             </p>
           </div>
           <a
             href="/demo-ders"
-            className="shrink-0 inline-flex items-center justify-center bg-[#DD7B3A] text-[#1B2430] font-black rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] px-5 py-3 text-sm hover:-translate-y-0.5 active:translate-y-1 active:shadow-none transition-all"
+            className="relative z-10 shrink-0 inline-flex items-center justify-center bg-[#DD7B3A] text-white font-bold rounded-full px-6 py-3 text-sm hover:bg-[#DD7B3A]/90 transition-all shadow-[0_0_15px_rgba(221,123,58,0.3)]"
           >
             Ücretsiz Dersi Başlat →
           </a>

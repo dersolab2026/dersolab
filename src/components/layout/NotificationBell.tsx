@@ -112,11 +112,11 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
       className={`fixed max-h-96 w-80 overflow-y-auto z-50 ${PIXEL_CARD} p-0`}
       style={{ left: coords?.left, top: coords?.top, bottom: coords?.bottom }}
     >
-      <div className="flex items-center justify-between border-b-2 border-[#1B2430] p-3">
-        <p className="font-bold text-[#1B2430]">Bildirimler</p>
+      <div className="flex items-center justify-between border-b-2 border-white/10 p-3">
+        <p className="font-bold text-slate-200">Bildirimler</p>
         <div className="flex items-center gap-3">
           {readCount > 0 && (
-            <button type="button" onClick={handleClearRead} className="text-xs font-bold text-[#1B2430]/70 underline">
+            <button type="button" onClick={handleClearRead} className="text-xs font-bold text-slate-400 underline">
               Okunanları temizle
             </button>
           )}
@@ -128,26 +128,26 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
         </div>
       </div>
       {notifications.length === 0 ? (
-        <p className="p-4 text-sm font-semibold text-[#1B2430]/70">Henüz bildirimin yok.</p>
+        <p className="p-4 text-sm font-semibold text-slate-400">Henüz bildirimin yok.</p>
       ) : (
         <ul>
           {notifications.map((n) => (
-            <li key={n.id} className="relative border-b border-[#1B2430]/10">
+            <li key={n.id} className="relative border-b border-white/10">
               <button
                 type="button"
                 onClick={() => handleItemClick(n)}
                 className={`block w-full p-3 pr-8 text-left hover:bg-[#1B2430]/5 ${n.isRead ? '' : 'bg-[#DD7B3A]/10'}`}
               >
-                <p className="text-sm font-bold text-[#1B2430]">{n.title}</p>
-                {n.body && <p className="mt-0.5 text-xs font-semibold text-[#1B2430]/70">{n.body}</p>}
-                <p className="mt-1 text-[10px] font-semibold text-[#1B2430]/70">
+                <p className="text-sm font-bold text-slate-200">{n.title}</p>
+                {n.body && <p className="mt-0.5 text-xs font-semibold text-slate-400">{n.body}</p>}
+                <p className="mt-1 text-[10px] font-semibold text-slate-400">
                   {new Date(n.createdAt).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })}
                 </p>
               </button>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleDelete(n.id) }}
-                className="absolute top-3 right-2 text-[#1B2430]/55 hover:text-[#1B2430]"
+                className="absolute top-3 right-2 text-slate-500 hover:text-slate-200"
                 aria-label="Bildirimi sil"
               >
                 <X className="h-3.5 w-3.5" />
@@ -172,17 +172,16 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
           className={`absolute top-0 left-1/2 h-5 w-5 -translate-x-1/2 transition-all ${
             unreadCount > 0
               ? 'fill-yellow-300 text-yellow-500 drop-shadow-[0_0_6px_rgba(250,204,21,0.95)] animate-pulse'
-              : 'text-[#1B2430]/55'
+              : 'text-slate-500'
           }`}
         />
         <img
-          src="/fox-mascot-icon-96.png"
+          src="/fox-head.png"
           alt="Bildirimler"
-          className="h-12 w-12"
-          style={{ imageRendering: 'pixelated' }}
+          className="h-10 w-10 object-contain drop-shadow-md"
         />
         {unreadCount > 0 && (
-          <span className="absolute bottom-0 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-[#1B2430] bg-[#DD7B3A] px-1 text-[10px] font-bold text-white">
+          <span className="absolute bottom-0 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full border border-white/5 bg-[#DD7B3A] px-1 text-[10px] font-bold text-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

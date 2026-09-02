@@ -127,6 +127,9 @@
   html {
     @apply font-sans;
   }
+  .dark option {
+    @apply bg-[#1a1a1a] text-slate-200;
+  }
 }
 /* Kaydirilabilir ama cubugu gorunmeyen kap.
  *

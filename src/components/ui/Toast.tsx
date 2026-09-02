@@ -50,13 +50,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           key={t.id}
           role="status"
           aria-live="polite"
-          className={`pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-xl border-4 border-[#1B2430] px-4 py-3 shadow-[0_4px_0_#1B2430] ${
+          className={`pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-xl border border-white/10 px-4 py-3 shadow-[0_0_15px_rgba(0,0,0,0.3)] ${
             t.tone === 'success' ? 'bg-[#6FA89E] text-[#F4F1E8]' : 'bg-white text-red-600'
           }`}
         >
           {t.tone === 'success' && (
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-[#1B2430] bg-[#F4F1E8]">
-              <Check className="h-4 w-4 text-[#1B2430]" strokeWidth={3} />
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-white/5 bg-white/[0.02]">
+              <Check className="h-4 w-4 text-slate-200" strokeWidth={3} />
             </span>
           )}
           <p className="flex-1 text-sm font-bold">{t.message}</p>

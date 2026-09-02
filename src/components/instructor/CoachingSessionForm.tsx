@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Loader2, Trash2, ClipboardList } from 'lucide-react'
 import { saveSessionNote, deleteSessionNote } from '@/actions/coaching'
 import { useToast } from '@/components/ui/Toast'
-import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY, PIXEL_INPUT } from '@/lib/theme'
+import { PIXEL_CARD, INSTRUCTOR_BUTTON_PRIMARY, PIXEL_INPUT } from '@/lib/theme'
 
 /**
  * Koçluk oturum formu.
@@ -91,11 +91,11 @@ export function CoachingSessionForm({ studentId, notes, canWrite }: Props) {
     <div className={`${PIXEL_CARD} space-y-4 p-5`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <ClipboardList className="h-5 w-5 text-[#1B2430]" />
-          <p className="font-bold text-[#1B2430]">Koçluk Görüşmeleri</p>
+          <ClipboardList className="h-5 w-5 text-slate-200" />
+          <p className="font-bold text-slate-200">Koçluk Görüşmeleri</p>
         </div>
         {canWrite && !acik && (
-          <button type="button" onClick={() => setAcik(true)} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
+          <button type="button" onClick={() => setAcik(true)} className={`${INSTRUCTOR_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
             Görüşme Notu Ekle
           </button>
         )}
@@ -103,23 +103,23 @@ export function CoachingSessionForm({ studentId, notes, canWrite }: Props) {
 
       {/* Bir onceki taahhut, yeni gorusmenin acilis sorusu olsun diye en ustte */}
       {sonTaahhut && (
-        <div className="rounded-xl border-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
             Geçen görüşmedeki taahhüdü
           </p>
-          <p className="text-sm font-semibold text-[#1B2430]">{sonTaahhut}</p>
+          <p className="text-sm font-semibold text-slate-200">{sonTaahhut}</p>
         </div>
       )}
 
       {acik && canWrite && (
-        <div className="space-y-3 rounded-xl border-4 border-[#1B2430] bg-white p-4">
+        <div className="space-y-3 rounded-xl border border-white/10 bg-white p-4">
           <div>
-            <label className="mb-1 block text-sm font-bold text-[#1B2430]">Görüşme tarihi</label>
+            <label className="mb-1 block text-sm font-bold text-slate-200">Görüşme tarihi</label>
             <input type="date" value={sessionDate} onChange={(e) => setSessionDate(e.target.value)} className={PIXEL_INPUT} />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-bold text-[#1B2430]">Bu hafta plana uydu mu?</label>
+            <label className="mb-1 block text-sm font-bold text-slate-200">Bu hafta plana uydu mu?</label>
             <div className="flex gap-2">
               {PLAN_SECENEK.map((s) => (
                 <button
@@ -127,8 +127,8 @@ export function CoachingSessionForm({ studentId, notes, canWrite }: Props) {
                   type="button"
                   onClick={() => setPlanFollowed(planFollowed === s.deger ? null : s.deger)}
                   aria-pressed={planFollowed === s.deger}
-                  className={`rounded-lg border-4 border-[#1B2430] px-3 py-1.5 text-sm font-bold transition-all ${
-                    planFollowed === s.deger ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+                  className={`rounded-lg border border-white/10 px-3 py-1.5 text-sm font-bold transition-all ${
+                    planFollowed === s.deger ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white/5 text-slate-200'
                   }`}
                 >
                   {s.etiket}
@@ -138,14 +138,14 @@ export function CoachingSessionForm({ studentId, notes, canWrite }: Props) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-bold text-[#1B2430]">Engel neydi?</label>
+            <label className="mb-1 block text-sm font-bold text-slate-200">Engel neydi?</label>
             <textarea value={obstacle} onChange={(e) => setObstacle(e.target.value)} rows={2}
               placeholder="Örn. okul sınavları, motivasyon düşüklüğü, konu ağırdı"
               className={`${PIXEL_INPUT} resize-y`} />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-bold text-[#1B2430]">
+            <label className="mb-1 block text-sm font-bold text-slate-200">
               Öğrencinin gelecek hafta taahhüdü
             </label>
             <textarea value={commitment} onChange={(e) => setCommitment(e.target.value)} rows={2}
@@ -154,14 +154,14 @@ export function CoachingSessionForm({ studentId, notes, canWrite }: Props) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-bold text-[#1B2430]">Kararların</label>
+            <label className="mb-1 block text-sm font-bold text-slate-200">Kararların</label>
             <textarea value={decisions} onChange={(e) => setDecisions(e.target.value)} rows={3}
               placeholder="En fazla 3 madde — bu hafta neyi değiştiriyoruz?"
               className={`${PIXEL_INPUT} resize-y`} />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-bold text-[#1B2430]">
+            <label className="mb-1 block text-sm font-bold text-slate-200">
               &quot;Bunu yapabilirim&quot; puanı (1–10)
             </label>
             <input type="number" min={1} max={10} value={confidence}
@@ -173,11 +173,11 @@ export function CoachingSessionForm({ studentId, notes, canWrite }: Props) {
           {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
 
           <div className="flex gap-2">
-            <button type="button" onClick={kaydet} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
+            <button type="button" onClick={kaydet} disabled={isPending} className={`${INSTRUCTOR_BUTTON_PRIMARY} px-4 py-2 text-sm`}>
               {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
             </button>
             <button type="button" onClick={() => { setAcik(false); setError(null) }}
-              className="rounded-xl border-4 border-[#1B2430] bg-white px-4 py-2 text-sm font-bold text-[#1B2430]">
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold text-slate-200">
               Vazgeç
             </button>
           </div>
@@ -185,44 +185,44 @@ export function CoachingSessionForm({ studentId, notes, canWrite }: Props) {
       )}
 
       {notes.length === 0 ? (
-        <p className="text-sm font-semibold text-[#1B2430]/70">Henüz görüşme notu yok.</p>
+        <p className="text-sm font-semibold text-slate-400">Henüz görüşme notu yok.</p>
       ) : (
         <div className="space-y-2">
           {notes.map((n) => (
-            <div key={n.id} className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
+            <div key={n.id} className="rounded-xl border border-white/5 bg-white/5 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-bold text-[#1B2430]">
+                <p className="text-sm font-bold text-slate-200">
                   {new Date(n.sessionDate).toLocaleDateString('tr-TR')}
                   {n.planFollowed && (
-                    <span className={`ml-2 rounded-lg border-2 border-[#1B2430] px-2 py-0.5 text-xs ${
+                    <span className={`ml-2 rounded-lg border border-white/5 px-2 py-0.5 text-xs ${
                       n.planFollowed === 'evet' ? 'bg-[#6FA89E] text-[#F4F1E8]'
-                        : n.planFollowed === 'kismen' ? 'bg-[#E8C468] text-[#1B2430]'
+                        : n.planFollowed === 'kismen' ? 'bg-[#E8C468] text-slate-200'
                         : 'bg-[#DD7B3A] text-[#F4F1E8]'
                     }`}>
                       {PLAN_ETIKET[n.planFollowed]}
                     </span>
                   )}
                   {n.confidence !== null && (
-                    <span className="ml-2 text-xs font-bold text-[#1B2430]/70">
+                    <span className="ml-2 text-xs font-bold text-slate-400">
                       özgüven {n.confidence}/10
                     </span>
                   )}
                 </p>
                 {canWrite && (
                   <button type="button" onClick={() => sil(n.id)} aria-label="Notu sil"
-                    className="text-[#1B2430]/55 transition-colors hover:text-red-600">
+                    className="text-slate-500 transition-colors hover:text-red-600">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 )}
               </div>
               {n.obstacle && (
-                <p className="mt-1 text-sm text-[#1B2430]/80"><strong>Engel:</strong> {n.obstacle}</p>
+                <p className="mt-1 text-sm text-slate-200/80"><strong>Engel:</strong> {n.obstacle}</p>
               )}
               {n.studentCommitment && (
-                <p className="mt-1 text-sm text-[#1B2430]/80"><strong>Taahhüdü:</strong> {n.studentCommitment}</p>
+                <p className="mt-1 text-sm text-slate-200/80"><strong>Taahhüdü:</strong> {n.studentCommitment}</p>
               )}
               {n.coachDecisions && (
-                <p className="mt-1 text-sm text-[#1B2430]/80"><strong>Kararlar:</strong> {n.coachDecisions}</p>
+                <p className="mt-1 text-sm text-slate-200/80"><strong>Kararlar:</strong> {n.coachDecisions}</p>
               )}
             </div>
           ))}

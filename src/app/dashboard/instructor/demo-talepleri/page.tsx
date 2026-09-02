@@ -27,22 +27,22 @@ export default async function DemoRequestsPage() {
       description="Hoş Geldin Paketi talepleri: kredisiz tanışma dersi — ilk üstlenen alır."
     >
       {requests.length === 0 ? (
-        <p className="font-semibold text-[#1B2430]">Şu anda bekleyen talep yok.</p>
+        <p className="font-semibold text-slate-200">Şu anda bekleyen talep yok.</p>
       ) : (
         <div className="space-y-3">
           {requests.map((r) => (
             <div key={r.id} className={`${PIXEL_CARD} p-4 flex flex-wrap items-center justify-between gap-3`}>
               <div>
-                <p className="font-bold text-[#1B2430]">
+                <p className="font-bold text-slate-200">
                   {r.studentName}
-                  <span className="ml-2 inline-block px-2 py-0.5 rounded-lg border-2 border-[#1B2430] bg-white text-xs text-[#1B2430]">
+                  <span className="ml-2 inline-block px-2 py-0.5 rounded-lg border border-white/5 bg-white text-xs text-slate-200">
                     Tanışma Dersi
                   </span>
                 </p>
                 {r.leadEmail && (
-                  <p className="text-sm font-semibold text-[#1B2430]/70">{r.leadEmail}</p>
+                  <p className="text-sm font-semibold text-slate-400">{r.leadEmail}</p>
                 )}
-                <p className="text-sm font-semibold text-[#1B2430]/70">
+                <p className="text-sm font-semibold text-slate-400">
                   {kisaTarihSaat(r.createdAt)} tarihinde talep edildi
                   {!r.studentId && ' · hesapsız, kabul edince e-posta ile iletişime geç'}
                 </p>

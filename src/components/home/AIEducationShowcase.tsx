@@ -95,11 +95,11 @@ export function AIEducationShowcase() {
   const active = SAMPLE_SOLUTIONS.find((s) => s.id === activeId) ?? SAMPLE_SOLUTIONS[0]
 
   return (
-    <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-9 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] space-y-6">
+    <div className="bg-white/[0.02] rounded-2xl p-6 sm:p-9 border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] space-y-6">
       
       {/* Header Banner */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border-2 border-[#1B2430] bg-[#D5EAE3] text-[#1B2430] text-xs font-black">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/5 bg-black text-slate-200 text-xs font-black">
           <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -109,54 +109,54 @@ export function AIEducationShowcase() {
           <span>Google AI × DersoLab | Yapay Zeka Çağında Yeni Nesil Eğitim</span>
         </div>
 
-        <h2 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430]">
+        <h2 className="font-sans text-2xl sm:text-3xl font-black text-slate-200">
           Yapay Zeka Çağını Yakalayın: 7/24 Sınırsız AI Soru Çözüm Asistanı
         </h2>
 
-        <p className="text-base font-semibold text-[#1B2430]/75 max-w-2xl mx-auto">
+        <p className="text-base font-semibold text-slate-200/75 max-w-2xl mx-auto">
           DersoLab’a kayıtlı tüm öğrencilerimiz için 7/24 sınırsız, adım adım ve mantığını kavratan Google Gemini AI soru çözüm desteği!
         </p>
       </div>
 
       {/* 4 Feature Highlights */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-        <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3.5 text-center">
-          <div className="w-8 h-8 rounded-lg bg-[#D5EAE3] border-2 border-[#1B2430] flex items-center justify-center mx-auto mb-1.5 text-[#1B2430]">
+        <div className="rounded-xl border border-white/5 bg-white/5 p-3.5 text-center">
+          <div className="w-8 h-8 rounded-lg bg-black border border-white/5 flex items-center justify-center mx-auto mb-1.5 text-slate-200">
             <Zap className="w-4 h-4" />
           </div>
-          <p className="font-bold text-xs text-[#1B2430]">Google Gemini 3.6</p>
-          <p className="text-[11px] text-[#1B2430]/70 font-semibold mt-0.5">Saniyeler içinde çözüm</p>
+          <p className="font-bold text-xs text-slate-200">Google Gemini 3.6</p>
+          <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Saniyeler içinde çözüm</p>
         </div>
 
-        <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3.5 text-center">
-          <div className="w-8 h-8 rounded-lg bg-[#D5EAE3] border-2 border-[#1B2430] flex items-center justify-center mx-auto mb-1.5 text-[#1B2430]">
+        <div className="rounded-xl border border-white/5 bg-white/5 p-3.5 text-center">
+          <div className="w-8 h-8 rounded-lg bg-black border border-white/5 flex items-center justify-center mx-auto mb-1.5 text-slate-200">
             <BookOpen className="w-4 h-4" />
           </div>
-          <p className="font-bold text-xs text-[#1B2430]">Mantığını Öğretir</p>
-          <p className="text-[11px] text-[#1B2430]/70 font-semibold mt-0.5">Adım adım detaylı anlatım</p>
+          <p className="font-bold text-xs text-slate-200">Mantığını Öğretir</p>
+          <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Adım adım detaylı anlatım</p>
         </div>
 
-        <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3.5 text-center">
-          <div className="w-8 h-8 rounded-lg bg-[#D5EAE3] border-2 border-[#1B2430] flex items-center justify-center mx-auto mb-1.5 text-[#1B2430]">
+        <div className="rounded-xl border border-white/5 bg-white/5 p-3.5 text-center">
+          <div className="w-8 h-8 rounded-lg bg-black border border-white/5 flex items-center justify-center mx-auto mb-1.5 text-slate-200">
             <Camera className="w-4 h-4" />
           </div>
-          <p className="font-bold text-xs text-[#1B2430]">Fotoğraf & Metin</p>
-          <p className="text-[11px] text-[#1B2430]/70 font-semibold mt-0.5">Kitaptan çek, sor</p>
+          <p className="font-bold text-xs text-slate-200">Fotoğraf & Metin</p>
+          <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Kitaptan çek, sor</p>
         </div>
 
-        <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3.5 text-center">
-          <div className="w-8 h-8 rounded-lg bg-[#D5EAE3] border-2 border-[#1B2430] flex items-center justify-center mx-auto mb-1.5 text-[#1B2430]">
+        <div className="rounded-xl border border-white/5 bg-white/5 p-3.5 text-center">
+          <div className="w-8 h-8 rounded-lg bg-black border border-white/5 flex items-center justify-center mx-auto mb-1.5 text-slate-200">
             <Gift className="w-4 h-4" />
           </div>
-          <p className="font-bold text-xs text-[#1B2430]">Sınırsız Soru Desteği</p>
-          <p className="text-[11px] text-[#1B2430]/70 font-semibold mt-0.5">Kayıtlı öğrencilere özel</p>
+          <p className="font-bold text-xs text-slate-200">Sınırsız Soru Desteği</p>
+          <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Kayıtlı öğrencilere özel</p>
         </div>
       </div>
 
       {/* Interactive Live Preview Box */}
-      <div className="rounded-xl border-4 border-[#1B2430] bg-white p-4 sm:p-6 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-[#1B2430]/10 pb-3">
-          <span className="text-xs font-black uppercase text-[#1B2430] flex items-center gap-1.5">
+      <div className="rounded-xl border border-white/10 bg-white p-4 sm:p-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-white/10 pb-3">
+          <span className="text-xs font-black uppercase text-slate-200 flex items-center gap-1.5">
             <Sparkles className="w-4 h-4 text-[#DD7B3A]" />
             Örnek Çözüm Simülasyonu (Ders Seçin):
           </span>
@@ -166,10 +166,10 @@ export function AIEducationShowcase() {
                 key={s.id}
                 type="button"
                 onClick={() => setActiveId(s.id)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold border-2 border-[#1B2430] transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-lg text-xs font-bold border border-white/5 transition-all cursor-pointer ${
                   activeId === s.id
                     ? 'bg-[#DD7B3A] text-[#F4F1E8] shadow-[0_2px_0_#1B2430] translate-y-[-1px]'
-                    : 'bg-[#F4F1E8] text-[#1B2430] hover:bg-[#D5EAE3]'
+                    : 'bg-white/[0.02] text-slate-200 hover:bg-black'
                 }`}
               >
                 {s.subject}
@@ -181,24 +181,24 @@ export function AIEducationShowcase() {
         {/* Question & Solution Container */}
         <div className="grid md:grid-cols-12 gap-4 pt-1">
           {/* Question */}
-          <div className="md:col-span-5 rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] p-4 space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-[#1B2430]">
+          <div className="md:col-span-5 rounded-lg border border-white/5 bg-white/[0.02] p-4 space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-200">
               <span>{active.topic}</span>
-              <span className="px-2 py-0.5 rounded bg-white border border-[#1B2430] text-[10px]">
+              <span className="px-2 py-0.5 rounded bg-white border border-white/10 text-[10px]">
                 {active.examBadge}
               </span>
             </div>
-            <p className="text-sm font-semibold text-[#1B2430] bg-white p-3 rounded-lg border border-[#1B2430]/20">
+            <p className="text-sm font-semibold text-slate-200 bg-white/5 p-3 rounded-lg border border-white/10/20">
               &ldquo;{active.question}&rdquo;
             </p>
-            <div className="flex items-center gap-1 text-[11px] text-[#1B2430]/60 font-semibold pt-1">
+            <div className="flex items-center gap-1 text-[11px] text-slate-200/60 font-semibold pt-1">
               <Lock className="w-3 h-3 text-[#DD7B3A]" />
               <span>Giriş yapan öğrenciler panelden 7/24 sınırsız soru sorabilir.</span>
             </div>
           </div>
 
           {/* AI Solution */}
-          <div className="md:col-span-7 rounded-lg border-2 border-[#1B2430] bg-[#1B2430] text-[#F4F1E8] p-4 space-y-3">
+          <div className="md:col-span-7 rounded-lg border border-white/5 bg-[#1B2430] text-[#F4F1E8] p-4 space-y-3">
             <div className="flex items-center justify-between text-xs font-bold border-b border-white/10 pb-2">
               <span className="flex items-center gap-1.5 text-emerald-400">
                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -239,7 +239,7 @@ export function AIEducationShowcase() {
       <div className="text-center pt-2">
         <Link
           href="/register"
-          className="inline-flex items-center gap-2 py-3.5 px-8 text-base sm:text-lg bg-[#DD7B3A] text-[#F4F1E8] font-black rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all hover:bg-[#c96a2d]"
+          className="inline-flex items-center gap-2 py-3.5 px-8 text-base sm:text-lg bg-[#DD7B3A] text-[#F4F1E8] font-black rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] active:translate-y-0 active:scale-95 transition-all hover:bg-[#c96a2d]"
         >
           <span>Ücretsiz Kaydolun & AI Asistanı Kullanın</span>
           <ChevronRight className="w-5 h-5" />

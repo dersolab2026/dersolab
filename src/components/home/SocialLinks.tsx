@@ -48,8 +48,8 @@ export function SocialLinks() {
   if (SOCIAL_LINKS.length === 0) return null
 
   return (
-    <div className="bg-[#F4F1E8] rounded-2xl p-7 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] text-center">
-      <p className="font-sans text-lg sm:text-xl font-bold text-[#1B2430] mb-5">
+    <div className="bg-white/[0.02] rounded-2xl p-7 sm:p-8 border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] text-center">
+      <p className="font-sans text-lg sm:text-xl font-bold text-slate-200 mb-5">
         Bizi sosyal medya hesaplarımızdan da takip edebilirsiniz.
       </p>
       <div className="flex flex-wrap items-center justify-center gap-4">
@@ -61,7 +61,7 @@ export function SocialLinks() {
             rel="noopener noreferrer"
             aria-label={`DersoLab ${SOCIAL_LABELS[platform]} hesabı`}
             title={SOCIAL_LABELS[platform]}
-            className="flex h-14 w-14 items-center justify-center rounded-xl border-4 border-[#1B2430] bg-white text-[#1B2430] shadow-[0_4px_0_#1B2430] transition-all hover:bg-[#DD7B3A] hover:text-[#F4F1E8] active:translate-y-1 active:shadow-none"
+            className="flex h-14 w-14 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 shadow-[0_0_15px_rgba(0,0,0,0.3)] transition-all hover:bg-[#DD7B3A] hover:text-[#F4F1E8] active:translate-y-0 active:scale-95"
           >
             <svg
               viewBox="0 0 24 24"

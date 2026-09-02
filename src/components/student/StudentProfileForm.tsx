@@ -59,35 +59,35 @@ export function StudentProfileForm({ name: initialName, schoolName: initialSchoo
 
   return (
     <form onSubmit={handleSubmit} className={`${PIXEL_CARD} p-5 space-y-4`}>
-      <p className="font-bold text-[#1B2430]">Profil Bilgilerim</p>
+      <p className="font-bold text-slate-200">Profil Bilgilerim</p>
 
       <div>
-        <label className="block text-[#1B2430] font-bold mb-2">Ad Soyad</label>
+        <label className="block text-slate-200 font-bold mb-2">Ad Soyad</label>
         <input
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+          className="w-full p-3 rounded-xl border border-white/10 bg-white/5 outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
         />
       </div>
 
       <div>
-        <label className="block text-[#1B2430] font-bold mb-2">Okul Adı</label>
+        <label className="block text-slate-200 font-bold mb-2">Okul Adı</label>
         <input
           required
           value={schoolName}
           onChange={(e) => setSchoolName(e.target.value)}
-          className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+          className="w-full p-3 rounded-xl border border-white/10 bg-white/5 outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
         />
       </div>
 
       <div>
-        <label className="block text-[#1B2430] font-bold mb-2">Sınıf</label>
+        <label className="block text-slate-200 font-bold mb-2">Sınıf</label>
         <select
           required
           value={grade}
           onChange={(e) => { setGrade(e.target.value); setTrack('') }}
-          className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+          className="w-full p-3 rounded-xl border border-white/10 bg-white/5 outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
         >
           <option value="" disabled>Seç</option>
           {GRADES.map((g) => (
@@ -99,12 +99,12 @@ export function StudentProfileForm({ name: initialName, schoolName: initialSchoo
 
       {isLise && (
         <div>
-          <label className="block text-[#1B2430] font-bold mb-2">Alan</label>
+          <label className="block text-slate-200 font-bold mb-2">Alan</label>
           <select
             required
             value={track}
             onChange={(e) => setTrack(e.target.value as Track)}
-            className="w-full p-3 rounded-xl border-4 border-[#1B2430] bg-white outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
+            className="w-full p-3 rounded-xl border border-white/10 bg-white/5 outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all"
           >
             <option value="" disabled>Seç</option>
             {(Object.keys(TRACK_LABELS) as Track[]).map((t) => (

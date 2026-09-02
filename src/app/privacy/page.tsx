@@ -4,10 +4,10 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen w-full bg-[#F4F1E8]">
-      <div className="mx-auto max-w-3xl px-5 py-12 text-[#1B2430]">
+    <div className="min-h-screen w-full bg-[#0a0a0a]">
+      <div className="mx-auto max-w-3xl px-5 py-12 text-slate-200">
         <h1 className="text-3xl font-bold mb-2">Gizlilik Politikası</h1>
-        <p className="text-sm text-[#1B2430]/70 mb-8">Son güncelleme: 9 Ağustos 2026</p>
+        <p className="text-sm text-slate-400 mb-8">Son güncelleme: 9 Ağustos 2026</p>
 
         <div className="space-y-6 leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-2 [&_p]:mb-3 [&_li]:mb-1 [&_ul]:list-disc [&_ul]:pl-6">
 

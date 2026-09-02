@@ -22,14 +22,14 @@ const SLIDES: Slide[] = [
     baslik: 'Öğrenciler İçin Online Özel Ders ve Koçluk',
     metin: 'Okul derslerinden LGS ve YKS hazırlığına kadar, alanında deneyimli ve onaylı eğitmenlerden bire bir online ders alın.',
     cta: { href: '/register', label: 'Ücretsiz Kaydolun' },
-    arka: 'bg-[#F4F1E8]', yazi: 'text-[#1B2430]', rozetArka: 'bg-[#DD7B3A] text-[#F4F1E8]',
+    arka: 'bg-white/[0.02]', yazi: 'text-slate-200', rozetArka: 'bg-[#DD7B3A] text-[#F4F1E8]',
   },
   {
     rozet: 'ÖDEME YOK · KART YOK',
     baslik: 'Hoş Geldin Paketiniz Bizden',
     metin: 'Her öğrenciye bir kere ücretsiz tanışma dersi. Beğenmezseniz hiçbir ödeme yapmadan bırakabilirsiniz.',
     cta: { href: '/demo-ders', label: 'Hoş Geldin Paketini Alın' },
-    arka: 'bg-[#6FA89E]', yazi: 'text-[#F4F1E8]', rozetArka: 'bg-[#F4F1E8] text-[#1B2430]',
+    arka: 'bg-[#6FA89E]', yazi: 'text-[#F4F1E8]', rozetArka: 'bg-white/[0.02] text-slate-200',
   },
 ]
 
@@ -73,7 +73,7 @@ export function HeroSlider() {
              Sabit biraksaydim turkuaza gecerken bir anlik soluklasma
              kalirdi. */}
       <div
-        className={`rounded-2xl border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430] overflow-hidden transition-colors duration-[400ms] ease-in-out motion-reduce:transition-none ${SLIDES[aktif].arka}`}
+        className={`rounded-2xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden transition-colors duration-[400ms] ease-in-out motion-reduce:transition-none ${SLIDES[aktif].arka}`}
       >
         {/* Yükseklik slaytlar arasında zıplamasın diye sabit minimum. */}
         <div className="relative min-h-[440px] sm:min-h-[420px] p-6 sm:p-12 flex flex-col items-center justify-center text-center">
@@ -92,7 +92,7 @@ export function HeroSlider() {
                 i === aktif ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
-              <span className={`inline-block mb-4 px-3.5 py-1.5 rounded-lg border-2 border-[#1B2430] text-xs sm:text-sm font-black ${s.rozetArka}`}>
+              <span className={`inline-block mb-4 px-3.5 py-1.5 rounded-lg border border-white/5 text-xs sm:text-sm font-black ${s.rozetArka}`}>
                 {s.rozet}
               </span>
               <h2 className={`font-sans text-3xl sm:text-5xl font-black mb-4 max-w-3xl mx-auto text-center text-balance ${s.yazi}`}>
@@ -104,14 +104,14 @@ export function HeroSlider() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
                   href={s.cta.href}
-                  className="py-3.5 px-9 text-lg bg-[#DD7B3A] text-[#F4F1E8] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
+                  className="py-3.5 px-9 text-lg bg-[#DD7B3A] text-[#F4F1E8] font-bold rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] active:translate-y-0 active:scale-95 transition-all"
                 >
                   {s.cta.label}
                 </Link>
                 {s.ikincilCta && (
                   <Link
                     href={s.ikincilCta.href}
-                    className="py-3 px-8 bg-white text-[#1B2430] font-bold rounded-xl border-4 border-[#1B2430] shadow-[0_4px_0_#1B2430] active:translate-y-1 active:shadow-none transition-all"
+                    className="py-3 px-8 bg-white/5 text-slate-200 font-bold rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] active:translate-y-0 active:scale-95 transition-all"
                   >
                     {s.ikincilCta.label}
                   </Link>
@@ -127,7 +127,7 @@ export function HeroSlider() {
           type="button"
           onClick={() => ilerle(-1)}
           aria-label="Önceki fırsat"
-          className="flex h-9 w-9 items-center justify-center rounded-full border-4 border-[#1B2430] bg-white text-[#1B2430] font-bold shadow-[0_3px_0_#1B2430] active:translate-y-0.5 active:shadow-none transition-all"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 font-bold shadow-[0_3px_0_#1B2430] active:translate-y-0.5 active:shadow-none transition-all"
         >
           ‹
         </button>
@@ -139,7 +139,7 @@ export function HeroSlider() {
               onClick={() => setAktif(i)}
               aria-label={`${i + 1}. fırsat: ${s.baslik}`}
               aria-current={i === aktif}
-              className={`h-3 rounded-full border-2 border-[#1B2430] transition-all ${
+              className={`h-3 rounded-full border border-white/5 transition-all ${
                 i === aktif ? 'w-8 bg-[#DD7B3A]' : 'w-3 bg-white'
               }`}
             />
@@ -149,7 +149,7 @@ export function HeroSlider() {
           type="button"
           onClick={() => ilerle(1)}
           aria-label="Sonraki fırsat"
-          className="flex h-9 w-9 items-center justify-center rounded-full border-4 border-[#1B2430] bg-white text-[#1B2430] font-bold shadow-[0_3px_0_#1B2430] active:translate-y-0.5 active:shadow-none transition-all"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 font-bold shadow-[0_3px_0_#1B2430] active:translate-y-0.5 active:shadow-none transition-all"
         >
           ›
         </button>

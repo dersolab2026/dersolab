@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { updateInstructorPayoutInfo } from '@/actions/instructor-profile'
 import { useToast } from '@/components/ui/Toast'
-import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY, PIXEL_INPUT } from '@/lib/theme'
+import { PIXEL_CARD, INSTRUCTOR_BUTTON_PRIMARY, PIXEL_INPUT } from '@/lib/theme'
 
 interface PayoutInfoFormProps {
   initialPayoutName: string | null
@@ -35,14 +35,14 @@ export function PayoutInfoForm({ initialPayoutName, initialPayoutIban, payoutUpd
   return (
     <form onSubmit={handleSubmit} className={`${PIXEL_CARD} p-5 space-y-3`}>
       <div>
-        <p className="font-bold text-[#1B2430]">Ödeme Bilgilerim</p>
-        <p className="text-sm font-semibold text-[#1B2430]/70">
+        <p className="font-bold text-slate-200">Ödeme Bilgilerim</p>
+        <p className="text-sm font-semibold text-slate-400">
           Ders ücretlerinin yatırılacağı hesap bilgilerini buradan güncelleyebilirsin.
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-bold text-[#1B2430] mb-1">Ad Soyad (hesap sahibi)</label>
+        <label className="block text-sm font-bold text-slate-200 mb-1">Ad Soyad (hesap sahibi)</label>
         <input
           value={payoutName}
           onChange={(e) => setPayoutName(e.target.value)}
@@ -52,7 +52,7 @@ export function PayoutInfoForm({ initialPayoutName, initialPayoutIban, payoutUpd
       </div>
 
       <div>
-        <label className="block text-sm font-bold text-[#1B2430] mb-1">IBAN</label>
+        <label className="block text-sm font-bold text-slate-200 mb-1">IBAN</label>
         <input
           value={payoutIban}
           onChange={(e) => setPayoutIban(e.target.value)}
@@ -64,12 +64,12 @@ export function PayoutInfoForm({ initialPayoutName, initialPayoutIban, payoutUpd
 
       {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
       {payoutUpdatedAt && (
-        <p className="text-xs font-semibold text-[#1B2430]/70">
+        <p className="text-xs font-semibold text-slate-400">
           Son güncelleme: {new Date(payoutUpdatedAt).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })}
         </p>
       )}
 
-      <button type="submit" disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2`}>
+      <button type="submit" disabled={isPending} className={`${INSTRUCTOR_BUTTON_PRIMARY} px-4 py-2`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
       </button>
     </form>

@@ -50,19 +50,19 @@ export default async function InstructorProfilePage() {
         <AvatarUploader userId={user.id} currentAvatarUrl={userRow?.avatar_url ?? null} name={userRow?.name ?? ''} />
       </div>
       <div className={`${PIXEL_CARD} p-5`}>
-        <h2 className="mb-3 font-bold text-[#1B2430]">Tanıtım Yazısı</h2>
+        <h2 className="mb-3 font-bold text-slate-200">Tanıtım Yazısı</h2>
         <BioEditor initialBio={instructorRow?.bio ?? null} />
       </div>
       <div className={`${PIXEL_CARD} p-5`}>
-        <h2 className="mb-3 font-bold text-[#1B2430]">Branşlar</h2>
+        <h2 className="mb-3 font-bold text-slate-200">Branşlar</h2>
         <SubjectsEditor initialSubjects={instructorRow?.subjects ?? []} />
       </div>
       <div className={`${PIXEL_CARD} p-5`}>
-        <h2 className="mb-3 font-bold text-[#1B2430]">Eğitim Bilgileri</h2>
+        <h2 className="mb-3 font-bold text-slate-200">Eğitim Bilgileri</h2>
         <EducationEditor initialEntries={education} />
       </div>
       <div className={`${PIXEL_CARD} p-5`}>
-        <h2 className="mb-3 font-bold text-[#1B2430]">Tanıtım Videosu</h2>
+        <h2 className="mb-3 font-bold text-slate-200">Tanıtım Videosu</h2>
         <IntroVideoEditor initialUrl={instructorRow?.intro_video_url ?? null} userId={user.id} />
       </div>
     </DashboardPageShell>

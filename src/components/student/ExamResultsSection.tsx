@@ -121,7 +121,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
         <form onSubmit={handleSubmit} className={`${PIXEL_CARD} p-5 space-y-4`}>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-bold text-[#1B2430] mb-1">Deneme Adı</label>
+              <label className="block text-sm font-bold text-slate-200 mb-1">Deneme Adı</label>
               <input
                 value={examName}
                 onChange={(e) => setExamName(e.target.value)}
@@ -130,63 +130,63 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#1B2430] mb-1">Deneme Türü</label>
+              <label className="block text-sm font-bold text-slate-200 mb-1">Deneme Türü</label>
               <select value={examType} onChange={(e) => turDegisti(e.target.value as ExamType)} className={PIXEL_INPUT}>
-                {EXAM_TYPES.map((t) => <option key={t} value={t}>{EXAM_TYPE_LABELS[t]}</option>)}
+                {EXAM_TYPES.map((t) => <option key={t} value={t} className="bg-slate-900 text-slate-200">{EXAM_TYPE_LABELS[t]}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#1B2430] mb-1">Tarih</label>
+              <label className="block text-sm font-bold text-slate-200 mb-1">Tarih</label>
               <input type="date" value={examDate} onChange={(e) => setExamDate(e.target.value)} className={PIXEL_INPUT} />
             </div>
             {requiresTrack(examType) && (
               <div>
-                <label className="block text-sm font-bold text-[#1B2430] mb-1">Alan</label>
+                <label className="block text-sm font-bold text-slate-200 mb-1">Alan</label>
                 <select value={track} onChange={(e) => alanDegisti(e.target.value as ExamTrack)} className={PIXEL_INPUT}>
                   {(Object.keys(TRACK_LABELS) as ExamTrack[]).map((t) => (
-                    <option key={t} value={t}>{TRACK_LABELS[t]}</option>
+                    <option key={t} value={t} className="bg-slate-900 text-slate-200">{TRACK_LABELS[t]}</option>
                   ))}
                 </select>
               </div>
             )}
             <div>
-              <label className="block text-sm font-bold text-[#1B2430] mb-1">Yayın</label>
+              <label className="block text-sm font-bold text-slate-200 mb-1">Yayın</label>
               <select value={yayin} onChange={(e) => setYayin(e.target.value)} className={PIXEL_INPUT}>
-                <option value="">Belirtme</option>
-                {DENEME_YAYINLARI.map((y) => <option key={y} value={y}>{y}</option>)}
-                <option value={DIGER_YAYIN}>{DIGER_YAYIN}</option>
+                <option value="" className="bg-slate-900 text-slate-200">Belirtme</option>
+                {DENEME_YAYINLARI.map((y) => <option key={y} value={y} className="bg-slate-900 text-slate-200">{y}</option>)}
+                <option value={DIGER_YAYIN} className="bg-slate-900 text-slate-200">{DIGER_YAYIN}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#1B2430] mb-1">Süre (dakika)</label>
+              <label className="block text-sm font-bold text-slate-200 mb-1">Süre (dakika)</label>
               <input type="number" min={1} max={600} value={sure} onChange={(e) => setSure(e.target.value)}
                 placeholder="Kaç dakikada bitirdin?" className={PIXEL_INPUT} />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-[#1B2430] mb-1">Deneme sana nasıl geldi?</label>
+            <label className="block text-sm font-bold text-slate-200 mb-1">Deneme sana nasıl geldi?</label>
             <div className="flex flex-wrap gap-2">
               {ZORLUK_SECENEKLERI.map((z) => (
                 <button key={z.deger} type="button"
                   onClick={() => setZorluk(zorluk === z.deger ? '' : z.deger)}
                   aria-pressed={zorluk === z.deger}
-                  className={`rounded-lg border-4 border-[#1B2430] px-3 py-1.5 text-sm font-bold transition-all ${
-                    zorluk === z.deger ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+                  className={`rounded-lg border border-white/10 px-3 py-1.5 text-sm font-bold transition-all ${
+                    zorluk === z.deger ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white/5 text-slate-200'
                   }`}>
                   {z.etiket}
                 </button>
               ))}
             </div>
-            <p className="mt-1 text-xs font-semibold text-[#1B2430]/70">
+            <p className="mt-1 text-xs font-semibold text-slate-400">
               Zorluğu kaydedersen, farklı zorlukta denemeleri karşılaştırırken uyarı gösterilir.
             </p>
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm font-bold text-[#1B2430]">
+            <p className="text-sm font-bold text-slate-200">
               Ders Ders Doğru / Yanlış
-              <span className="ml-2 font-semibold text-[#1B2430]/70">
+              <span className="ml-2 font-semibold text-slate-400">
                 toplam {getTotalQuestions(examType, aktifTrack)} soru
               </span>
             </p>
@@ -199,21 +199,21 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                 const net = calculateNet(examType, dogru, yanlis)
                 return (
                   <div key={d.name} className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-2">
-                    <span className="min-w-0 truncate text-sm font-bold text-[#1B2430]" title={d.name}>
+                    <span className="min-w-0 truncate text-sm font-bold text-slate-200" title={d.name}>
                       {d.name}
-                      <span className="ml-1 font-semibold text-[#1B2430]/70">({d.questionCount})</span>
+                      <span className="ml-1 font-semibold text-slate-400">({d.questionCount})</span>
                     </span>
                     <input
                       type="number" min={0} max={d.questionCount} placeholder="D"
                       value={g.dogru} onChange={(e) => setGiris(d.name, 'dogru', e.target.value)}
                       aria-label={`${d.name} doğru`}
-                      className={`w-16 p-2 rounded-lg border-2 bg-white text-sm text-center outline-none focus:ring-2 focus:ring-[#6FA89E]/50 ${asiyor ? 'border-red-500' : 'border-[#1B2430]'}`}
+                      className={`w-16 p-2 rounded-lg border bg-black/20 text-slate-200 placeholder:text-slate-500 text-sm text-center outline-none focus:border-[#6FA89E]/50 transition-colors ${asiyor ? 'border-red-500' : 'border-white/10'}`}
                     />
                     <input
                       type="number" min={0} max={d.questionCount} placeholder="Y"
                       value={g.yanlis} onChange={(e) => setGiris(d.name, 'yanlis', e.target.value)}
                       aria-label={`${d.name} yanlış`}
-                      className={`w-16 p-2 rounded-lg border-2 bg-white text-sm text-center outline-none focus:ring-2 focus:ring-[#6FA89E]/50 ${asiyor ? 'border-red-500' : 'border-[#1B2430]'}`}
+                      className={`w-16 p-2 rounded-lg border bg-black/20 text-slate-200 placeholder:text-slate-500 text-sm text-center outline-none focus:border-[#6FA89E]/50 transition-colors ${asiyor ? 'border-red-500' : 'border-white/10'}`}
                     />
                     <span className="w-16 text-right text-sm font-bold text-[#3F6E66]">
                       {dogru || yanlis ? net : '—'}
@@ -226,8 +226,8 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
 
           {supportsObp(examType) && (
             <div>
-              <label className="block text-sm font-bold text-[#1B2430] mb-1">
-                OBP <span className="font-semibold text-[#1B2430]/70">(isteğe bağlı — girersen yerleştirme puanı da hesaplanır)</span>
+              <label className="block text-sm font-bold text-slate-200 mb-1">
+                OBP <span className="font-semibold text-slate-400">(isteğe bağlı — girersen yerleştirme puanı da hesaplanır)</span>
               </label>
               <input
                 type="number" min={100} max={500} step="0.01"
@@ -260,7 +260,7 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
       )}
 
       {entries.length === 0 ? (
-        <p className="font-semibold text-[#1B2430]/70">
+        <p className="font-semibold text-slate-400">
           Henüz deneme eklemedin. Denemelerini buraya girdikçe netlerinin nasıl değiştiğini göreceksin.
         </p>
       ) : (
@@ -274,19 +274,19 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
               <div key={e.id} className={`${PIXEL_CARD} p-4 space-y-2`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-bold text-[#1B2430]">
+                    <p className="font-bold text-slate-200">
                       {e.examName}
-                      <span className="ml-2 inline-block px-2 py-0.5 rounded-lg border-2 border-[#1B2430] bg-white text-xs">
+                      <span className="ml-2 inline-block px-2 py-0.5 rounded-lg border border-white/5 bg-white text-xs">
                         {EXAM_TYPE_LABELS[e.examType]}{e.track ? ` · ${TRACK_LABELS[e.track]}` : ''}
                       </span>
                     </p>
-                    <p className="text-sm font-semibold text-[#1B2430]/70">
+                    <p className="text-sm font-semibold text-slate-400">
                       {new Date(e.examDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
                       {' · '}{e.correctCount} doğru · {e.wrongCount} yanlış
                       {e.publisher && ` · ${e.publisher}`}
                       {e.durationMinutes && ` · ${e.durationMinutes} dk`}
                       {e.difficulty && (
-                        <span className="ml-2 inline-block rounded border-2 border-[#1B2430] px-1.5 text-xs font-bold text-[#1B2430]"
+                        <span className="ml-2 inline-block rounded border border-white/5 px-1.5 text-xs font-bold text-slate-200"
                           style={{ backgroundColor: ZORLUK_RENK[e.difficulty] }}>
                           {ZORLUK_ETIKET[e.difficulty]}
                         </span>
@@ -303,14 +303,14 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                         type="button"
                         onClick={() => setAcikKayit(acik ? null : e.id)}
                         aria-label={acik ? 'Ders detayını gizle' : 'Ders detayını göster'}
-                        className="text-[#1B2430]/70 hover:text-[#1B2430]"
+                        className="text-slate-400 hover:text-slate-200"
                       >
                         {acik ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                       </button>
                     )}
                     <button
                       type="button" onClick={() => handleDelete(e.id)}
-                      aria-label="Denemeyi sil" className="text-[#1B2430]/55 hover:text-red-600"
+                      aria-label="Denemeyi sil" className="text-slate-500 hover:text-red-600"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -318,12 +318,12 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                 </div>
 
                 {acik && e.sections.length > 0 && (
-                  <div className="space-y-3 border-t-2 border-[#1B2430]/10 pt-2">
+                  <div className="space-y-3 border-t border-white/10 pt-2">
                     <ul className="space-y-1">
                       {e.sections.map((s) => (
                         <li key={s.name} className="flex items-center justify-between gap-2 text-sm">
-                          <span className="font-semibold text-[#1B2430]">{s.name}</span>
-                          <span className="font-semibold text-[#1B2430]/70">
+                          <span className="font-semibold text-slate-200">{s.name}</span>
+                          <span className="font-semibold text-slate-400">
                             {s.correctCount}D · {s.wrongCount}Y
                             <strong className="ml-2 text-[#3F6E66]">
                               {calculateNet(e.examType, s.correctCount, s.wrongCount)} net
@@ -333,11 +333,11 @@ export function ExamResultsSection({ entries }: ExamResultsSectionProps) {
                       ))}
                     </ul>
 
-                    <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
+                    <div className="rounded-xl border border-white/5 bg-white/5 p-3">
                       <ErrorTypeEditor entry={e} />
                     </div>
 
-                    <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
+                    <div className="rounded-xl border border-white/5 bg-white/5 p-3">
                       <ExamReflection entry={e} />
                     </div>
                   </div>

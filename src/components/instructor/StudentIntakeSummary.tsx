@@ -42,28 +42,28 @@ export function StudentIntakeSummary({ veri }: { veri: IntakeData }) {
   return (
     <div className={`${PIXEL_CARD} space-y-4 p-5`}>
       <div className="flex items-center gap-2">
-        <ClipboardCheck className="h-5 w-5 text-[#1B2430]" />
-        <p className="font-bold text-[#1B2430]">Tanışma Formu</p>
+        <ClipboardCheck className="h-5 w-5 text-slate-200" />
+        <p className="font-bold text-slate-200">Tanışma Formu</p>
       </div>
 
       {form?.whoWanted && (
-        <div className={`flex items-center gap-2 rounded-xl border-4 border-[#1B2430] px-3 py-2 ${
+        <div className={`flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 ${
           form.whoWanted === 'ailem' ? 'bg-[#F6EAD2]' : 'bg-white'
         }`}>
           {form.whoWanted === 'ailem' && <AlertTriangle className="h-4 w-4 shrink-0 text-[#8A5A00]" />}
-          <p className="text-sm font-bold text-[#1B2430]">{KIM_ETIKET[form.whoWanted]}</p>
+          <p className="text-sm font-bold text-slate-200">{KIM_ETIKET[form.whoWanted]}</p>
         </div>
       )}
 
       {satirlar.length > 0 && (
         <div className="space-y-2">
           {satirlar.map((s) => (
-            <div key={s.etiket} className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
-              <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">{s.etiket}</p>
+            <div key={s.etiket} className="rounded-xl border border-white/5 bg-white/5 p-3">
+              <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-slate-400">{s.etiket}</p>
               <div className="flex flex-wrap gap-1.5">
                 {s.degerler.map((d) => (
                   <span key={d}
-                    className="rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] px-2 py-0.5 text-sm font-semibold text-[#1B2430]">
+                    className="rounded-lg border border-white/5 bg-white/[0.02] px-2 py-0.5 text-sm font-semibold text-slate-200">
                     {d}
                   </span>
                 ))}
@@ -74,21 +74,21 @@ export function StudentIntakeSummary({ veri }: { veri: IntakeData }) {
       )}
 
       {form?.notes && (
-        <div className="rounded-xl border-2 border-[#1B2430] bg-white p-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Eklemek istediği</p>
-          <p className="text-sm font-semibold text-[#1B2430] whitespace-pre-wrap">{form.notes}</p>
+        <div className="rounded-xl border border-white/5 bg-white/5 p-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Eklemek istediği</p>
+          <p className="text-sm font-semibold text-slate-200 whitespace-pre-wrap">{form.notes}</p>
         </div>
       )}
 
       {son && (
-        <div className="space-y-3 border-t-2 border-[#1B2430]/10 pt-3">
-          <p className="text-sm font-bold text-[#1B2430]/70">
+        <div className="space-y-3 border-t border-white/10 pt-3">
+          <p className="text-sm font-bold text-slate-400">
             Çalışma alışkanlıkları profili
             {olcumler.length > 1 && ` · ${olcumler.length} ölçüm`}
           </p>
 
           {zayif.length > 0 && (
-            <p className="text-sm font-bold text-[#1B2430]">
+            <p className="text-sm font-bold text-slate-200">
               En zayıf iki alan: <span className="text-[#9C4A0C]">{zayif.map((z) => z.ad).join(' ve ')}</span>
             </p>
           )}
@@ -100,7 +100,7 @@ export function StudentIntakeSummary({ veri }: { veri: IntakeData }) {
             guncelTarih={son.takenOn}
           />
 
-          <p className="text-xs font-semibold text-[#1B2430]/70">
+          <p className="text-xs font-semibold text-slate-400">
             Bu ölçek doğrulanmış bir psikometrik test değil; öğrencinin kendi
             beyanı. Tanı aracı olarak değil, görüşmede nereden başlanacağını
             belirlemek için kullanın.

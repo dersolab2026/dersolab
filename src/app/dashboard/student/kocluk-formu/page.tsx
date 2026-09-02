@@ -23,9 +23,9 @@ export default async function KoclukFormuPage() {
       title="Koçluk Formu"
       description="Koçunun seni tanıması için. Bir kere doldur, istediğinde güncelle."
     >
-      <div className="flex items-start gap-2 rounded-xl border-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#1B2430]/70" />
-        <p className="text-sm font-semibold text-[#1B2430]/80">
+      <div className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+        <p className="text-sm font-semibold text-slate-200/80">
           Bu formu koçun ve ders aldığın eğitmenler görebilir.
         </p>
       </div>

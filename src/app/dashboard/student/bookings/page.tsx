@@ -19,9 +19,9 @@ export default async function StudentBookingsPage() {
   return (
     <DashboardPageShell title="Derslerim" description="Planlanan ve geçmiş derslerin.">
       <div className="space-y-3">
-        <h2 className="font-bold text-[#1B2430]">Yaklaşan Dersler</h2>
+        <h2 className="font-bold text-slate-200">Yaklaşan Dersler</h2>
         {upcoming.length === 0 ? (
-          <p className="text-sm font-bold text-[#1B2430]">Planlanmış ders yok.</p>
+          <p className="text-sm font-bold text-slate-200">Planlanmış ders yok.</p>
         ) : (
           <div className="space-y-3">
             {upcoming.map((b) => (
@@ -32,9 +32,9 @@ export default async function StudentBookingsPage() {
       </div>
 
       <div className="space-y-3">
-        <h2 className="font-bold text-[#1B2430]">Geçmiş Dersler</h2>
+        <h2 className="font-bold text-slate-200">Geçmiş Dersler</h2>
         {past.length === 0 ? (
-          <p className="text-sm font-bold text-[#1B2430]">Henüz geçmiş ders yok.</p>
+          <p className="text-sm font-bold text-slate-200">Henüz geçmiş ders yok.</p>
         ) : (
           <div className="space-y-3">
             {past.map((b) => (

@@ -7,7 +7,7 @@ import { updateIntroVideo } from '@/actions/instructor-profile'
 import { uploadIntroVideo } from '@/lib/storage/upload-intro-video'
 import { parseVideoUrl } from '@/lib/video/parse-video-url'
 import { useToast } from '@/components/ui/Toast'
-import { PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
+import { INSTRUCTOR_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT } from '@/lib/theme'
 
 interface IntroVideoEditorProps {
   initialUrl: string | null
@@ -75,13 +75,13 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
           onChange={(e) => setUrl(e.target.value)}
           className={`${PIXEL_INPUT} py-2`}
         />
-        <button onClick={handleSaveLink} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2 text-sm shrink-0`}>
+        <button onClick={handleSaveLink} disabled={isPending} className={`${INSTRUCTOR_BUTTON_PRIMARY} px-4 py-2 text-sm shrink-0`}>
           {isPending && !isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
         </button>
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-semibold text-[#1B2430]/70">veya</span>
+        <span className="text-xs font-semibold text-slate-400">veya</span>
         <input ref={inputRef} type="file" accept="video/mp4,video/quicktime,video/webm" className="hidden" onChange={handleFileChange} />
         <button
           type="button"
@@ -92,7 +92,7 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
           {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
           {isUploading ? 'Yükleniyor...' : 'Video Dosyası Yükle'}
         </button>
-        <span className="text-xs font-semibold text-[#1B2430]/70">en fazla 200 MB</span>
+        <span className="text-xs font-semibold text-slate-400">en fazla 200 MB</span>
       </div>
 
       {url.trim() && !embedPreview && !isDirectFile && (
@@ -100,12 +100,12 @@ export function IntroVideoEditor({ initialUrl, userId }: IntroVideoEditorProps) 
       )}
 
       {embedPreview && (
-        <div className="aspect-video w-full max-w-md overflow-hidden rounded-xl border-4 border-[#1B2430]">
+        <div className="aspect-video w-full max-w-md overflow-hidden rounded-xl border border-white/10">
           <iframe src={embedPreview.embedUrl} className="h-full w-full" allowFullScreen />
         </div>
       )}
       {isDirectFile && (
-        <video src={url} controls className="aspect-video w-full max-w-md rounded-xl border-4 border-[#1B2430]" />
+        <video src={url} controls className="aspect-video w-full max-w-md rounded-xl border border-white/10" />
       )}
 
       {error && <p className="text-sm font-semibold text-red-600">{error}</p>}

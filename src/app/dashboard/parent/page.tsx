@@ -8,10 +8,10 @@ import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { PIXEL_CARD } from '@/lib/theme'
 
 function Kutu({ etiket, deger, vurgu }: { etiket: string; deger: string; vurgu?: 'iyi' | 'dikkat' }) {
-  const renk = vurgu === 'iyi' ? 'text-[#2F8570]' : vurgu === 'dikkat' ? 'text-[#C2682F]' : 'text-[#1B2430]'
+  const renk = vurgu === 'iyi' ? 'text-[#2F8570]' : vurgu === 'dikkat' ? 'text-[#C2682F]' : 'text-slate-200'
   return (
-    <div className="rounded-xl border-2 border-[#1B2430]/15 bg-white px-3 py-2">
-      <p className="text-xs font-semibold text-[#1B2430]/70">{etiket}</p>
+    <div className="rounded-xl border border-white/5/15 bg-white px-3 py-2">
+      <p className="text-xs font-semibold text-slate-400">{etiket}</p>
       <p className={`text-lg font-bold tabular-nums ${renk}`}>{deger}</p>
     </div>
   )
@@ -33,7 +33,7 @@ export default async function ParentHomePage() {
         <>
           <LinkStudentForm />
           <div className={`${PIXEL_CARD} p-5`}>
-            <p className="font-semibold text-[#1B2430]/70">
+            <p className="font-semibold text-slate-400">
               Henüz bağlı bir öğrenciniz yok. Yukarıdaki alana öğrencinizden aldığınız kodu girin.
             </p>
           </div>
@@ -48,27 +48,27 @@ export default async function ParentHomePage() {
                   <div>
                     <Link
                       href={`/dashboard/parent/${o.personId}`}
-                      className="text-lg font-bold text-[#1B2430] underline decoration-2 underline-offset-2"
+                      className="text-lg font-bold text-slate-200 underline decoration-2 underline-offset-2"
                     >
                       {o.personName}
                     </Link>
-                    <p className="text-sm font-semibold text-[#1B2430]/70">{o.personEmail}</p>
+                    <p className="text-sm font-semibold text-slate-400">{o.personEmail}</p>
                   </div>
                   <UnlinkStudentButton studentId={o.personId} studentName={o.personName} />
                 </div>
 
                 {z?.siradakiDers ? (
-                  <div className="rounded-xl border-2 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">Sıradaki ders</p>
-                    <p className="font-bold text-[#1B2430]">
+                  <div className="rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Sıradaki ders</p>
+                    <p className="font-bold text-slate-200">
                       {z.siradakiDers.instructorName}
-                      <span className="font-semibold text-[#1B2430]/70">
+                      <span className="font-semibold text-slate-400">
                         {' · '}{kisaTarihSaat(z.siradakiDers.startTime)}
                       </span>
                     </p>
                   </div>
                 ) : (
-                  <p className="text-sm font-semibold text-[#1B2430]/70">Planlanmış ders yok.</p>
+                  <p className="text-sm font-semibold text-slate-400">Planlanmış ders yok.</p>
                 )}
 
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -105,12 +105,12 @@ export default async function ParentHomePage() {
       )}
 
       <div className={`${PIXEL_CARD} p-5`}>
-        <p className="font-bold text-[#1B2430]">Neyi görebilirsiniz?</p>
-        <p className="mt-1 text-sm font-semibold text-[#1B2430]/70">
+        <p className="font-bold text-slate-200">Neyi görebilirsiniz?</p>
+        <p className="mt-1 text-sm font-semibold text-slate-400">
           Ders takvimi ve katılım, ödev durumu, deneme netleri, kredi bakiyesi ve ödeme geçmişi.
           Ders planlandığında, tamamlandığında ya da katılım olmadığında size de bildirim gelir.
         </p>
-        <p className="mt-2 text-sm font-semibold text-[#1B2430]/70">
+        <p className="mt-2 text-sm font-semibold text-slate-400">
           Öğrencinizin günlüğü ve koçluk formu cevapları size kapalıdır — bunlar öğrencinin
           koçuyla arasındaki alandır. Açık olsaydı öğrenci dürüst cevap veremezdi.
         </p>

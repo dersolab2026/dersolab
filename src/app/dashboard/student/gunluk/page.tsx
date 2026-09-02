@@ -30,9 +30,9 @@ export default async function StudentGunlukPage() {
     <DashboardPageShell title="Günlük" description="Bir gün seç, o güne ait derslerini ve çalışma notlarını gör.">
       {/* Ogrenci, gunlugunu kimin gordugunu bilsin: kocluk iliskisinin dogal
           parcasi ama sessizce olmasi dogru degil. */}
-      <div className="flex items-start gap-2 rounded-xl border-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#1B2430]/70" />
-        <p className="text-sm font-semibold text-[#1B2430]/80">
+      <div className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+        <p className="text-sm font-semibold text-slate-200/80">
           Ders aldığın eğitmenler ve koçun bu sayfayı görebilir — çalışmanı takip edip
           sana daha iyi yol gösterebilmeleri için.
         </p>

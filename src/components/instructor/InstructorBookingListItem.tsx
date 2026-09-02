@@ -7,7 +7,7 @@ import { AssignHomeworkDialog } from './AssignHomeworkDialog'
 import { LessonMaterials } from '@/components/booking/LessonMaterials'
 import type { InstructorBookingItem } from '@/lib/bookings/get-instructor-bookings'
 import type { LessonMaterial } from '@/lib/lessons/get-lesson-materials'
-import { PIXEL_CARD, PIXEL_BADGE, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
+import { PIXEL_CARD, PIXEL_BADGE, INSTRUCTOR_BADGE_ACTIVE, PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 
 interface InstructorBookingListItemProps {
   booking: InstructorBookingItem
@@ -29,18 +29,18 @@ export function InstructorBookingListItem({ booking, materials }: InstructorBook
   return (
     <div className={`${PIXEL_CARD} p-4 flex flex-wrap items-center justify-between gap-3`}>
       <div>
-        <p className="font-bold text-[#1B2430]">
+        <p className="font-bold text-slate-200">
           {booking.studentName}
           {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#9C4A0C]">Tanışma Dersi</span>}
         </p>
-        <p className="text-sm font-semibold text-[#1B2430]/70">{formattedDate}</p>
+        <p className="text-sm font-semibold text-slate-400">{formattedDate}</p>
         {booking.topicNote && <p className="mt-1 text-xs font-bold text-[#9C4A0C]">Öğrencinin sorusu: {booking.topicNote}</p>}
-        {booking.instructorNotes && <p className="mt-1 text-xs font-semibold text-[#1B2430]/70">Not: {booking.instructorNotes}</p>}
+        {booking.instructorNotes && <p className="mt-1 text-xs font-semibold text-slate-400">Not: {booking.instructorNotes}</p>}
         <LessonMaterials bookingId={booking.id} materials={materials} isInstructor />
       </div>
 
       <div className="flex items-center gap-2">
-        <span className={booking.status === 'scheduled' ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE}>{statusLabel}</span>
+        <span className={booking.status === 'scheduled' ? INSTRUCTOR_BADGE_ACTIVE : PIXEL_BADGE}>{statusLabel}</span>
 
         {booking.status === 'scheduled' && !isPastDue && (
           <>

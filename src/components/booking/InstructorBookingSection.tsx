@@ -58,21 +58,21 @@ export function InstructorBookingSection({
 
       {selectedSlot && (
         <div className={`${PIXEL_CARD} p-4 space-y-3`}>
-          <p className="text-sm font-semibold text-[#1B2430]">
+          <p className="text-sm font-semibold text-slate-200">
             Seçilen saat:{' '}
             <strong>{new Date(selectedSlot.start).toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' })}</strong>
           </p>
           {canChooseType && (
             <div>
-              <label className="block text-sm font-bold text-[#1B2430] mb-1">Ne planlamak istiyorsun?</label>
+              <label className="block text-sm font-bold text-slate-200 mb-1">Ne planlamak istiyorsun?</label>
               <div className="grid grid-cols-2 gap-2">
                 {(['lesson', 'coaching'] as const).map((type) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => setSessionType(type)}
-                    className={`py-2 rounded-xl border-2 border-[#1B2430] font-bold text-sm transition-all ${
-                      sessionType === type ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+                    className={`py-2 rounded-xl border border-white/5 font-bold text-sm transition-all ${
+                      sessionType === type ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white/5 text-slate-200'
                     }`}
                   >
                     {SESSION_TYPE_LABELS[type]}
@@ -83,15 +83,15 @@ export function InstructorBookingSection({
           )}
 
           <div>
-            <label className="block text-sm font-bold text-[#1B2430] mb-1">
-              Hangi konuda yardım istiyorsun? <span className="font-semibold text-[#1B2430]/70">(isteğe bağlı)</span>
+            <label className="block text-sm font-bold text-slate-200 mb-1">
+              Hangi konuda yardım istiyorsun? <span className="font-semibold text-slate-400">(isteğe bağlı)</span>
             </label>
             <textarea
               value={topicNote}
               onChange={(e) => setTopicNote(e.target.value)}
               rows={2}
               placeholder="Örn: Türev konusunda takıldığım sorular var"
-              className="w-full p-2 rounded-xl border-2 border-[#1B2430] bg-white text-sm outline-none focus:ring-4 focus:ring-[#6FA89E]/50 transition-all resize-none"
+              className="w-full p-2 rounded-xl border border-white/10 bg-black/20 text-slate-200 text-sm outline-none focus:ring-4 focus:ring-[#DD7B3A]/30 transition-all resize-none placeholder:text-slate-500"
             />
           </div>
           <div className="flex justify-end">

@@ -35,10 +35,10 @@ export function ExamReflection({ entry }: { entry: ExamResultEntry }) {
 
   return (
     <div className="space-y-2">
-      <p className="text-sm font-bold text-[#1B2430]/70">Deneme sonrası notların</p>
+      <p className="text-sm font-bold text-slate-400">Deneme sonrası notların</p>
 
       <div>
-        <label className="mb-1 block text-xs font-bold text-[#1B2430]">
+        <label className="mb-1 block text-xs font-bold text-slate-200">
           Bu denemeye nasıl hazırlandın?
         </label>
         <textarea value={hazirlik} onChange={(e) => setHazirlik(e.target.value)} rows={2}
@@ -47,7 +47,7 @@ export function ExamReflection({ entry }: { entry: ExamResultEntry }) {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-bold text-[#1B2430]">
+        <label className="mb-1 block text-xs font-bold text-slate-200">
           Hangi derste süre yetmedi?
         </label>
         <input value={sureDersi} onChange={(e) => setSureDersi(e.target.value)}

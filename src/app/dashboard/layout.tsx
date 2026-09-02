@@ -38,9 +38,15 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   const notifications = await getNotifications()
 
   return (
-    <div className="md:flex">
-      <DashboardNav role={role} offersFreeTrial={offersFreeTrial} notifications={notifications} />
-      <main className="md:flex-1 md:min-w-0">{children}</main>
+    <div className="md:flex min-h-screen bg-[#0a0a0a] text-slate-200 relative">
+      {/* Global Dashboard Background Orbs */}
+      <div className="fixed top-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[120px] pointer-events-none z-0" />
+      <div className="fixed bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-orange-600/10 blur-[120px] pointer-events-none z-0" />
+      
+      <div className="relative z-50 md:shrink-0">
+        <DashboardNav role={role} offersFreeTrial={offersFreeTrial} notifications={notifications} />
+      </div>
+      <main className="relative z-10 md:flex-1 md:min-w-0">{children}</main>
     </div>
   )
 }

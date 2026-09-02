@@ -31,7 +31,7 @@ export default async function InstructorDashboardPage() {
     <DashboardPageShell title="Derslerim" description="Rezervasyonlarını buradan yönetebilirsin.">
       {instructorRow?.approval_status === 'pending' && (
         <div className={`${PIXEL_CARD} p-3`}>
-          <p className="text-sm font-semibold text-[#1B2430]">Profilin henüz onay bekliyor, onaylanana kadar öğrenciler seni göremez.</p>
+          <p className="text-sm font-semibold text-slate-200">Profilin henüz onay bekliyor, onaylanana kadar öğrenciler seni göremez.</p>
         </div>
       )}
       {instructorRow?.approval_status === 'rejected' && (
@@ -39,7 +39,7 @@ export default async function InstructorDashboardPage() {
       )}
       {instructorRow?.approval_status === 'approved' && !instructorRow.calendar_connected && (
         <div className={`${PIXEL_CARD} p-3`}>
-          <p className="text-sm font-semibold text-[#1B2430]">
+          <p className="text-sm font-semibold text-slate-200">
             Öğrenciler rezervasyon yapabilsin diye önce{' '}
             <Link href="/dashboard/instructor/settings" className="underline text-[#9C4A0C]">Google Takvimini bağlaman</Link> gerekiyor.
           </p>
@@ -60,8 +60,8 @@ export default async function InstructorDashboardPage() {
 
       {needsAction.length > 0 && (
         <div className="space-y-3">
-          <h2 className="font-bold text-[#1B2430]">Onay Bekleyen Dersler</h2>
-          <p className="text-sm font-semibold text-[#1B2430]/70">Saati geçmiş, tamamlandı olarak işaretlemen gerekiyor.</p>
+          <h2 className="font-bold text-slate-200">Onay Bekleyen Dersler</h2>
+          <p className="text-sm font-semibold text-slate-400">Saati geçmiş, tamamlandı olarak işaretlemen gerekiyor.</p>
           <div className="space-y-3">
             {needsAction.map((b) => (
               <InstructorBookingListItem key={b.id} booking={b} materials={materialsByBooking[b.id] ?? []} />
@@ -71,9 +71,9 @@ export default async function InstructorDashboardPage() {
       )}
 
       <div className="space-y-3">
-        <h2 className="font-bold text-[#1B2430]">Yaklaşan Dersler</h2>
+        <h2 className="font-bold text-slate-200">Yaklaşan Dersler</h2>
         {upcoming.length === 0 ? (
-          <p className="text-sm font-bold text-[#1B2430]">Planlanmış ders yok.</p>
+          <p className="text-sm font-bold text-slate-200">Planlanmış ders yok.</p>
         ) : (
           <div className="space-y-3">
             {upcoming.map((b) => (
@@ -84,9 +84,9 @@ export default async function InstructorDashboardPage() {
       </div>
 
       <div className="space-y-3">
-        <h2 className="font-bold text-[#1B2430]">Geçmiş Dersler</h2>
+        <h2 className="font-bold text-slate-200">Geçmiş Dersler</h2>
         {past.length === 0 ? (
-          <p className="text-sm font-bold text-[#1B2430]">Henüz geçmiş ders yok.</p>
+          <p className="text-sm font-bold text-slate-200">Henüz geçmiş ders yok.</p>
         ) : (
           <div className="space-y-3">
             {past.map((b) => (

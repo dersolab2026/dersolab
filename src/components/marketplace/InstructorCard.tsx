@@ -56,14 +56,14 @@ export function InstructorCard({ instructor, sessionTypeHint, nextSlot }: Instru
 
   return (
     <Link href={href}>
-      <div className="h-full flex flex-col bg-[#F4F1E8] rounded-2xl p-5 border-4 border-[#1B2430] shadow-[0_6px_0_#1B2430] transition-all hover:-translate-y-0.5">
+      <div className="h-full flex flex-col bg-white/[0.02] rounded-2xl p-5 border border-white/10 shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all hover:-translate-y-0.5">
         <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12 border-2 border-[#1B2430]">
+          <Avatar className="h-12 w-12 border border-white/5">
             <AvatarImage src={instructor.avatarUrl ?? undefined} alt={instructor.name} />
-            <AvatarFallback className="bg-white text-[#1B2430] font-bold">{initials}</AvatarFallback>
+            <AvatarFallback className="bg-white/5 text-slate-200 font-bold">{initials}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-bold text-[#1B2430]">{instructor.name}</p>
+            <p className="font-bold text-slate-200">{instructor.name}</p>
             {instructor.completedLessonCount > 0 && (
               <span className="flex items-center gap-1 text-xs font-bold text-[#3F6E66]">
                 <GraduationCap className="h-3.5 w-3.5" />
@@ -76,14 +76,14 @@ export function InstructorCard({ instructor, sessionTypeHint, nextSlot }: Instru
         <div className="mt-3 space-y-2 flex-1">
           <div className="flex flex-wrap gap-1">
             {instructor.subjects.map((subject) => (
-              <span key={subject} className="px-2 py-0.5 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-xs font-bold">
+              <span key={subject} className="px-2 py-0.5 rounded-lg border border-white/5 bg-white/5 text-slate-200 text-xs font-bold">
                 {subject}
               </span>
             ))}
           </div>
-          {instructor.bio && <p className="line-clamp-2 text-sm font-semibold text-[#1B2430]/70">{instructor.bio}</p>}
+          {instructor.bio && <p className="line-clamp-2 text-sm font-semibold text-slate-400">{instructor.bio}</p>}
           {instructor.introVideoUrl && (
-            <span className="flex items-center gap-1 text-xs font-bold text-[#1B2430]/70">
+            <span className="flex items-center gap-1 text-xs font-bold text-slate-400">
               <PlayCircle className="h-3.5 w-3.5" />
               Tanıtım videosu var
             </span>
@@ -91,14 +91,14 @@ export function InstructorCard({ instructor, sessionTypeHint, nextSlot }: Instru
         </div>
 
         {/* Alt bilgi ve buton */}
-        <div className="mt-4 pt-3 border-t-2 border-[#1B2430]/10 flex items-center justify-between gap-2">
+        <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
           {nextSlot ? (
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border-2 border-[#1B2430] bg-[#6FA89E] text-[#F4F1E8] text-[11px] font-bold shrink-0">
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-white/5 bg-[#6FA89E] text-[#F4F1E8] text-[11px] font-bold shrink-0">
               <CalendarClock className="h-3 w-3 shrink-0" />
               <span>{formatNextSlot(nextSlot)}</span>
             </span>
           ) : (
-            <span className="inline-block px-2 py-0.5 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-[11px] font-bold shrink-0">
+            <span className="inline-block px-2 py-0.5 rounded-lg border border-white/5 bg-white/5 text-slate-200 text-[11px] font-bold shrink-0">
               Yakında müsait
             </span>
           )}

@@ -13,9 +13,24 @@ import { PIXEL_BUTTON_SECONDARY } from '@/lib/theme'
 const SIDEBAR_COLLAPSED_KEY = 'dersolab-sidebar-collapsed'
 const SIDEBAR_WIDTH = 224
 
-const SIDEBAR_LINK_BASE = 'block w-full px-3 py-2 rounded-lg border-2 border-[#1B2430] text-sm font-bold text-left'
-const SIDEBAR_LINK_ACTIVE = `${SIDEBAR_LINK_BASE} bg-[#DD7B3A] text-[#F4F1E8]`
-const SIDEBAR_LINK_INACTIVE = `${SIDEBAR_LINK_BASE} bg-white text-[#1B2430]`
+const SIDEBAR_LINK_BASE = 'block w-full px-3 py-2 rounded-lg border border-transparent text-sm font-bold text-left transition-all duration-300'
+const SIDEBAR_LINK_INACTIVE = `${SIDEBAR_LINK_BASE} bg-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5`
+
+function getActiveLinkClass(role: string) {
+  if (role === 'instructor') {
+    return `${SIDEBAR_LINK_BASE} bg-blue-500/20 border-blue-500/30 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]`
+  }
+  if (role === 'parent') {
+    return `${SIDEBAR_LINK_BASE} bg-emerald-500/20 border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]`
+  }
+  return `${SIDEBAR_LINK_BASE} bg-orange-500/20 border-orange-500/30 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.15)]`
+}
+
+function getLogoTextClass(role: string) {
+  if (role === 'instructor') return 'from-blue-400 to-cyan-400'
+  if (role === 'parent') return 'from-emerald-400 to-teal-400'
+  return 'from-orange-400 to-amber-400'
+}
 
 interface DashboardNavProps {
   role: UserRole
@@ -30,7 +45,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/student/netlerim', label: 'Netlerim' },
     { href: '/dashboard/student/kocluk-formu', label: 'Koçluk Formu' },
     { href: '/dashboard/student/homework', label: 'Ödevlerim' },
-    { href: '/dashboard/student/ai-asistan', label: '🤖 AI Soru Asistanı' },
+    { href: '/dashboard/student/ai-asistan', label: 'AI Soru Asistanı' },
     { href: '/dashboard/student/packages', label: 'Paketler' },
     { href: '/instructors', label: 'Eğitmenler' },
     { href: '/kocluk', label: 'Koçluk' },
@@ -107,24 +122,25 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
 
   const dividerIndex = role === 'admin' ? NAV_ITEMS.admin.length : -1
 
+  const mascotSrc = '/fox-head.png'
+
   return (
     <>
       {/* Mobil: üst bar + hamburger */}
-      <nav className="flex md:hidden items-center justify-between gap-2 border-b-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
+      <nav className="flex md:hidden items-center justify-between gap-2 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl px-4 py-3">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Menüyü aç"
-            className={`${PIXEL_BUTTON_SECONDARY} p-1.5`}
+            className="p-1 hover:scale-105 transition-transform"
           >
-            {/* Kafa kare değil (300x242); w-auto olmazsa eziliyor.
-                imageRendering:pixelated YOK — kaynak yumuşak bir çizim,
-                zorlanınca kenarlar lapa oluyordu. */}
-            <img src="/fox-head.png" alt="" className="h-7 w-auto" />
+            <img src={mascotSrc} alt="" className="h-8 w-8 object-contain drop-shadow-md" />
           </button>
           <Link href="/dashboard">
-            <img src="/dersolab-logo-560.png" alt="DersoLab" className="h-7 w-auto" />
+            <div className="flex items-center gap-2 group">
+              <span className="font-black text-white text-lg tracking-tight">Derso<span className={`text-transparent bg-clip-text bg-gradient-to-r ${getLogoTextClass(role)}`}>Lab</span></span>
+            </div>
           </Link>
         </div>
         <NotificationBell initialNotifications={notifications} role={role} />
@@ -133,37 +149,39 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
       {/* Mobil: kayan menü (drawer) */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-[#1B2430]/50 md:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] flex flex-col border-r-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-5 transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] flex flex-col border-r border-white/10 bg-[#0a0a0a] px-4 py-5 transition-transform duration-300 ease-in-out md:hidden ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex items-center justify-between mb-6 shrink-0">
           <Link href="/dashboard">
-            <img src="/dersolab-logo-560.png" alt="DersoLab" className="h-8 w-auto" />
+            <div className="flex items-center gap-2 group">
+              <span className="font-black text-white text-xl tracking-tight">Derso<span className={`text-transparent bg-clip-text bg-gradient-to-r ${getLogoTextClass(role)}`}>Lab</span></span>
+            </div>
           </Link>
           <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Menüyü kapat" className="p-1">
-            <X className="h-5 w-5 text-[#1B2430]" />
+            <X className="h-5 w-5 text-slate-400" />
           </button>
         </div>
         <div className="flex-1 flex flex-col gap-2 overflow-y-auto gizli-kaydirma">
           {items.map((item, i) => (
             <div key={item.href}>
-              {i === dividerIndex && <div className="my-2 border-t-2 border-[#1B2430]/10" />}
+              {i === dividerIndex && <div className="my-2 border-t border-white/10" />}
               <Link
                 href={item.href}
-                className={pathname === item.href ? SIDEBAR_LINK_ACTIVE : SIDEBAR_LINK_INACTIVE}
+                className={pathname === item.href ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE}
               >
                 {item.label}
               </Link>
             </div>
           ))}
         </div>
-        <div className="pt-4 mt-4 border-t-2 border-[#1B2430]/10 shrink-0">
+        <div className="pt-4 mt-4 border-t border-white/10 shrink-0">
           <form action={logoutUser}>
             <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} w-full px-3 py-1.5 text-xs`}>Çıkış Yap</button>
           </form>
@@ -172,7 +190,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
 
       {/* Masaüstü: sol menü (açılıp kapanabilir) */}
       <aside
-        className={`hidden md:flex md:flex-col md:shrink-0 md:min-w-0 md:sticky md:top-0 md:h-screen md:overflow-hidden border-r-4 border-[#1B2430] bg-[#F4F1E8] py-5 ${hasMounted ? 'transition-[width,padding] duration-300 ease-in-out' : ''}`}
+        className={`hidden md:flex md:flex-col md:shrink-0 md:min-w-0 md:sticky md:top-0 md:h-screen md:overflow-hidden border-r border-white/10 bg-[#0a0a0a]/50 backdrop-blur-xl py-5 ${hasMounted ? 'transition-[width,padding] duration-300 ease-in-out' : ''}`}
         style={{
           width: collapsed ? 0 : SIDEBAR_WIDTH,
           flexBasis: collapsed ? 0 : SIDEBAR_WIDTH,
@@ -184,22 +202,24 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
       >
         <div className="flex flex-col h-full" style={{ width: SIDEBAR_WIDTH - 32 }}>
           <Link href="/dashboard" className="mb-6 block shrink-0">
-            <img src="/dersolab-logo-560.png" alt="DersoLab" className="h-8 w-auto" />
+            <div className="flex items-center gap-2 group">
+              <span className="font-black text-white text-xl tracking-tight">Derso<span className={`text-transparent bg-clip-text bg-gradient-to-r ${getLogoTextClass(role)}`}>Lab</span></span>
+            </div>
           </Link>
           <div className="flex-1 flex flex-col gap-2 overflow-y-auto gizli-kaydirma">
             {items.map((item, i) => (
               <div key={item.href}>
-                {i === dividerIndex && <div className="my-2 border-t-2 border-[#1B2430]/10" />}
+                {i === dividerIndex && <div className="my-2 border-t border-white/10" />}
                 <Link
                   href={item.href}
-                  className={pathname === item.href ? SIDEBAR_LINK_ACTIVE : SIDEBAR_LINK_INACTIVE}
+                  className={pathname === item.href ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE}
                 >
                   {item.label}
                 </Link>
               </div>
             ))}
           </div>
-          <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t-2 border-[#1B2430]/10 shrink-0">
+          <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t border-white/10 shrink-0">
             <NotificationBell initialNotifications={notifications} role={role} panelPosition="up" />
             <form action={logoutUser}>
               <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-3 py-1.5 text-xs`}>Çıkış Yap</button>
@@ -212,16 +232,13 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
         type="button"
         onClick={toggleCollapsed}
         aria-label={collapsed ? 'Menüyü aç' : 'Menüyü kapat'}
-        className={`hidden md:flex fixed top-24 z-30 h-10 w-10 items-center justify-center rounded-full border-2 border-[#1B2430] bg-white shadow-sm ${hasMounted ? 'transition-[left] duration-300 ease-in-out' : ''}`}
+        className={`hidden md:flex fixed top-24 z-30 h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-xl hover:bg-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)] ${hasMounted ? 'transition-[left] duration-300 ease-in-out' : ''}`}
         style={{ left: collapsed ? 12 : SIDEBAR_WIDTH - 20 }}
       >
-        {/* Kapalıyken tilki soluklaşıyor. Ayrı bir "uyuyan" görsel yok:
-            eski kapalı-göz dosyası da kırpıktı ve temizinden türetmek
-            gözleri bozuyordu; soluklaşma aynı geri bildirimi veriyor. */}
         <img
-          src="/fox-head.png"
+          src={mascotSrc}
           alt=""
-          className={`h-8 w-auto transition-opacity ${collapsed ? 'opacity-45' : 'opacity-100'}`}
+          className={`h-8 w-8 object-contain drop-shadow-md transition-opacity ${collapsed ? 'opacity-45' : 'opacity-100'}`}
         />
       </button>
     </>

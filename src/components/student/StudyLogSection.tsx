@@ -61,9 +61,9 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
   }
 
   return (
-    <div className="pt-2 border-t-2 border-[#1B2430]/10 space-y-2">
+    <div className="pt-2 border-t border-white/10 space-y-2">
       <div className="flex items-center justify-between">
-        <p className="font-bold text-[#1B2430]">Çalışma Notlarım</p>
+        <p className="font-bold text-slate-200">Çalışma Notlarım</p>
         <button
           type="button"
           onClick={() => setIsOpen((v) => !v)}
@@ -74,19 +74,19 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
       </div>
 
       {entries.length === 0 && !isOpen && (
-        <p className="text-sm font-semibold text-[#1B2430]/70">Bu gün için henüz bir çalışma notu yok.</p>
+        <p className="text-sm font-semibold text-slate-400">Bu gün için henüz bir çalışma notu yok.</p>
       )}
 
       {entries.length > 0 && (
         <div className="space-y-2">
           {entries.map((entry) => (
             <div key={entry.id} className="flex items-start justify-between gap-2 rounded-lg bg-[#DD7B3A]/10 border-2 border-[#DD7B3A] px-3 py-2">
-              <div className="text-sm text-[#1B2430]">
+              <div className="text-sm text-slate-200">
                 <p className="font-bold">
                   {entry.subject}
                   {entry.topic && <span className="font-semibold"> · {entry.topic}</span>}
                 </p>
-                <p className="font-semibold text-[#1B2430]/70">
+                <p className="font-semibold text-slate-400">
                   {[
                     entry.hours ? `${entry.hours} saat çalıştım` : null,
                     entry.questionsSolved ? `${entry.questionsSolved} soru çözdüm` : null,
@@ -98,7 +98,7 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
                 type="button"
                 onClick={() => handleDelete(entry.id)}
                 disabled={isPending}
-                className="text-[#1B2430]/55 hover:text-red-600 shrink-0"
+                className="text-slate-500 hover:text-red-600 shrink-0"
                 aria-label="Notu sil"
               >
                 <Trash2 className="h-4 w-4" />
@@ -109,65 +109,67 @@ export function StudyLogSection({ logDate, entries }: StudyLogSectionProps) {
       )}
 
       {isOpen && (
-        <form onSubmit={handleSubmit} className="space-y-3 rounded-lg bg-white border-2 border-[#1B2430] p-3">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-white/5 border border-white/10 p-4 mt-4">
           <div>
-            <label className="block text-xs font-bold text-[#1B2430] mb-1">Ders</label>
+            <label className="block text-xs font-bold text-slate-300 mb-1.5">Ders</label>
             <select
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+              className="w-full p-2.5 rounded-lg border border-white/10 bg-black/20 text-slate-200 text-sm outline-none focus:border-[#DD7B3A]/50 transition-colors"
             >
-              <option value="" disabled>Seç</option>
+              <option value="" disabled className="bg-slate-900 text-slate-200">Seç</option>
               {LESSON_SUBJECTS.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s} className="bg-slate-900 text-slate-200">{s}</option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#1B2430] mb-1">Konu (isteğe bağlı)</label>
+            <label className="block text-xs font-bold text-slate-300 mb-1.5">Konu (isteğe bağlı)</label>
             <input
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="ör. Türev"
-              className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+              className="w-full p-2.5 rounded-lg border border-white/10 bg-black/20 text-slate-200 placeholder:text-slate-500 text-sm outline-none focus:border-[#DD7B3A]/50 transition-colors"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-[#1B2430] mb-1">Kaç Saat Çalıştım</label>
+              <label className="block text-xs font-bold text-slate-300 mb-1.5">Kaç Saat Çalıştım</label>
               <input
                 type="number" min="0" step="0.5"
                 value={hours}
                 onChange={(e) => setHours(e.target.value)}
-                className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+                placeholder="ör. 2"
+                className="w-full p-2.5 rounded-lg border border-white/10 bg-black/20 text-slate-200 placeholder:text-slate-500 text-sm outline-none focus:border-[#DD7B3A]/50 transition-colors"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#1B2430] mb-1">Kaç Soru Çözdüm</label>
+              <label className="block text-xs font-bold text-slate-300 mb-1.5">Kaç Soru Çözdüm</label>
               <input
                 type="number" min="0"
                 value={questionsSolved}
                 onChange={(e) => setQuestionsSolved(e.target.value)}
-                className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+                placeholder="ör. 50"
+                className="w-full p-2.5 rounded-lg border border-white/10 bg-black/20 text-slate-200 placeholder:text-slate-500 text-sm outline-none focus:border-[#DD7B3A]/50 transition-colors"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#1B2430] mb-1">Kaynak (isteğe bağlı)</label>
+            <label className="block text-xs font-bold text-slate-300 mb-1.5">Kaynak (isteğe bağlı)</label>
             <input
               value={source}
               onChange={(e) => setSource(e.target.value)}
               placeholder="ör. 3D Yayınları TYT Matematik"
-              className="w-full p-2 rounded-lg border-2 border-[#1B2430] bg-white text-sm outline-none"
+              className="w-full p-2.5 rounded-lg border border-white/10 bg-black/20 text-slate-200 placeholder:text-slate-500 text-sm outline-none focus:border-[#DD7B3A]/50 transition-colors"
             />
           </div>
 
-          {error && <p className="text-xs font-bold text-red-600">{error}</p>}
+          {error && <p className="text-xs font-bold text-red-500">{error}</p>}
 
-          <button type="submit" disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-1.5 text-sm w-full`}>
+          <button type="submit" disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-2.5 text-sm w-full mt-2 font-bold`}>
             {isPending ? 'Kaydediliyor...' : 'Kaydet'}
           </button>
         </form>

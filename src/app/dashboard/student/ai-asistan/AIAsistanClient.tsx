@@ -36,8 +36,8 @@ const EXAMPLE_QUESTIONS: Record<string, string> = {
 function parseMarkdown(text: string): string {
   return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^## (.*?)$/gm, '<h2 class="text-base font-black text-[#1B2430] mt-4 mb-2">$1</h2>')
-    .replace(/^### (.*?)$/gm, '<h3 class="text-sm font-black text-[#1B2430] mt-3 mb-1">$1</h3>')
+    .replace(/^## (.*?)$/gm, '<h2 class="text-base font-black text-slate-200 mt-4 mb-2">$1</h2>')
+    .replace(/^### (.*?)$/gm, '<h3 class="text-sm font-black text-slate-200 mt-3 mb-1">$1</h3>')
     .replace(/^(\d+\.) (.*?)$/gm, '<div class="flex gap-2 my-1.5"><span class="font-black text-[#DD7B3A] shrink-0">$1</span><span>$2</span></div>')
     .replace(/^→ (.*?)$/gm, '<div class="ml-6 my-1 px-3 py-1.5 rounded-lg bg-[#1B2430] text-[#F4F1E8] text-sm font-mono">→ $1</div>')
     .replace(/\n/g, '<br/>')
@@ -152,20 +152,20 @@ export function AIAsistanClient() {
 
   return (
     <DashboardPageShell
-      title="🤖 AI Soru Asistanı"
+      title="AI Soru Asistanı"
       description="Gemini ile güçlendirilmiş adım adım çözüm asistanı"
     >
       <div className="max-w-2xl mx-auto space-y-6">
 
         {/* Powered by badges */}
         <div className="flex flex-wrap items-center gap-2.5">
-          <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-xs font-bold whitespace-nowrap">
+          <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-white/5 bg-white/5 text-slate-200 text-xs font-bold whitespace-nowrap">
             <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#4285F4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Google Gemini AI
           </span>
-          <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border-2 border-[#1B2430] bg-white text-[#1B2430] text-xs font-bold whitespace-nowrap">
+          <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-white/5 bg-white/5 text-slate-200 text-xs font-bold whitespace-nowrap">
             <span>♾️</span>
             <span>Sınırsız Soru Çözümü Aktif</span>
           </span>
@@ -175,7 +175,7 @@ export function AIAsistanClient() {
         <div className={`${PIXEL_CARD} p-6 space-y-4`}>
           {/* Branş seçimi */}
           <div>
-            <label className="block text-sm font-black text-[#1B2430] mb-2">
+            <label className="block text-sm font-black text-slate-200 mb-2">
               Branş Seç
             </label>
             <select
@@ -184,7 +184,7 @@ export function AIAsistanClient() {
               className={PIXEL_INPUT}
             >
               {SUBJECTS.map(s => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s} className="bg-slate-900 text-slate-200">{s}</option>
               ))}
             </select>
           </div>
@@ -192,14 +192,14 @@ export function AIAsistanClient() {
           {/* Soru girişi */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-black text-[#1B2430]">
+              <label className="block text-sm font-black text-slate-200">
                 Sorun
               </label>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-xs font-bold text-[#1B2430] hover:text-[#DD7B3A] flex items-center gap-1 cursor-pointer transition-colors"
+                  className="text-xs font-bold text-slate-200 hover:text-[#DD7B3A] flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Camera className="w-3.5 h-3.5" />
                   <span>Fotoğraf Yükle</span>
@@ -239,23 +239,23 @@ export function AIAsistanClient() {
 
             {/* Uploaded Image Preview */}
             {imageBase64 && (
-              <div className="mt-3 p-3 rounded-xl border-2 border-[#1B2430] bg-[#D5EAE3]/40 flex items-center justify-between gap-3">
+              <div className="mt-3 p-3 rounded-xl border border-white/5 bg-black/40 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={imageBase64}
                     alt="Soru görseli"
-                    className="w-14 h-14 object-cover rounded-lg border-2 border-[#1B2430] bg-white shrink-0"
+                    className="w-14 h-14 object-cover rounded-lg border border-white/5 bg-white shrink-0"
                   />
                   <div className="text-xs truncate">
-                    <p className="font-bold text-[#1B2430] truncate">{imageName ?? 'Soru Fotoğrafı'}</p>
-                    <p className="text-[11px] text-[#1B2430]/70">Görsel eklendi (Gemini analiz edecek)</p>
+                    <p className="font-bold text-slate-200 truncate">{imageName ?? 'Soru Fotoğrafı'}</p>
+                    <p className="text-[11px] text-slate-400">Görsel eklendi (Gemini analiz edecek)</p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="p-1.5 rounded-lg border-2 border-[#1B2430] bg-white hover:bg-red-50 text-red-600 transition-colors shrink-0"
+                  className="p-1.5 rounded-lg border border-white/5 bg-white hover:bg-red-50 text-red-600 transition-colors shrink-0"
                   title="Fotoğrafı kaldır"
                 >
                   <X className="w-4 h-4" />
@@ -263,7 +263,7 @@ export function AIAsistanClient() {
               </div>
             )}
 
-            <div className="flex items-center justify-between text-xs text-[#1B2430]/60 mt-1 font-semibold">
+            <div className="flex items-center justify-between text-xs text-slate-200/60 mt-1 font-semibold">
               <span className="flex items-center gap-1">
                 <ImageIcon className="w-3.5 h-3.5" />
                 Fotoğraf desteği: JPG, PNG, WEBP (Max 5MB)
@@ -295,7 +295,7 @@ export function AIAsistanClient() {
                 Gemini düşünüyor...
               </span>
             ) : (
-              '🤖 Gemini ile Çöz'
+              'Gemini ile Çöz'
             )}
           </button>
         </div>
@@ -303,18 +303,18 @@ export function AIAsistanClient() {
         {/* Çözüm */}
         {solution && (
           <div ref={solutionRef} className={`${PIXEL_CARD} p-6`}>
-            <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-[#1B2430]/10">
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-white/10">
               <span className="text-lg">✨</span>
-              <h2 className="font-black text-[#1B2430] text-base">Çözüm</h2>
+              <h2 className="font-black text-slate-200 text-base">Çözüm</h2>
               <span className={`${PIXEL_BADGE} ml-auto text-[10px]`}>
                 Google Gemini AI
               </span>
             </div>
             <div
-              className="text-[#1B2430] text-sm leading-relaxed font-medium space-y-1 prose-sm"
+              className="text-slate-200 text-sm leading-relaxed font-medium space-y-1 prose-sm"
               dangerouslySetInnerHTML={{ __html: parseMarkdown(solution) }}
             />
-            <div className="mt-6 pt-4 border-t-2 border-[#1B2430]/10 flex gap-3">
+            <div className="mt-6 pt-4 border-t border-white/10 flex gap-3">
               <button
                 type="button"
                 onClick={() => { setSolution(''); setQuestion(''); handleRemoveImage(); }}
@@ -333,9 +333,9 @@ export function AIAsistanClient() {
         )}
 
         {/* Bilgi notu */}
-        <div className="p-4 rounded-xl border-2 border-[#1B2430]/20 bg-[#F4F1E8]/50 text-xs text-[#1B2430]/80 font-semibold space-y-1">
+        <div className="p-4 rounded-xl border border-white/5/20 bg-white/[0.02]/50 text-xs text-slate-200/80 font-semibold space-y-1">
           <p>💡 <strong>DersoLab Branş Kapsamı:</strong> AI Soru Asistanı sadece platformumuzdaki resmi LGS ve YKS (Matematik, Fizik, Kimya, Biyoloji, Türkçe, Tarih vb.) ders soruları için eğitilmiştir.</p>
-          <p className="text-[#1B2430]/60">DersoLab öğrencisi olarak 7/24 sınırsız soru sorabilir ve adım adım çözümlerle sınavlara eksiksiz hazırlanabilirsiniz.</p>
+          <p className="text-slate-200/60">DersoLab öğrencisi olarak 7/24 sınırsız soru sorabilir ve adım adım çözümlerle sınavlara eksiksiz hazırlanabilirsiniz.</p>
         </div>
 
       </div>

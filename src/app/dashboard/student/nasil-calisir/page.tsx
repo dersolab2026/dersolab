@@ -41,8 +41,8 @@ export default async function StudentHowItWorksPage() {
       <div className="space-y-4">
         {ITEMS.map((item) => (
           <div key={item.question} className={`${PIXEL_CARD} p-5 space-y-1.5`}>
-            <p className="font-bold text-[#1B2430]">{item.question}</p>
-            <p className="text-sm font-semibold text-[#1B2430]/70">{item.answer}</p>
+            <p className="font-bold text-slate-200">{item.question}</p>
+            <p className="text-sm font-semibold text-slate-400">{item.answer}</p>
           </div>
         ))}
       </div>

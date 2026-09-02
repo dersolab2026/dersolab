@@ -101,8 +101,8 @@ export function AssignHomeworkDialog({ studentId, bookingId, triggerLabel = 'Öd
                   onClick={() => setTip(t.deger)}
                   aria-pressed={tip === t.deger}
                   title={t.aciklama}
-                  className={`rounded-lg border-2 border-[#1B2430] px-2.5 py-1 text-xs font-bold transition-all ${
-                    tip === t.deger ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white text-[#1B2430]'
+                  className={`rounded-lg border border-white/5 px-2.5 py-1 text-xs font-bold transition-all ${
+                    tip === t.deger ? 'bg-[#DD7B3A] text-[#F4F1E8]' : 'bg-white/5 text-slate-200'
                   }`}
                 >
                   {t.etiket}
@@ -120,7 +120,7 @@ export function AssignHomeworkDialog({ studentId, bookingId, triggerLabel = 'Öd
                   id="homework-resource"
                   value={kaynakId}
                   onChange={(e) => setKaynakId(e.target.value)}
-                  className="w-full rounded-lg border-2 border-[#1B2430] bg-white px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-white/5 bg-white px-3 py-2 text-sm"
                 >
                   <option value="">Seç…</option>
                   {kaynaklar.map((k) => (

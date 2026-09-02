@@ -10,7 +10,7 @@ export function IntroVideoPlayer({ videoUrl }: IntroVideoPlayerProps) {
   const parsed = parseVideoUrl(videoUrl)
 
   return (
-    <div className="aspect-video w-full overflow-hidden rounded-xl border-4 border-[#1B2430]">
+    <div className="aspect-video w-full overflow-hidden rounded-xl border border-white/10">
       {parsed ? (
         <iframe
           src={parsed.embedUrl}

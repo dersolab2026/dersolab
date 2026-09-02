@@ -43,11 +43,11 @@ export default async function InstructorSettingsPage({ searchParams }: Instructo
 
       <div className={`${PIXEL_CARD} p-5 space-y-4`}>
         <div>
-          <p className="font-bold text-[#1B2430]">Hesap Ayarları</p>
-          <p className="text-sm font-semibold text-[#1B2430]/70">Profilini dondurabilir ya da hesabını kapatabilirsin. Kapatınca kişisel bilgilerin kaldırılır; ders ve hakediş kayıtları kimliksizleştirilerek durur.</p>
+          <p className="font-bold text-slate-200">Hesap Ayarları</p>
+          <p className="text-sm font-semibold text-slate-400">Profilini dondurabilir ya da hesabını kapatabilirsin. Kapatınca kişisel bilgilerin kaldırılır; ders ve hakediş kayıtları kimliksizleştirilerek durur.</p>
         </div>
         <PauseProfileButton paused={instructorRow?.paused ?? false} />
-        <div className="pt-2 border-t-2 border-[#1B2430]/10">
+        <div className="pt-2 border-t border-white/10">
           <DeleteAccountButton />
         </div>
       </div>

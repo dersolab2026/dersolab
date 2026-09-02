@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { updateInstructorSubjects } from '@/actions/instructor-profile'
 import { useToast } from '@/components/ui/Toast'
 import { INSTRUCTOR_SUBJECT_OPTIONS } from '@/lib/constants'
-import { PIXEL_BADGE, PIXEL_BADGE_ACTIVE, PIXEL_BUTTON_PRIMARY } from '@/lib/theme'
+import { PIXEL_BADGE, INSTRUCTOR_BADGE_ACTIVE, INSTRUCTOR_BUTTON_PRIMARY } from '@/lib/theme'
 
 interface SubjectsEditorProps {
   initialSubjects: string[]
@@ -38,14 +38,14 @@ export function SubjectsEditor({ initialSubjects }: SubjectsEditorProps) {
             key={subject}
             type="button"
             onClick={() => toggle(subject)}
-            className={`${selected.includes(subject) ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE} cursor-pointer px-3 py-1`}
+            className={`${selected.includes(subject) ? INSTRUCTOR_BADGE_ACTIVE : PIXEL_BADGE} cursor-pointer px-3 py-1`}
           >
             {subject}
           </button>
         ))}
       </div>
       {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-      <button type="button" onClick={handleSave} disabled={isPending} className={`${PIXEL_BUTTON_PRIMARY} px-4 py-1.5 text-sm`}>
+      <button type="button" onClick={handleSave} disabled={isPending} className={`${INSTRUCTOR_BUTTON_PRIMARY} px-4 py-1.5 text-sm`}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Kaydet'}
       </button>
     </div>

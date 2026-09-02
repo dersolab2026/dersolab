@@ -45,8 +45,8 @@ export function GuardianLinkCard({ mevcutKod, veliler }: Props) {
   return (
     <div className={`${PIXEL_CARD} space-y-4 p-5`}>
       <div>
-        <p className="font-bold text-[#1B2430]">Veli Bağlantısı</p>
-        <p className="text-sm font-semibold text-[#1B2430]/70">
+        <p className="font-bold text-slate-200">Veli Bağlantısı</p>
+        <p className="text-sm font-semibold text-slate-400">
           Velin gelişimini takip edebilsin istiyorsan bir kod üret ve ona ver. Velin bu kodu
           kendi hesabına girer. Kod <strong>tek kullanımlıktır</strong> ve 7 gün geçerlidir.
         </p>
@@ -55,19 +55,19 @@ export function GuardianLinkCard({ mevcutKod, veliler }: Props) {
       {mevcutKod ? (
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <span className="flex-1 rounded-xl border-4 border-[#1B2430] bg-white px-4 py-2.5 font-mono text-lg font-bold tracking-widest text-[#1B2430]">
+            <span className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 font-mono text-lg font-bold tracking-widest text-slate-200">
               {mevcutKod.code}
             </span>
             <button
               type="button"
               onClick={() => kopyala(mevcutKod.code)}
               aria-label="Veli kodunu kopyala"
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-4 border-[#1B2430] bg-white shadow-[0_3px_0_#1B2430] active:translate-y-0.5 active:shadow-none transition-all"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white shadow-[0_3px_0_#1B2430] active:translate-y-0.5 active:shadow-none transition-all"
             >
-              {kopyalandi ? <Check className="h-5 w-5 text-[#3F6E66]" /> : <Copy className="h-5 w-5 text-[#1B2430]" />}
+              {kopyalandi ? <Check className="h-5 w-5 text-[#3F6E66]" /> : <Copy className="h-5 w-5 text-slate-200" />}
             </button>
           </div>
-          <p className="text-xs font-semibold text-[#1B2430]/70">
+          <p className="text-xs font-semibold text-slate-400">
             Son kullanma: {new Date(mevcutKod.expiresAt).toLocaleDateString('tr-TR', { dateStyle: 'medium' })}
           </p>
         </div>
@@ -78,16 +78,16 @@ export function GuardianLinkCard({ mevcutKod, veliler }: Props) {
       </button>
 
       {veliler.length > 0 && (
-        <div className="space-y-2 border-t-2 border-[#1B2430]/10 pt-3">
-          <p className="text-sm font-bold text-[#1B2430]">Hesabına bağlı veliler</p>
+        <div className="space-y-2 border-t border-white/10 pt-3">
+          <p className="text-sm font-bold text-slate-200">Hesabına bağlı veliler</p>
           <ul className="space-y-1">
             {veliler.map((v) => (
-              <li key={v.id} className="text-sm font-semibold text-[#1B2430]">
-                {v.personName} <span className="text-[#1B2430]/70">· {v.personEmail}</span>
+              <li key={v.id} className="text-sm font-semibold text-slate-200">
+                {v.personName} <span className="text-slate-400">· {v.personEmail}</span>
               </li>
             ))}
           </ul>
-          <p className="text-xs font-semibold text-[#1B2430]/70">
+          <p className="text-xs font-semibold text-slate-400">
             Bağlantıyı yalnızca velin kaldırabilir. Bir yanlışlık olduğunu düşünüyorsan bize yaz.
           </p>
         </div>

@@ -16,53 +16,53 @@ export default async function StudentHomeworkPage() {
   return (
     <DashboardPageShell title="Ödevlerim" description="Eğitmenlerin verdiği ödevler ve teslim durumları.">
       {homeworkList.length === 0 ? (
-        <p className="font-semibold text-[#1B2430]">Henüz ödev verilmedi.</p>
+        <p className="font-semibold text-slate-200">Henüz ödev verilmedi.</p>
       ) : (
         <div className="space-y-4">
           {homeworkList.map((hw) => (
             <div key={hw.id} className={`${PIXEL_CARD} p-5 space-y-2`}>
               <div className="flex items-center justify-between gap-3">
-                <p className="font-bold text-[#1B2430]">{hw.title}</p>
+                <p className="font-bold text-slate-200">{hw.title}</p>
                 <span className={hw.status === 'completed' ? PIXEL_BADGE_ACTIVE : PIXEL_BADGE}>
                   {hw.status === 'completed' ? 'Onaylandı' : hw.status === 'submitted' ? 'Teslim Edildi' : 'Bekliyor'}
                 </span>
               </div>
-              <p className="text-sm font-semibold text-[#1B2430]/70">
+              <p className="text-sm font-semibold text-slate-400">
                 {hw.instructorName}
                 {hw.homeworkType !== 'serbest' && (
-                  <span className="ml-2 inline-block rounded border-2 border-[#1B2430] bg-white px-1.5 text-xs font-bold text-[#1B2430]">
+                  <span className="ml-2 inline-block rounded border border-white/5 bg-white px-1.5 text-xs font-bold text-slate-200">
                     {ODEV_TIPI_ETIKET[hw.homeworkType]}
                   </span>
                 )}
               </p>
 
               {(hw.resourceLabel || hw.resourceRange) && (
-                <p className="text-sm font-bold text-[#1B2430]">
+                <p className="text-sm font-bold text-slate-200">
                   {hw.resourceLabel}
                   {hw.resourceLabel && hw.resourceRange ? ' · ' : ''}
                   {hw.resourceRange}
                 </p>
               )}
 
-              {hw.description && <p className="text-sm font-semibold text-[#1B2430]">{hw.description}</p>}
+              {hw.description && <p className="text-sm font-semibold text-slate-200">{hw.description}</p>}
 
               {/* Tipin asil isi burada: ogrenci ne yapacagini biliyor. */}
               {hw.homeworkType !== 'serbest' && hw.status !== 'completed' && (
-                <p className="rounded-lg border-2 border-[#1B2430] bg-[#F4F1E8] px-3 py-2 text-sm font-semibold text-[#1B2430]">
+                <p className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm font-semibold text-slate-200">
                   {odevTipi(hw.homeworkType).ogrenciYonergesi}
                 </p>
               )}
 
               {hw.instructorFeedback && (
-                <div className="rounded-lg border-2 border-[#1B2430] bg-white px-3 py-2">
-                  <p className="text-xs font-bold uppercase tracking-wide text-[#1B2430]/70">
+                <div className="rounded-lg border border-white/5 bg-white px-3 py-2">
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
                     Eğitmenin geri bildirimi
                   </p>
-                  <p className="text-sm font-semibold text-[#1B2430]">{hw.instructorFeedback}</p>
+                  <p className="text-sm font-semibold text-slate-200">{hw.instructorFeedback}</p>
                 </div>
               )}
               {hw.dueDate && (
-                <p className="text-xs font-semibold text-[#1B2430]/70">
+                <p className="text-xs font-semibold text-slate-400">
                   Son tarih: {new Date(hw.dueDate).toLocaleDateString('tr-TR', { dateStyle: 'long' })}
                 </p>
               )}

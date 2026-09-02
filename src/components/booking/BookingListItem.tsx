@@ -26,13 +26,13 @@ export function BookingListItem({ booking, materials }: BookingListItemProps) {
   return (
     <div className={`${PIXEL_CARD} p-4 flex flex-wrap items-center justify-between gap-3`}>
       <div>
-        <p className="font-bold text-[#1B2430]">
+        <p className="font-bold text-slate-200">
           {booking.instructorName}
           {booking.isTrial && <span className="ml-2 text-xs font-bold text-[#9C4A0C]">Tanışma Dersi</span>}
         </p>
-        <p className="text-sm font-semibold text-[#1B2430]/70">{formattedDate}</p>
+        <p className="text-sm font-semibold text-slate-400">{formattedDate}</p>
         {booking.status === 'cancelled' && (
-          <p className="text-xs font-semibold text-[#1B2430]/70">
+          <p className="text-xs font-semibold text-slate-400">
             {booking.creditRefunded ? 'Kredi iade edildi' : 'Kredi iade edilmedi'}
           </p>
         )}

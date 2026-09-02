@@ -16,7 +16,7 @@ export function PurchasePackageButton({ shopierProductUrl }: PurchasePackageButt
       <a href={shopierProductUrl} className={`${PIXEL_BUTTON_PRIMARY} block w-full py-2.5 text-center`}>
         Satın Al
       </a>
-      <p className="text-xs font-semibold text-[#1B2430]/70">
+      <p className="text-xs font-semibold text-slate-400">
         Ödeme Shopier üzerinden alınır. Kredilerin doğru hesaba tanımlanması için Shopier&apos;de bu DersoLab hesabınla aynı e-postayı kullan.
       </p>
     </div>

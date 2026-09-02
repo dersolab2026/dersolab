@@ -30,15 +30,15 @@ export function ChangePasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className={`${PIXEL_CARD} p-5 space-y-4`}>
-      <p className="font-bold text-[#1B2430]">Şifremi Değiştir</p>
+      <p className="font-bold text-slate-200">Şifremi Değiştir</p>
 
       <div>
-        <label className="block text-[#1B2430] font-bold mb-2">Yeni Şifre</label>
+        <label className="block text-slate-200 font-bold mb-2">Yeni Şifre</label>
         <PasswordInput required minLength={8} value={password} onChange={setPassword} placeholder="••••••••" />
       </div>
 
       <div>
-        <label className="block text-[#1B2430] font-bold mb-2">Yeni Şifre (Tekrar)</label>
+        <label className="block text-slate-200 font-bold mb-2">Yeni Şifre (Tekrar)</label>
         <PasswordInput required minLength={8} value={passwordConfirm} onChange={setPasswordConfirm} placeholder="••••••••" />
       </div>
 

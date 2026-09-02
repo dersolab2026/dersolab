@@ -33,7 +33,7 @@ export function UnlinkStudentButton({ studentId, studentName }: { studentId: str
       <button
         type="button"
         onClick={() => setOnay(true)}
-        className="text-xs font-bold text-[#1B2430]/70 hover:text-red-600"
+        className="text-xs font-bold text-slate-400 hover:text-red-600"
       >
         Bağlantıyı kaldır
       </button>
@@ -42,11 +42,11 @@ export function UnlinkStudentButton({ studentId, studentName }: { studentId: str
 
   return (
     <span className="flex items-center gap-2 text-xs font-bold">
-      <span className="text-[#1B2430]/70">Emin misiniz?</span>
+      <span className="text-slate-400">Emin misiniz?</span>
       <button type="button" onClick={kopar} disabled={isPending} className="text-red-600 hover:underline">
         {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Evet, kaldır'}
       </button>
-      <button type="button" onClick={() => setOnay(false)} className="text-[#1B2430]/70 hover:underline">
+      <button type="button" onClick={() => setOnay(false)} className="text-slate-400 hover:underline">
         Vazgeç
       </button>
     </span>

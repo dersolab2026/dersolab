@@ -27,9 +27,9 @@ export default async function NetlerimPage() {
       description="Girdiğin denemeleri kaydet, netlerinin nasıl değiştiğini takip et."
     >
       {/* Denemeler artik egitmene de gorunuyor (0083); ogrenci bunu bilsin. */}
-      <div className="flex items-start gap-2 rounded-xl border-4 border-[#1B2430] bg-[#F4F1E8] px-4 py-3">
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#1B2430]/70" />
-        <p className="text-sm font-semibold text-[#1B2430]/80">
+      <div className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+        <p className="text-sm font-semibold text-slate-200/80">
           Ders aldığın eğitmenler ve koçun deneme sonuçlarını görebilir.
         </p>
       </div>
@@ -40,7 +40,7 @@ export default async function NetlerimPage() {
 
       <ExamResultsSection entries={entries} />
 
-      <p className="text-xs font-semibold text-[#1B2430]/70">
+      <p className="text-xs font-semibold text-slate-400">
         Net hesabı kesindir (LGS&apos;de 3, diğer sınavlarda 4 yanlış bir doğruyu götürür).
         Puan ve yerleştirme değerleri <strong>tahminidir</strong>: ÖSYM&apos;nin gerçek puanı
         adayların standart sapmasına göre hesaplandığı için dışarıdan birebir hesaplanamaz.

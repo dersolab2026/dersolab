@@ -13,21 +13,16 @@ export default async function DemoLessonPage() {
     : { data: null }
 
   return (
-    <div className="min-h-screen w-full bg-[#D5EAE3] relative overflow-hidden">
-      <div
-        className="absolute inset-0 z-0 opacity-40 pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(45deg, #6FA89E 25%, transparent 25%), linear-gradient(-45deg, #6FA89E 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #6FA89E 75%), linear-gradient(-45deg, transparent 75%, #6FA89E 75%)',
-          backgroundSize: '40px 40px', backgroundPosition: '0 0, 0 20px, 20px -20px, -20px 0px'
-        }}
-      />
+    <div className="min-h-screen w-full bg-[#050505] relative overflow-hidden">
+      {/* Background glow effects */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-2xl space-y-6 p-5 py-10">
-        <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
-          <h1 className="font-sans text-2xl sm:text-3xl font-black text-[#1B2430] leading-snug">
+        <div className="bg-[#0a0a0a] rounded-[2rem] p-8 sm:p-10 border border-white/5 shadow-2xl text-center">
+          <h1 className="text-2xl sm:text-3xl font-black text-white leading-snug tracking-tight">
             Hoş Geldin Paketi
           </h1>
-          <p className="mt-2 font-sans font-semibold text-[#1B2430]">
+          <p className="mt-4 font-semibold text-slate-400">
             Ücretsiz tanışma dersi. Her öğrenciye bir kere, tamamen ücretsiz.
           </p>
         </div>
@@ -35,16 +30,16 @@ export default async function DemoLessonPage() {
         {!user ? (
           <>
             <DemoLessonEmailForm />
-            <p className="text-center text-sm font-semibold text-[#1B2430]">
+            <p className="text-center text-sm font-semibold text-slate-400">
               Zaten hesabın var mı?{' '}
-              <Link href="/login" className="text-[#9C4A0C] font-bold underline">Giriş Yap</Link>
+              <Link href="/login" className="text-blue-400 font-bold hover:text-blue-300 transition-colors underline">Giriş Yap</Link>
             </p>
           </>
         ) : userRecord?.role === 'student' ? (
           <DemoLessonRequestCard studentId={user.id} initialStatus={await getDemoLessonStatus(user.id)} />
         ) : (
-          <div className="bg-[#F4F1E8] rounded-2xl p-6 sm:p-8 border-4 border-[#1B2430] shadow-[0_8px_0_#1B2430]">
-            <p className="font-sans font-semibold text-[#1B2430]">
+          <div className="bg-[#0a0a0a] rounded-[2rem] p-8 sm:p-10 border border-white/5 shadow-2xl text-center">
+            <p className="font-semibold text-slate-400">
               Hoş Geldin Paketi sadece öğrenci hesapları için geçerli.
             </p>
           </div>

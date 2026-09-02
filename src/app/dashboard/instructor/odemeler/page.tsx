@@ -41,39 +41,39 @@ export default async function InstructorPayoutPage({ searchParams }: InstructorP
     <DashboardPageShell title="Ödemelerim" description="Ders ücretlerinin yatırılacağı hesap bilgilerini ve ders istatistiklerini yönet.">
       <div className={`${PIXEL_CARD} p-5 space-y-4`}>
         <div>
-          <p className="font-bold text-[#1B2430]">İstatistikler</p>
-          <p className="text-sm font-semibold text-[#1B2430]/70">
+          <p className="font-bold text-slate-200">İstatistikler</p>
+          <p className="text-sm font-semibold text-slate-400">
             Seçtiğin tarih aralığındaki {isGuidance ? 'seans' : 'ders'} sayısı.
           </p>
         </div>
 
         <form method="GET" className="flex flex-wrap items-end gap-3">
           <div className="flex flex-col gap-1">
-            <label htmlFor="from" className="text-xs font-bold text-[#1B2430]">Başlangıç</label>
+            <label htmlFor="from" className="text-xs font-bold text-slate-200">Başlangıç</label>
             <input
               id="from"
               type="date"
               name="from"
               defaultValue={formatDateInput(fromDate)}
-              className="p-2 rounded-lg border-2 border-[#1B2430] bg-white outline-none focus:ring-2 focus:ring-[#6FA89E]/50"
+              className="p-2 rounded-lg border border-white/5 bg-white/5 outline-none focus:ring-2 focus:ring-[#6FA89E]/50"
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="to" className="text-xs font-bold text-[#1B2430]">Bitiş</label>
+            <label htmlFor="to" className="text-xs font-bold text-slate-200">Bitiş</label>
             <input
               id="to"
               type="date"
               name="to"
               defaultValue={formatDateInput(toDate)}
-              className="p-2 rounded-lg border-2 border-[#1B2430] bg-white outline-none focus:ring-2 focus:ring-[#6FA89E]/50"
+              className="p-2 rounded-lg border border-white/5 bg-white/5 outline-none focus:ring-2 focus:ring-[#6FA89E]/50"
             />
           </div>
           <button type="submit" className={`${PIXEL_BUTTON_SECONDARY} px-4 py-2 text-sm`}>Filtrele</button>
         </form>
 
-        <div className="pt-2 border-t-2 border-[#1B2430]/10">
-          <p className="text-xs font-semibold text-[#1B2430]/70">{isGuidance ? 'Seans Sayısı' : 'Ders Sayısı'}</p>
-          <p className="text-2xl font-bold text-[#1B2430]">{stats.lessonCount}</p>
+        <div className="pt-2 border-t border-white/10">
+          <p className="text-xs font-semibold text-slate-400">{isGuidance ? 'Seans Sayısı' : 'Ders Sayısı'}</p>
+          <p className="text-2xl font-bold text-slate-200">{stats.lessonCount}</p>
         </div>
       </div>
 
