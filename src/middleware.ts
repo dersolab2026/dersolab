@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Basit In-Memory Rate Limiter (Edge üzerinde per-instance çalışır)
-    const ip = request.ip ?? request.headers.get('x-forwarded-for') ?? 'unknown'
+    const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
     if (checkRateLimit(ip)) {
       return new NextResponse('Too Many Requests', { status: 429 })
     }
