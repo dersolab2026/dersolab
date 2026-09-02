@@ -214,7 +214,7 @@ export function StudentLandingView({ examFilter, onExamFilterChange }: StudentLa
                   <Target className="w-6 h-6 text-rose-400" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4 leading-tight">Hedef Lise ve Üniversite Simülatörü</h3>
-                <p className="text-slate-400 font-light">Hayalindeki okula girmek için daha kaç net yapman gerektiğini anlık olarak hesapla.</p>
+                <p className="text-slate-400 font-light">Hayalindeki okula girmek için kaç net yapman gerektiğini anlık olarak hesapla.</p>
              </div>
           </div>
 
