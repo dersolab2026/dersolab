@@ -122,19 +122,19 @@ export function OnboardingTour({ role }: OnboardingTourProps) {
         next: 'İleri',
         skip: 'Turu Geç',
       }}
-      // @ts-ignore - react-joyride types are slightly mismatched
+      // @ts-ignore
       styles={{
         options: {
           arrowColor: 'rgba(15, 23, 42, 0.95)',
-          backgroundColor: 'rgba(15, 23, 42, 0.95)', // bg-slate-900
+          backgroundColor: 'rgba(15, 23, 42, 0.95)',
           overlayColor: 'rgba(0, 0, 0, 0.6)',
-          primaryColor: '#f59e0b', // amber-500
-          textColor: '#f1f5f9', // slate-100
+          primaryColor: '#f59e0b',
+          textColor: '#f1f5f9',
           width: 350,
           zIndex: 1000,
         },
         tooltipContainer: {
-          textAlign: 'left',
+          textAlign: 'left' as const,
           backdropFilter: 'blur(16px)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '0.75rem',
@@ -155,7 +155,7 @@ export function OnboardingTour({ role }: OnboardingTourProps) {
         buttonSkip: {
           color: '#94a3b8',
         }
-      }}
+      } as any}
     />
   )
 }
