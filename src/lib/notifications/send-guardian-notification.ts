@@ -1,3 +1,4 @@
+import { buildEmailHtml } from '@/lib/email-template'
 import { Resend } from 'resend'
 import { tamTarihSaat } from '@/lib/format/datetime'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -63,7 +64,7 @@ async function notifyGuardians(params: {
           from: 'DersoLab <bildirim@dersolab.com>',
           to: veli.email,
           subject: `${params.studentName} — ${params.title} - DersoLab`,
-          html: `<p>Merhaba ${veli.name},</p><p>${params.body}</p>`,
+        html: buildEmailHtml(`${params.studentName} — ${params.title}`, `<p>Merhaba ${veli.name},</p><p>${params.body}</p>`),
         })
       }
     } catch (err) {
@@ -103,9 +104,9 @@ export async function notifyBookingCreated(params: BookingNotificationParams) {
         from: 'DersoLab <bildirim@dersolab.com>',
         to: recipient.email,
         subject: 'Ders planlandı - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p>
+        html: buildEmailHtml('Ders planlandı', `<p>Merhaba ${recipient.name},</p>
           <p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihinde bir ders planlandı.</p>
-          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`,
+          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`),
       })
     } catch (err) {
       console.error('Bildirim e-postasi gonderilemedi:', err)
@@ -137,9 +138,9 @@ export async function notifyBookingCreated(params: BookingNotificationParams) {
         from: 'DersoLab <bildirim@dersolab.com>',
         to: instructor.email,
         subject: 'Yeni ders rezervasyonu - DersoLab',
-        html: `<p>Merhaba ${instructor.name},</p>
+        html: buildEmailHtml('Yeni ders rezervasyonu', `<p>Merhaba ${instructor.name},</p>
           <p><strong>${params.studentName}</strong> seninle <strong>${formattedDate}</strong> tarihinde bir ders planladı.</p>
-          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`,
+          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`),
       })
     } catch (err) {
       console.error('Bildirim e-postasi gonderilemedi:', err)
@@ -181,9 +182,9 @@ export async function notifyBookingCancelled(params: {
         from: 'DersoLab <bildirim@dersolab.com>',
         to: recipient.email,
         subject: 'Ders iptal edildi - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p>
+        html: buildEmailHtml('Ders iptal edildi', `<p>Merhaba ${recipient.name},</p>
           <p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihindeki ders iptal edildi.</p>
-          <p>${refundNote}</p>`,
+          <p>${refundNote}</p>`),
       })
     } catch (err) {
       console.error('Iptal bildirimi e-postasi gonderilemedi:', err)
@@ -207,8 +208,8 @@ export async function notifyBookingCancelled(params: {
           from: 'DersoLab <bildirim@dersolab.com>',
           to: instructor.email,
           subject: 'Ders iptal edildi - DersoLab',
-          html: `<p>Merhaba ${instructor.name},</p>
-            <p><strong>${params.studentName}</strong> ile <strong>${formattedDate}</strong> tarihindeki ders iptal edildi.</p>`,
+        html: buildEmailHtml('Ders iptal edildi', `<p>Merhaba ${instructor.name},</p>
+            <p><strong>${params.studentName}</strong> ile <strong>${formattedDate}</strong> tarihindeki ders iptal edildi.</p>`),
         })
       } catch (err) {
         console.error('Iptal bildirimi e-postasi gonderilemedi:', err)
@@ -235,7 +236,7 @@ export async function notifyLessonCompleted(params: {
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
         subject: 'Ders tamamlandı - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihindeki ders tamamlandı.</p>`,
+        html: buildEmailHtml('Ders tamamlandı', `<p>Merhaba ${recipient.name},</p><p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihindeki ders tamamlandı.</p>`),
       })
     } catch (err) { console.error('Ders tamamlandi bildirimi gonderilemedi:', err) }
   }
@@ -268,7 +269,7 @@ export async function notifyLessonMissed(params: {
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
         subject: 'Derse katılım sağlanmadı - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihindeki derse katılım sağlanmadı.</p>`,
+        html: buildEmailHtml('Derse katılım sağlanmadı', `<p>Merhaba ${recipient.name},</p><p><strong>${params.instructorName}</strong> ile <strong>${formattedDate}</strong> tarihindeki derse katılım sağlanmadı.</p>`),
       })
     } catch (err) { console.error('Ders kacirildi bildirimi gonderilemedi:', err) }
   }
@@ -308,9 +309,9 @@ export async function notifyBookingReminder(params: {
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
         subject: 'Dersin yaklaşıyor - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p>
+        html: buildEmailHtml('Dersin yaklaşıyor', `<p>Merhaba ${recipient.name},</p>
           <p><strong>${params.instructorName}</strong> ile <strong>${formattedTime}</strong> tarihindeki dersin yaklaşıyor.</p>
-          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`,
+          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`),
       })
     } catch (err) { console.error('Ders hatirlatma bildirimi gonderilemedi:', err) }
   }
@@ -327,9 +328,9 @@ export async function notifyBookingReminder(params: {
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>', to: instructor.email,
         subject: 'Dersin yaklaşıyor - DersoLab',
-        html: `<p>Merhaba ${instructor.name},</p>
+        html: buildEmailHtml('Dersin yaklaşıyor', `<p>Merhaba ${instructor.name},</p>
           <p><strong>${params.studentName}</strong> ile <strong>${formattedTime}</strong> tarihindeki dersin yaklaşıyor.</p>
-          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`,
+          <p>Ders linki: <a href="${params.meetLink}">${params.meetLink}</a></p>`),
       })
     } catch (err) { console.error('Ders hatirlatma bildirimi gonderilemedi:', err) }
   }
@@ -354,7 +355,7 @@ export async function notifyHomeworkAssigned(params: {
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
         subject: 'Yeni ödev verildi - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> ödevi verildi. Son tarih: ${dueDateText}.</p>`,
+        html: buildEmailHtml('Yeni ödev verildi', `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> ödevi verildi. Son tarih: ${dueDateText}.</p>`),
       })
     } catch (err) { console.error('Odev atama bildirimi gonderilemedi:', err) }
   }
@@ -375,7 +376,7 @@ export async function notifyHomeworkCompleted(params: { studentId: string; homew
       await resend.emails.send({
         from: 'DersoLab <bildirim@dersolab.com>', to: recipient.email,
         subject: 'Ödev onaylandı - DersoLab',
-        html: `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> ödevi eğitmen tarafından incelendi ve onaylandı.</p>`,
+        html: buildEmailHtml('Ödev onaylandı', `<p>Merhaba ${recipient.name},</p><p><strong>${params.title}</strong> ödevi eğitmen tarafından incelendi ve onaylandı.</p>`),
       })
     } catch (err) { console.error('Odev onay bildirimi gonderilemedi:', err) }
   }
@@ -397,7 +398,7 @@ export async function notifyHomeworkSubmitted(params: { homeworkId: string; inst
     await resend.emails.send({
       from: 'DersoLab <bildirim@dersolab.com>', to: instructor.email,
       subject: 'Ödev incelemeni bekliyor - DersoLab',
-      html: `<p>Merhaba ${instructor.name},</p><p><strong>${params.title}</strong> ödevi için öğrencin bir gönderim yaptı.</p>`,
+        html: buildEmailHtml('Ödev incelemeni bekliyor', `<p>Merhaba ${instructor.name},</p><p><strong>${params.title}</strong> ödevi için öğrencin bir gönderim yaptı.</p>`),
     })
   } catch (err) { console.error('Odev gonderim bildirimi gonderilemedi:', err) }
 }

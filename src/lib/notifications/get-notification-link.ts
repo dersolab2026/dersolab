@@ -1,3 +1,4 @@
+import { buildEmailHtml } from '@/lib/email-template'
 import type { UserRole } from '@/types'
 
 export type AdminNotificationCategory = 'general' | 'lessons' | 'homework' | 'packages'

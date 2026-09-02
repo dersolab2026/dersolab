@@ -1,3 +1,4 @@
+import { buildEmailHtml } from '@/lib/email-template'
 import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -30,9 +31,9 @@ export async function notifyDemoLessonRequested(studentName: string) {
         from: 'DersoLab <bildirim@dersolab.com>',
         to: u.email,
         subject: 'Yeni ücretsiz tanışma dersi talebi - DersoLab',
-        html: `<p>Merhaba ${u.name},</p>
+        html: buildEmailHtml('Yeni ücretsiz tanışma dersi talebi', `<p>Merhaba ${u.name},</p>
           <p><strong>${studentName}</strong> için ücretsiz tanışma dersi talebi var.</p>
-          <p>Uygunsan panelden kabul edip bir saat seçebilirsin. İlk kabul eden eğitmen dersi alır.</p>`,
+          <p>Uygunsan panelden kabul edip bir saat seçebilirsin. İlk kabul eden eğitmen dersi alır.</p>`),
       })
     } catch (err) {
       console.error('Demo ders talebi bildirimi gonderilemedi:', err)
