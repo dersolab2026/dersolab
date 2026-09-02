@@ -107,53 +107,54 @@ export function OnboardingTour({ role }: OnboardingTourProps) {
 
   return (
     <Joyride
-      callback={handleJoyrideCallback}
-      continuous
-      hideCloseButton
-      run={run}
-      scrollToFirstStep
-      showProgress
-      showSkipButton
-      steps={steps}
-      locale={{
-        back: 'Geri',
-        close: 'Kapat',
-        last: 'Bitir',
-        next: 'İleri',
-        skip: 'Turu Geç',
-      }}
-      // @ts-ignore
-      styles={{
-        options: {
-          arrowColor: 'rgba(15, 23, 42, 0.95)',
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          overlayColor: 'rgba(0, 0, 0, 0.6)',
-          primaryColor: '#f59e0b',
-          textColor: '#f1f5f9',
-          width: 350,
-          zIndex: 1000,
+      {...{
+        callback: handleJoyrideCallback,
+        continuous: true,
+        hideCloseButton: true,
+        run: run,
+        scrollToFirstStep: true,
+        showProgress: true,
+        showSkipButton: true,
+        steps: steps,
+        locale: {
+          back: 'Geri',
+          close: 'Kapat',
+          last: 'Bitir',
+          next: 'İleri',
+          skip: 'Turu Geç',
         },
-        tooltipContainer: {
-          textAlign: 'left' as const,
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '0.75rem',
-        },
-        tooltipContent: {
-          padding: '10px 0',
-        },
-        buttonNext: {
-          backgroundColor: '#f59e0b',
-          color: '#0f172a',
-          fontWeight: 'bold',
-          borderRadius: '0.5rem',
-        },
-        buttonBack: {
-          color: '#94a3b8',
-          marginRight: '8px',
-        },
-        buttonSkip: {
-          color: '#94a3b8',
+        styles: {
+          options: {
+            arrowColor: 'rgba(15, 23, 42, 0.95)',
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            overlayColor: 'rgba(0, 0, 0, 0.6)',
+            primaryColor: '#f59e0b',
+            textColor: '#f1f5f9',
+            width: 350,
+            zIndex: 1000,
+          },
+          tooltipContainer: {
+            textAlign: 'left' as const,
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '0.75rem',
+          },
+          tooltipContent: {
+            padding: '10px 0',
+          },
+          buttonNext: {
+            backgroundColor: '#f59e0b',
+            color: '#0f172a',
+            fontWeight: 'bold',
+            borderRadius: '0.5rem',
+          },
+          buttonBack: {
+            color: '#94a3b8',
+            marginRight: '8px',
+          },
+          buttonSkip: {
+            color: '#94a3b8',
+          }
         }
       } as any}
     />
