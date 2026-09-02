@@ -35,7 +35,7 @@ export default async function AdminUsersPage() {
         >
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b bg-muted/50">
+              <thead className="border-b border-white/10 bg-white/5">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
                   <th className="px-3 py-2 text-left font-medium">E-posta</th>
@@ -48,7 +48,7 @@ export default async function AdminUsersPage() {
               </thead>
               <tbody>
                 {instructors.map((u) => (
-                  <tr key={u.id} className="border-b last:border-0">
+                  <tr key={u.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
                     <td className="px-3 py-2">{u.name || '—'}</td>
                     <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
                     <td className="px-3 py-2">
@@ -81,7 +81,7 @@ export default async function AdminUsersPage() {
         >
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b bg-muted/50">
+              <thead className="border-b border-white/10 bg-white/5">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
                   <th className="px-3 py-2 text-left font-medium">E-posta</th>
@@ -94,7 +94,7 @@ export default async function AdminUsersPage() {
               </thead>
               <tbody>
                 {students.map((u) => (
-                  <tr key={u.id} className="border-b last:border-0">
+                  <tr key={u.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
                     <td className="px-3 py-2">{u.name || '—'}</td>
                     <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
                     <td className="px-3 py-2 text-muted-foreground">{u.gradeTrack ? u.gradeTrack.toUpperCase() : '—'}</td>
@@ -123,7 +123,7 @@ export default async function AdminUsersPage() {
         >
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b bg-muted/50">
+              <thead className="border-b border-white/10 bg-white/5">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
                   <th className="px-3 py-2 text-left font-medium">E-posta</th>
@@ -134,7 +134,7 @@ export default async function AdminUsersPage() {
               </thead>
               <tbody>
                 {parents.map((u) => (
-                  <tr key={u.id} className="border-b last:border-0">
+                  <tr key={u.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
                     <td className="px-3 py-2">{u.name || '—'}</td>
                     <td className="px-3 py-2 text-muted-foreground">{u.email}</td>
                     <td className="px-3 py-2">
