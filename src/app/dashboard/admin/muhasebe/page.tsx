@@ -28,7 +28,7 @@ export default async function AdminMuhasebePage() {
         <p className="text-sm text-muted-foreground">Kayıtlı eğitmen yok.</p>
       ) : (
         <div className="overflow-x-auto rounded-md border border-white/10">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[700px] text-sm">
             <thead className="border-b border-white/10 bg-white/5">
               <tr>
                 <th className="px-3 py-2 text-left font-medium">Eğitmen</th>

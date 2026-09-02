@@ -34,7 +34,7 @@ export default async function AdminUsersPage() {
           bosMesaj="Kayıtlı eğitmen yok."
         >
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[800px] text-sm">
               <thead className="border-b border-white/10 bg-white/5">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
@@ -80,7 +80,7 @@ export default async function AdminUsersPage() {
           bosMesaj="Kayıtlı öğrenci yok."
         >
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[800px] text-sm">
               <thead className="border-b border-white/10 bg-white/5">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>
@@ -122,7 +122,7 @@ export default async function AdminUsersPage() {
           bosMesaj="Kayıtlı veli yok."
         >
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[800px] text-sm">
               <thead className="border-b border-white/10 bg-white/5">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium">Ad Soyad</th>

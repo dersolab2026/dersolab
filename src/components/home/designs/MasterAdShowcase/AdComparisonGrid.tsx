@@ -44,7 +44,7 @@ export function AdComparisonGrid() {
 
       <div className="rounded-3xl bg-slate-900/80 border-2 border-white/15 overflow-hidden backdrop-blur-2xl shadow-2xl font-sans">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[600px] text-left text-sm">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.04]">
                 <th className="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-wider">
