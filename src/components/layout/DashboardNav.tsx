@@ -17,7 +17,7 @@ const SIDEBAR_LINK_BASE = 'block w-full px-3 py-2 rounded-lg border border-trans
 const SIDEBAR_LINK_INACTIVE = `${SIDEBAR_LINK_BASE} bg-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5`
 
 function getActiveLinkClass(role: string) {
-  if (role === 'instructor') {
+  if (role === 'instructor' || role === 'admin') {
     return `${SIDEBAR_LINK_BASE} bg-blue-500/20 border-blue-500/30 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]`
   }
   if (role === 'parent') {
@@ -27,7 +27,7 @@ function getActiveLinkClass(role: string) {
 }
 
 function getLogoTextClass(role: string) {
-  if (role === 'instructor') return 'from-blue-400 to-cyan-400'
+  if (role === 'instructor' || role === 'admin') return 'from-blue-400 to-cyan-400'
   if (role === 'parent') return 'from-emerald-400 to-teal-400'
   return 'from-orange-400 to-amber-400'
 }
