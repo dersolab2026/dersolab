@@ -7,10 +7,12 @@ import {
   ShieldCheck,
   Briefcase,
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import type { PersonaType } from '../../PersonaSwitcher'
-import { StudentLandingView } from './StudentLandingView'
-import { ParentLandingView } from './ParentLandingView'
-import { InstructorLandingView } from './InstructorLandingView'
+
+const StudentLandingView = dynamic(() => import('./StudentLandingView').then(mod => mod.StudentLandingView), { ssr: true })
+const ParentLandingView = dynamic(() => import('./ParentLandingView').then(mod => mod.ParentLandingView), { ssr: true })
+const InstructorLandingView = dynamic(() => import('./InstructorLandingView').then(mod => mod.InstructorLandingView), { ssr: true })
 
 function TikTokIcon({ className }: { className?: string }) {
   return (

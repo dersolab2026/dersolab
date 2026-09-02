@@ -51,10 +51,13 @@ export function StudentLandingView({ examFilter, onExamFilterChange }: StudentLa
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-8 flex items-center justify-center gap-3"
           >
-            <img 
+            <Image 
               src="/fox-head.png" 
               alt="DersoLab Avatar" 
-              className="w-10 h-10 object-contain drop-shadow-md" 
+              width={40}
+              height={40}
+              priority
+              className="object-contain drop-shadow-md" 
             />
             <span className="text-3xl font-black tracking-tight text-white">
               Derso<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-rose-400">Lab</span>

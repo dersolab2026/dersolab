@@ -79,9 +79,12 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="flex items-center justify-center gap-3"
           >
-            <img 
+            <Image 
               src="/fox-head.png" 
               alt="DersoLab Avatar" 
+              width={48}
+              height={48}
+              priority
               className="w-12 h-12 sm:w-10 sm:h-10 object-contain drop-shadow-md" 
             />
             <span className="text-3xl sm:text-4xl font-black tracking-tight text-white">
