@@ -131,7 +131,7 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
           {/* Social Links */}
           <div className="flex items-center gap-4">
             <a
-              href="https://instagram.com/dersolab"
+              href="https://www.instagram.com/dersolabegitim/"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-amber-400 hover:bg-white/[0.08] hover:border-amber-400/30 transition-all duration-300"
@@ -140,7 +140,7 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
               <Instagram className="w-5 h-5" />
             </a>
             <a
-              href="https://tiktok.com/@dersolab"
+              href="https://www.tiktok.com/@dersolabegitim"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-amber-400 hover:bg-white/[0.08] hover:border-amber-400/30 transition-all duration-300"
