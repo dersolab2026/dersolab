@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { TERMS_VERSION } from '@/lib/legal'
 import { gecerliRolMu } from '@/lib/auth/account-type'
