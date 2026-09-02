@@ -6,11 +6,20 @@ import {
   GraduationCap,
   ShieldCheck,
   Briefcase,
+  Instagram,
 } from 'lucide-react'
 import type { PersonaType } from '../../PersonaSwitcher'
 import { StudentLandingView } from './StudentLandingView'
 import { ParentLandingView } from './ParentLandingView'
 import { InstructorLandingView } from './InstructorLandingView'
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+    </svg>
+  )
+}
 
 interface PersonaDedicatedViewProps {
   initialPersona?: PersonaType
@@ -118,13 +127,35 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
         )}
 
         {/* ── FOOTER SIGNATURE ── */}
-        <footer className="border-t border-white/[0.08] pt-12 pb-8 text-center text-xs text-slate-500 space-y-3">
+        <footer className="border-t border-white/[0.08] pt-12 pb-8 flex flex-col items-center justify-center space-y-6 text-xs text-slate-500">
+          {/* Social Links */}
+          <div className="flex items-center gap-4">
+            <a
+              href="https://instagram.com/dersolab"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-amber-400 hover:bg-white/[0.08] hover:border-amber-400/30 transition-all duration-300"
+              aria-label="Instagram"
+            >
+              <Instagram className="w-5 h-5" />
+            </a>
+            <a
+              href="https://tiktok.com/@dersolab"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-amber-400 hover:bg-white/[0.08] hover:border-amber-400/30 transition-all duration-300"
+              aria-label="TikTok"
+            >
+              <TikTokIcon className="w-5 h-5" />
+            </a>
+          </div>
+
           <div className="flex items-center justify-center gap-6 text-slate-400 font-semibold">
             <Link href="/about" className="hover:text-amber-400 transition-colors">Hakkımızda</Link>
             <Link href="/privacy" className="hover:text-amber-400 transition-colors">Gizlilik Politikası</Link>
             <Link href="/terms" className="hover:text-amber-400 transition-colors">Kullanım Şartları</Link>
           </div>
-          <p>© 2026 DersoLab · Butik Online Akademi ve Koçluk Sistemi. Tüm hakları saklıdır.</p>
+          <p className="opacity-80">© 2026 DersoLab · Butik Online Akademi ve Koçluk Sistemi. Tüm hakları saklıdır.</p>
         </footer>
       </div>
     </div>
