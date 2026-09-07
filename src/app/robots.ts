@@ -19,7 +19,19 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/dashboard/', '/api/', '/auth/', '/hesap-turu', '/terms/accept'],
+      disallow: [
+        '/dashboard/',
+        '/api/',
+        '/auth/',
+        '/hesap-turu',
+        '/terms/accept',
+        '/instructors',
+        '/kocluk',
+        '/tasarim',
+        '/tasarim2',
+        '/tasarim3',
+        '/reset-password',
+      ],
     },
     sitemap: `${TABAN}/sitemap.xml`,
   }

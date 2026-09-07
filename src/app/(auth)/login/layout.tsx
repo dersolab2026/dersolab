@@ -9,6 +9,13 @@ import type { ReactNode } from 'react'
 export const metadata = {
   title: 'Giriş Yap',
   description: 'DersoLab hesabına giriş yap.',
+  robots: {
+    index: false,
+    follow: true,
+  },
+  alternates: {
+    canonical: '/login',
+  },
 }
 
 export default function Layout({ children }: { children: ReactNode }) {

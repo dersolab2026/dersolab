@@ -9,6 +9,10 @@ import type { ReactNode } from 'react'
 export const metadata = {
   title: 'Yeni Şifre Belirle',
   description: 'Hesabın için yeni bir şifre belirle.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default function Layout({ children }: { children: ReactNode }) {

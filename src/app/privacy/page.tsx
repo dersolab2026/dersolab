@@ -1,5 +1,10 @@
-export const metadata = {
-  title: 'Gizlilik Politikası - DersoLab',
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Gizlilik Politikası',
+  alternates: {
+    canonical: '/privacy',
+  },
 }
 
 export default function PrivacyPage() {

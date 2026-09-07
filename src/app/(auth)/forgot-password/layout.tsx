@@ -9,6 +9,10 @@ import type { ReactNode } from 'react'
 export const metadata = {
   title: 'Şifremi Unuttum',
   description: 'Şifreni sıfırlamak için e-posta adresini gir.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default function Layout({ children }: { children: ReactNode }) {

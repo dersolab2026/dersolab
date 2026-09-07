@@ -1,5 +1,11 @@
-export const metadata = {
-  title: 'Hakkımızda - DersoLab',
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Hakkımızda',
+  description: 'DersoLab hakkında bilgi edinin. Onaylı eğitmenlerle kaliteli online özel ders ve koçluk platformu.',
+  alternates: {
+    canonical: '/hakkimizda',
+  },
 }
 
 export default function AboutPage() {

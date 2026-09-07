@@ -1,5 +1,10 @@
-export const metadata = {
-  title: 'Kullanım Şartları - DersoLab',
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Kullanım Şartları',
+  alternates: {
+    canonical: '/terms',
+  },
 }
 
 export default function TermsPage() {

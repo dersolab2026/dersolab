@@ -1,4 +1,11 @@
+import type { Metadata } from 'next'
 import { PersonaDedicatedView } from '@/components/home/designs/PersonaDedicated/PersonaDedicatedView'
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: '/',
+  },
+}
 
 export default function HomePage() {
   return (

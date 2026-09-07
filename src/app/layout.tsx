@@ -49,9 +49,6 @@ export const metadata = {
     description:
       'Onaylı eğitmenlerle bire bir online ders, deneme analizi ve koçluk. Aylık abonelik yok, kullanmadığın kredi yanmaz.',
   },
-  alternates: {
-    canonical: '/',
-  },
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

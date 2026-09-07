@@ -1,8 +1,17 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getDemoLessonStatus } from '@/lib/demo-lessons/get-demo-lesson-status'
 import { DemoLessonRequestCard } from '@/components/demo-lessons/DemoLessonRequestCard'
 import { DemoLessonEmailForm } from '@/components/demo-lessons/DemoLessonEmailForm'
+
+export const metadata: Metadata = {
+  title: 'Hoş Geldin Paketi',
+  description: 'Ücretsiz tanışma dersi. Her öğrenciye bir kere, tamamen ücretsiz.',
+  alternates: {
+    canonical: '/demo-ders',
+  },
+}
 
 export default async function DemoLessonPage() {
   const supabase = await createClient()
