@@ -162,7 +162,7 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
           </div>
 
           <div className="flex items-center justify-center gap-6 text-slate-400 font-semibold">
-            <Link href="/about" className="hover:text-amber-400 transition-colors">Hakkımızda</Link>
+            <Link href="/hakkimizda" className="hover:text-amber-400 transition-colors">Hakkımızda</Link>
             <Link href="/privacy" className="hover:text-amber-400 transition-colors">Gizlilik Politikası</Link>
             <Link href="/terms" className="hover:text-amber-400 transition-colors">Kullanım Şartları</Link>
           </div>

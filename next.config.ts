@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   async redirects() {
     return [
+      // Eski /about baglantisi /hakkimizda sayfasina yonlendirilsin
+      { source: '/about', destination: '/hakkimizda', permanent: true },
       // Rehberlik sayfasi Kocluk olarak yeniden adlandirildi; eski baglantilar kirilmasin.
       { source: '/rehberlik', destination: '/kocluk', permanent: true },
       // 1 haftalik ucretsiz kocluk urun karariyla kaldirildi
