@@ -85,7 +85,7 @@ export function BiyolojiLabView() {
           </div>
 
           {/* Module Selector Tabs */}
-          <div className="mt-8 flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
+          <div className="mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3 border-t border-slate-800/60 pt-5">
             {TABS.map((tab) => {
               const Icon = tab.icon
               const isActive = activeTab === tab.id
@@ -93,19 +93,19 @@ export function BiyolojiLabView() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all border ${
+                  className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400/40 shadow-lg shadow-emerald-500/25'
-                      : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                      ? 'bg-slate-800 text-white border border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)] ring-1 ring-emerald-500/20'
+                      : 'bg-slate-900/60 border border-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 hover:border-slate-700'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-emerald-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
                   <span>{tab.label}</span>
                   <span
-                    className={`px-1.5 py-0.5 text-[10px] rounded-md font-bold uppercase tracking-wider ${
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
                       isActive
-                        ? 'bg-white/20 text-white'
-                        : 'bg-slate-800 text-slate-400'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : 'bg-slate-800/80 text-slate-400'
                     }`}
                   >
                     {tab.badge}
