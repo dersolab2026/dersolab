@@ -15,6 +15,8 @@ import {
   Layers,
 } from 'lucide-react'
 
+import { TURKEY_CITIES, TURKEY_MAP_VIEWBOX, TurkeyCity } from './turkeyMapData'
+
 type GeoLayer = 'climate' | 'faults' | 'winds'
 
 interface RegionInfo {
@@ -83,6 +85,7 @@ const WINDS_DATA = [
 export function GeoAtlas() {
   const [activeLayer, setActiveLayer] = useState<GeoLayer>('climate')
   const [selectedClimate, setSelectedClimate] = useState<RegionInfo>(CLIMATE_REGIONS[0])
+  const [hoveredCity, setHoveredCity] = useState<TurkeyCity | null>(null)
 
   return (
     <div className="space-y-6">
@@ -155,183 +158,251 @@ export function GeoAtlas() {
           </div>
 
           {/* SVG Map Canvas */}
-          <div className="relative w-full h-[360px] bg-slate-950/90 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-center p-4">
+          <div className="relative w-full h-[400px] sm:h-[480px] bg-slate-950/95 rounded-2xl border border-slate-800/80 overflow-hidden flex items-center justify-center p-2 sm:p-4 shadow-inner">
             
-            {/* Background Map Grid */}
-            <svg viewBox="0 0 800 420" className="w-full h-full">
-              {/* Sea backgrounds */}
-              <rect x="0" y="0" width="800" height="420" fill="#090d16" />
-              
-              {/* Turkey Silhouette Stylized Polyline */}
-              <path
-                d="M 60,140 Q 140,80 240,90 Q 360,70 520,75 Q 680,60 740,110 L 760,200 L 710,290 L 590,320 L 460,330 L 320,340 L 220,330 L 160,290 L 80,260 L 50,190 Z"
-                fill="#161f30"
-                stroke="#334155"
-                strokeWidth="2"
-              />
+            {/* Active Hover Tooltip */}
+            {hoveredCity && (
+              <div className="absolute top-3 left-3 z-20 px-3.5 py-1.5 rounded-xl bg-slate-900/95 border border-slate-700/80 backdrop-blur-md shadow-2xl flex items-center gap-2 pointer-events-none">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                <span className="text-xs font-black text-white">
+                  {hoveredCity.name} <span className="text-slate-400 font-mono">({hoveredCity.plate})</span>
+                </span>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                    hoveredCity.climate === 'karadeniz'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      : hoveredCity.climate === 'akdeniz'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      : hoveredCity.climate === 'sert-karasal'
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                      : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                  }`}
+                >
+                  {hoveredCity.climate === 'karadeniz' && 'Karadeniz İklimi'}
+                  {hoveredCity.climate === 'akdeniz' && 'Akdeniz İklimi'}
+                  {hoveredCity.climate === 'karasal' && 'Karasal İklim'}
+                  {hoveredCity.climate === 'sert-karasal' && 'Sert Karasal'}
+                </span>
+              </div>
+            )}
 
-              {/* CLIMATE LAYER */}
-              {activeLayer === 'climate' && (
-                <>
-                  {/* Karadeniz Strip (Top) */}
-                  <path
-                    d="M 120,110 Q 240,90 380,82 Q 540,78 720,110 L 700,145 Q 520,110 380,115 Q 240,120 130,135 Z"
-                    fill="rgba(16, 185, 129, 0.45)"
-                    stroke="#10b981"
-                    strokeWidth="1.5"
-                    className="cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => setSelectedClimate(CLIMATE_REGIONS[0])}
-                  />
-                  <text x="420" y="105" fill="#34d399" fontSize="12" fontWeight="bold" textAnchor="middle">
-                    Karadeniz İklimi
-                  </text>
+            {/* High Precision Turkey Map Canvas */}
+            <svg viewBox={TURKEY_MAP_VIEWBOX} className="w-full h-full select-none">
+              <defs>
+                {/* Arrow markers for winds */}
+                <marker id="coldArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+                </marker>
+                <marker id="warmArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#f43f5e" />
+                </marker>
+              </defs>
 
-                  {/* Akdeniz & Ege Strip (South & West) */}
-                  <path
-                    d="M 70,160 L 120,160 Q 150,260 220,300 L 340,320 L 460,310 L 580,300 L 580,330 L 460,340 L 320,350 L 210,340 L 140,300 L 70,250 Z"
-                    fill="rgba(245, 158, 11, 0.4)"
-                    stroke="#f59e0b"
-                    strokeWidth="1.5"
-                    className="cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => setSelectedClimate(CLIMATE_REGIONS[1])}
-                  />
-                  <text x="360" y="335" fill="#fbbf24" fontSize="12" fontWeight="bold" textAnchor="middle">
-                    Akdeniz İklimi
-                  </text>
+              {/* Water background */}
+              <rect x="0" y="0" width="1008" height="528" fill="#080c14" />
 
-                  {/* Erzurum-Kars (North East) */}
-                  <polygon
-                    points="590,130 730,110 745,190 620,195"
-                    fill="rgba(6, 182, 212, 0.4)"
-                    stroke="#06b6d4"
-                    strokeWidth="1.5"
-                    className="cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => setSelectedClimate(CLIMATE_REGIONS[3])}
-                  />
-                  <text x="660" y="155" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">
-                    Sert Karasal
-                  </text>
+              {/* All 81 Provinces of Turkey */}
+              <g id="turkey-provinces">
+                {TURKEY_CITIES.map((city) => {
+                  let fillColor = '#1e293b'
+                  let strokeColor = '#334155'
+                  let strokeWidth = '0.7'
+                  let opacity = 0.9
 
-                  {/* Karasal / Step (Center & Southeast) */}
-                  <path
-                    d="M 160,160 Q 320,140 500,140 L 600,200 L 700,210 L 690,280 L 580,280 L 460,290 L 300,280 L 180,240 Z"
-                    fill="rgba(202, 138, 4, 0.35)"
-                    stroke="#ca8a04"
-                    strokeWidth="1.5"
-                    className="cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => setSelectedClimate(CLIMATE_REGIONS[2])}
-                  />
-                  <text x="370" y="210" fill="#facc15" fontSize="13" fontWeight="bold" textAnchor="middle">
-                    İç & Güneydoğu Karasal (Step)
-                  </text>
-                </>
-              )}
+                  if (activeLayer === 'climate') {
+                    if (city.climate === 'karadeniz') {
+                      fillColor = selectedClimate.id === 'karadeniz' ? '#059669' : '#064e3b'
+                      strokeColor = selectedClimate.id === 'karadeniz' ? '#34d399' : '#10b981'
+                      opacity = selectedClimate.id === 'karadeniz' ? 0.95 : 0.6
+                    } else if (city.climate === 'akdeniz') {
+                      fillColor = selectedClimate.id === 'akdeniz' ? '#d97706' : '#78350f'
+                      strokeColor = selectedClimate.id === 'akdeniz' ? '#fbbf24' : '#f59e0b'
+                      opacity = selectedClimate.id === 'akdeniz' ? 0.95 : 0.6
+                    } else if (city.climate === 'karasal') {
+                      fillColor = selectedClimate.id === 'karasal' ? '#ca8a04' : '#713f12'
+                      strokeColor = selectedClimate.id === 'karasal' ? '#fde047' : '#eab308'
+                      opacity = selectedClimate.id === 'karasal' ? 0.95 : 0.6
+                    } else if (city.climate === 'sert-karasal') {
+                      fillColor = selectedClimate.id === 'sert-karasal' ? '#0891b2' : '#164e63'
+                      strokeColor = selectedClimate.id === 'sert-karasal' ? '#38bdf8' : '#06b6d4'
+                      opacity = selectedClimate.id === 'sert-karasal' ? 0.95 : 0.6
+                    }
+                  } else if (activeLayer === 'faults') {
+                    if (city.fault === 'kaf') {
+                      fillColor = '#dc2626'
+                      strokeColor = '#f87171'
+                      opacity = 0.85
+                    } else if (city.fault === 'daf') {
+                      fillColor = '#ea580c'
+                      strokeColor = '#fb923c'
+                      opacity = 0.85
+                    } else if (city.fault === 'baf') {
+                      fillColor = '#d97706'
+                      strokeColor = '#facc15'
+                      opacity = 0.85
+                    } else {
+                      fillColor = '#1e293b'
+                      strokeColor = '#334155'
+                      opacity = 0.55
+                    }
+                  } else if (activeLayer === 'winds') {
+                    fillColor = '#161f30'
+                    strokeColor = '#293548'
+                    opacity = 0.85
+                  }
 
-              {/* WINDS LAYER (KAYIP SAKAL) */}
+                  const isHovered = hoveredCity?.id === city.id
+
+                  return (
+                    <g
+                      key={city.id}
+                      className="cursor-pointer transition-all duration-150"
+                      onMouseEnter={() => setHoveredCity(city)}
+                      onMouseLeave={() => setHoveredCity(null)}
+                      onClick={() => {
+                        if (activeLayer === 'climate') {
+                          const matched = CLIMATE_REGIONS.find((c) => c.id === city.climate)
+                          if (matched) setSelectedClimate(matched)
+                        }
+                      }}
+                    >
+                      {city.paths.map((p, pIdx) => (
+                        <path
+                          key={pIdx}
+                          d={p}
+                          fill={isHovered ? '#38bdf8' : fillColor}
+                          stroke={isHovered ? '#ffffff' : strokeColor}
+                          strokeWidth={isHovered ? '2' : strokeWidth}
+                          fillOpacity={isHovered ? 1 : opacity}
+                        />
+                      ))}
+                    </g>
+                  )
+                })}
+              </g>
+
+              {/* ── OVERLAYS: WINDS (KAYIP SAKAL) ── */}
               {activeLayer === 'winds' && (
                 <>
                   {/* Karayel Arrow (NW) */}
                   <g className="animate-pulse">
-                    <line x1="80" y1="50" x2="160" y2="120" stroke="#38bdf8" strokeWidth="3" markerEnd="url(#arrow)" />
-                    <text x="70" y="45" fill="#38bdf8" fontSize="12" fontWeight="bold">Karayel (Soğuk)</text>
+                    <line x1="70" y1="30" x2="160" y2="105" stroke="#38bdf8" strokeWidth="3.5" markerEnd="url(#coldArrow)" />
+                    <rect x="35" y="10" width="115" height="22" rx="6" fill="#090d16" stroke="#38bdf8" strokeWidth="1" />
+                    <text x="92" y="25" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">Karayel (Soğuk)</text>
                   </g>
 
                   {/* Yıldız Arrow (N) */}
                   <g className="animate-pulse">
-                    <line x1="400" y1="20" x2="400" y2="80" stroke="#38bdf8" strokeWidth="3" />
-                    <text x="400" y="16" fill="#38bdf8" fontSize="12" fontWeight="bold" textAnchor="middle">Yıldız (Soğuk)</text>
+                    <line x1="500" y1="10" x2="500" y2="70" stroke="#38bdf8" strokeWidth="3.5" markerEnd="url(#coldArrow)" />
+                    <rect x="450" y="2" width="100" height="22" rx="6" fill="#090d16" stroke="#38bdf8" strokeWidth="1" />
+                    <text x="500" y="17" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">Yıldız (Soğuk)</text>
                   </g>
 
                   {/* Poyraz Arrow (NE) */}
                   <g className="animate-pulse">
-                    <line x1="720" y1="40" x2="650" y2="100" stroke="#38bdf8" strokeWidth="3" />
-                    <text x="740" y="35" fill="#38bdf8" fontSize="12" fontWeight="bold">Poyraz (Ayaz)</text>
+                    <line x1="940" y1="30" x2="850" y2="95" stroke="#38bdf8" strokeWidth="3.5" markerEnd="url(#coldArrow)" />
+                    <rect x="875" y="10" width="115" height="22" rx="6" fill="#090d16" stroke="#38bdf8" strokeWidth="1" />
+                    <text x="932" y="25" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">Poyraz (Ayaz)</text>
                   </g>
 
                   {/* Lodos Arrow (SW) */}
                   <g className="animate-pulse">
-                    <line x1="60" y1="360" x2="140" y2="290" stroke="#f43f5e" strokeWidth="3" />
-                    <text x="40" y="380" fill="#f43f5e" fontSize="12" fontWeight="bold">Lodos (Ilık/Nemli)</text>
+                    <line x1="60" y1="440" x2="150" y2="360" stroke="#f43f5e" strokeWidth="3.5" markerEnd="url(#warmArrow)" />
+                    <rect x="20" y="445" width="130" height="22" rx="6" fill="#090d16" stroke="#f43f5e" strokeWidth="1" />
+                    <text x="85" y="460" fill="#f43f5e" fontSize="11" fontWeight="bold" textAnchor="middle">Lodos (Ilık/Nemli)</text>
                   </g>
 
                   {/* Kıble Arrow (S) */}
                   <g className="animate-pulse">
-                    <line x1="400" y1="400" x2="400" y2="340" stroke="#f43f5e" strokeWidth="3" />
-                    <text x="400" y="415" fill="#f43f5e" fontSize="12" fontWeight="bold" textAnchor="middle">Kıble (Sıcak)</text>
+                    <line x1="560" y1="510" x2="560" y2="445" stroke="#f43f5e" strokeWidth="3.5" markerEnd="url(#warmArrow)" />
+                    <rect x="515" y="500" width="90" height="22" rx="6" fill="#090d16" stroke="#f43f5e" strokeWidth="1" />
+                    <text x="560" y="515" fill="#f43f5e" fontSize="11" fontWeight="bold" textAnchor="middle">Kıble (Sıcak)</text>
                   </g>
 
                   {/* Samyeli Arrow (SE) */}
                   <g className="animate-pulse">
-                    <line x1="720" y1="380" x2="630" y2="300" stroke="#f43f5e" strokeWidth="3" />
-                    <text x="690" y="400" fill="#f43f5e" fontSize="12" fontWeight="bold">Samyeli (Kurak)</text>
+                    <line x1="930" y1="480" x2="830" y2="410" stroke="#f43f5e" strokeWidth="3.5" markerEnd="url(#warmArrow)" />
+                    <rect x="855" y="480" width="135" height="22" rx="6" fill="#090d16" stroke="#f43f5e" strokeWidth="1" />
+                    <text x="922" y="495" fill="#f43f5e" fontSize="11" fontWeight="bold" textAnchor="middle">Samyeli (Kurak/Çöl)</text>
                   </g>
 
-                  {/* Center Formula Box */}
-                  <rect x="280" y="170" width="240" height="60" rx="10" fill="#0f172a" stroke="#f59e0b" strokeWidth="2" />
-                  <text x="400" y="195" fill="#fbbf24" fontSize="14" fontWeight="bold" textAnchor="middle">
-                    KAYIP SAKAL Şifresi
+                  {/* Center Mnemonic Formula Box */}
+                  <rect x="375" y="200" width="260" height="65" rx="14" fill="#0b1120" stroke="#f59e0b" strokeWidth="2" opacity="0.95" />
+                  <text x="505" y="225" fill="#fbbf24" fontSize="14" fontWeight="900" textAnchor="middle" letterSpacing="2">
+                    KAYIP SAKAL ŞİFRESİ
                   </text>
-                  <text x="400" y="215" fill="#cbd5e1" fontSize="11" textAnchor="middle">
-                    Kuzeyden Soğuk, Güneyden Sıcak Rüzgarlar
+                  <text x="505" y="247" fill="#cbd5e1" fontSize="11" textAnchor="middle">
+                    Kuzeyden Soğuk (Ka-Yı-P), Güneyden Sıcak (Sa-K-L)
                   </text>
                 </>
               )}
 
-              {/* FAULTS LAYER */}
+              {/* ── OVERLAYS: FAULTS (KAF, DAF, BAF) ── */}
               {activeLayer === 'faults' && (
                 <>
-                  {/* KAF (Kuzey Anadolu Fay Hattı) - Saros Körfezinden Van Gölüne */}
+                  {/* KAF - Kuzey Anadolu Fayı (Saros Körfezinden Karlıova'ya) */}
                   <path
-                    d="M 120,135 Q 260,120 400,120 Q 560,150 710,210"
+                    d="M 150,155 Q 260,135 375,130 Q 510,130 650,170 Q 730,195 810,240"
                     fill="none"
                     stroke="#ef4444"
-                    strokeWidth="4"
-                    strokeDasharray="6,3"
+                    strokeWidth="4.5"
+                    strokeDasharray="8,4"
+                    className="drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"
                   />
-                  <text x="340" y="110" fill="#f87171" fontSize="12" fontWeight="bold">
+                  <rect x="380" y="100" width="165" height="22" rx="6" fill="#450a0a" stroke="#ef4444" strokeWidth="1" />
+                  <text x="462" y="115" fill="#fca5a5" fontSize="11" fontWeight="bold" textAnchor="middle">
                     KAF (Kuzey Anadolu Fayı)
                   </text>
 
-                  {/* DAF (Doğu Anadolu Fay Hattı) - Hatay'dan Bingöl Karlıova'ya */}
+                  {/* DAF - Doğu Anadolu Fayı (Hatay'dan Karlıova'ya) */}
                   <path
-                    d="M 480,340 Q 530,280 620,180"
+                    d="M 565,450 Q 590,370 655,315 Q 730,270 810,240"
                     fill="none"
                     stroke="#f97316"
-                    strokeWidth="4"
-                    strokeDasharray="6,3"
+                    strokeWidth="4.5"
+                    strokeDasharray="8,4"
+                    className="drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]"
                   />
-                  <text x="560" y="280" fill="#fb923c" fontSize="12" fontWeight="bold">
+                  <rect x="655" y="335" width="165" height="22" rx="6" fill="#431407" stroke="#f97316" strokeWidth="1" />
+                  <text x="737" y="350" fill="#fdba74" fontSize="11" fontWeight="bold" textAnchor="middle">
                     DAF (Doğu Anadolu Fayı)
                   </text>
 
-                  {/* BAF (Batı Anadolu Fay Hattı) - Ege Grabenleri */}
-                  <g stroke="#eab308" strokeWidth="3" strokeDasharray="4,3">
-                    <line x1="80" y1="180" x2="160" y2="190" />
-                    <line x1="80" y1="210" x2="170" y2="220" />
-                    <line x1="90" y1="240" x2="180" y2="250" />
+                  {/* BAF - Batı Anadolu Fay Kuşağı (Ege Grabenleri) */}
+                  <g stroke="#facc15" strokeWidth="3" strokeDasharray="5,3" className="drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]">
+                    <line x1="100" y1="210" x2="220" y2="230" />
+                    <line x1="90" y1="250" x2="230" y2="265" />
+                    <line x1="100" y1="285" x2="240" y2="295" />
+                    <line x1="110" y1="320" x2="250" y2="330" />
                   </g>
-                  <text x="90" y="165" fill="#facc15" fontSize="11" fontWeight="bold">
+                  <rect x="85" y="175" width="165" height="22" rx="6" fill="#422006" stroke="#facc15" strokeWidth="1" />
+                  <text x="167" y="190" fill="#fef08a" fontSize="10.5" fontWeight="bold" textAnchor="middle">
                     BAF (Batı Anadolu Grabenleri)
                   </text>
 
-                  {/* Masif Araziler (Deprem Riski Az) */}
-                  <circle cx="370" cy="270" r="16" fill="rgba(34, 197, 94, 0.4)" stroke="#22c55e" strokeWidth="2" />
-                  <text x="370" y="274" fill="#4ade80" fontSize="9" fontWeight="bold" textAnchor="middle">Konya</text>
+                  {/* Masif Araziler (1. Derece Deprem Riski En Az Alanlar) */}
+                  <g className="animate-pulse">
+                    <circle cx="400" cy="350" r="24" fill="rgba(34, 197, 94, 0.45)" stroke="#22c55e" strokeWidth="2.5" />
+                    <text x="400" y="354" fill="#4ade80" fontSize="10" fontWeight="black" textAnchor="middle">Konya</text>
 
-                  <circle cx="640" cy="300" r="16" fill="rgba(34, 197, 94, 0.4)" stroke="#22c55e" strokeWidth="2" />
-                  <text x="640" y="304" fill="#4ade80" fontSize="9" fontWeight="bold" textAnchor="middle">Mardin</text>
+                    <circle cx="800" cy="380" r="22" fill="rgba(34, 197, 94, 0.45)" stroke="#22c55e" strokeWidth="2.5" />
+                    <text x="800" y="384" fill="#4ade80" fontSize="10" fontWeight="black" textAnchor="middle">Mardin</text>
 
-                  <circle cx="160" cy="85" r="14" fill="rgba(34, 197, 94, 0.4)" stroke="#22c55e" strokeWidth="2" />
-                  <text x="160" y="88" fill="#4ade80" fontSize="8" fontWeight="bold" textAnchor="middle">Yıldız</text>
+                    <circle cx="130" cy="85" r="18" fill="rgba(34, 197, 94, 0.45)" stroke="#22c55e" strokeWidth="2" />
+                    <text x="130" y="89" fill="#4ade80" fontSize="9" fontWeight="black" textAnchor="middle">Yıldız</text>
+
+                    <circle cx="530" cy="80" r="16" fill="rgba(34, 197, 94, 0.45)" stroke="#22c55e" strokeWidth="2" />
+                    <text x="530" y="84" fill="#4ade80" fontSize="9" fontWeight="black" textAnchor="middle">Sinop</text>
+                  </g>
                 </>
               )}
             </svg>
 
             {/* Quick layer tip overlay */}
-            <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700/60 backdrop-blur-md text-[11px] text-slate-300">
-              {activeLayer === 'climate' && '💡 Haritadaki iklim bölgelerine tıklayarak detaylı YKS analizini görün.'}
-              {activeLayer === 'winds' && '💡 Kuzeyden esen rüzgârlar sıcaklığı düşürür, güneyden esenler yükseltir.'}
-              {activeLayer === 'faults' && '💡 Yeşil halkalar 1. derece deprem riski en az olan Masif arazilerdir.'}
+            <div className="absolute bottom-3 left-3 z-20 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700/60 backdrop-blur-md text-[11px] text-slate-300 pointer-events-none">
+              {activeLayer === 'climate' && '💡 İllere tıklayarak veya üzerine gelerek iklim analizini anında görün.'}
+              {activeLayer === 'winds' && '💡 Kuzeyden esenler (KAYIP) soğutur, güneyden esenler (SAKAL) ısıtır.'}
+              {activeLayer === 'faults' && '💡 Kırmızı & turuncu çizgiler ana fay hatları, yeşil halkalar kararlı Masif arazilerdir.'}
             </div>
           </div>
 
