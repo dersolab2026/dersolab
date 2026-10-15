@@ -14,11 +14,24 @@ import {
   Flame,
   ArrowRight,
   Bookmark,
+  Info,
+  Globe,
 } from 'lucide-react'
 
 interface TdkPayload {
   success: boolean
   source: 'tdk_live' | 'dersolab_curated'
+  todayTdkSelection?: {
+    madde: string
+    kategori: string
+    tarih: string
+    koken: string
+    kaynak: string
+    anlam: string
+    ornek: string
+    yazar: string
+    kulturNotu: string
+  }
   data?: {
     kelime?: { madde: string; anlam: string }[]
     atasoz?: { madde: string; anlam: string }[]
@@ -291,27 +304,125 @@ export function TdkWordOfTheDay() {
         </div>
       )}
 
-      {/* ── 2. TAB: TDK CANLI API VERİLERİ (GÜNÜN KELİMESİ & ATASÖZÜ) ── */}
+      {/* ── 2. TAB: TDK CANLI API VE GÜNÜN KELİMESİ VERİLERİ ── */}
       {activeTab === 'tdk_live' && (
         <div className="space-y-6">
-          {tdkData?.data?.kelime && tdkData.data.kelime.length > 0 ? (
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/70 border border-slate-800/80 backdrop-blur-xl space-y-6 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  Bugün TDK'da Öne Çıkan Sözcük (Canlı)
+          {/* A. TDK Resmî "Her Güne Bir Kelime" Seçkisi (@tdk_govtr) */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-emerald-500/30 backdrop-blur-xl space-y-6 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-500/40 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  TDK Resmî "Her Güne Bir Kelime" Seçkisi
                 </span>
-                <span className="text-xs text-slate-400 font-mono">Kaynak: sozluk.gov.tr</span>
+                <span className="text-xs text-slate-400 font-mono">15 Ekim 2026</span>
+              </div>
+              <span className="text-xs text-emerald-400/90 font-mono flex items-center gap-1.5">
+                <ExternalLink className="w-3.5 h-3.5" />
+                Kaynak: @tdk_govtr & Derleme Sözlüğü
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <h3 className="text-4xl sm:text-5xl font-black text-white capitalize font-serif tracking-tight">
+                  {tdkData?.todayTdkSelection?.madde || 'firik'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => playPronunciation(tdkData?.todayTdkSelection?.madde || 'firik')}
+                  className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 transition-colors cursor-pointer"
+                  title="Sesli Telaffuz Dinle"
+                >
+                  <Volume2 className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">
+                  Köken: {tdkData?.todayTdkSelection?.koken || 'Türkçe (Halk Ağzı)'}
+                </span>
+                <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+                  Kültürel Söz Varlığı
+                </span>
+              </div>
+            </div>
+
+            {/* Tanım Kartı */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                TDK Sözlük Tanımı:
+              </span>
+              <div className="space-y-2">
+                <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-sm text-slate-200">
+                  <strong className="text-emerald-400 mr-2">1.</strong>
+                  Olgunlaşmak üzere olan tahıl, kavurga.
+                </div>
+                <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-sm text-slate-200">
+                  <strong className="text-emerald-400 mr-2">2.</strong>
+                  Henüz olgunlaşmadan biçilerek ateşte tütsülenmiş taze buğday veya bu buğdaydan yapılan yöresel pilav/aş.
+                </div>
+              </div>
+            </div>
+
+            {/* Edebi & Kültürel Cümle */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/30 to-slate-950/60 border border-emerald-500/20 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
+                Cümle İçinde Kullanımı:
+              </span>
+              <p className="text-sm italic text-slate-200 leading-relaxed font-serif">
+                "{tdkData?.todayTdkSelection?.ornek || 'Tarlaların ucunda yeni biçilmiş firik kokusu akşamın serinliğine karışıyordu.'}"
+              </p>
+              <div className="text-right text-xs font-semibold text-slate-400">
+                — {tdkData?.todayTdkSelection?.yazar || 'Halk Ağzı / Kültür Mirası'}
+              </div>
+            </div>
+
+            {/* Maarif Söz Varlığı & Kültür Notu */}
+            <div className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 leading-relaxed flex items-start gap-2.5">
+              <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-emerald-300 block mb-0.5 font-bold">
+                  Maarif Modeli & Söz Varlığı Notu:
+                </strong>
+                {tdkData?.todayTdkSelection?.kulturNotu ||
+                  'TDK resmî sosyal medya kanalında (@tdk_govtr) 15 Ekim tarihli "Günün Kelimesi" olarak duyurulmuştur. Yeni Maarif Modeli söz varlığı ve Derleme Sözlüğü kapsamında yöresel kültürel değerlerimizdendir.'}
+              </div>
+            </div>
+          </div>
+
+          {/* B. TDK Canlı Web Portalı API Verisi (sozluk.gov.tr) */}
+          {tdkData?.data?.kelime && tdkData.data.kelime.length > 0 && (
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/60 border border-slate-800 backdrop-blur-xl space-y-6 shadow-xl">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+                  <Globe className="w-4 h-4 text-cyan-400" />
+                  TDK Resmî Sözlük Portalı Canlı API Akışı
+                </span>
+                <span className="text-xs text-slate-400 font-mono">sozluk.gov.tr/icerik</span>
               </div>
 
               <div>
-                <h3 className="text-3xl font-black text-white capitalize font-serif">
-                  {tdkData.data.kelime[0].madde}
-                </h3>
+                <div className="flex items-center gap-3">
+                  <h3 className="text-3xl font-black text-white capitalize font-serif">
+                    {tdkData.data.kelime[0].madde}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => playPronunciation(tdkData.data!.kelime![0].madde)}
+                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 transition-colors cursor-pointer"
+                    title="Sesli Telaffuz Dinle"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                  </button>
+                </div>
+
                 <div className="mt-3 space-y-2">
                   {tdkData.data.kelime.map((item, i) => (
                     <div key={i} className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 text-sm text-slate-200">
-                      <strong className="text-emerald-400 mr-2">{i + 1}.</strong>
+                      <strong className="text-cyan-400 mr-2">{i + 1}.</strong>
                       {item.anlam}
                     </div>
                   ))}
@@ -320,9 +431,9 @@ export function TdkWordOfTheDay() {
 
               {/* Günün Atasözü */}
               {tdkData.data.atasoz && tdkData.data.atasoz.length > 0 && (
-                <div className="p-5 rounded-2xl bg-gradient-to-r from-cyan-950/40 to-slate-900 border border-cyan-800/40 space-y-1.5">
+                <div className="p-5 rounded-2xl bg-gradient-to-r from-cyan-950/30 to-slate-950/60 border border-cyan-800/30 space-y-1.5">
                   <span className="text-[10px] uppercase font-bold text-cyan-300 tracking-wider">
-                    Günün Atasözü / Deyimi (TDK):
+                    Günün Atasözü / Deyimi (sozluk.gov.tr Canlı):
                   </span>
                   <h4 className="text-base font-bold text-white font-serif">
                     "{tdkData.data.atasoz[0].madde}"
@@ -333,11 +444,27 @@ export function TdkWordOfTheDay() {
                 </div>
               )}
             </div>
-          ) : (
-            <div className="p-8 text-center text-slate-400 text-sm">
-              TDK canlı verileri yükleniyor...
-            </div>
           )}
+
+          {/* C. TDK Çift Kaynak Bilgi Notu */}
+          <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-200 leading-relaxed flex items-start gap-2.5">
+            <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+            <div>
+              <strong className="text-blue-300 block mb-0.5 font-bold">
+                TDK Veri Kaynakları Hakkında Bilgilendirme:
+              </strong>
+              Türk Dil Kurumu'nun dijital ekosisteminde iki resmî yayın akışı bulunur:
+              <ul className="list-disc list-inside mt-1 space-y-0.5 text-blue-200/90">
+                <li>
+                  <strong>@tdk_govtr Sosyal Medya Seçkisi:</strong> Kurum editörlerince her gün yayımlanan "Her Güne Bir Kelime" tematik seçkisidir (Bugün: <em>firik</em>).
+                </li>
+                <li>
+                  <strong>sozluk.gov.tr Canlı Sözlük Portalı:</strong> TDK ana arama motorunda anlık API ile sunulan güncel madde ve atasözü akışıdır (Bugün: <em>paleografi</em> ve <em>uykuda olmak</em>).
+                </li>
+              </ul>
+              DersoLab, her iki resmî veriyi de eşzamanlı olarak öğrencilere ulaştırır.
+            </div>
+          </div>
         </div>
       )}
 

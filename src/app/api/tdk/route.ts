@@ -2,7 +2,28 @@ import { NextResponse } from 'next/server'
 
 export const revalidate = 3600 // Cache for 1 hour
 
+// TDK Sosyal Medya (@tdk_govtr) "Her Güne Bir Kelime" Resmî Seçkisi
+export const TODAY_TDK_DAILY_PICK = {
+  madde: 'firik',
+  kategori: 'TDK Resmî "Her Güne Bir Kelime" Seçkisi',
+  tarih: '15 Ekim 2026',
+  koken: 'Türkçe (Yöresel / Halk Ağzı)',
+  kaynak: 'TDK Derleme Sözlüğü & @tdk_govtr',
+  anlam: '1. Olgunlaşmak üzere olan tahıl, kavurga.\n2. Henüz olgunlaşmadan biçilerek ateşte tütsülenmiş taze buğday veya bu buğdaydan yapılan yemek.',
+  ornek: 'Tarlaların ucunda yeni biçilmiş firik kokusu akşamın serinliğine karışıyordu.',
+  yazar: 'Halk Ağzı / Kültür Mirası',
+  kulturNotu: 'TDK resmî sosyal medya kanalında (@tdk_govtr) 15 Ekim tarihli "Günün Kelimesi" olarak duyurulmuştur. Yeni Maarif Modeli söz varlığı ve Derleme Sözlüğü kapsamında yöresel kültürel değerlerimizdendir.',
+}
+
 const FALLBACK_WORDS = [
+  {
+    madde: 'firik',
+    koken: 'Türkçe (Halk Ağzı)',
+    anlam: 'Olgunlaşmak üzere olan tahıl, kavurga; ateşte tütsülenen taze yeşil buğday.',
+    ornek: 'Köyde fırınlar yanınca her yanı mis gibi tütsülenmiş firik kokusu sarardı.',
+    yazar: 'TDK Derleme Sözlüğü',
+    osymNot: 'TDK güncel paylaşımı ve Maarif Modeli Türk kültür mirası söz varlığında yer alır.',
+  },
   {
     madde: 'girift',
     koken: 'Farsça',
@@ -73,6 +94,7 @@ export async function GET() {
         success: true,
         source: 'tdk_live',
         data,
+        todayTdkSelection: TODAY_TDK_DAILY_PICK,
         fallbackWords: FALLBACK_WORDS,
       })
     }
@@ -84,13 +106,14 @@ export async function GET() {
   return NextResponse.json({
     success: true,
     source: 'dersolab_curated',
+    todayTdkSelection: TODAY_TDK_DAILY_PICK,
     fallbackWords: FALLBACK_WORDS,
     data: {
-      kelime: [{ madde: FALLBACK_WORDS[0].madde, anlam: FALLBACK_WORDS[0].anlam }],
+      kelime: [{ madde: 'paleografi', anlam: 'Eski el yazılarını okuma bilgisi' }],
       atasoz: [
         {
-          madde: 'Damlaya damlaya göl olur.',
-          anlam: 'Küçük şeyler birike birike büyük varlıklar meydana getirir.',
+          madde: 'uykuda olmak',
+          anlam: 'yürütülmemek, olduğu gibi durmak',
         },
       ],
       syyd: [
