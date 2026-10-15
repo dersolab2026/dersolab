@@ -327,13 +327,49 @@ export function GeoAtlas() {
                   </g>
 
                   {/* Center Mnemonic Formula Box */}
-                  <rect x="375" y="200" width="260" height="65" rx="14" fill="#0b1120" stroke="#f59e0b" strokeWidth="2" opacity="0.95" />
-                  <text x="505" y="225" fill="#fbbf24" fontSize="14" fontWeight="900" textAnchor="middle" letterSpacing="2">
-                    KAYIP SAKAL ŞİFRESİ
-                  </text>
-                  <text x="505" y="247" fill="#cbd5e1" fontSize="11" textAnchor="middle">
-                    Kuzeyden Soğuk (Ka-Yı-P), Güneyden Sıcak (Sa-K-L)
-                  </text>
+                  <g className="drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
+                    <rect
+                      x="310"
+                      y="190"
+                      width="390"
+                      height="80"
+                      rx="18"
+                      fill="#090e17"
+                      stroke="#f59e0b"
+                      strokeWidth="2.5"
+                      opacity="0.98"
+                    />
+                    <rect
+                      x="316"
+                      y="196"
+                      width="378"
+                      height="68"
+                      rx="14"
+                      fill="#1e293b"
+                      fillOpacity="0.25"
+                    />
+                    <text
+                      x="505"
+                      y="223"
+                      fill="#fbbf24"
+                      fontSize="14.5"
+                      fontWeight="900"
+                      textAnchor="middle"
+                      letterSpacing="2.5"
+                    >
+                      KAYIP SAKAL ŞİFRESİ
+                    </text>
+                    <text
+                      x="505"
+                      y="249"
+                      fill="#e2e8f0"
+                      fontSize="11.5"
+                      fontWeight="600"
+                      textAnchor="middle"
+                    >
+                      Kuzeyden Soğuk (Ka-Yı-P), Güneyden Sıcak (Sa-K-L)
+                    </text>
+                  </g>
                 </>
               )}
 
@@ -349,7 +385,7 @@ export function GeoAtlas() {
                     strokeDasharray="8,4"
                     className="drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"
                   />
-                  <rect x="380" y="100" width="165" height="22" rx="6" fill="#450a0a" stroke="#ef4444" strokeWidth="1" />
+                  <rect x="365" y="98" width="195" height="26" rx="7" fill="#450a0a" stroke="#ef4444" strokeWidth="1.2" />
                   <text x="462" y="115" fill="#fca5a5" fontSize="11" fontWeight="bold" textAnchor="middle">
                     KAF (Kuzey Anadolu Fayı)
                   </text>
@@ -363,7 +399,7 @@ export function GeoAtlas() {
                     strokeDasharray="8,4"
                     className="drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]"
                   />
-                  <rect x="655" y="335" width="165" height="22" rx="6" fill="#431407" stroke="#f97316" strokeWidth="1" />
+                  <rect x="645" y="333" width="185" height="26" rx="7" fill="#431407" stroke="#f97316" strokeWidth="1.2" />
                   <text x="737" y="350" fill="#fdba74" fontSize="11" fontWeight="bold" textAnchor="middle">
                     DAF (Doğu Anadolu Fayı)
                   </text>
@@ -375,7 +411,7 @@ export function GeoAtlas() {
                     <line x1="100" y1="285" x2="240" y2="295" />
                     <line x1="110" y1="320" x2="250" y2="330" />
                   </g>
-                  <rect x="85" y="175" width="165" height="22" rx="6" fill="#422006" stroke="#facc15" strokeWidth="1" />
+                  <rect x="65" y="173" width="205" height="26" rx="7" fill="#422006" stroke="#facc15" strokeWidth="1.2" />
                   <text x="167" y="190" fill="#fef08a" fontSize="10.5" fontWeight="bold" textAnchor="middle">
                     BAF (Batı Anadolu Grabenleri)
                   </text>
