@@ -19,6 +19,13 @@ export function NativeAuthBridge() {
     if (!Capacitor.isNativePlatform()) return
 
     const listenerPromise = App.addListener('appUrlOpen', async ({ url }) => {
+      if (url.includes('calendar_connected') || url.includes('calendar/callback')) {
+        await Browser.close().catch(() => {})
+        router.replace('/dashboard/instructor/settings?calendar_connected=1')
+        router.refresh()
+        return
+      }
+
       if (!url.includes('auth/callback')) return
       const code = new URL(url).searchParams.get('code')
       await Browser.close().catch(() => {})

@@ -19,7 +19,8 @@ export function CancelBookingButton({ bookingId, startTime }: CancelBookingButto
   const [error, setError] = useState<string | null>(null)
   const { showToast } = useToast()
 
-  const hoursUntilLesson = (new Date(startTime).getTime() - Date.now()) / (1000 * 60 * 60)
+  const [now] = useState(() => Date.now())
+  const hoursUntilLesson = (new Date(startTime).getTime() - now) / (1000 * 60 * 60)
   const willBeRefunded = hoursUntilLesson >= 24
 
   function handleConfirm() {
@@ -49,8 +50,8 @@ export function CancelBookingButton({ bookingId, startTime }: CancelBookingButto
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Vazgeç</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm}>
-              Evet, iptal et
+            <AlertDialogAction onClick={handleConfirm} disabled={isPending}>
+              {isPending ? 'İptal ediliyor...' : 'Evet, iptal et'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

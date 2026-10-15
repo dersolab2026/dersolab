@@ -82,7 +82,7 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
 
   const secililer = grubunDenemeleri.filter((e) => !haricTutulan.has(e.id))
 
-  const dersler = grup ? getExamSections(grup.examType, grup.track) : []
+  const dersler = useMemo(() => (grup ? getExamSections(grup.examType, grup.track) : []), [grup])
   const toplamSoru = grup ? getTotalQuestions(grup.examType, grup.track) : 0
 
   const noktalar: Nokta[] = useMemo(

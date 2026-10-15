@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useSyncExternalStore, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Check, X } from 'lucide-react'
 
@@ -27,11 +27,15 @@ export function useToast(): ToastContextValue {
   return ctx
 }
 
+const emptySubscribe = () => () => {}
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => setIsMounted(true), [])
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
 
   const showToast = useCallback((message: string, tone: ToastTone = 'success') => {
     const id = Date.now() + Math.random()

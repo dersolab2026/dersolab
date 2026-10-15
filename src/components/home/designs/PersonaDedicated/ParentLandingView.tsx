@@ -126,7 +126,7 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
 
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
               <Link
-                href="/register"
+                href="/register?role=parent"
                 className="group relative px-8 py-5 rounded-2xl bg-white text-black font-semibold text-lg transition-all overflow-hidden flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)] w-full sm:w-auto"
               >
                 Ücretsiz Hesap Açın

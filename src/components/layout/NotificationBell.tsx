@@ -1,7 +1,7 @@
 'use client'
 
 import type { UserRole } from '@/types'
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from 'react'
 import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { Lightbulb, X } from 'lucide-react'
@@ -15,6 +15,7 @@ import { PIXEL_CARD } from '@/lib/theme'
 const POLL_INTERVAL_MS = 30_000
 const PANEL_WIDTH = 320
 const PANEL_GAP = 8
+const emptySubscribe = () => () => {}
 
 interface NotificationBellProps {
   initialNotifications: NotificationItem[]
@@ -24,19 +25,17 @@ interface NotificationBellProps {
 
 export function NotificationBell({ initialNotifications, role, panelPosition = 'down' }: NotificationBellProps) {
   const router = useRouter()
-  const [notifications, setNotifications] = useState(initialNotifications)
-  const [isOpen, setIsOpen] = useState(false)
   const [, startTransition] = useTransition()
+  const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications)
+  const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [coords, setCoords] = useState<{ left: number; top?: number; bottom?: number } | null>(null)
-  const [isMounted, setIsMounted] = useState(false)
+  const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false)
 
   const unreadCount = notifications.filter((n) => !n.isRead).length
   const readCount = notifications.filter((n) => n.isRead).length
-
-  useEffect(() => setIsMounted(true), [])
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -59,7 +58,7 @@ export function NotificationBell({ initialNotifications, role, panelPosition = '
 
   // Panel body'ye taşındığı için konumunu butona göre kendimiz hesaplıyoruz.
   useEffect(() => {
-    if (!isOpen) { setCoords(null); return }
+    if (!isOpen) return
 
     function reposition() {
       const rect = buttonRef.current?.getBoundingClientRect()

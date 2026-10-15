@@ -11,33 +11,19 @@ interface AuthShellProps {
 }
 
 function DynamicRoleHeader({ role }: { role?: 'student' | 'instructor' | 'parent' | null }) {
-  let themeFrom = 'from-orange-500/20'
-  let themeTo = 'to-amber-500/20'
-  let themeBorder = 'border-orange-500/20'
-  let themeShadow = 'shadow-orange-500/10'
   let textFrom = 'from-orange-400'
   let textTo = 'to-amber-400'
   let glowColor = 'bg-orange-500/10'
-  let mascotSrc = '/fox-head.png'
+  const mascotSrc = '/fox-head.png'
 
   if (role === 'instructor') {
-    themeFrom = 'from-blue-500/20'
-    themeTo = 'to-cyan-500/20'
-    themeBorder = 'border-blue-500/20'
-    themeShadow = 'shadow-blue-500/10'
     textFrom = 'from-blue-400'
     textTo = 'to-cyan-400'
     glowColor = 'bg-blue-500/10'
   } else if (role === 'parent') {
-    themeFrom = 'from-emerald-500/20'
-    themeTo = 'to-teal-500/20'
-    themeBorder = 'border-emerald-500/20'
-    themeShadow = 'shadow-emerald-500/10'
     textFrom = 'from-emerald-400'
     textTo = 'to-teal-400'
     glowColor = 'bg-emerald-500/10'
-  } else if (role === null) {
-    // default main logo
   }
 
   return (

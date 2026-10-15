@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 
 // Holographic Card Component with Mouse Tracking
-function HolographicCard({ title, desc, icon: Icon, color }: { title: string, desc: string, icon: any, color: string }) {
+function HolographicCard({ title, desc, icon: Icon, color }: { title: string; desc: string; icon: React.ComponentType<{ className?: string }>; color: string }) {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
@@ -143,7 +143,7 @@ export function InstructorLandingView({ examFilter, onExamFilterChange }: Instru
 
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center gap-4 justify-center mt-4">
               <Link
-                href="/register"
+                href="/register?role=instructor"
                 className="group relative px-8 py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(37,99,235,0.3)] hover:shadow-[0_0_40px_rgba(37,99,235,0.5)] active:scale-95 w-full sm:w-auto"
               >
                 Hemen Başvur

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { FlaskConical } from 'lucide-react'
 
 interface CleanHeaderProps {
   isLoggedIn?: boolean
@@ -21,6 +22,14 @@ export function CleanHeader({ isLoggedIn, dashboardHref }: CleanHeaderProps) {
 
       {/* Navigation */}
       <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+        <Link
+          href="/lab"
+          className="hover:text-purple-600 font-semibold transition-colors flex items-center gap-1.5 text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200/60"
+        >
+          <FlaskConical className="w-3.5 h-3.5 text-purple-600" />
+          <span>L.A.B.</span>
+          <span className="text-[10px] bg-purple-600 text-white px-1.5 py-0.2 rounded-full font-bold">Yeni</span>
+        </Link>
         <Link href="/instructors" className="hover:text-slate-950 transition-colors">
           Eğitmenler
         </Link>

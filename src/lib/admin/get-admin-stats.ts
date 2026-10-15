@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export interface AdminStats {
   totalStudents: number
@@ -9,7 +9,7 @@ export interface AdminStats {
 }
 
 export async function getAdminStats(): Promise<AdminStats> {
-  const supabase = await createClient()
+  const admin = createAdminClient()
 
   const startOfMonth = new Date()
   startOfMonth.setDate(1)
@@ -25,10 +25,10 @@ export async function getAdminStats(): Promise<AdminStats> {
     { count: bookingsThisMonth },
     { data: purchasesThisMonth },
   ] = await Promise.all([
-    supabase.from('users').select('id, role').is('deleted_at', null),
-    supabase.from('instructors').select('user_id, approval_status'),
-    supabase.from('bookings').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth.toISOString()),
-    supabase.from('package_purchases').select('amount_paid').eq('status', 'completed').gte('created_at', startOfMonth.toISOString()),
+    admin.from('users').select('id, role').is('deleted_at', null),
+    admin.from('instructors').select('user_id, approval_status'),
+    admin.from('bookings').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth.toISOString()),
+    admin.from('package_purchases').select('amount_paid').eq('status', 'completed').gte('created_at', startOfMonth.toISOString()),
   ])
 
   const liveUserIds = new Set((liveUsers ?? []).map((u: any) => u.id))

@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   },
 }
 
+import { Suspense } from 'react'
+
 export default function RegisterPage() {
-  return <RegisterForm />
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#07090E]" />}>
+      <RegisterForm />
+    </Suspense>
+  )
 }

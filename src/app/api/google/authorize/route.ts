@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { getGoogleConsentUrl } from '@/lib/google/oauth-client'
+import { createSignedOAuthState } from '@/lib/google/oauth-state'
 
 export async function GET() {
   const supabase = await createClient()
@@ -11,7 +11,7 @@ export async function GET() {
     return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_APP_URL))
   }
 
-  const state = randomUUID()
+  const state = createSignedOAuthState(user.id)
   const consentUrl = getGoogleConsentUrl(state)
 
   const response = NextResponse.redirect(consentUrl)
@@ -19,7 +19,7 @@ export async function GET() {
     httpOnly: true,
     secure: true,
     sameSite: 'lax',
-    maxAge: 600,
+    maxAge: 900,
   })
   return response
 }

@@ -75,9 +75,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Kullanıcı oturumunu kontrol et
+    // Kullanıcı oturumunu kontrol et (Cookie veya Authorization Header üzerinden)
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    
+    let user = null;
+    const authHeader = request.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const { data } = await supabase.auth.getUser(token);
+      user = data.user;
+    } else {
+      const { data } = await supabase.auth.getUser();
+      user = data.user;
+    }
 
     if (!user) {
       return NextResponse.json(
@@ -151,7 +161,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+      model: 'gemini-2.5-flash',
       config: {
         systemInstruction: SYSTEM_PROMPT,
         temperature: 0.3,

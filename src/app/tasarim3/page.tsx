@@ -1,7 +1,8 @@
-import { InteractiveCampusView } from '@/components/home/designs/InteractiveCampusView'
+import { AllStarLandingView } from '@/components/home/designs/AllStarHero/AllStarLandingView'
 
 export default function Tasarim3TestPage() {
   return (
-    <InteractiveCampusView />
+    <AllStarLandingView />
   )
 }
+

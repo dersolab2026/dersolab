@@ -34,7 +34,7 @@ export function StudentLandingView({ examFilter, onExamFilterChange }: StudentLa
       <section className="relative w-full max-w-[90rem] mx-auto min-h-[85vh] flex flex-col items-center justify-center rounded-[3rem] sm:rounded-[4rem] overflow-hidden border border-white/[0.05] bg-[#030712] shadow-2xl">
         
         {/* Animated Background Mesh & Orbs */}
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] mix-blend-overlay" />
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px] opacity-40 mix-blend-overlay" />
         <div className="absolute top-0 left-1/4 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-indigo-600/30 rounded-full blur-[120px] mix-blend-screen animate-pulse" style={{ animationDuration: '8s' }} />
         <div className="absolute bottom-0 right-1/4 w-[30vw] h-[30vw] max-w-[500px] max-h-[500px] bg-rose-600/20 rounded-full blur-[100px] mix-blend-screen animate-pulse" style={{ animationDuration: '10s' }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[20vw] h-[20vw] max-w-[400px] max-h-[400px] bg-amber-500/10 rounded-full blur-[120px] mix-blend-screen" />
@@ -118,7 +118,10 @@ export function StudentLandingView({ examFilter, onExamFilterChange }: StudentLa
                 placeholder="E-posta adresin..."
                 className="w-full bg-transparent border-none outline-none text-white text-lg sm:text-xl px-4 py-4 placeholder-slate-600 font-light"
               />
-              <Link href="/register" className="w-full sm:w-auto shrink-0 group/btn relative overflow-hidden rounded-2xl bg-white text-black px-8 py-4 sm:py-5 font-bold text-sm sm:text-base tracking-wide transition-transform hover:scale-[0.98] active:scale-95 flex justify-center items-center">
+              <Link 
+                href={email.trim() ? `/register?email=${encodeURIComponent(email.trim())}&role=student` : '/register?role=student'} 
+                className="w-full sm:w-auto shrink-0 group/btn relative overflow-hidden rounded-2xl bg-white text-black px-8 py-4 sm:py-5 font-bold text-sm sm:text-base tracking-wide transition-transform hover:scale-[0.98] active:scale-95 flex justify-center items-center"
+              >
                 <span className="relative z-10 flex items-center gap-2">
                   Ücretsiz Başla <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                 </span>

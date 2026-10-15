@@ -191,7 +191,7 @@ export function LabSceneEnhanced({ labType, onBack }: LabSceneEnhancedProps) {
         <div className="lg:col-span-5 space-y-4">
           <div className="p-4 rounded-2xl bg-black/85 border border-amber-500/40 backdrop-blur-xl space-y-1 shadow-lg">
             <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider">
-              {data.code} // AKTİF LABORATUVAR
+              {`${data.code} // AKTİF LABORATUVAR`}
             </span>
             <h3 className="text-xl font-bold text-white font-serif">{data.title}</h3>
             <p className="text-xs text-slate-300 font-light">{data.chalkExplanation}</p>

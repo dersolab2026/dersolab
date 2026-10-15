@@ -7,7 +7,7 @@ interface PurchasePackageButtonProps {
 export function PurchasePackageButton({ shopierProductUrl }: PurchasePackageButtonProps) {
   if (!shopierProductUrl) {
     return (
-      <p className="text-sm font-semibold text-red-600">Bu paket şu anda satın alınamıyor, bizi bilgilendirdik.</p>
+      <p className="text-sm font-semibold text-red-600">Bu paket şu anda satın alınamıyor, lütfen bizimle iletişime geçin.</p>
     )
   }
 

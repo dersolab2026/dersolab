@@ -21,18 +21,33 @@ function checkRateLimit(ip: string): boolean {
 export async function middleware(request: NextRequest) {
   // CSRF / CORS Koruması: Sadece GET, HEAD, OPTIONS dışındaki mutasyon (veri değiştirici) istekleri kontrol et
   if (request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS') {
-    const origin = request.headers.get('origin')
-    const host = request.headers.get('host')
-    
-    // İstek aynı alan adından (host) gelmiyorsa engelle (CSRF önlemi)
-    if (origin && host && new URL(origin).host !== host) {
-      return new NextResponse('Invalid Origin', { status: 403 })
-    }
+    const pathname = request.nextUrl.pathname
+    const isWebhook = pathname.startsWith('/api/shopier/webhook')
+    const isCron = pathname.startsWith('/api/cron/')
 
-    // Basit In-Memory Rate Limiter (Edge üzerinde per-instance çalışır)
-    const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
-    if (checkRateLimit(ip)) {
-      return new NextResponse('Too Many Requests', { status: 429 })
+    // Webhook (HMAC imzalı) ve Cron (Bearer token korumalı) uç noktaları harici çağrıldığı için CSRF kontrolünden muaftır
+    if (!isWebhook && !isCron) {
+      const origin = request.headers.get('origin')
+      const host = request.headers.get('host')
+      
+      // İstek aynı alan adından (host) gelmiyorsa engelle (CSRF önlemi, Capacitor localhost isteklerine de izin ver)
+      if (origin && host) {
+        try {
+          const originHost = new URL(origin).host
+          const isCapacitor = originHost === 'localhost' || origin.startsWith('capacitor://')
+          if (originHost !== host && !isCapacitor) {
+            return new NextResponse('Invalid Origin', { status: 403 })
+          }
+        } catch {
+          return new NextResponse('Invalid Origin', { status: 403 })
+        }
+      }
+
+      // Basit In-Memory Rate Limiter (Edge üzerinde per-instance çalışır)
+      const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
+      if (checkRateLimit(ip)) {
+        return new NextResponse('Too Many Requests', { status: 429 })
+      }
     }
   }
 

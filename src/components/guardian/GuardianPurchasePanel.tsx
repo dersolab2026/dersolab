@@ -115,7 +115,7 @@ export function GuardianPurchasePanel({ ogrenciler, paketler }: Props) {
               </div>
             ) : (
               <p className="text-sm font-semibold text-red-600">
-                Bu paket şu anda satın alınamıyor, bizi bilgilendirdik.
+                Bu paket şu anda satın alınamıyor, lütfen bizimle iletişime geçin.
               </p>
             )}
           </div>

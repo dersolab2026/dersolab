@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Capacitor } from '@capacitor/core'
 import { Browser } from '@capacitor/browser'
 import { AuthShell } from '@/components/auth/AuthShell'
@@ -23,11 +24,16 @@ const TRACK_LABELS: Record<Track, string> = {
 }
 
 export function RegisterForm() {
+  const searchParams = useSearchParams()
+  const initialEmail = searchParams.get('email') ?? ''
+  const roleParam = searchParams.get('role')
+  const initialRole: Role = roleParam === 'instructor' || roleParam === 'parent' ? roleParam : 'student'
+
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(initialEmail)
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
-  const [role, setRole] = useState<Role>('student')
+  const [role, setRole] = useState<Role>(initialRole)
   const [schoolName, setSchoolName] = useState('')
   const [grade, setGrade] = useState('')
   const [track, setTrack] = useState<Track | ''>('')

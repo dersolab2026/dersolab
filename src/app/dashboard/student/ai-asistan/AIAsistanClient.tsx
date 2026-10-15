@@ -33,8 +33,17 @@ const EXAMPLE_QUESTIONS: Record<string, string> = {
   'TYT Türkçe': '"Gözlemlediği şeyleri hafızasında saklayıp uygun zamanda kullanan kişi" ifadesini tek bir kelimeyle ifade ediniz.',
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
 function parseMarkdown(text: string): string {
-  return text
+  return escapeHtml(text)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/^## (.*?)$/gm, '<h2 class="text-base font-black text-slate-200 mt-4 mb-2">$1</h2>')
     .replace(/^### (.*?)$/gm, '<h3 class="text-sm font-black text-slate-200 mt-3 mb-1">$1</h3>')
@@ -51,15 +60,11 @@ export function AIAsistanClient() {
   const [solution, setSolution] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [charCount, setCharCount] = useState(0)
+  const charCount = question.length
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const solutionRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    setCharCount(question.length)
-  }, [question])
 
   function loadExample() {
     const ex = EXAMPLE_QUESTIONS[subject] ?? Object.values(EXAMPLE_QUESTIONS)[0]

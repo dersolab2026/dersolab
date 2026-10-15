@@ -23,11 +23,13 @@ export async function getOrCreateCoachInviteCode(): Promise<
   if (!user) return { success: false, error: 'Giriş yapmalısın' }
 
   const admin = createAdminClient()
-  let { data: mevcut, error: coachCodeErr } = await admin
+  let mevcut: { coach_invite_code: string | null } | null = null
+  const { data: initData, error: coachCodeErr } = await admin
     .from('instructor_coach_codes')
     .select('coach_invite_code')
     .eq('user_id', user.id)
     .maybeSingle()
+  mevcut = initData
 
   if (coachCodeErr) {
     const { data: fallback } = await admin

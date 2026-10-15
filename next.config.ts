@@ -8,7 +8,7 @@ const CSP = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval' https://esm.sh" : ''}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${SUPABASE_ORIGIN} https://img.youtube.com`,
+  `img-src 'self' data: blob: ${SUPABASE_ORIGIN} https://img.youtube.com https://*.googleusercontent.com https://lh3.googleusercontent.com`,
   `media-src 'self' ${SUPABASE_ORIGIN}`,
   "font-src 'self' data:",
   `connect-src 'self' ${SUPABASE_ORIGIN}${isDev ? ' ws://localhost:* wss://localhost:*' : ''}`,

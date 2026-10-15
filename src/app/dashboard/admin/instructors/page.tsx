@@ -8,7 +8,7 @@ export default async function AdminInstructorsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Eğitmen Onayları</h1>
-        <p className="text-muted-foreground">Onaylanana kadar eğitmen marketplace'te görünmez.</p>
+        <p className="text-muted-foreground">Onaylanana kadar eğitmen marketplace&apos;te görünmez.</p>
       </div>
 
       {pendingInstructors.length === 0 ? (

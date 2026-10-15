@@ -58,3 +58,9 @@ graphify-out/
 design/
 public/vitrin/
 public/tasarim/
+
+# Temporary / scratch scripts
+extract-texts.js
+extracted_texts.txt
+find-tdk-errors.js
+refactor_emails.js
