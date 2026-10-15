@@ -165,6 +165,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
         <div className="flex items-center justify-between mb-6 shrink-0">
           <Link href="/dashboard">
             <div className="flex items-center gap-2 group">
+              <img src={mascotSrc} alt="" className="h-7 w-7 object-contain drop-shadow-md group-hover:scale-105 transition-transform" />
               <span className="font-black text-white text-xl tracking-tight">Derso<span className={`text-transparent bg-clip-text bg-gradient-to-r ${getLogoTextClass(role)}`}>Lab</span></span>
             </div>
           </Link>
@@ -211,6 +212,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
         <div className="flex flex-col h-full" style={{ width: SIDEBAR_WIDTH - 32 }}>
           <Link href="/dashboard" className="mb-6 block shrink-0">
             <div className="flex items-center gap-2 group">
+              <img src={mascotSrc} alt="" className="h-7 w-7 object-contain drop-shadow-md group-hover:scale-105 transition-transform" />
               <span className="font-black text-white text-xl tracking-tight">Derso<span className={`text-transparent bg-clip-text bg-gradient-to-r ${getLogoTextClass(role)}`}>Lab</span></span>
             </div>
           </Link>

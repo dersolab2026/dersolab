@@ -12,7 +12,6 @@ import {
   Globe2,
   Languages,
   Home,
-  Sparkles,
   ArrowRight,
 } from 'lucide-react'
 

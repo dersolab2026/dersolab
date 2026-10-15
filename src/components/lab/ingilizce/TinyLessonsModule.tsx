@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Sparkles,
   Volume2,
   VolumeX,
   BookOpen,
@@ -827,7 +826,7 @@ export function TinyLessonsModule() {
             <span className="text-xs text-slate-400">Durumsal Bağlamsal Öğrenme</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-sky-400" />
+            <BookOpen className="w-5 h-5 text-sky-400" />
             Durumsal Pratik Senaryoları (Situational Lessons)
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">

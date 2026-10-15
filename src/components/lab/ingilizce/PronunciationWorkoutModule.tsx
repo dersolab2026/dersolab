@@ -6,7 +6,6 @@ import {
   Mic,
   MicOff,
   Volume2,
-  Sparkles,
   AlertCircle,
   CheckCircle2,
   XCircle,
@@ -16,6 +15,7 @@ import {
   Flame,
   Award,
   ChevronRight,
+  Headphones,
 } from 'lucide-react'
 import { playSpeech, EnglishAccent } from './speechHelper'
 
@@ -128,14 +128,16 @@ export function PronunciationWorkoutModule() {
   const [isListening, setIsListening] = useState<boolean>(false)
   const [recognizedText, setRecognizedText] = useState<string>('')
   const [accuracyScore, setAccuracyScore] = useState<number | null>(null)
-  const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false)
+  const [playingSpeed, setPlayingSpeed] = useState<number | null>(null)
   const [micSupported, setMicSupported] = useState<boolean>(true)
+  const [micError, setMicError] = useState<string | null>(null)
 
   const currentItem = PRONUNCIATION_LIST[selectedWordIndex]
   const recognitionRef = useRef<any>(null)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    // Check SpeechRecognition support
+    // Check SpeechRecognition support in current browser
     if (typeof window !== 'undefined') {
       const SpeechRecognition =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
@@ -143,12 +145,19 @@ export function PronunciationWorkoutModule() {
         setMicSupported(false)
       }
     }
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort() } catch {}
+      }
+    }
   }, [])
 
   const handlePlayWord = (text: string, speed = 0.95) => {
-    setIsPlayingAudio(true)
+    setPlayingSpeed(speed)
     playSpeech(text, accent, speed, () => {
-      setIsPlayingAudio(false)
+      setPlayingSpeed(null)
     })
   }
 
@@ -158,70 +167,116 @@ export function PronunciationWorkoutModule() {
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
 
     if (!SpeechRecognition) {
-      alert('Tarayıcınız Web Speech Tanıma API’sini desteklemiyor. Chrome veya Edge kullanabilirsiniz.')
+      setMicError('Tarayıcınızda doğrudan Web Speech Tanıma API’si bulunamadı. Chrome veya Edge ile deneyebilir veya aşağıdaki değerlendirme ile pratik yapabilirsiniz.')
       return
     }
 
+    setMicError(null)
+    setRecognizedText('')
+    setAccuracyScore(null)
+
     try {
       if (recognitionRef.current) {
-        recognitionRef.current.abort()
+        try { recognitionRef.current.abort() } catch {}
       }
 
       const recognition = new SpeechRecognition()
       recognition.lang = accent
       recognition.interimResults = false
-      recognition.maxAlternatives = 1
+      recognition.maxAlternatives = 2
 
       recognition.onstart = () => {
         setIsListening(true)
-        setRecognizedText('')
-        setAccuracyScore(null)
+        setMicError(null)
+
+        // Auto timeout in case no audio is caught after 8 seconds
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        timeoutRef.current = setTimeout(() => {
+          if (recognitionRef.current) {
+            try { recognitionRef.current.stop() } catch {}
+          }
+          setIsListening(false)
+          setMicError('Ses algılanamadı. Mikrofona daha yakın konuşarak tekrar deneyin.')
+        }, 8000)
       }
 
       recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript.trim()
-        setRecognizedText(transcript)
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
         setIsListening(false)
 
-        // Compare transcript with target word / sentence
-        const targetClean = currentItem.word.toLowerCase()
-        const saidClean = transcript.toLowerCase()
+        const transcript = event.results[0][0].transcript.trim()
+        setRecognizedText(transcript)
 
-        if (saidClean.includes(targetClean) || targetClean.includes(saidClean)) {
-          setAccuracyScore(98)
+        // Evaluate pronunciation against target word
+        const cleanWord = (w: string) => w.toLowerCase().replace(/[^a-z0-9]/g, '')
+        const saidClean = cleanWord(transcript)
+        const targetWords = currentItem.word.split(/[ &,/]+/).map(cleanWord).filter(Boolean)
+
+        // Check if any target word was captured
+        const hasDirectMatch = targetWords.some(
+          (tw) => saidClean.includes(tw) || tw.includes(saidClean)
+        )
+
+        if (hasDirectMatch) {
+          setAccuracyScore(96)
         } else {
           // Similarity check
-          let matchCount = 0
-          for (let i = 0; i < Math.min(targetClean.length, saidClean.length); i++) {
-            if (targetClean[i] === saidClean[i]) matchCount++
+          let bestRatio = 0
+          for (const tw of targetWords) {
+            let matches = 0
+            for (let i = 0; i < Math.min(tw.length, saidClean.length); i++) {
+              if (tw[i] === saidClean[i]) matches++
+            }
+            const ratio = Math.round((matches / Math.max(tw.length, 1)) * 100)
+            if (ratio > bestRatio) bestRatio = ratio
           }
-          const ratio = Math.round((matchCount / targetClean.length) * 100)
-          setAccuracyScore(Math.max(45, Math.min(ratio, 85)))
+          setAccuracyScore(Math.max(50, Math.min(bestRatio, 88)))
         }
       }
 
-      recognition.onerror = (err: any) => {
-        console.warn('SpeechRecognition error:', err)
+      recognition.onerror = (event: any) => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
         setIsListening(false)
+        console.warn('SpeechRecognition error:', event.error)
+
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          setMicError('Tarayıcınızda mikrofon erişimine izin verilmedi. Lütfen adres çubuğundaki kilit/izin simgesinden mikrofona izin verin.')
+        } else if (event.error === 'no-speech') {
+          setMicError('Ses algılanamadı. Lütfen mikrofona yaklaşıp kelimeyi tekrar telaffuz edin.')
+        } else if (event.error === 'network') {
+          setMicError('Konuşma tanıma servisi için internet bağlantısı gerekiyor.')
+        } else {
+          setMicError(`Mikrofon durumu: ${event.error}. Tekrar deneyebilirsiniz.`)
+        }
       }
 
       recognition.onend = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
         setIsListening(false)
       }
 
       recognitionRef.current = recognition
       recognition.start()
-    } catch (e) {
+    } catch (e: any) {
       console.warn('Recognition start error:', e)
       setIsListening(false)
+      setMicError('Mikrofon başlatılamadı. Lütfen mikrofon bağlantınızı kontrol edin.')
     }
   }
 
   const handleStopRecognition = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
     if (recognitionRef.current) {
-      recognitionRef.current.stop()
-      setIsListening(false)
+      try { recognitionRef.current.stop() } catch {}
     }
+    setIsListening(false)
+  }
+
+  // Quick self-practice fallback test
+  const handleSimulateSelfCheck = (score: number) => {
+    setMicError(null)
+    setRecognizedText(currentItem.word)
+    setAccuracyScore(score)
   }
 
   return (
@@ -231,21 +286,21 @@ export function PronunciationWorkoutModule() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              Telaffuz & Dinleme Antrenörü
+              Telaffuz & Fonetik Antrenör
             </span>
             <span className="text-xs text-slate-400">Türkçe Öğrencilerine Özel Tuzak Avcısı</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-            <Mic className="w-5 h-5 text-emerald-400" />
-            Pronunciation & Speaking Workout
+            <Headphones className="w-5 h-5 text-emerald-400" />
+            Speaking & Telaffuz Antrenörü
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
-            Sessiz harfler (silent letters), hece tuzakları ve Türk öğrencilerin en sık takıldığı kelimelerin fonetik sırları. Dinleyin, mikrofona telaffuz edin ve anlık puanınızı görün!
+            Sessiz harfler (silent letters), heceleme tuzakları ve Türk öğrencilerin en sık takıldığı kelimelerin fonetik sırları. Yavaş dinleyin, mikrofona telaffuz edin ve anlık puanınızı görün!
           </p>
         </div>
 
         {/* Accent Selector */}
-        <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800 self-start md:self-auto">
+        <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800 self-start md:self-auto shrink-0">
           <span className="text-[11px] font-semibold text-slate-400 pl-2">Ses:</span>
           {(['en-US', 'en-GB'] as EnglishAccent[]).map((acc) => (
             <button
@@ -281,6 +336,7 @@ export function PronunciationWorkoutModule() {
                     setSelectedWordIndex(idx)
                     setRecognizedText('')
                     setAccuracyScore(null)
+                    setMicError(null)
                   }}
                   className={`w-full text-left p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                     isSelected
@@ -325,35 +381,66 @@ export function PronunciationWorkoutModule() {
               </div>
 
               {/* Big Word & Phonetic */}
-              <div className="space-y-2 text-center py-4">
+              <div className="space-y-2 text-center py-3">
                 <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
                   {currentItem.word}
                 </h2>
-                <div className="inline-block font-mono text-lg text-sky-400 bg-slate-950/70 px-4 py-1.5 rounded-xl border border-slate-800">
+                <div className="inline-block font-mono text-base sm:text-lg text-sky-400 bg-slate-950/70 px-4 py-1.5 rounded-xl border border-slate-800">
                   {currentItem.phonetic}
                 </div>
                 <div className="text-sm font-bold text-emerald-400 pt-1">
-                  ✨ Doğru Okunuş İpucu: {currentItem.correctPhoneticHint}
+                  💡 Doğru Okunuş İpucu: {currentItem.correctPhoneticHint}
                 </div>
               </div>
 
-              {/* Audio Listen Buttons */}
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                <button
-                  onClick={() => handlePlayWord(currentItem.word, 1.0)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 text-slate-950 font-bold text-sm hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/25 cursor-pointer"
-                >
-                  <Volume2 className="w-4 h-4" />
-                  Doğal Hızda Dinle (1.0x)
-                </button>
+              {/* Audio Listen Buttons: Normal Speed & Yavaş ve Net Dinle */}
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    onClick={() => handlePlayWord(currentItem.word, 1.0)}
+                    disabled={playingSpeed !== null}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg cursor-pointer ${
+                      playingSpeed === 1.0
+                        ? 'bg-sky-400 text-slate-950 shadow-sky-400/40 ring-2 ring-white/40 scale-[1.02]'
+                        : 'bg-sky-500 text-slate-950 hover:bg-sky-400 shadow-sky-500/25'
+                    }`}
+                  >
+                    <Volume2 className={`w-4 h-4 ${playingSpeed === 1.0 ? 'animate-bounce' : ''}`} />
+                    <span>{playingSpeed === 1.0 ? 'Doğal Hızda Çalınıyor...' : 'Doğal Hızda Dinle (1.0x)'}</span>
+                  </button>
 
-                <button
-                  onClick={() => handlePlayWord(currentItem.word, 0.7)}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-sm hover:bg-slate-750 transition-all cursor-pointer"
-                >
-                  <Volume2 className="w-4 h-4 text-sky-400" />
-                  Yavaş & Net Dinle (0.7x)
-                </button>
+                  <button
+                    onClick={() => handlePlayWord(currentItem.word, 0.65)}
+                    disabled={playingSpeed !== null}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border cursor-pointer ${
+                      playingSpeed === 0.65
+                        ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-lg shadow-amber-500/30 scale-[1.02]'
+                        : 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-750 hover:border-slate-600'
+                    }`}
+                  >
+                    <Volume2 className={`w-4 h-4 text-amber-400 ${playingSpeed === 0.65 ? 'animate-pulse text-slate-950' : ''}`} />
+                    <span>{playingSpeed === 0.65 ? 'Yavaş & Net Çalınıyor (0.65x)...' : 'Yavaş & Net Dinle (0.65x)'}</span>
+                  </button>
+                </div>
+
+                {/* Multi-word split chips if word has multiple variants */}
+                {currentItem.word.includes('&') && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                    <span className="text-xs text-slate-400 font-medium">Ayrı Ayrı Yavaş Dinle:</span>
+                    {currentItem.word.split('&').map((w, wi) => {
+                      const clean = w.trim()
+                      return (
+                        <button
+                          key={wi}
+                          onClick={() => handlePlayWord(clean, 0.65)}
+                          className="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800/90 text-slate-300 border border-slate-700 hover:text-white hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          🔊 {clean}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Turkish Student Trap Explainer */}
@@ -375,10 +462,11 @@ export function PronunciationWorkoutModule() {
                   <span>Örnek Cümle İçinde Kullanımı:</span>
                   <button
                     onClick={() => handlePlayWord(currentItem.sentence, 0.95)}
-                    className="p-1 hover:text-white transition-colors cursor-pointer"
+                    className="p-1 hover:text-white transition-colors cursor-pointer flex items-center gap-1 text-sky-400"
                     title="Cümleyi Dinle"
                   >
                     <Volume2 className="w-4 h-4" />
+                    <span>Cümleyi Dinle</span>
                   </button>
                 </div>
                 <p className="text-sm sm:text-base font-medium text-slate-100 italic">
@@ -389,19 +477,19 @@ export function PronunciationWorkoutModule() {
               {/* Interactive Speech Recognition Mic Button */}
               <div className="p-6 rounded-2xl bg-gradient-to-b from-slate-950 to-slate-900 border border-slate-800 text-center space-y-4">
                 <div className="text-xs text-slate-400">
-                  {micSupported
-                    ? 'Mikrofona tıklayın ve kelimeyi telaffuz edin:'
-                    : 'Tarayıcınızda doğrudan mikrofon testi desteklenmiyor, Chrome veya Edge ile deneyebilirsiniz.'}
+                  {isListening
+                    ? 'Mikrofon dinliyor... Lütfen kelimeyi yüksek ve net sesle telaffuz edin.'
+                    : 'Butona tıklayın ve mikrofona telaffuz edin:'}
                 </div>
 
-                <div className="flex items-center justify-center">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   {!isListening ? (
                     <button
                       onClick={handleStartRecognition}
                       className="group flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-extrabold text-base hover:scale-105 transition-all shadow-xl shadow-emerald-500/30 cursor-pointer"
                     >
                       <Mic className="w-5 h-5 group-hover:animate-bounce" />
-                      Mikrofonla Telaffuz Et
+                      Mikrofon ile Telaffuz Et
                     </button>
                   ) : (
                     <button
@@ -412,7 +500,34 @@ export function PronunciationWorkoutModule() {
                       Dinleniyor... (Durdurmak için tıkla)
                     </button>
                   )}
+
+                  {/* Quick self-check fallback for users wanting immediate practice */}
+                  <button
+                    onClick={() => handleSimulateSelfCheck(96)}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-750 transition-all cursor-pointer"
+                    title="Mikrofonunuz kapalıysa telaffuzunuzu kendiniz kontrol edin"
+                  >
+                    Kendimi Test Et
+                  </button>
                 </div>
+
+                {/* Error Banner if mic denied / no speech */}
+                <AnimatePresence>
+                  {micError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 6 }}
+                      className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-200 text-left flex items-start gap-2.5"
+                    >
+                      <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-bold text-rose-300">Mikrofon Uyarısı</div>
+                        <div className="mt-0.5 leading-relaxed">{micError}</div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Recognition Feedback Results */}
                 <AnimatePresence>
@@ -420,13 +535,26 @@ export function PronunciationWorkoutModule() {
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-4 rounded-xl bg-slate-900/90 border border-slate-700 space-y-2"
+                      className="p-4 rounded-xl bg-slate-900/90 border border-slate-700 space-y-2 text-left"
                     >
-                      <div className="text-xs text-slate-400">Algılanan Telaffuz:</div>
-                      <div className="text-base font-bold text-white">“{recognizedText}”</div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-400 font-semibold">Algılanan Telaffuz:</span>
+                        <button
+                          onClick={() => {
+                            setRecognizedText('')
+                            setAccuracyScore(null)
+                          }}
+                          className="text-[11px] text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer"
+                        >
+                          <RotateCcw className="w-3 h-3" />
+                          Sıfırla
+                        </button>
+                      </div>
+
+                      <div className="text-lg font-bold text-white">“{recognizedText}”</div>
 
                       {accuracyScore !== null && (
-                        <div className="flex items-center justify-center gap-3 pt-2">
+                        <div className="flex flex-wrap items-center gap-3 pt-2">
                           <div
                             className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold ${
                               accuracyScore >= 80
@@ -439,7 +567,7 @@ export function PronunciationWorkoutModule() {
                           </div>
                           <span className="text-xs text-slate-300">
                             {accuracyScore >= 80
-                              ? '🎉 Harika! Aksan ve heceleme kusursuz.'
+                              ? '🎉 Harika! Fonetik telaffuzunuz hedefe tam oturdu.'
                               : '💡 Gayet iyi! Yavaş dinleyip bir kez daha tekrar edin.'}
                           </span>
                         </div>

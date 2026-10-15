@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Sparkles,
   Volume2,
   VolumeX,
   MessageSquare,

@@ -10,7 +10,6 @@ import {
   Calculator,
   BookOpen,
   Globe2,
-  Sparkles,
   Search,
   ArrowRight,
   CheckCircle2,
@@ -595,7 +594,7 @@ export function LabHubView() {
         <section className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-cyan-950/40 via-slate-900/90 to-indigo-950/40 border border-cyan-500/30 backdrop-blur-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1.5 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
+              <GraduationCap className="w-3.5 h-3.5" />
               <span>DersoLab Canlı Özel Ders</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-black text-white">
