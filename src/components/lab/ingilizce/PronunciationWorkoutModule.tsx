@@ -270,6 +270,7 @@ export function PronunciationWorkoutModule() {
   const [userAudioBlobUrl, setUserAudioBlobUrl] = useState<string | null>(null)
   const [isPlayingUserAudio, setIsPlayingUserAudio] = useState<boolean>(false)
   const [customInput, setCustomInput] = useState<string>('')
+  const [browserNotice, setBrowserNotice] = useState<string | null>(null)
 
   const currentItem = PRONUNCIATION_LIST[selectedWordIndex]
 
@@ -283,8 +284,24 @@ export function PronunciationWorkoutModule() {
   const isListeningRef = useRef<boolean>(false)
   const userAudioPlayerRef = useRef<HTMLAudioElement | null>(null)
 
-  // Cleanup on unmount
+  // Detect browser compatibility
   useEffect(() => {
+    if (typeof navigator !== 'undefined') {
+      const ua = navigator.userAgent
+      const isOpera = /OPR\//.test(ua) || /Opera/.test(ua)
+      const isFirefox = /Firefox\//.test(ua)
+
+      if (isOpera) {
+        setBrowserNotice(
+          'Opera tarayıcısı Google\'ın ses tanıma (SpeechRecognition) motorunu bünyesinde barındırmaz. Mikrofonla canlı konuşma tanıma için Google Chrome veya Microsoft Edge önerilir. Opera\'da aşağıdaki yazılı analiz kutusunu ve tek tıkla test simülasyonlarını eksiksiz kullanabilirsiniz.'
+        )
+      } else if (isFirefox) {
+        setBrowserNotice(
+          'Firefox tarayıcısında Web SpeechRecognition varsayılan olarak kapalıdır. Canlı konuşma için Google Chrome veya Microsoft Edge önerilir.'
+        )
+      }
+    }
+
     return () => {
       stopAllMedia()
       if (userAudioBlobUrl) {
@@ -346,6 +363,19 @@ export function PronunciationWorkoutModule() {
       setUserAudioBlobUrl(null)
     }
 
+    // Check if Opera or unsupported browser
+    const isOpera =
+      typeof navigator !== 'undefined' &&
+      (/OPR\//.test(navigator.userAgent) || /Opera/.test(navigator.userAgent))
+    if (isOpera) {
+      setMicError(
+        'Opera Tarayıcısı Bilgisi: Opera tarayıcısı Google\'ın ses tanıma (SpeechRecognition) altyapısını desteklememektedir. Ayrıca Opera üzerinde site izni açık görünse bile Windows 11 "Masaüstü uygulamalarına mikrofon izni verin" ayarı kapalıysa mikrofon sürücüsü kilitlenir. Canlı konuşarak pratik yapmak için lütfen Google Chrome veya Microsoft Edge kullanın ya da aşağıdaki yazılı analiz kutusunu kullanın.'
+      )
+      setIsListening(false)
+      isListeningRef.current = false
+      return
+    }
+
     // 1. Request real microphone access for volume meter & recording
     let stream: MediaStream | null = null
     try {
@@ -399,7 +429,7 @@ export function PronunciationWorkoutModule() {
       console.warn('Microphone permission / stream error:', micErr)
       let reason = 'Mikrofon erişimi engellendi veya bulunamadı.'
       if (micErr?.name === 'NotAllowedError' || micErr?.name === 'PermissionDeniedError') {
-        reason = 'Tarayıcınız bu adreste (localhost) mikrofonu önceden "Engellendi" olarak kaydettiği için güvenlik protokolü gereği tekrar açılır izin kutusu (popup) göstermez. Lütfen adres çubuğundaki kilit simgesinden izin verin.'
+        reason = 'Mikrofon erişimi engellendi (NotAllowedError). Tarayıcınızda izin açık görünmesine rağmen bu hatayı alıyorsanız: Windows Ayarları > Gizlilik ve Güvenlik > Mikrofon menüsünden "Masaüstü uygulamalarının mikrofonunuza erişmesine izin verin" ayarının AÇIK olduğundan ve tarayıcınıza izin verildiğinden emin olun.'
       } else if (micErr?.name === 'NotFoundError' || micErr?.name === 'DevicesNotFoundError') {
         reason = 'Bilgisayarınızda bağlı veya etkin bir mikrofon cihazı bulunamadı. Lütfen kulaklık/mikrofon bağlantınızı kontrol edin.'
       } else if (micErr?.name === 'NotReadableError') {
@@ -740,6 +770,17 @@ export function PronunciationWorkoutModule() {
 
               {/* Interactive Speech Recognition & Real Mic Section */}
               <div className="p-6 rounded-2xl bg-gradient-to-b from-slate-950 to-slate-900 border border-slate-800 text-center space-y-4">
+                {/* Browser Compatibility Notice if in Opera or Firefox */}
+                {browserNotice && (
+                  <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-[11px] text-amber-200 text-left flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold text-amber-300">Tarayıcı Uyarısı: </span>
+                      {browserNotice}
+                    </div>
+                  </div>
+                )}
+
                 <div className="text-xs text-slate-400">
                   {isListening
                     ? 'Mikrofon canlı dinliyor... Lütfen kelimeyi yüksek ve net sesle telaffuz edin:'
