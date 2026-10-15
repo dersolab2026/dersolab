@@ -269,6 +269,7 @@ export function PronunciationWorkoutModule() {
   const [micError, setMicError] = useState<string | null>(null)
   const [userAudioBlobUrl, setUserAudioBlobUrl] = useState<string | null>(null)
   const [isPlayingUserAudio, setIsPlayingUserAudio] = useState<boolean>(false)
+  const [customInput, setCustomInput] = useState<string>('')
 
   const currentItem = PRONUNCIATION_LIST[selectedWordIndex]
 
@@ -396,9 +397,15 @@ export function PronunciationWorkoutModule() {
       }
     } catch (micErr: any) {
       console.warn('Microphone permission / stream error:', micErr)
-      setMicError(
-        'Mikrofon erişimi engellendi veya bulunamadı. Lütfen tarayıcınızın adres çubuğundaki kilit/izin simgesinden mikrofona izin verin.'
-      )
+      let reason = 'Mikrofon erişimi engellendi veya bulunamadı.'
+      if (micErr?.name === 'NotAllowedError' || micErr?.name === 'PermissionDeniedError') {
+        reason = 'Tarayıcınız bu adreste (localhost) mikrofonu önceden "Engellendi" olarak kaydettiği için güvenlik protokolü gereği tekrar açılır izin kutusu (popup) göstermez. Lütfen adres çubuğundaki kilit simgesinden izin verin.'
+      } else if (micErr?.name === 'NotFoundError' || micErr?.name === 'DevicesNotFoundError') {
+        reason = 'Bilgisayarınızda bağlı veya etkin bir mikrofon cihazı bulunamadı. Lütfen kulaklık/mikrofon bağlantınızı kontrol edin.'
+      } else if (micErr?.name === 'NotReadableError') {
+        reason = 'Mikrofonunuz şu anda başka bir program (Zoom, Teams, Discord vb.) tarafından kullanılıyor.'
+      }
+      setMicError(reason)
       setIsListening(false)
       isListeningRef.current = false
       return
@@ -804,6 +811,35 @@ export function PronunciationWorkoutModule() {
                   </div>
                 </div>
 
+                {/* Manual Text Input Test */}
+                <div className="pt-2 border-t border-slate-800/80 max-w-md mx-auto space-y-1.5">
+                  <div className="text-[11px] text-slate-400 font-semibold flex items-center justify-center gap-1.5">
+                    <span>✍️ Veya Telaffuzunu Yazarak Anında Test Et:</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={customInput}
+                      onChange={(e) => setCustomInput(e.target.value)}
+                      placeholder='Örn: "comfartable" veya "comfortable"...'
+                      className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && customInput.trim()) {
+                          handleRunSimulatedTest(customInput.trim())
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        if (customInput.trim()) handleRunSimulatedTest(customInput.trim())
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400 transition-all cursor-pointer whitespace-nowrap"
+                    >
+                      Analiz Et
+                    </button>
+                  </div>
+                </div>
+
                 {/* Error Banner if mic denied / no speech */}
                 <AnimatePresence>
                   {micError && (
@@ -811,12 +847,29 @@ export function PronunciationWorkoutModule() {
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 6 }}
-                      className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-200 text-left flex items-start gap-2.5"
+                      className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-200 text-left space-y-3"
                     >
-                      <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                      <div>
-                        <div className="font-bold text-rose-300">Mikrofon Durumu</div>
-                        <div className="mt-0.5 leading-relaxed">{micError}</div>
+                      <div className="flex items-start gap-2.5">
+                        <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                        <div className="space-y-1">
+                          <div className="font-bold text-rose-300 text-sm">Tarayıcı Neden İzin Kutusu (Popup) Göstermedi?</div>
+                          <div className="leading-relaxed">{micError}</div>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-slate-950/80 border border-rose-500/20 space-y-1.5 text-[11px] text-slate-300">
+                        <div className="font-bold text-white flex items-center gap-1.5">
+                          <span>🔒 2 Adımda Mikrofonu Açma:</span>
+                        </div>
+                        <p>
+                          1. Ekranın en tepesindeki adres çubuğunda <strong>localhost:3000</strong> yazısının hemen solundaki <strong>kilit (🔒) veya ayarlar (🎛️)</strong> simgesine tıklayın.
+                        </p>
+                        <p>
+                          2. <strong>Mikrofon (Microphone)</strong> seçeneğini <strong>"İzin Ver" (Allow)</strong> olarak değiştirin ve sayfayı yenileyin (<kbd className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700">F5</kbd>).
+                        </p>
+                        <p className="text-slate-400 text-[10px] pt-0.5">
+                          (Windows kullanıyorsanız: Windows Ayarları &gt; Gizlilik &gt; Mikrofon bölümünden masaüstü uygulamalarına mikrofon izni verildiğinden ve bilgisayarınıza bir kulaklık/mikrofon bağlı olduğundan emin olun.)
+                        </p>
                       </div>
                     </motion.div>
                   )}
