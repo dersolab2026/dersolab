@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { KimyaLabView } from '@/components/lab/KimyaLabView'
 
 export const metadata: Metadata = {
-  title: 'KimyaLab — İnteraktif YKS Kimya Simülasyonları & 3D Periyodik Tablo | DersoLab',
+  title: 'KimyaLab — 3D Bohr Atom Modeli, Periyodik Cetvel & Titrasyon | DersoLab',
   description:
-    'DersoLab Kimya Laboratuvarı: 3D atom orbital görselleştirici, sanal asit-baz titrasyon deneyi, YKS ÖSYM hap bilgileri ve Kimya-Le mini oyunu.',
+    'DersoLab Kimya Laboratuvarı: MEB ve Maarif Modeli uyumlu 3D Bohr atom modeli ve katman elektron dağılımı, sanal asit-baz titrasyon deneyi ve Kimya-Le oyunu.',
 }
 
 export default function KimyaLabPage() {

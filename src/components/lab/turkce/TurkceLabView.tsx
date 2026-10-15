@@ -18,6 +18,8 @@ import { LiteratureMatchGame } from './LiteratureMatchGame'
 import { PhoneticInspector } from './PhoneticInspector'
 import { TdkWordOfTheDay } from './TdkWordOfTheDay'
 
+import { BranchNavHeader } from '../BranchNavHeader'
+
 type TurkceTabType = 'bionic' | 'literature' | 'phonetics' | 'tdk'
 
 export function TurkceLabView() {
@@ -58,58 +60,10 @@ export function TurkceLabView() {
       <div className="fixed top-1/3 left-1/4 w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none -z-10" />
 
       {/* ── Top Navigation Bar ── */}
-      <header className="sticky top-0 z-50 backdrop-blur-2xl bg-slate-950/80 border-b border-slate-800/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-          
-          {/* Logo & Lab Brand */}
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-xs font-semibold"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">DersoLab'a Dön</span>
-            </Link>
+      <BranchNavHeader currentBranch="turkce" />
 
-            <div className="h-4 w-px bg-slate-800" />
-
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-500 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.4)]">
-                <BookOpen className="w-4 h-4 stroke-[2.5]" />
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-base font-black tracking-tight text-white">Derso<span className="text-cyan-400">Lab</span></span>
-                <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[9px] font-black uppercase tracking-wider">
-                  L.A.B.
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[10px] font-black uppercase tracking-wider">
-                  TürkçeLab
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Switch to L.A.B. Hub or Instructor CTA */}
-          <div className="flex items-center gap-2.5">
-            <Link
-              href="/lab"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-cyan-300 text-xs font-bold border border-cyan-500/30 transition-all"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>L.A.B. Ana Merkez</span>
-            </Link>
-
-            <Link
-              href="/instructors"
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-black transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer"
-            >
-              <GraduationCap className="w-3.5 h-3.5" />
-              <span>Türkçe Eğitmenleri</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* ── Secondary Tab Navigation Pill Bar ── */}
+      {/* ── Secondary Tab Navigation Pill Bar ── */}
+      <div className="sticky top-16 z-40 backdrop-blur-2xl bg-slate-950/80 border-b border-slate-800/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 overflow-x-auto gizli-kaydirma">
           <div className="flex items-center gap-2 min-w-max">
             {TABS.map((tab) => {
@@ -139,7 +93,7 @@ export function TurkceLabView() {
             })}
           </div>
         </div>
-      </header>
+      </div>
 
       {/* ── Main Content Container ── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">

@@ -129,7 +129,7 @@ export function KimyaLabView() {
               Kimyayı Ezberleme, Mantığıyla Öğren.
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-              Simülasyonlarda gördüğün orbital dizilimleri, asit-baz titrasyonları ve mol hesaplarını onaylı kimya öğretmenlerimizle birebir derste pekiştir.
+              Simülasyonlarda gördüğün atomun katman elektron dağılımı (Bohr modeli), periyodik cetvel, asit-baz titrasyonları ve mol hesaplarını onaylı kimya öğretmenlerimizle birebir derste pekiştir.
             </p>
           </div>
 

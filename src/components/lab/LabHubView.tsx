@@ -65,27 +65,27 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     levelBadge: '7 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      '3D kuantum orbitalleri, sanal asit-baz titrasyon deneyi, interaktif periyodik tablo ve çözelti konsantrasyon aracı.',
+      '3D Bohr atom modeli ve katman elektron dağılımı (2-8-8 kuralı), sanal asit-baz titrasyon deneyi, interaktif periyodik cetvel ve mol/çözelti aracı.',
     modules: [
       {
-        title: '3D Orbital & Kuantum Görselleştirici',
-        desc: 's, p, d, f elektron bulutlarını 3 boyutta döndürün ve düğüm noktalarını inceleyin.',
-        badge: '3D Canlı',
+        title: '3D Atom Modeli & Katman Dağılımı (Bohr)',
+        desc: 'Çekirdekteki proton ve nötronlar ile yörüngelerdeki elektron katmanlarını (2-8-8 kuralı) 3 boyutta inceleyin; değerlik elektronları ile grup-periyot ilişkisini keşfedin.',
+        badge: '7-12. Sınıf & LGS/YKS',
       },
       {
         title: 'Sanal Asit-Baz Titrasyon Deneyi',
-        desc: 'Büret musluğunu açın, damla damla titrasyonla fenolftalein indikatörünün pembeleşmesini ve pH eğrisini izleyin.',
-        badge: '7-11. Sınıf',
+        desc: 'Büret musluğunu açın; asit-baz nötralleşmesini, pH cetvelini (0-14) ve fenolftalein indikatörünün pembeleşme dönüm noktasını canlı izleyin.',
+        badge: '8. Sınıf LGS & Lise',
       },
       {
         title: 'Kimya-Le: Günün Elementi',
-        desc: 'İpuçlarıyla periyodik cetveldeki gizli elementi tahmin etme keşif oyunu.',
-        badge: 'Mini Oyun',
+        desc: 'İlk 18 element ve günlük hayattaki yaygın metalleri/ametalleri ipuçlarıyla periyodik cetvelde tahmin etme oyunu.',
+        badge: '7-12. Sınıf Keşif',
       },
       {
         title: 'Mol & Çözelti Konsantrasyon Aracı',
-        desc: 'M = n/V ve d = m/V formüllerini canlı hesaplayın, çözelti hazırlama simülasyonu.',
-        badge: 'Hesaplama Aracı',
+        desc: 'M = n/V derişim ve kütle formüllerini interaktif hesaplama laboratuvarı.',
+        badge: 'Lise (10-11. Sınıf)',
       },
     ],
   },

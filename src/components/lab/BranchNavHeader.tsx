@@ -12,6 +12,7 @@ import {
   Globe2,
   Home,
   Sparkles,
+  ArrowRight,
 } from 'lucide-react'
 
 export type BranchId = 'kimya' | 'turkce' | 'fizik' | 'matematik' | 'biyoloji' | 'sosyal'
@@ -89,13 +90,14 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           
-          {/* Logo & Hub Link */}
+          {/* Logo -> Hesabımın Ana Sayfası (/dashboard) */}
           <div className="flex items-center gap-3">
             <Link
-              href="/lab"
+              href="/dashboard"
               className="flex items-center gap-2 group transition-opacity hover:opacity-95"
+              title="Hesabımın Ana Sayfasına (Dashboard) Dön"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div className="flex items-baseline gap-1.5">
@@ -115,7 +117,7 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
 
             <Link
               href="/lab"
-              title="Laboratuvar Destekli Akademik Başarı"
+              title="L.A.B. Simülasyon Merkezi"
               className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
                 !currentBranch
                   ? 'text-cyan-300 bg-cyan-950/50 border border-cyan-500/40 shadow-sm'
@@ -123,7 +125,7 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
               }`}
             >
               <Home className="w-3.5 h-3.5" />
-              L.A.B. Ana Merkez
+              L.A.B. Merkezi
             </Link>
           </div>
 
@@ -149,13 +151,15 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
             })}
           </nav>
 
-          {/* Return to main site */}
-          <div className="hidden md:flex items-center">
+          {/* Hesabımın Ana Sayfasına Dön (/dashboard) */}
+          <div className="flex items-center">
             <Link
-              href="/"
-              className="text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
+              href="/dashboard"
+              className="text-xs font-bold text-slate-200 hover:text-white transition-all flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 hover:border-cyan-500/50 hover:bg-slate-800 shadow-sm"
+              title="Hesabımın Ana Sayfasına (Dashboard) Dön"
             >
-              Ana Sayfa &rarr;
+              <span>Panelime Dön</span>
+              <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
             </Link>
           </div>
 

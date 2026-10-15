@@ -244,7 +244,7 @@ export const ELEMENTS_DATA: ElementData[] = [
     electronConfig: '[Ne] 3s² 3p³',
     oxidationStates: '-3, +3, +5',
     summary: 'Beyaz ve kırmızı fosfor gibi allotropları olan ametal.',
-    osymHint: 'Küresel simetriktir (son orbitali p³ yarı dolu). Bu yüzden 5A grubunun 1. iyonlaşma enerjisi 6A grubundan (Kükürt) BÜYÜKTÜR (3 aşağı 5 yukarı kuralı)!',
+    osymHint: 'Ortaokulda katman dağılımı 2-8-5 (3. periyot 5A ametal). Lise/AYT Seviyesi: Küresel simetriktir (son orbitali p³ yarı dolu), bu yüzden 1. iyonlaşma enerjisi 6A grubundan BÜYÜKTÜR (3 aşağı 5 yukarı kuralı)!',
     color: '#38bdf8',
   },
   {
