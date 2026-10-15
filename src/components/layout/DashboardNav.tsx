@@ -4,7 +4,7 @@ import type { UserRole } from '@/types'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { X, FlaskConical, Sparkles } from 'lucide-react'
+import { X } from 'lucide-react'
 import { logoutUser } from '@/actions/auth'
 import { NotificationBell } from '@/components/layout/NotificationBell'
 import type { NotificationItem } from '@/actions/notifications'
@@ -41,6 +41,7 @@ interface DashboardNavProps {
 const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   student: [
     { href: '/dashboard/student/bookings', label: 'Derslerim' },
+    { href: '/lab', label: 'L.A.B.' },
     { href: '/dashboard/student/gunluk', label: 'Günlük' },
     { href: '/dashboard/student/netlerim', label: 'Netlerim' },
     { href: '/dashboard/student/kocluk-formu', label: 'Koçluk Formu' },
@@ -55,12 +56,14 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
   parent: [
     { href: '/dashboard/parent', label: 'Öğrencilerim' },
+    { href: '/lab', label: 'L.A.B.' },
     { href: '/dashboard/parent/paketler', label: 'Paketler' },
     { href: '/dashboard/parent/settings', label: 'Ayarlar' },
   ],
   instructor: [
     { href: '/dashboard/instructor', label: 'Derslerim' },
     { href: '/dashboard/instructor/ogrencilerim', label: 'Öğrencilerim' },
+    { href: '/lab', label: 'L.A.B.' },
     { href: '/dashboard/instructor/homework', label: 'Ödevler' },
     { href: '/dashboard/instructor/availability', label: 'Ajanda' },
     { href: '/dashboard/instructor/profile', label: 'Profilim' },
@@ -70,6 +73,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
   admin: [
     { href: '/dashboard/admin', label: 'Genel Bakış' },
+    { href: '/lab', label: 'L.A.B.' },
     { href: '/dashboard/admin/users', label: 'Kullanıcılar' },
     { href: '/dashboard/admin/instructors', label: 'Eğitmen Onayları' },
     { href: '/dashboard/admin/packages', label: 'Paketler' },
@@ -143,16 +147,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
             </div>
           </Link>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/lab"
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-500/15 border border-purple-500/30 text-purple-300 hover:bg-purple-500/25 transition-all shadow-sm"
-          >
-            <FlaskConical className="w-3.5 h-3.5 text-purple-400" />
-            <span>L.A.B.</span>
-          </Link>
-          <NotificationBell initialNotifications={notifications} role={role} />
-        </div>
+        <NotificationBell initialNotifications={notifications} role={role} />
       </nav>
 
       {/* Mobil: kayan menü (drawer) */}
@@ -167,7 +162,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between mb-5 shrink-0">
+        <div className="flex items-center justify-between mb-6 shrink-0">
           <Link href="/dashboard">
             <div className="flex items-center gap-2 group">
               <span className="font-black text-white text-xl tracking-tight">Derso<span className={`text-transparent bg-clip-text bg-gradient-to-r ${getLogoTextClass(role)}`}>Lab</span></span>
@@ -178,50 +173,21 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
           </button>
         </div>
 
-        {/* Mobil: L.A.B. Ayrı Öne Çıkan Buton */}
-        <div className="mb-4 shrink-0">
-          <Link
-            href="/lab"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`group relative flex items-center justify-between p-2.5 rounded-xl border transition-all duration-300 ${
-              pathname.startsWith('/lab')
-                ? 'bg-gradient-to-r from-purple-500/25 via-indigo-500/20 to-pink-500/20 border-purple-400/50 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]'
-                : 'bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-purple-900/20 border-purple-500/30 text-purple-200 hover:border-purple-400/60 hover:bg-purple-900/40'
-            }`}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 via-indigo-500 to-pink-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-purple-500/25">
-                <FlaskConical className="w-4 h-4" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-black text-sm tracking-wider text-white">L.A.B.</span>
-                  <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-gradient-to-r from-purple-500 to-pink-500 text-white uppercase tracking-wider">
-                    Yeni
-                  </span>
-                </div>
-                <span className="text-[10px] text-purple-300/80 font-medium">
-                  Laboratuvar & Simülasyon
-                </span>
-              </div>
-            </div>
-            <Sparkles className="w-3.5 h-3.5 text-purple-400/70 shrink-0" />
-          </Link>
-          <div className="mt-3 border-t border-white/10" />
-        </div>
-
         <div className="flex-1 flex flex-col gap-2 overflow-y-auto gizli-kaydirma">
-          {items.map((item, i) => (
-            <div key={item.href}>
-              {i === dividerIndex && <div className="my-2 border-t border-white/10" />}
-              <Link
-                href={item.href}
-                className={pathname === item.href ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE}
-              >
-                {item.label}
-              </Link>
-            </div>
-          ))}
+          {items.map((item, i) => {
+            const isActive = item.href === '/lab' ? pathname.startsWith('/lab') : pathname === item.href
+            return (
+              <div key={item.href}>
+                {i === dividerIndex && <div className="my-2 border-t border-white/10" />}
+                <Link
+                  href={item.href}
+                  className={isActive ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE}
+                >
+                  {item.label}
+                </Link>
+              </div>
+            )
+          })}
         </div>
         <div className="pt-4 mt-4 border-t border-white/10 shrink-0">
           <form action={logoutUser}>
@@ -243,55 +209,27 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
         }}
       >
         <div className="flex flex-col h-full" style={{ width: SIDEBAR_WIDTH - 32 }}>
-          <Link href="/dashboard" className="mb-5 block shrink-0">
+          <Link href="/dashboard" className="mb-6 block shrink-0">
             <div className="flex items-center gap-2 group">
               <span className="font-black text-white text-xl tracking-tight">Derso<span className={`text-transparent bg-clip-text bg-gradient-to-r ${getLogoTextClass(role)}`}>Lab</span></span>
             </div>
           </Link>
 
-          {/* Masaüstü: L.A.B. Ayrı Öne Çıkan Buton (Öğrenci, Eğitmen ve Veli için) */}
-          <div className="mb-4 shrink-0">
-            <Link
-              href="/lab"
-              className={`group relative flex items-center justify-between p-2.5 rounded-xl border transition-all duration-300 ${
-                pathname.startsWith('/lab')
-                  ? 'bg-gradient-to-r from-purple-500/25 via-indigo-500/20 to-pink-500/20 border-purple-400/50 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]'
-                  : 'bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-purple-900/20 border-purple-500/30 text-purple-200 hover:border-purple-400/60 hover:bg-purple-900/40 hover:shadow-[0_0_15px_rgba(168,85,247,0.2)]'
-              }`}
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 via-indigo-500 to-pink-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-purple-500/25 group-hover:scale-105 transition-transform">
-                  <FlaskConical className="w-4 h-4" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-black text-sm tracking-wider text-white">L.A.B.</span>
-                    <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-gradient-to-r from-purple-500 to-pink-500 text-white uppercase tracking-wider shadow-sm">
-                      Yeni
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-purple-300/80 font-medium truncate">
-                    Simülasyon Merkezi
-                  </span>
-                </div>
-              </div>
-              <Sparkles className="w-3.5 h-3.5 text-purple-400/70 shrink-0 group-hover:text-purple-200 group-hover:rotate-12 transition-all" />
-            </Link>
-            <div className="mt-3 border-t border-white/10" />
-          </div>
-
           <div className="flex-1 flex flex-col gap-2 overflow-y-auto gizli-kaydirma">
-            {items.map((item, i) => (
-              <div key={item.href}>
-                {i === dividerIndex && <div className="my-2 border-t border-white/10" />}
-                <Link
-                  href={item.href}
-                  className={pathname === item.href ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE}
-                >
-                  {item.label}
-                </Link>
-              </div>
-            ))}
+            {items.map((item, i) => {
+              const isActive = item.href === '/lab' ? pathname.startsWith('/lab') : pathname === item.href
+              return (
+                <div key={item.href}>
+                  {i === dividerIndex && <div className="my-2 border-t border-white/10" />}
+                  <Link
+                    href={item.href}
+                    className={isActive ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE}
+                  >
+                    {item.label}
+                  </Link>
+                </div>
+              )
+            })}
           </div>
           <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t border-white/10 shrink-0">
             <NotificationBell initialNotifications={notifications} role={role} panelPosition="up" />
