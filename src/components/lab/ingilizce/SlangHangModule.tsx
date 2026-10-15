@@ -538,13 +538,13 @@ export function SlangHangModule() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-              Google Labs — Slang Hang Modeli
+              DersoLab — Yaşayan Dil & Deyimler
             </span>
             <span className="text-xs text-slate-400">Doğal Diyalog & Yerel Deyimler</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
             <Flame className="w-5 h-5 text-amber-400" />
-            Slang Hang — Sokak Dili & Deyimler
+            Doğal Konuşma & Sokak Deyimleri (Slang & Idioms)
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
             Amerikan, İngiliz ve Avustralya sokak jargonu, kültürel deyimler ve argo ifadeler. Altı çizili deyimlere dokunarak gerçek anlamı ve Türkçe karşılıklarını keşfedin.

@@ -259,32 +259,32 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-sky-500/10',
     borderColor: 'border-sky-500/30 group-hover:border-sky-400/60',
     textColor: 'text-sky-400',
-    tag: 'Little Language Lessons',
+    tag: 'Pratik Konuşma & Dil',
     category: 'dil',
     levels: ['ortaokul', 'lise'],
-    levelBadge: '5 - 12. Sınıf & LGS / YDT',
+    levelBadge: '5 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      'Google Little Language Lessons ilhamlı: Durumsal mikro dersler (Tiny Lessons), US/UK/AU sokak jargonu & deyimler (Slang Hang), fonetik telaffuz antrenörü ve görsel sahne kelime avcısı.',
+      'Durumsal konuşma senaryoları (kafe, havalimanı, mülakat), Amerikan/İngiliz sokak jargonu & deyimler, kritik telaffuz hataları ve görsel sahne nesne sözlüğü ile interaktif İngilizce atölyesi.',
     modules: [
       {
-        title: 'Tiny Lessons (Durumsal Mikro Dersler)',
+        title: 'Durumsal Mikro Senaryolar',
         desc: 'Kafede sipariş, havalimanında kayıp bagaj, iş mülakatı ve yön sorma gibi gerçek hayat senaryoları ve diyaloglar.',
-        badge: 'Google LLL Modeli',
+        badge: 'Durumsal Öğrenme',
       },
       {
-        title: 'Slang Hang (Sokak Dili & Deyimler)',
-        desc: 'Amerikan, İngiliz ve Avustralya aksanlarında doğal konuşmalar, deyimler ve Türkçe kültürel karşılıkları.',
+        title: 'Doğal Konuşma & Deyimler (Slang & Idioms)',
+        desc: 'Amerikan, İngiliz ve Avustralya aksanlarında yaşayan sokak dili, deyimler ve Türkçe kültürel karşılıkları.',
         badge: 'US • UK • AU',
       },
       {
-        title: 'Speaking & Telaffuz Antrenörü',
+        title: 'Fonetik Telaffuz & Konuşma Antrenörü',
         desc: 'Türk öğrencilerin en sık yaptığı sessiz harf tuzakları (receipt, subtle, queue) ve sesli telaffuz tanıma.',
         badge: 'Web Speech Audio',
       },
       {
-        title: 'Görsel Sahne Sözlüğü (Word Cam)',
-        desc: 'Kahve barı, havalimanı ve ofis sahnelerinde nesnelere dokunarak telaffuz ve örnek kalıp cümle keşfi.',
+        title: 'Görsel Sahne Sözlüğü (Visual Explorer)',
+        desc: 'Kahve barı, havalimanı ve ofis ortamlarında nesnelere dokunarak telaffuz ve örnek kalıp cümle keşfi.',
         badge: 'Görsel Öğrenme',
       },
     ],
@@ -412,7 +412,7 @@ export function LabHubView() {
               { id: 'lise' as FilterType, label: '🎓 Lise (9-12. Sınıf)' },
               { id: 'sayisal' as FilterType, label: '🔬 Fen & Matematik' },
               { id: 'sozel' as FilterType, label: '📚 Türkçe & Sosyal' },
-              { id: 'dil' as FilterType, label: '🌐 İngilizce (Google LLL)' },
+              { id: 'dil' as FilterType, label: '🌐 İngilizceLab' },
             ].map((f) => {
               const isActive = activeFilter === f.id
               return (

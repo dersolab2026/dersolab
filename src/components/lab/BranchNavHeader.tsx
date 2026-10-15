@@ -91,30 +91,35 @@ export const BRANCHES = [
     color: 'from-sky-500 to-indigo-500',
     borderActive: 'border-sky-500/50 text-sky-300 bg-sky-950/40',
     accentColor: 'text-sky-400',
-    tag: 'Little Language Lessons',
+    tag: 'Pratik Konuşma & Dil',
   },
 ]
 
 export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#07090E]/85 border-b border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+      <div className="max-w-[1440px] mx-auto px-2.5 sm:px-4 lg:px-6">
+        <div className="flex items-center justify-between h-16 gap-2 lg:gap-3">
           
           {/* Logo -> Hesabımın Ana Sayfası (/dashboard) */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 lg:gap-2.5 shrink-0">
             <Link
               href="/dashboard"
-              className="flex items-center gap-2 group transition-opacity hover:opacity-95"
+              className="flex items-center gap-2 group transition-opacity hover:opacity-95 shrink-0"
               title="Hesabımın Ana Sayfasına (Dashboard) Dön"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
+              <Image
+                src="/fox-head.png"
+                alt="DersoLab Maskot"
+                width={36}
+                height={36}
+                className="w-8 h-8 object-contain drop-shadow-md group-hover:scale-110 transition-transform shrink-0"
+                priority
+              />
               <div className="flex items-baseline gap-1.5">
                 <div className="flex items-baseline">
-                  <span className="text-lg font-black tracking-tight text-white">Derso</span>
-                  <span className="text-lg font-black tracking-tight bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">
+                  <span className="text-base sm:text-lg font-black tracking-tight text-white">Derso</span>
+                  <span className="text-base sm:text-lg font-black tracking-tight bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">
                     Lab
                   </span>
                 </div>
@@ -124,23 +129,23 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
               </div>
             </Link>
 
-            <span className="hidden sm:inline-block text-slate-700 text-sm">/</span>
+            <span className="hidden xl:inline-block text-slate-700 text-sm">/</span>
 
             <Link
               href="/lab"
               title="L.A.B. Simülasyon Merkezi"
-              className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+              className={`hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
                 !currentBranch
                   ? 'text-cyan-300 bg-cyan-950/50 border border-cyan-500/40 shadow-sm'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
               }`}
             >
               <Home className="w-3.5 h-3.5" />
-              L.A.B. Merkezi
+              <span>L.A.B. Merkezi</span>
             </Link>
           </div>
 
-          {/* Quick Branch Tabs */}
+          {/* Quick Branch Tabs - Compact to fit all cleanly */}
           <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-1">
             {BRANCHES.map((b) => {
               const Icon = b.icon
@@ -149,7 +154,7 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
                 <Link
                   key={b.id}
                   href={b.href}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border ${
+                  className={`flex items-center gap-1 px-2 py-1 xl:px-2.5 xl:py-1.5 rounded-lg xl:rounded-xl text-[11px] xl:text-xs font-semibold whitespace-nowrap transition-all border shrink-0 ${
                     isActive
                       ? b.borderActive + ' shadow-md'
                       : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -163,10 +168,10 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
           </nav>
 
           {/* Hesabımın Ana Sayfasına Dön (/dashboard) */}
-          <div className="flex items-center">
+          <div className="flex items-center shrink-0">
             <Link
               href="/dashboard"
-              className="text-xs font-bold text-slate-200 hover:text-white transition-all flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 hover:border-cyan-500/50 hover:bg-slate-800 shadow-sm"
+              className="text-[11px] sm:text-xs font-bold text-slate-200 hover:text-white transition-all flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 hover:border-cyan-500/50 hover:bg-slate-800 shadow-sm whitespace-nowrap"
               title="Hesabımın Ana Sayfasına (Dashboard) Dön"
             >
               <span>Panelime Dön</span>

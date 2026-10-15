@@ -252,7 +252,7 @@ export function VisualSceneModule() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-              Google Labs — Word Cam / Görsel Sahne Modeli
+              DersoLab — Görsel Sahne & Kelime Keşfi
             </span>
             <span className="text-xs text-slate-400">Görsel Nesne & Kelime Eşleştirme</span>
           </div>

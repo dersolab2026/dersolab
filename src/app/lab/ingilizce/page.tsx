@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { IngilizceLabView } from '@/components/lab/ingilizce/IngilizceLabView'
 
 export const metadata: Metadata = {
-  title: 'İngilizceLab — Google Little Language Lessons İlhamlı İnteraktif Dil Atölyesi | DersoLab',
+  title: 'İngilizceLab — İnteraktif Konuşma & Dil Atölyesi | DersoLab',
   description:
-    'DersoLab İngilizce Laboratuvarı: Google LLL ilhamlı durumsal mikro dersler (Tiny Lessons), sokak jargonu & deyimler (Slang Hang), fonetik telaffuz antrenörü ve görsel sahne kelime avcısı.',
+    'DersoLab İngilizce Laboratuvarı: Durumsal konuşma senaryoları, yaşayan sokak jargonu ve deyimler, fonetik telaffuz antrenörü ve görsel sahne nesne sözlüğü.',
 }
 
 export default function IngilizceLabPage() {

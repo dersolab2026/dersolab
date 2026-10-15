@@ -27,18 +27,18 @@ export function IngilizceLabView() {
   const TABS = [
     {
       id: 'tiny-lessons' as EnglishTabType,
-      label: 'Tiny Lessons',
-      sublabel: 'Durumsal Mikro Dersler',
+      label: 'Durumsal Senaryolar',
+      sublabel: 'Mikro Konuşma Dersleri',
       icon: BookOpen,
-      badge: 'Google LLL İlhamlı',
+      badge: 'Pratik Diyalog',
       color: 'from-sky-500 to-blue-500',
       activeBorder: 'border-sky-500/50 shadow-[0_0_20px_rgba(56,189,248,0.25)] ring-1 ring-sky-500/20',
       activeText: 'text-sky-300',
     },
     {
       id: 'slang-hang' as EnglishTabType,
-      label: 'Slang Hang',
-      sublabel: 'Deyimler & Sokak Dili',
+      label: 'Deyimler & Slang',
+      sublabel: 'Doğal Konuşma & Sokak Dili',
       icon: Flame,
       badge: 'US 🇺🇸 • UK 🇬🇧 • AU 🇦🇺',
       color: 'from-amber-500 to-orange-500',
@@ -47,20 +47,20 @@ export function IngilizceLabView() {
     },
     {
       id: 'pronunciation' as EnglishTabType,
-      label: 'Speaking & Telaffuz',
-      sublabel: 'Fonetik Antrenör',
+      label: 'Telaffuz & Fonetik',
+      sublabel: 'Tuzak Kelimeler & Mikrofon',
       icon: Mic,
-      badge: 'Sessiz Harf Tuzakları',
+      badge: 'Sessiz Harf Sırları',
       color: 'from-emerald-500 to-teal-500',
       activeBorder: 'border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-500/20',
       activeText: 'text-emerald-300',
     },
     {
       id: 'visual-scenes' as EnglishTabType,
-      label: 'Visual Explorer',
-      sublabel: 'Görsel Sahne & Nesneler',
+      label: 'Görsel Sahne Sözlüğü',
+      sublabel: 'Ortam & Nesne Keşfi',
       icon: Camera,
-      badge: 'Word Cam İlhamlı',
+      badge: 'Görsel Kelimeler',
       color: 'from-cyan-500 to-indigo-500',
       activeBorder: 'border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.25)] ring-1 ring-cyan-500/20',
       activeText: 'text-cyan-300',
@@ -90,11 +90,11 @@ export function IngilizceLabView() {
               <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
                 İngilizceLab —{' '}
                 <span className="bg-gradient-to-r from-sky-400 via-indigo-300 to-amber-400 bg-clip-text text-transparent">
-                  Little Language Lessons İlhamlı
+                  İnteraktif Konuşma & Dil Atölyesi
                 </span>
               </h1>
               <p className="mt-2 text-slate-400 text-sm sm:text-base max-w-2xl leading-relaxed">
-                Google Labs <span className="text-sky-300 font-medium">Little Language Lessons</span> paradigmasından esinlenildi: Kuru gramer kuralları yerine durumsal mikro dersler (Tiny Lessons), doğal sokak jargonu ve deyimler (Slang Hang), fonetik tuzak antrenörü ve görsel sahne keşfi.
+                Kuru gramer ezberi yerine gerçek yaşam senaryoları, yaşayan sokak jargonu ve deyimler, fonetik tuzak antrenörü ve görsel sahne keşfiyle İngilizceyi doğal refleks haline getirin.
               </p>
             </div>
 
@@ -174,7 +174,7 @@ export function IngilizceLabView() {
       <footer className="border-t border-slate-800/80 bg-slate-950/60 py-8 mt-16 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 space-y-2">
           <p>
-            DersoLab İngilizceLab — Google Little Language Lessons (LLL) deneysel vizyonu ve MEB Maarif Modeli kazanımları harmanlanarak geliştirilmiştir.
+            DersoLab İngilizceLab — Yaşayan İngilizce refleksleri ve MEB Maarif Modeli konuşma becerileri odaklı geliştirilmiştir.
           </p>
           <p className="text-[11px] text-slate-600">
             Kullanılan telaffuz sentezi tarayıcınızın yerel Web Speech API motoru tarafından gerçek zamanlı üretilmektedir.

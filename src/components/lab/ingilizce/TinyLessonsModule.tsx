@@ -822,13 +822,13 @@ export function TinyLessonsModule() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
-              Google Labs — Tiny Lesson Modeli
+              DersoLab — Durumsal Konuşma Atölyesi
             </span>
             <span className="text-xs text-slate-400">Durumsal Bağlamsal Öğrenme</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-sky-400" />
-            Durumsal Mikro Dersler (Tiny Lessons)
+            Durumsal Pratik Senaryoları (Situational Lessons)
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
             Kuru gramer tabloları yerine gerçek hayat senaryolarını seçin. Doğal diyalogları dinleyin, telaffuzları öğrenin ve konuşma tuzaklarından kurtulun.
@@ -836,7 +836,7 @@ export function TinyLessonsModule() {
         </div>
 
         {/* Accent / Voice Selector */}
-        <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800 self-start md:self-auto">
+        <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800 self-start md:self-auto shrink-0">
           <span className="text-[11px] font-semibold text-slate-400 pl-2">Aksan:</span>
           {(['en-US', 'en-GB', 'en-AU'] as EnglishAccent[]).map((acc) => (
             <button
@@ -854,8 +854,8 @@ export function TinyLessonsModule() {
         </div>
       </div>
 
-      {/* ── Scenario Carousel / Selector ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {/* ── Scenario Carousel / Selector — Compact \u0026 Fitted Cleanly ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-2.5">
         {SCENARIOS.map((scenario) => {
           const Icon = scenario.icon
           const isSelected = scenario.id === currentScenario.id
@@ -863,7 +863,7 @@ export function TinyLessonsModule() {
             <button
               key={scenario.id}
               onClick={() => handleSelectScenario(scenario.id)}
-              className={`group flex flex-col text-left p-3.5 rounded-2xl border transition-all cursor-pointer ${
+              className={`group flex flex-col text-left p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer min-w-0 ${
                 isSelected
                   ? 'bg-gradient-to-b from-sky-900/40 to-slate-900/90 border-sky-400/60 shadow-[0_0_20px_rgba(56,189,248,0.25)] ring-1 ring-sky-400/30'
                   : 'bg-slate-900/60 border-slate-800/80 hover:bg-slate-850 hover:border-slate-700'
@@ -871,16 +871,16 @@ export function TinyLessonsModule() {
             >
               <div className="flex items-center justify-between mb-2">
                 <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 ${
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 shrink-0 ${
                     isSelected
                       ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
                       : 'bg-slate-800 text-slate-400'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-4 h-4" />
                 </div>
                 <span
-                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  className={`text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
                     scenario.cefrLevel.includes('A1')
                       ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                       : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'
@@ -889,8 +889,12 @@ export function TinyLessonsModule() {
                   {scenario.cefrLevel.split(' ')[0]}
                 </span>
               </div>
-              <h4 className="text-xs sm:text-sm font-bold text-white line-clamp-1">{scenario.title}</h4>
-              <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{scenario.turkishTitle}</p>
+              <h4 className="text-xs sm:text-[13px] font-bold text-white truncate" title={scenario.title}>
+                {scenario.title}
+              </h4>
+              <p className="text-[11px] text-slate-400 truncate mt-0.5" title={scenario.turkishTitle}>
+                {scenario.turkishTitle}
+              </p>
             </button>
           )
         })}
