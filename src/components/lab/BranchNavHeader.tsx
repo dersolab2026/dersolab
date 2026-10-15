@@ -10,12 +10,13 @@ import {
   Calculator,
   Dna,
   Globe2,
+  Languages,
   Home,
   Sparkles,
   ArrowRight,
 } from 'lucide-react'
 
-export type BranchId = 'kimya' | 'turkce' | 'fizik' | 'matematik' | 'biyoloji' | 'sosyal'
+export type BranchId = 'kimya' | 'turkce' | 'fizik' | 'matematik' | 'biyoloji' | 'sosyal' | 'ingilizce'
 
 interface BranchNavHeaderProps {
   currentBranch?: BranchId
@@ -81,6 +82,16 @@ export const BRANCHES = [
     borderActive: 'border-rose-500/50 text-rose-300 bg-rose-950/40',
     accentColor: 'text-rose-400',
     tag: 'Türkiye Atlası & Tarih',
+  },
+  {
+    id: 'ingilizce' as BranchId,
+    name: 'İngilizceLab',
+    href: '/lab/ingilizce',
+    icon: Languages,
+    color: 'from-sky-500 to-indigo-500',
+    borderActive: 'border-sky-500/50 text-sky-300 bg-sky-950/40',
+    accentColor: 'text-sky-400',
+    tag: 'Little Language Lessons',
   },
 ]
 

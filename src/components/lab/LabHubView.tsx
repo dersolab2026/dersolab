@@ -22,6 +22,7 @@ import {
   Rocket,
   Atom,
   RotateCcw,
+  Languages,
 } from 'lucide-react'
 import { BranchNavHeader, BRANCHES, BranchId } from './BranchNavHeader'
 
@@ -41,7 +42,7 @@ interface BranchCardData {
   borderColor: string
   textColor: string
   tag: string
-  category: 'sayisal' | 'sozel'
+  category: 'sayisal' | 'sozel' | 'dil'
   levels: ('ortaokul' | 'lise')[]
   levelBadge: string
   maarifModel: boolean
@@ -249,9 +250,48 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
       },
     ],
   },
+  {
+    id: 'ingilizce',
+    name: 'İngilizceLab',
+    href: '/lab/ingilizce',
+    icon: Languages,
+    color: 'from-sky-500 to-indigo-500',
+    bgGlow: 'bg-sky-500/10',
+    borderColor: 'border-sky-500/30 group-hover:border-sky-400/60',
+    textColor: 'text-sky-400',
+    tag: 'Little Language Lessons',
+    category: 'dil',
+    levels: ['ortaokul', 'lise'],
+    levelBadge: '5 - 12. Sınıf & LGS / YDT',
+    maarifModel: true,
+    description:
+      'Google Little Language Lessons ilhamlı: Durumsal mikro dersler (Tiny Lessons), US/UK/AU sokak jargonu & deyimler (Slang Hang), fonetik telaffuz antrenörü ve görsel sahne kelime avcısı.',
+    modules: [
+      {
+        title: 'Tiny Lessons (Durumsal Mikro Dersler)',
+        desc: 'Kafede sipariş, havalimanında kayıp bagaj, iş mülakatı ve yön sorma gibi gerçek hayat senaryoları ve diyaloglar.',
+        badge: 'Google LLL Modeli',
+      },
+      {
+        title: 'Slang Hang (Sokak Dili & Deyimler)',
+        desc: 'Amerikan, İngiliz ve Avustralya aksanlarında doğal konuşmalar, deyimler ve Türkçe kültürel karşılıkları.',
+        badge: 'US • UK • AU',
+      },
+      {
+        title: 'Speaking & Telaffuz Antrenörü',
+        desc: 'Türk öğrencilerin en sık yaptığı sessiz harf tuzakları (receipt, subtle, queue) ve sesli telaffuz tanıma.',
+        badge: 'Web Speech Audio',
+      },
+      {
+        title: 'Görsel Sahne Sözlüğü (Word Cam)',
+        desc: 'Kahve barı, havalimanı ve ofis sahnelerinde nesnelere dokunarak telaffuz ve örnek kalıp cümle keşfi.',
+        badge: 'Görsel Öğrenme',
+      },
+    ],
+  },
 ]
 
-type FilterType = 'all' | 'maarif' | 'ortaokul' | 'lise' | 'sayisal' | 'sozel'
+type FilterType = 'all' | 'maarif' | 'ortaokul' | 'lise' | 'sayisal' | 'sozel' | 'dil'
 
 export function LabHubView() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all')
@@ -281,6 +321,7 @@ export function LabHubView() {
       if (activeFilter === 'maarif') return branch.maarifModel === true
       if (activeFilter === 'sayisal') return branch.category === 'sayisal'
       if (activeFilter === 'sozel') return branch.category === 'sozel'
+      if (activeFilter === 'dil') return branch.category === 'dil'
 
       return true
     })
@@ -327,7 +368,7 @@ export function LabHubView() {
               <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
               <div className="text-left">
                 <span className="text-xs text-slate-400 block font-medium">Toplam</span>
-                <span className="text-sm font-bold text-white">6 Branş Atölyesi</span>
+                <span className="text-sm font-bold text-white">7 Branş Atölyesi</span>
               </div>
             </div>
 
@@ -335,7 +376,7 @@ export function LabHubView() {
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
               <div className="text-left">
                 <span className="text-xs text-slate-400 block font-medium">İçerik</span>
-                <span className="text-sm font-bold text-white">16+ Sanal Simülatör</span>
+                <span className="text-sm font-bold text-white">20+ Sanal Simülatör</span>
               </div>
             </div>
 
@@ -371,6 +412,7 @@ export function LabHubView() {
               { id: 'lise' as FilterType, label: '🎓 Lise (9-12. Sınıf)' },
               { id: 'sayisal' as FilterType, label: '🔬 Fen & Matematik' },
               { id: 'sozel' as FilterType, label: '📚 Türkçe & Sosyal' },
+              { id: 'dil' as FilterType, label: '🌐 İngilizce (Google LLL)' },
             ].map((f) => {
               const isActive = activeFilter === f.id
               return (
