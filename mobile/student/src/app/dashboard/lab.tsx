@@ -201,41 +201,37 @@ export default function LabScreen() {
               </Text>
 
               {/* Mediums */}
-              <View style={styles.rowBetween}>
-                <View style={styles.halfCol}>
-                  <Text style={styles.inputLabel}>1. Ortam (Gelen)</Text>
-                  <View style={styles.pillRow}>
-                    <TouchableOpacity
-                      onPress={() => setMedium1Index(1.0)}
-                      style={[styles.pillBtn, medium1Index === 1.0 && styles.pillBtnActive]}
-                    >
-                      <Text style={[styles.pillText, medium1Index === 1.0 && styles.pillTextActive]}>Hava (1.0)</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => setMedium1Index(1.33)}
-                      style={[styles.pillBtn, medium1Index === 1.33 && styles.pillBtnActive]}
-                    >
-                      <Text style={[styles.pillText, medium1Index === 1.33 && styles.pillTextActive]}>Su (1.33)</Text>
-                    </TouchableOpacity>
-                  </View>
+              <View style={styles.mediumSection}>
+                <Text style={styles.inputLabel}>1. Ortam (Gelen Işın):</Text>
+                <View style={styles.pillRowWrap}>
+                  <TouchableOpacity
+                    onPress={() => setMedium1Index(1.0)}
+                    style={[styles.pillBtn, medium1Index === 1.0 && styles.pillBtnActive]}
+                  >
+                    <Text style={[styles.pillText, medium1Index === 1.0 && styles.pillTextActive]}>Hava (n₁ = 1.0)</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setMedium1Index(1.33)}
+                    style={[styles.pillBtn, medium1Index === 1.33 && styles.pillBtnActive]}
+                  >
+                    <Text style={[styles.pillText, medium1Index === 1.33 && styles.pillTextActive]}>Su (n₁ = 1.33)</Text>
+                  </TouchableOpacity>
                 </View>
 
-                <View style={styles.halfCol}>
-                  <Text style={styles.inputLabel}>2. Ortam (Kırılan)</Text>
-                  <View style={styles.pillRow}>
-                    <TouchableOpacity
-                      onPress={() => setMedium2Index(1.33)}
-                      style={[styles.pillBtn, medium2Index === 1.33 && styles.pillBtnActive]}
-                    >
-                      <Text style={[styles.pillText, medium2Index === 1.33 && styles.pillTextActive]}>Su (1.33)</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => setMedium2Index(1.5)}
-                      style={[styles.pillBtn, medium2Index === 1.5 && styles.pillBtnActive]}
-                    >
-                      <Text style={[styles.pillText, medium2Index === 1.5 && styles.pillTextActive]}>Cam (1.5)</Text>
-                    </TouchableOpacity>
-                  </View>
+                <Text style={[styles.inputLabel, { marginTop: 12 }]}>2. Ortam (Kırılan Işın):</Text>
+                <View style={styles.pillRowWrap}>
+                  <TouchableOpacity
+                    onPress={() => setMedium2Index(1.33)}
+                    style={[styles.pillBtn, medium2Index === 1.33 && styles.pillBtnActive]}
+                  >
+                    <Text style={[styles.pillText, medium2Index === 1.33 && styles.pillTextActive]}>Su (n₂ = 1.33)</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setMedium2Index(1.5)}
+                    style={[styles.pillBtn, medium2Index === 1.5 && styles.pillBtnActive]}
+                  >
+                    <Text style={[styles.pillText, medium2Index === 1.5 && styles.pillTextActive]}>Cam (n₂ = 1.5)</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
 
@@ -871,38 +867,42 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 4,
   },
+  mediumSection: {
+    marginBottom: 16,
+  },
   inputLabel: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: '#cbd5e1',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   pillRow: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 8,
   },
   pillRowWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
-    marginVertical: 8,
+    gap: 8,
+    marginVertical: 4,
   },
   pillBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 14,
     backgroundColor: '#1e293b',
     borderWidth: 1,
     borderColor: '#334155',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   pillBtnActive: {
     backgroundColor: '#00e5ff',
     borderColor: '#00e5ff',
   },
   pillText: {
-    fontSize: 11,
-    color: '#94a3b8',
+    fontSize: 12,
+    color: '#cbd5e1',
     fontWeight: '700',
   },
   pillTextActive: {
@@ -910,27 +910,29 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   sliderBox: {
-    marginTop: 14,
+    marginTop: 16,
     backgroundColor: '#1e293b55',
-    borderRadius: 16,
-    padding: 12,
+    borderRadius: 18,
+    padding: 16,
     borderWidth: 1,
     borderColor: '#334155',
   },
   statValueHighlight: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '900',
     color: '#00e5ff',
   },
   stepBtnRow: {
     flexDirection: 'row',
-    gap: 6,
-    marginTop: 8,
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
   },
   stepBtn: {
     flex: 1,
-    paddingVertical: 6,
-    borderRadius: 8,
+    minWidth: 54,
+    paddingVertical: 10,
+    borderRadius: 10,
     backgroundColor: '#1e293b',
     alignItems: 'center',
     borderWidth: 1,
@@ -941,7 +943,7 @@ const styles = StyleSheet.create({
     borderColor: '#60a5fa',
   },
   stepBtnText: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#cbd5e1',
     fontWeight: '700',
   },

@@ -171,140 +171,158 @@ export default function DashboardHome() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00e5ff" />
         }
       >
-        {/* Top Header with Profile Avatar */}
+        {/* Top Header */}
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
             <Text style={styles.greeting}>Merhaba, {studentName} 👋</Text>
-            <Text style={styles.subtitle}>Bugünkü hedeflerine ve deneylerine göz at.</Text>
+            <Text style={styles.subtitle}>Bugünkü hedeflerine ve derslerine göz at.</Text>
           </View>
           <TouchableOpacity
-            onPress={() => router.push('/dashboard/profile')}
+            onPress={() => router.push('/dashboard/profile' as any)}
             style={styles.profileBtn}
             activeOpacity={0.8}
           >
-            <Ionicons name="person-circle-outline" size={36} color="#00e5ff" />
+            <Ionicons name="person-circle-outline" size={38} color="#00e5ff" />
           </TouchableOpacity>
         </View>
 
-        {/* 4 Big Quick Launch Cards */}
-        <View style={styles.quickGrid}>
-          {/* L.A.B. Launch */}
+        {/* Ferah Hızlı Başlatıcı Kartları (Quick Actions) */}
+        <View style={styles.quickList}>
+          {/* L.A.B. */}
           <TouchableOpacity
-            style={styles.quickCard}
+            style={styles.quickRowCard}
             onPress={() => router.push('/dashboard/lab' as any)}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#00e5ff22', '#3b82f611']} style={styles.quickCardGradient}>
-              <View style={[styles.quickCardIcon, { backgroundColor: '#00e5ff22' }]}>
-                <Ionicons name="flask" size={22} color="#00e5ff" />
+            <LinearGradient colors={['#00e5ff18', '#3b82f60a']} style={styles.quickRowGradient}>
+              <View style={[styles.quickRowIcon, { backgroundColor: '#00e5ff22' }]}>
+                <Ionicons name="flask" size={24} color="#00e5ff" />
               </View>
-              <Text style={styles.quickCardTitle}>L.A.B.</Text>
-              <Text style={styles.quickCardSub}>7 Branş Simülasyonu</Text>
+              <View style={styles.quickRowTextWrap}>
+                <Text style={styles.quickRowTitle}>L.A.B. Deney Merkezi</Text>
+                <Text style={styles.quickRowSub}>7 Branş: Fizik, Kimya, Biyo, Mat, İngilizce, Türkçe, Sosyal</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#00e5ff" />
             </LinearGradient>
           </TouchableOpacity>
 
           {/* AI Soru */}
           <TouchableOpacity
-            style={styles.quickCard}
+            style={styles.quickRowCard}
             onPress={() => router.push('/dashboard/ai' as any)}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#f59e0b22', '#ef444411']} style={styles.quickCardGradient}>
-              <View style={[styles.quickCardIcon, { backgroundColor: '#f59e0b22' }]}>
-                <Ionicons name="hardware-chip" size={22} color="#f59e0b" />
+            <LinearGradient colors={['#ec489918', '#f43f5e0a']} style={styles.quickRowGradient}>
+              <View style={[styles.quickRowIcon, { backgroundColor: '#ec489922' }]}>
+                <Ionicons name="hardware-chip" size={24} color="#ec4899" />
               </View>
-              <Text style={styles.quickCardTitle}>DersoAI</Text>
-              <Text style={styles.quickCardSub}>Fotoğraflı Soru Çöz</Text>
+              <View style={styles.quickRowTextWrap}>
+                <Text style={styles.quickRowTitle}>DersoAI Soru Asistanı</Text>
+                <Text style={styles.quickRowSub}>Fotoğraf çek veya soru yaz, anında adım adım çözüme ulaş</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#ec4899" />
             </LinearGradient>
           </TouchableOpacity>
 
           {/* Ödevlerim */}
           <TouchableOpacity
-            style={styles.quickCard}
+            style={styles.quickRowCard}
             onPress={() => router.push('/dashboard/homework' as any)}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#38bdf822', '#6366f111']} style={styles.quickCardGradient}>
-              <View style={[styles.quickCardIcon, { backgroundColor: '#38bdf822' }]}>
-                <Ionicons name="school" size={22} color="#38bdf8" />
+            <LinearGradient colors={['#38bdf818', '#6366f10a']} style={styles.quickRowGradient}>
+              <View style={[styles.quickRowIcon, { backgroundColor: '#38bdf822' }]}>
+                <Ionicons name="school" size={24} color="#38bdf8" />
               </View>
-              <Text style={styles.quickCardTitle}>Ödevlerim</Text>
-              <Text style={styles.quickCardSub}>Görevler & Teslim</Text>
+              <View style={styles.quickRowTextWrap}>
+                <Text style={styles.quickRowTitle}>Ödevlerim & Görevler</Text>
+                <Text style={styles.quickRowSub}>Eğitmenlerinin verdiği ödevleri incele ve çözümlerini yükle</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#38bdf8" />
             </LinearGradient>
           </TouchableOpacity>
 
           {/* Netlerim */}
           <TouchableOpacity
-            style={styles.quickCard}
+            style={styles.quickRowCard}
             onPress={() => router.push('/dashboard/netlerim' as any)}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#10b98122', '#14b8a611']} style={styles.quickCardGradient}>
-              <View style={[styles.quickCardIcon, { backgroundColor: '#10b98122' }]}>
-                <Ionicons name="trending-up" size={22} color="#10b981" />
+            <LinearGradient colors={['#10b98118', '#14b8a60a']} style={styles.quickRowGradient}>
+              <View style={[styles.quickRowIcon, { backgroundColor: '#10b98122' }]}>
+                <Ionicons name="trending-up" size={24} color="#10b981" />
               </View>
-              <Text style={styles.quickCardTitle}>Netlerim</Text>
-              <Text style={styles.quickCardSub}>LGS & YKS Takibi</Text>
+              <View style={styles.quickRowTextWrap}>
+                <Text style={styles.quickRowTitle}>Netlerim & Deneme Takibi</Text>
+                <Text style={styles.quickRowSub}>LGS & YKS deneme sınavı net artışını ve hedeflerini gör</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#10b981" />
             </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        {/* Pomodoro Focus Timer Card */}
+        {/* Ferah Pomodoro Odak Masası */}
         <View style={styles.pomodoroCard}>
-          <View style={styles.pomoTop}>
+          <View style={styles.pomoHeader}>
             <View style={styles.rowAlign}>
-              <Ionicons name="timer-outline" size={20} color="#f97316" style={{ marginRight: 6 }} />
+              <Ionicons name="timer-outline" size={22} color="#f97316" style={{ marginRight: 8 }} />
               <Text style={styles.pomoTitle}>Pomodoro Odak Masası</Text>
             </View>
-            <View style={styles.pomoModeSwitch}>
-              <TouchableOpacity
-                onPress={() => {
-                  setTimerMode('study');
-                  setIsTimerRunning(false);
-                  setTimeLeft(25 * 60);
-                }}
-                style={[styles.pomoModeBtn, timerMode === 'study' && styles.pomoModeBtnActive]}
-              >
-                <Text style={[styles.pomoModeText, timerMode === 'study' && styles.pomoModeTextActive]}>
-                  Ders (25dk)
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setTimerMode('break');
-                  setIsTimerRunning(false);
-                  setTimeLeft(5 * 60);
-                }}
-                style={[styles.pomoModeBtn, timerMode === 'break' && styles.pomoModeBtnActive]}
-              >
-                <Text style={[styles.pomoModeText, timerMode === 'break' && styles.pomoModeTextActive]}>
-                  Mola (5dk)
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.pomoSub}>25 dk Derin Odaklanma • 5 dk Dinlenme</Text>
           </View>
 
-          <View style={styles.pomoDisplayRow}>
-            <Text style={styles.pomoClockText}>{formattedTime}</Text>
+          {/* Mod Butonları */}
+          <View style={styles.pomoModeRow}>
+            <TouchableOpacity
+              onPress={() => {
+                setTimerMode('study');
+                setIsTimerRunning(false);
+                setTimeLeft(25 * 60);
+              }}
+              style={[styles.pomoModePill, timerMode === 'study' && styles.pomoModePillStudy]}
+            >
+              <Text style={[styles.pomoModeText, timerMode === 'study' && styles.pomoModeTextActive]}>
+                Ders Saati (25 Dk)
+              </Text>
+            </TouchableOpacity>
 
-            <View style={styles.pomoActions}>
+            <TouchableOpacity
+              onPress={() => {
+                setTimerMode('break');
+                setIsTimerRunning(false);
+                setTimeLeft(5 * 60);
+              }}
+              style={[styles.pomoModePill, timerMode === 'break' && styles.pomoModePillBreak]}
+            >
+              <Text style={[styles.pomoModeText, timerMode === 'break' && styles.pomoModeTextActive]}>
+                Mola (5 Dk)
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Saat ve Butonlar */}
+          <View style={styles.pomoTimerBox}>
+            <Text style={styles.pomoClockLarge}>{formattedTime}</Text>
+
+            <View style={styles.pomoControls}>
               <TouchableOpacity
                 onPress={() => setIsTimerRunning(!isTimerRunning)}
                 style={[
-                  styles.pomoPlayBtn,
+                  styles.pomoBigPlayBtn,
                   isTimerRunning ? { backgroundColor: '#f97316' } : { backgroundColor: '#00e5ff' },
                 ]}
               >
                 <Ionicons
                   name={isTimerRunning ? 'pause' : 'play'}
-                  size={18}
+                  size={20}
                   color="#030712"
                 />
-                <Text style={styles.pomoPlayText}>{isTimerRunning ? 'Durdur' : 'Başlat'}</Text>
+                <Text style={styles.pomoBigPlayText}>{isTimerRunning ? 'Durdur' : 'Odaklanmayı Başlat'}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -312,25 +330,29 @@ export default function DashboardHome() {
                   setIsTimerRunning(false);
                   setTimeLeft(timerMode === 'study' ? 25 * 60 : 5 * 60);
                 }}
-                style={styles.pomoResetBtn}
+                style={styles.pomoResetIconBtn}
               >
-                <Ionicons name="refresh" size={18} color="#94a3b8" />
+                <Ionicons name="refresh" size={22} color="#94a3b8" />
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.pomoFooter}>
+          <View style={styles.pomoFooterBox}>
+            <Ionicons name="flame" size={16} color="#f97316" style={{ marginRight: 6 }} />
             <Text style={styles.pomoCompletedText}>
-              🔥 Bugün Tamamlanan: <Text style={{ color: '#ffffff', fontWeight: '800' }}>{completedSessions} Odak Seansı</Text>
+              Bugün Tamamlanan:{' '}
+              <Text style={{ color: '#ffffff', fontWeight: '800' }}>
+                {completedSessions} Odak Seansı ({completedSessions * 25} dk)
+              </Text>
             </Text>
           </View>
         </View>
 
-        {/* Credit & Quick Action Card */}
+        {/* Kalan Ders Kredisi Kartı */}
         <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.creditCard}>
           <View style={styles.creditTop}>
             <View>
-              <Text style={styles.creditLabel}>Kalan Birebir Ders Kredin</Text>
+              <Text style={styles.creditLabel}>Kalan Birebir Canlı Ders Kredin</Text>
               <Text style={styles.creditValue}>
                 {creditBalance} <Text style={styles.creditUnit}>Kredi</Text>
               </Text>
@@ -339,6 +361,7 @@ export default function DashboardHome() {
               <Ionicons name="wallet-outline" size={24} color="#00e5ff" />
             </View>
           </View>
+
           <Text style={styles.creditSub}>
             {creditBalance > 0
               ? 'Onaylı eğitmenlerinden dilediğin zaman canlı ders randevusu alabilirsin.'
@@ -349,7 +372,7 @@ export default function DashboardHome() {
             style={styles.findInstructorFullBtn}
             onPress={() => router.push('/explore')}
           >
-            <Ionicons name="search" size={16} color="#030712" style={{ marginRight: 6 }} />
+            <Ionicons name="search" size={18} color="#030712" style={{ marginRight: 8 }} />
             <Text style={styles.findInstructorFullBtnText}>Eğitmen Bul & Ders Ayarla</Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -358,7 +381,7 @@ export default function DashboardHome() {
           <ActivityIndicator size="large" color="#00e5ff" style={{ marginTop: 40 }} />
         ) : (
           <>
-            {/* Upcoming Bookings */}
+            {/* Yaklaşan Canlı Dersler */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Yaklaşan Canlı Derslerin</Text>
@@ -371,7 +394,7 @@ export default function DashboardHome() {
 
               {upcoming.length === 0 ? (
                 <View style={styles.emptyCard}>
-                  <Ionicons name="calendar-outline" size={28} color="#475569" style={{ marginBottom: 6 }} />
+                  <Ionicons name="calendar-outline" size={32} color="#475569" style={{ marginBottom: 8 }} />
                   <Text style={styles.emptyText}>Henüz planlanmış aktif bir dersin yok.</Text>
                 </View>
               ) : (
@@ -393,8 +416,8 @@ export default function DashboardHome() {
                         activeOpacity={0.8}
                         onPress={() => openMeetLink(b.meet_link)}
                       >
-                        <Ionicons name="videocam" size={18} color="#030712" style={{ marginRight: 6 }} />
-                        <Text style={styles.joinButtonText}>Canlı Derse Katıl</Text>
+                        <Ionicons name="videocam" size={20} color="#030712" style={{ marginRight: 8 }} />
+                        <Text style={styles.joinButtonText}>Canlı Derse Katıl (Google Meet)</Text>
                       </TouchableOpacity>
                     ) : (
                       <View style={[styles.joinButton, { backgroundColor: '#1e293b' }]}>
@@ -408,7 +431,7 @@ export default function DashboardHome() {
               )}
             </View>
 
-            {/* Past Bookings */}
+            {/* Geçmiş Dersler */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Geçmiş Dersler</Text>
 
@@ -431,7 +454,7 @@ export default function DashboardHome() {
           </>
         )}
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: 60 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -443,14 +466,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#030712',
   },
   content: {
-    padding: 16,
-    paddingTop: Platform.OS === 'android' ? 40 : 10,
+    padding: 20,
+    paddingTop: Platform.OS === 'android' ? 40 : 16,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   greeting: {
     fontSize: 24,
@@ -462,169 +485,196 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: '#94a3b8',
+    lineHeight: 18,
   },
   profileBtn: {
     padding: 4,
   },
-  quickGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 18,
+  quickList: {
+    gap: 12,
+    marginBottom: 22,
   },
-  quickCard: {
-    width: '48%',
+  quickRowCard: {
     borderRadius: 18,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#1e293b',
   },
-  quickCardGradient: {
-    padding: 14,
-    borderRadius: 18,
+  quickRowGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
-  quickCardIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
+  quickRowIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
   },
-  quickCardTitle: {
-    fontSize: 14,
-    fontWeight: '900',
+  quickRowTextWrap: {
+    flex: 1,
+    marginLeft: 14,
+    marginRight: 8,
+  },
+  quickRowTitle: {
+    fontSize: 15,
+    fontWeight: '800',
     color: '#ffffff',
   },
-  quickCardSub: {
-    fontSize: 11,
+  quickRowSub: {
+    fontSize: 12,
     color: '#94a3b8',
     marginTop: 2,
+    lineHeight: 16,
   },
   pomodoroCard: {
     backgroundColor: '#0f172a',
-    borderRadius: 20,
+    borderRadius: 22,
     borderWidth: 1,
     borderColor: '#1e293b',
-    padding: 16,
-    marginBottom: 18,
+    padding: 18,
+    marginBottom: 22,
   },
-  pomoTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+  pomoHeader: {
+    marginBottom: 14,
   },
   rowAlign: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   pomoTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '800',
     color: '#ffffff',
   },
-  pomoModeSwitch: {
+  pomoSub: {
+    fontSize: 12,
+    color: '#94a3b8',
+    marginTop: 2,
+  },
+  pomoModeRow: {
     flexDirection: 'row',
+    gap: 8,
+    marginBottom: 14,
+  },
+  pomoModePill: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 12,
     backgroundColor: '#1e293b',
-    borderRadius: 10,
-    padding: 2,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#334155',
   },
-  pomoModeBtn: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  pomoModeBtnActive: {
+  pomoModePillStudy: {
     backgroundColor: '#f97316',
+    borderColor: '#f97316',
+  },
+  pomoModePillBreak: {
+    backgroundColor: '#10b981',
+    borderColor: '#10b981',
   },
   pomoModeText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
-    color: '#94a3b8',
+    color: '#cbd5e1',
   },
   pomoModeTextActive: {
     color: '#030712',
     fontWeight: '900',
   },
-  pomoDisplayRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  pomoTimerBox: {
+    backgroundColor: '#1e293b55',
+    borderRadius: 18,
+    padding: 16,
     alignItems: 'center',
-    backgroundColor: '#1e293b66',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#334155',
   },
-  pomoClockText: {
+  pomoClockLarge: {
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-    fontSize: 28,
+    fontSize: 36,
     fontWeight: '900',
     color: '#ffffff',
+    letterSpacing: 2,
+    marginBottom: 12,
   },
-  pomoActions: {
+  pomoControls: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
+    width: '100%',
+  },
+  pomoBigPlayBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
+    paddingVertical: 12,
+    borderRadius: 14,
   },
-  pomoPlayBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12,
-  },
-  pomoPlayText: {
-    fontSize: 12,
+  pomoBigPlayText: {
+    fontSize: 13,
     fontWeight: '900',
     color: '#030712',
   },
-  pomoResetBtn: {
-    padding: 8,
-    borderRadius: 10,
+  pomoResetIconBtn: {
+    padding: 12,
+    borderRadius: 14,
     backgroundColor: '#1e293b',
+    borderWidth: 1,
+    borderColor: '#334155',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  pomoFooter: {
-    marginTop: 10,
+  pomoFooterBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#1e293b',
   },
   pomoCompletedText: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#94a3b8',
   },
   creditCard: {
-    borderRadius: 20,
-    padding: 18,
+    borderRadius: 22,
+    padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(0, 229, 255, 0.2)',
-    marginBottom: 20,
+    borderColor: 'rgba(0, 229, 255, 0.25)',
+    marginBottom: 22,
   },
   creditTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   creditLabel: {
     color: '#94a3b8',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   creditValue: {
     color: '#ffffff',
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '900',
     letterSpacing: -0.5,
   },
   creditUnit: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#00e5ff',
     fontWeight: '700',
   },
   creditIconBox: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: 'rgba(0, 229, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -633,19 +683,19 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     fontSize: 12,
     lineHeight: 18,
-    marginBottom: 14,
+    marginBottom: 16,
   },
   findInstructorFullBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#00e5ff',
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingVertical: 12,
+    borderRadius: 14,
   },
   findInstructorFullBtnText: {
     color: '#030712',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '900',
   },
   section: {
@@ -657,7 +707,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '800',
     color: '#ffffff',
   },
@@ -675,8 +725,8 @@ const styles = StyleSheet.create({
   },
   emptyCard: {
     backgroundColor: 'rgba(30, 41, 59, 0.2)',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 18,
+    padding: 24,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
@@ -693,8 +743,8 @@ const styles = StyleSheet.create({
   },
   bookingCard: {
     backgroundColor: '#0f172a',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 18,
+    padding: 18,
     borderWidth: 1,
     borderColor: '#1e293b',
     marginBottom: 12,
@@ -709,7 +759,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   bookingSubject: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#ffffff',
   },
@@ -732,20 +782,21 @@ const styles = StyleSheet.create({
   },
   bookingInfo: {
     color: '#94a3b8',
-    fontSize: 12,
-    marginBottom: 12,
+    fontSize: 13,
+    marginBottom: 14,
+    lineHeight: 18,
   },
   joinButton: {
     backgroundColor: '#00e5ff',
     flexDirection: 'row',
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingVertical: 12,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   joinButtonText: {
     color: '#030712',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '900',
   },
 });

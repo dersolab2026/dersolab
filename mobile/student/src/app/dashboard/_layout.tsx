@@ -18,8 +18,8 @@ export default function DashboardLayout() {
   const pathname = usePathname();
   const { width } = useWindowDimensions();
 
-  // Tablet/Web vs Telefon genişliği kontrolü
-  const isCompact = width < 768;
+  // Tablet/Geniş Ekran kontrolü
+  const isExpanded = width >= 768;
 
   const NAV_ITEMS: {
     id: string;
@@ -48,15 +48,15 @@ export default function DashboardLayout() {
   return (
     <SafeAreaView style={styles.rootContainer}>
       <View style={styles.mainLayout}>
-        {/* SOL PANEL (LEFT SIDEBAR NAVIGATION) */}
-        <View style={[styles.sidebar, isCompact ? styles.sidebarCompact : styles.sidebarExpanded]}>
+        {/* SOL PANEL (GENİŞ & FERAH KENAR ÇUBUĞU) */}
+        <View style={[styles.sidebar, isExpanded ? styles.sidebarExpanded : styles.sidebarCompact]}>
           {/* Logo / Brand Header */}
-          <View style={styles.brandContainer}>
+          <View style={[styles.brandContainer, isExpanded ? styles.brandContainerExpanded : styles.brandContainerCompact]}>
             <LinearGradient colors={['#00e5ff', '#3b82f6']} style={styles.brandIconBox}>
-              <Ionicons name="flask" size={isCompact ? 18 : 20} color="#030712" />
+              <Ionicons name="flask" size={20} color="#030712" />
             </LinearGradient>
-            {!isCompact && (
-              <View style={{ marginLeft: 10 }}>
+            {isExpanded && (
+              <View style={{ marginLeft: 12 }}>
                 <Text style={styles.brandTitle}>DersoLab</Text>
                 <Text style={styles.brandSubtitle}>Öğrenci Paneli</Text>
               </View>
@@ -75,39 +75,39 @@ export default function DashboardLayout() {
                 <TouchableOpacity
                   key={item.id}
                   onPress={() => router.push(item.path as any)}
-                  activeOpacity={0.75}
+                  activeOpacity={0.7}
                   style={[
-                    styles.navItem,
-                    isCompact ? styles.navItemCompact : styles.navItemExpanded,
+                    styles.navItemBase,
+                    isExpanded ? styles.navItemExpanded : styles.navItemCompact,
                     isActive && styles.navItemActive,
-                    isActive && { borderColor: `${item.color}55` },
+                    isActive && { borderColor: `${item.color}44` },
                   ]}
                 >
-                  {/* Sol Kenar Aktif Çubuğu */}
+                  {/* Aktif İndikatörü */}
                   {isActive && <View style={[styles.activeIndicator, { backgroundColor: item.color }]} />}
 
                   <Ionicons
                     name={isActive ? item.activeIcon : item.icon}
-                    size={isCompact ? 22 : 20}
+                    size={22}
                     color={isActive ? item.color : '#94a3b8'}
                   />
 
-                  {isCompact ? (
+                  {isExpanded ? (
                     <Text
                       style={[
-                        styles.compactLabel,
+                        styles.expandedLabel,
                         isActive && { color: '#ffffff', fontWeight: '800' },
                       ]}
-                      numberOfLines={1}
                     >
                       {item.label}
                     </Text>
                   ) : (
                     <Text
                       style={[
-                        styles.expandedLabel,
-                        isActive && { color: '#ffffff', fontWeight: '800' },
+                        styles.compactLabel,
+                        isActive && { color: item.color, fontWeight: '800' },
                       ]}
+                      numberOfLines={1}
                     >
                       {item.label}
                     </Text>
@@ -117,8 +117,8 @@ export default function DashboardLayout() {
             })}
           </ScrollView>
 
-          {/* Alt Kısım: Küçük Canlı Gösterge */}
-          {!isCompact && (
+          {/* Alt Kısım */}
+          {isExpanded && (
             <View style={styles.sidebarFooter}>
               <View style={styles.onlineDot} />
               <Text style={styles.onlineText}>DersoLab v1.0</Text>
@@ -126,7 +126,7 @@ export default function DashboardLayout() {
           )}
         </View>
 
-        {/* SAĞ İÇERİK ALANI (SCREEN CONTENT) */}
+        {/* SAĞ İÇERİK ALANI */}
         <View style={styles.screenContentArea}>
           <Slot />
         </View>
@@ -149,50 +149,58 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: '#1e293b',
     paddingTop: Platform.OS === 'android' ? 36 : 14,
-    paddingBottom: 14,
-    justifyContent: 'space-between',
+    paddingBottom: 16,
     zIndex: 50,
   },
   sidebarCompact: {
-    width: 72,
+    width: 78,
     alignItems: 'center',
+    paddingHorizontal: 4,
   },
   sidebarExpanded: {
-    width: 210,
-    paddingHorizontal: 12,
+    width: 220,
+    paddingHorizontal: 14,
   },
   brandContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#1e293b',
-    marginBottom: 10,
+    marginBottom: 12,
+  },
+  brandContainerCompact: {
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  brandContainerExpanded: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 6,
   },
   brandIconBox: {
-    width: 36,
-    height: 36,
+    width: 38,
+    height: 38,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   brandTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
     color: '#ffffff',
     letterSpacing: -0.3,
   },
   brandSubtitle: {
-    fontSize: 10,
+    fontSize: 11,
     color: '#00e5ff',
     fontWeight: '700',
   },
   navItemsList: {
-    gap: 8,
-    paddingVertical: 4,
+    gap: 10,
+    paddingVertical: 6,
+    alignItems: 'center',
   },
-  navItem: {
+  navItemBase: {
     borderRadius: 14,
     backgroundColor: 'transparent',
     borderWidth: 1,
@@ -201,58 +209,59 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   navItemCompact: {
-    width: 60,
+    width: 70,
     paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   navItemExpanded: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 11,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     gap: 12,
   },
   navItemActive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   activeIndicator: {
     position: 'absolute',
     left: 0,
     top: 6,
     bottom: 6,
-    width: 3,
+    width: 3.5,
     borderRadius: 2,
   },
   compactLabel: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '700',
     color: '#94a3b8',
-    marginTop: 3,
+    marginTop: 4,
     textAlign: 'center',
   },
   expandedLabel: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
     color: '#94a3b8',
   },
   sidebarFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 12,
+    paddingTop: 14,
     paddingHorizontal: 8,
     borderTopWidth: 1,
     borderTopColor: '#1e293b',
-    gap: 6,
+    gap: 8,
   },
   onlineDot: {
-    width: 7,
-    height: 7,
+    width: 8,
+    height: 8,
     borderRadius: 4,
     backgroundColor: '#10b981',
   },
   onlineText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '700',
     color: '#64748b',
   },
