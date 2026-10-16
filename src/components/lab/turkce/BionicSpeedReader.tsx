@@ -189,11 +189,14 @@ export function BionicSpeedReader() {
     handleReset()
   }
 
-  const handleParagraphChange = (index: number) => {
-    setSelectedParaIndex(index)
+  const handleNextRandomParagraph = () => {
+    let nextIdx = Math.floor(Math.random() * PARAGRAPHS.length)
+    if (nextIdx === selectedParaIndex && PARAGRAPHS.length > 1) {
+      nextIdx = (selectedParaIndex + 1) % PARAGRAPHS.length
+    }
+    setSelectedParaIndex(nextIdx)
     handleReset()
   }
-
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
@@ -225,26 +228,27 @@ export function BionicSpeedReader() {
         </div>
       </div>
 
-      {/* ── Paragraf Seçici Tabs & Okuma Modları ── */}
+      {/* ── Paragraf Seçici & Okuma Modları ── */}
       <div className="space-y-4">
-        {/* Metin Seçici Sekmeler */}
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <span className="text-sm font-bold text-slate-300">Örnek Paragraflar:</span>
-          <div className="flex items-center gap-2 overflow-x-auto gizli-kaydirma w-full sm:w-auto">
-            {PARAGRAPHS.map((p, idx) => (
-              <button
-                key={p.id}
-                onClick={() => handleParagraphChange(idx)}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
-                  selectedParaIndex === idx
-                    ? 'bg-cyan-500 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.35)]'
-                    : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                {p.category}
-              </button>
-            ))}
+        {/* Rastgele Paragraf Değiştirici Buton */}
+        <div className="flex items-center justify-between gap-3 flex-wrap p-3.5 px-5 rounded-2xl bg-slate-900/60 border border-slate-800">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-slate-200">
+              Paragraf #{selectedParaIndex + 1}
+            </span>
+            <span className="text-xs text-slate-400">
+              ({words.length} Kelime)
+            </span>
           </div>
+
+          <button
+            type="button"
+            onClick={handleNextRandomParagraph}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 shadow-md transition-all cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Farklı Bir Paragraf Getir 🎲</span>
+          </button>
         </div>
 
         {/* Okuma Modu Seçici (Normal -> Biyonik -> Kelime Akışı) */}
@@ -294,9 +298,6 @@ export function BionicSpeedReader() {
         {/* Metin Başlığı ve Kelime Sayısı */}
         <div className="flex items-center justify-between border-b border-slate-200 pb-4">
           <div className="space-y-0.5">
-            <span className="text-xs font-bold uppercase tracking-wider text-cyan-700">
-              {currentPara.category}
-            </span>
             <h3 className="text-base sm:text-lg font-black text-slate-900">
               {currentPara.title}
             </h3>
@@ -568,10 +569,10 @@ export function BionicSpeedReader() {
                   Farklı bir metinle hızını yeniden test etmek ister misin?
                 </span>
                 <button
-                  onClick={() => handleParagraphChange((selectedParaIndex + 1) % PARAGRAPHS.length)}
+                  onClick={handleNextRandomParagraph}
                   className="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-bold text-xs sm:text-sm border border-cyan-500/30 transition-all cursor-pointer flex items-center gap-1.5"
                 >
-                  <span>Sonraki Metne Geç</span>
+                  <span>Farklı Bir Paragrafa Geç</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

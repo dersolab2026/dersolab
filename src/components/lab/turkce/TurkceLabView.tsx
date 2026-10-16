@@ -16,15 +16,13 @@ import {
   FlaskConical,
 } from 'lucide-react'
 import { BionicSpeedReader } from './BionicSpeedReader'
-import { LiteratureMatchGame } from './LiteratureMatchGame'
 import { PhoneticInspector } from './PhoneticInspector'
 import { TdkWordOfTheDay } from './TdkWordOfTheDay'
-import { SentenceParserModule } from './SentenceParserModule'
 import { SocialCommunityBar } from '@/components/home/SocialCommunityBar'
 
 import { BranchNavHeader } from '../BranchNavHeader'
 
-export type TurkceTabType = 'bionic' | 'tdk' | 'sentence' | 'literature' | 'phonetics'
+export type TurkceTabType = 'bionic' | 'phonetics' | 'tdk'
 
 export function TurkceLabView() {
   const [activeTab, setActiveTab] = useState<TurkceTabType>('bionic')
@@ -49,41 +47,29 @@ export function TurkceLabView() {
     {
       id: 'bionic' as TurkceTabType,
       label: 'Paragraf Hız Antrenörü',
-      badge: '5-12. Sınıf',
+      badge: 'Okuma & Kavrama',
       icon: Zap,
     },
     {
-      id: 'sentence' as TurkceTabType,
-      label: 'Cümlenin Ögeleri & Fiilimsiler',
-      badge: '8. Sınıf LGS & TYT',
-      icon: Tag,
+      id: 'phonetics' as TurkceTabType,
+      label: 'Ses Olayları & Yazım Kuralları',
+      badge: 'Yazım Kuralları',
+      icon: Layers,
     },
     {
       id: 'tdk' as TurkceTabType,
-      label: 'Günün Kelimesi & Sözlük',
+      label: 'Günün Kelimesi & TDK Sözlük',
       badge: 'Canlı TDK',
       icon: BookMarked,
-    },
-    {
-      id: 'literature' as TurkceTabType,
-      label: 'Yazar Eser Eşleştirme',
-      badge: 'Edebiyat Kart Oyunu',
-      icon: BookOpen,
-    },
-    {
-      id: 'phonetics' as TurkceTabType,
-      label: 'Ses Olayları Dedektifi',
-      badge: 'Dil Bilgisi',
-      icon: Layers,
     },
   ]
 
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-cyan-500 selection:text-slate-950 font-sans">
       
-      {/* ── Background Glow Effects ── */}
-      <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed top-1/3 left-1/4 w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none -z-10" />
+      {/* ── Background Glow Effects (GPU Optimized) ── */}
+      <div className="fixed top-0 right-1/4 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed top-1/3 left-1/4 w-[350px] h-[350px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
       {/* ── Top Navigation Bar ── */}
       <BranchNavHeader currentBranch="turkce" />
@@ -139,10 +125,8 @@ export function TurkceLabView() {
             transition={{ duration: 0.2 }}
           >
             {activeTab === 'bionic' && <BionicSpeedReader />}
-            {activeTab === 'sentence' && <SentenceParserModule />}
-            {activeTab === 'tdk' && <TdkWordOfTheDay />}
-            {activeTab === 'literature' && <LiteratureMatchGame />}
             {activeTab === 'phonetics' && <PhoneticInspector />}
+            {activeTab === 'tdk' && <TdkWordOfTheDay />}
           </motion.div>
         </AnimatePresence>
 
@@ -157,13 +141,13 @@ export function TurkceLabView() {
                 height={16}
                 className="w-3.5 h-3.5 object-contain"
               />
-              <span>DersoLab Bire Bir Türkçe & Edebiyat Atölyesi</span>
+              <span>DersoLab Bire Bir Türkçe Atölyesi</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-black text-white">
-              Türkçe ve Edebiyatta Netlerini Katla.
+              Paragraf ve Yazım Kurallarında Netlerini Katla.
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-              Cümlenin ögeleri, fiilimsiler, bionic paragraf hızı ve yazar-eser kodlamalarını Türkiye&apos;nin en iyi öğretmenleriyle bire bir canlı derste çalış.
+              Hızlı okuma, odaklı kavrama, ses olayları ve yazım kurallarını Türkiye&apos;nin en iyi öğretmenleriyle bire bir canlı derste çalış.
             </p>
           </div>
 
@@ -184,7 +168,7 @@ export function TurkceLabView() {
 
       {/* ── Footer ── */}
       <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
-        DersoLab L.A.B. • Türkiye Yüzyılı Maarif Modeli, Ortaokul & Lise Müfredatına Uygun 5 Türkçe & Edebiyat Simülasyonu
+        DersoLab L.A.B. • Türkiye Yüzyılı Maarif Modeli, Ortaokul & Lise Müfredatına Uygun İnteraktif Türkçe Atölyeleri
       </footer>
     </div>
   )

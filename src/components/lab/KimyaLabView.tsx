@@ -147,7 +147,7 @@ export function KimyaLabView() {
       targetMetric: 'P ≥ 2.0 atm',
       hint: 'Hacim küçüldükçe birim yüzeye çarpan gaz molekülü sayısı artar, dolayısıyla basınç yükselir.',
       xp: 50,
-      isCompleted: () => true,
+      isCompleted: (s) => Boolean(s && typeof s.P === 'number' && s.P >= 2.0),
     },
     {
       id: 'chem-c2',
@@ -157,7 +157,7 @@ export function KimyaLabView() {
       targetMetric: 'T ≥ 500 K',
       hint: 'V / T = sabit bağıntısına göre mutlak sıcaklık arttıkça kinetik enerji ve hacim artar.',
       xp: 100,
-      isCompleted: () => true,
+      isCompleted: (s) => Boolean(s && typeof s.T === 'number' && s.T >= 500),
     },
     {
       id: 'chem-c3',
@@ -167,7 +167,7 @@ export function KimyaLabView() {
       targetMetric: 'W = P · ΔV (Pozitif İş)',
       hint: 'Piston serbestken basınç daima dış basınca eşit kalır (P = sabit); hacim sıcaklıkla doğrusal genişler.',
       xp: 150,
-      isCompleted: () => true,
+      isCompleted: (s) => Boolean(s && typeof s.n === 'number' && typeof s.P === 'number' && s.n >= 1.5 && s.P >= 2.5),
     },
   ]
 
@@ -248,9 +248,9 @@ export function KimyaLabView() {
 
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-emerald-500 selection:text-slate-950 font-sans">
-      {/* ── Background Glow Effects ── */}
-      <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed top-1/3 right-1/4 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none -z-10" />
+      {/* ── Background Glow Effects (GPU Optimized) ── */}
+      <div className="fixed top-0 left-1/4 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed top-1/3 right-1/4 w-[350px] h-[350px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
       {/* ── Top Navigation Bar ── */}
       <BranchNavHeader currentBranch="kimya" />

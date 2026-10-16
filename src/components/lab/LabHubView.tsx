@@ -260,38 +260,28 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-amber-500/10',
     borderColor: 'border-amber-500/30 group-hover:border-amber-400/60',
     textColor: 'text-amber-400',
-    tag: 'Ögeler, Bionic Hız & Edebiyat',
+    tag: 'Bionic Hız, Ses Olayları & TDK',
     category: 'sozel',
     levels: ['ortaokul', 'lise'],
-    levelBadge: '5 - 12. Sınıf & Maarif',
+    levelBadge: '5 - 12. Sınıf',
     maarifModel: true,
     description:
-      'Cümlenin ögeleri ve fiilimsiler çözümleyici, bionic okuma paragraf antrenörü, canlı TDK günün kelimesi ve edebiyat eşleştirme oyunu.',
+      'Bionic okuma paragraf antrenörü, yazım kuralları ve ses olayları dedektifi ile canlı TDK günün kelimesi sözlüğü.',
     modules: [
-      {
-        title: 'Cümlenin Ögeleri & Fiilimsiler Çözümleyici',
-        desc: 'Yüklem, özne, nesne, yer tamlayıcısı ve zarf tümleci tespiti; isim-fiil, sıfat-fiil ve zarf-fiil ekleri.',
-        badge: '8. Sınıf LGS & TYT',
-      },
       {
         title: 'Bionic Paragraf Hız Antrenörü',
         desc: 'Kelimelerin ilk harflerini vurgulayarak göz sıçrama hızınızı artırın; anlama ve kavrama hızınızı katlayın.',
         badge: 'Hızlı Okuma',
       },
       {
-        title: 'Günün Kelimesi & TDK Sözlük',
+        title: 'Ses Olayları & Yazım Kuralları Dedektifi',
+        desc: 'Cümledeki ünlü düşmesi, ünsüz benzeşmesi ve yumuşamalarını etkileşimli büyüteçle ortaya çıkarın.',
+        badge: 'Yazım Kuralları',
+      },
+      {
+        title: 'Günün Kelimesi & TDK Canlı Sözlük',
         desc: 'Türkçenin zengin söz varlığını, anlamı karıştırılan sözcükleri ve köken bilgilerini keşfedin.',
         badge: 'Canlı TDK',
-      },
-      {
-        title: 'Edebiyat Yazar — Eser Match',
-        desc: 'Divan, Tanzimat, Milli Edebiyat ve Cumhuriyet dönemi yazarlarını eserleriyle eşleştirme kart oyunu.',
-        badge: 'Edebiyat Oyunu',
-      },
-      {
-        title: 'Ses Olayları Dedektifi',
-        desc: 'Cümledeki ünlü düşmesi, ünsüz benzeşmesi ve yumuşamalarını etkileşimli büyüteçle ortaya çıkarın.',
-        badge: '5-12. Sınıf',
       },
     ],
   },
@@ -346,11 +336,16 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     tag: 'Pratik Konuşma & Dil',
     category: 'dil',
     levels: ['ortaokul', 'lise'],
-    levelBadge: '5 - 12. Sınıf & Maarif',
+    levelBadge: '5 - 12. Sınıf',
     maarifModel: true,
     description:
-      'Durumsal konuşma senaryoları (kafe, havalimanı, mülakat), Amerikan/İngiliz sokak jargonu & deyimler, kritik telaffuz hataları ve görsel sahne nesne sözlüğü ile interaktif İngilizce atölyesi.',
+      'MEB okul ders kitapları 5-12. sınıf ünite müfredatı, durumsal konuşma senaryoları, Amerikan/İngiliz aksanları ve görsel sahne sözlüğü ile interaktif İngilizce atölyesi.',
     modules: [
+      {
+        title: 'MEB Okul Ders Kitapları (5-12. Sınıf & LGS/YDT)',
+        desc: 'Milli Eğitim müfredatındaki tüm sınıf kademeleri için ünite kelimeleri, gramer formülleri, mini diyaloglar ve sınav soruları.',
+        badge: '5-12. MEB & LGS/YDT',
+      },
       {
         title: 'Durumsal Mikro Senaryolar',
         desc: 'Kafede sipariş, havalimanında kayıp bagaj, iş mülakatı ve yön sorma gibi gerçek hayat senaryoları ve diyaloglar.',
@@ -375,7 +370,7 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
   },
 ]
 
-type FilterType = 'all' | 'maarif' | 'ortaokul' | 'lise' | 'sayisal' | 'sozel' | 'dil'
+type FilterType = 'all' | 'ortaokul' | 'lise'
 
 export function LabHubView() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all')
@@ -402,10 +397,6 @@ export function LabHubView() {
       // Category matching
       if (activeFilter === 'ortaokul') return branch.levels.includes('ortaokul')
       if (activeFilter === 'lise') return branch.levels.includes('lise')
-      if (activeFilter === 'maarif') return branch.maarifModel === true
-      if (activeFilter === 'sayisal') return branch.category === 'sayisal'
-      if (activeFilter === 'sozel') return branch.category === 'sozel'
-      if (activeFilter === 'dil') return branch.category === 'dil'
 
       return true
     })
@@ -413,10 +404,9 @@ export function LabHubView() {
 
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-cyan-500 selection:text-slate-950 font-sans">
-      {/* ── Background Glow Effects ── */}
-      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[160px] pointer-events-none -z-10" />
-      <div className="fixed top-1/3 right-1/4 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[160px] pointer-events-none -z-10" />
-      <div className="fixed bottom-10 left-1/3 w-[450px] h-[450px] bg-emerald-500/10 rounded-full blur-[160px] pointer-events-none -z-10" />
+      {/* ── Background Glow Effects (GPU Optimized) ── */}
+      <div className="fixed top-0 left-1/4 w-[450px] h-[450px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed top-1/3 right-1/4 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
       {/* ── Top Navigation Bar ── */}
       <BranchNavHeader />
@@ -487,23 +477,19 @@ export function LabHubView() {
       <section className="sticky top-16 z-40 backdrop-blur-2xl bg-slate-950/85 border-b border-slate-800/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
           
-          {/* Category Filter Pills */}
+          {/* Category Filter Pills (Sadece Tüm Atölyeler, Ortaokul, Lise) */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full md:w-auto pb-1 md:pb-0">
             {[
               { id: 'all' as FilterType, label: 'Tüm Atölyeler' },
-              { id: 'maarif' as FilterType, label: '✨ Maarif Modeli' },
               { id: 'ortaokul' as FilterType, label: '🎒 Ortaokul (5-8. Sınıf)' },
               { id: 'lise' as FilterType, label: '🎓 Lise (9-12. Sınıf)' },
-              { id: 'sayisal' as FilterType, label: '🔬 Fen & Matematik' },
-              { id: 'sozel' as FilterType, label: '📚 Türkçe & Sosyal' },
-              { id: 'dil' as FilterType, label: '🌐 İngilizceLab' },
             ].map((f) => {
               const isActive = activeFilter === f.id
               return (
                 <button
                   key={f.id}
                   onClick={() => setActiveFilter(f.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                     isActive
                       ? 'bg-cyan-500 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.35)]'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900'
@@ -577,80 +563,66 @@ export function LabHubView() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.25 }}
-                  className="group relative rounded-3xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700/80 backdrop-blur-xl p-6 flex flex-col justify-between overflow-hidden shadow-xl transition-all hover:shadow-2xl hover:shadow-cyan-500/5"
                 >
-                  {/* Subtle Corner Glow */}
-                  <div
-                    className={`absolute -top-12 -right-12 w-36 h-36 ${branch.bgGlow} rounded-full blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-500`}
-                  />
-
-                  <div>
-                    {/* Header Row: Icon & Tag */}
-                    <div className="flex items-center justify-between gap-3 mb-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${branch.color} flex items-center justify-center shadow-lg shadow-cyan-500/10 group-hover:scale-105 transition-transform`}
-                        >
-                          <Icon className="w-6 h-6 text-slate-950" />
-                        </div>
-                        <div>
-                          <h2 className="text-xl font-black text-white group-hover:text-cyan-300 transition-colors">
-                            {displayTitle}
-                          </h2>
-                          <span className="text-[11px] font-semibold text-slate-400">
-                            {displayTag}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Kademe & Maarif Badge */}
-                      <div className="flex items-center gap-1">
-                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
-                          {branch.levelBadge}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Short Description */}
-                    <p className="text-xs text-slate-300 leading-relaxed mb-5">
-                      {branch.description}
-                    </p>
-
-                    {/* Interactive Modules Preview List */}
-                    <div className="space-y-2 mb-6">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        İçerdiği Sanal Modüller:
-                      </div>
-                      <div className="space-y-1.5">
-                        {branch.modules.map((m, idx) => (
-                          <div
-                            key={idx}
-                            className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-start justify-between gap-2 text-xs hover:border-slate-700 transition-colors"
-                          >
-                            <div>
-                              <span className="font-semibold text-white block">
-                                {m.title}
-                              </span>
-                              <span className="text-[11px] text-slate-400 leading-tight">
-                                {m.desc}
-                              </span>
-                            </div>
-                            <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 border border-cyan-500/30">
-                              {m.badge}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Direct Link Button */}
                   <Link
                     href={branch.href}
-                    className={`w-full py-3 px-4 rounded-xl bg-gradient-to-r ${branch.color} text-slate-950 font-black text-xs flex items-center justify-center gap-2 group-hover:opacity-95 shadow-md shadow-cyan-500/10 transition-all cursor-pointer tracking-wider`}
+                    className="group relative rounded-3xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700/80 backdrop-blur-xl p-6 flex flex-col justify-between overflow-hidden shadow-xl transition-all hover:shadow-2xl hover:shadow-cyan-500/10 block cursor-pointer h-full"
                   >
-                    <span>BAŞLA</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    {/* Subtle Corner Glow */}
+                    <div
+                      className={`absolute -top-12 -right-12 w-36 h-36 ${branch.bgGlow} rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500`}
+                    />
+
+                    <div>
+                      {/* Header Row: Icon & Lab Title */}
+                      <div className="flex items-center justify-between gap-3 mb-5">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${branch.color} flex items-center justify-center shadow-lg shadow-cyan-500/10 group-hover:scale-105 transition-transform`}
+                          >
+                            <Icon className="w-6 h-6 text-slate-950" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-black text-white group-hover:text-cyan-300 transition-colors">
+                              {displayTitle}
+                            </h2>
+                            <span className="text-[11px] font-semibold text-slate-400">
+                              {displayTag}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Interactive Modules Preview List (Sadece Başlıklar) */}
+                      <div className="space-y-2 mb-6">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          İçerdiği Sanal Modüller:
+                        </div>
+                        <div className="space-y-1.5">
+                          {branch.modules.map((m, idx) => (
+                            <div
+                              key={idx}
+                              className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between gap-2 text-xs group-hover:border-slate-700/80 transition-colors"
+                            >
+                              <span className="font-semibold text-white">
+                                {m.title}
+                              </span>
+                              <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 border border-cyan-500/30">
+                                {m.badge}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Direct Link Button */}
+                    <div
+                      className={`w-full py-3 px-4 rounded-xl bg-gradient-to-r ${branch.color} text-slate-950 font-black text-xs flex items-center justify-center gap-2 group-hover:brightness-110 shadow-md shadow-cyan-500/10 transition-all tracking-wider`}
+                    >
+                      <span>BAŞLA</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                    </div>
                   </Link>
                 </motion.div>
               )

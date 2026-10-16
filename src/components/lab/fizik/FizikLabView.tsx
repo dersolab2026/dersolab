@@ -145,7 +145,7 @@ export function FizikLabView() {
       targetMetric: 'dc < ds (Yüzen Cisim)',
       hint: 'Cisim yoğunluğu sürgüsünü 0.8 g/cm³ altına çekin veya sıvı yoğunluğunu artırın.',
       xp: 50,
-      isCompleted: () => true,
+      isCompleted: (s) => Boolean(s && typeof s.dc === 'number' && typeof s.ds === 'number' && s.dc < s.ds),
     },
     {
       id: 'buoyancy-c2',
@@ -155,7 +155,7 @@ export function FizikLabView() {
       targetMetric: 'P_sıvı ≥ 2000 Pa',
       hint: 'P = h · d · g formülünde derinlik (h) ile basınç doğru orantılıdır.',
       xp: 100,
-      isCompleted: () => true,
+      isCompleted: (s) => Boolean(s && typeof s.h === 'number' && typeof s.ds === 'number' && s.h * s.ds >= 35),
     },
     {
       id: 'buoyancy-c3',
@@ -165,7 +165,7 @@ export function FizikLabView() {
       targetMetric: 'dc = ds (Fk = G)',
       hint: 'Her iki yoğunluk değeri birbirine eşit olduğunda batan hacim cismin tüm hacmine eşit olur.',
       xp: 150,
-      isCompleted: () => true,
+      isCompleted: (s) => Boolean(s && typeof s.dc === 'number' && typeof s.ds === 'number' && Math.abs(s.dc - s.ds) < 0.04),
     },
   ]
 
@@ -249,9 +249,9 @@ export function FizikLabView() {
 
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-blue-500 selection:text-slate-950 font-sans">
-      {/* ── Background Glow Effects ── */}
-      <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed top-1/3 right-1/4 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none -z-10" />
+      {/* ── Background Glow Effects (GPU Optimized) ── */}
+      <div className="fixed top-0 left-1/4 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed top-1/3 right-1/4 w-[350px] h-[350px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
       {/* ── Top Navigation Bar ── */}
       <BranchNavHeader currentBranch="fizik" />

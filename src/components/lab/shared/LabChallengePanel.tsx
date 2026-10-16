@@ -33,6 +33,8 @@ export function LabChallengePanel({
   const [completedIds, setCompletedIds] = useState<string[]>([])
   const [openHintId, setOpenHintId] = useState<string | null>(null)
   const [justCompletedId, setJustCompletedId] = useState<string | null>(null)
+  const isInitializedRef = React.useRef(false)
+  const lastStateJsonRef = React.useRef<string>('')
 
   // Load completed from localStorage
   useEffect(() => {
@@ -44,25 +46,45 @@ export function LabChallengePanel({
       }
     } catch {
       // ignore
+    } finally {
+      // Mark as initialized after initial localStorage read
+      setTimeout(() => {
+        isInitializedRef.current = true
+      }, 100)
     }
   }, [moduleKey])
 
   // Real-time evaluation against current simulation state
   useEffect(() => {
+    if (!isInitializedRef.current || !currentState) return
+
+    // Debounce / deduplicate if state didn't actually change
+    const stateJson = JSON.stringify(currentState)
+    if (stateJson === lastStateJsonRef.current) return
+    lastStateJsonRef.current = stateJson
+
     for (const challenge of challenges) {
       if (!completedIds.includes(challenge.id)) {
-        if (challenge.isCompleted(currentState)) {
-          const updated = [...completedIds, challenge.id]
-          setCompletedIds(updated)
-          try {
-            localStorage.setItem(`dersolab_challenges_${moduleKey}`, JSON.stringify(updated))
-          } catch {
-            // ignore
+        try {
+          if (challenge.isCompleted(currentState)) {
+            const updated = [...completedIds, challenge.id]
+            setCompletedIds(updated)
+            try {
+              localStorage.setItem(`dersolab_challenges_${moduleKey}`, JSON.stringify(updated))
+            } catch {
+              // ignore
+            }
+            setJustCompletedId(challenge.id)
+            try {
+              playSuccessFanfare()
+            } catch {
+              // ignore
+            }
+            setTimeout(() => setJustCompletedId(null), 4000)
+            break
           }
-          setJustCompletedId(challenge.id)
-          playSuccessFanfare()
-          setTimeout(() => setJustCompletedId(null), 4000)
-          break
+        } catch {
+          // ignore error in custom isCompleted
         }
       }
     }
