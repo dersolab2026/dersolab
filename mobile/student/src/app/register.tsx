@@ -4,9 +4,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
 import { Picker } from '@react-native-picker/picker';
 import Checkbox from 'expo-checkbox';
 import { supabase } from '@/lib/supabase';
+
+WebBrowser.maybeCompleteAuthSession();
 
 const GRADES = [5, 6, 7, 8, 9, 10, 11, 12];
 const MEZUN_GRADE = 13;
@@ -85,16 +88,58 @@ export default function RegisterScreen() {
   };
 
   const handleGoogleRegister = async () => {
-    const redirectUrl = Linking.createURL('/');
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-      },
-    });
-    
-    if (error) {
-      setErrorMsg(error.message);
+    try {
+      setLoading(true);
+      setErrorMsg('');
+      const redirectUrl = Linking.createURL('/');
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: Platform.OS !== 'web',
+        },
+      });
+
+      if (error) {
+        setErrorMsg(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (Platform.OS === 'web') {
+        if (data?.url) {
+          window.location.href = data.url;
+        }
+      } else {
+        if (data?.url) {
+          const res = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+          if (res.type === 'success' && res.url) {
+            const hash = res.url.includes('#') ? res.url.split('#')[1] : res.url.split('?')[1];
+            if (hash) {
+              const params = new URLSearchParams(hash);
+              const access_token = params.get('access_token');
+              const refresh_token = params.get('refresh_token');
+
+              if (access_token && refresh_token) {
+                const { error: sessionErr } = await supabase.auth.setSession({
+                  access_token,
+                  refresh_token,
+                });
+                if (sessionErr) {
+                  setErrorMsg(sessionErr.message);
+                } else {
+                  router.replace('/dashboard');
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (e: any) {
+      setErrorMsg(e?.message || 'Google ile kayıt açılamadı.');
+    } finally {
+      setLoading(false);
     }
   };
 
