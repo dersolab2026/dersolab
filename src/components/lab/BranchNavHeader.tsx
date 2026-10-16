@@ -93,7 +93,7 @@ export const BRANCHES = [
     color: 'from-sky-500 to-indigo-500',
     borderActive: 'border-sky-500/50 text-sky-300 bg-sky-950/40',
     accentColor: 'text-sky-400',
-    tag: 'Pratik Konuşma & Dil',
+    tag: '5-12. Sınıf MEB & LGS/YDT',
   },
 ]
 

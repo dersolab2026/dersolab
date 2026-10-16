@@ -5,51 +5,51 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Languages,
   BookOpen,
-  Flame,
   Volume2,
   Camera,
-  Layers,
-  ArrowRight,
+  School,
   GraduationCap,
+  Sparkles,
 } from 'lucide-react'
 import { BranchNavHeader } from '../BranchNavHeader'
+import { MEBCurriculumEnglishModule } from './MEBCurriculumEnglishModule'
 import { TinyLessonsModule } from './TinyLessonsModule'
-import { SlangHangModule } from './SlangHangModule'
 import { PronunciationWorkoutModule } from './PronunciationWorkoutModule'
 import { VisualSceneModule } from './VisualSceneModule'
+import { playClickSound } from '@/lib/soundFx'
 
-type EnglishTabType = 'tiny-lessons' | 'slang-hang' | 'pronunciation' | 'visual-scenes'
+type EnglishTabType = 'meb-curriculum' | 'tiny-lessons' | 'pronunciation' | 'visual-scenes'
 
 export function IngilizceLabView() {
-  const [activeTab, setActiveTab] = useState<EnglishTabType>('tiny-lessons')
+  const [activeTab, setActiveTab] = useState<EnglishTabType>('meb-curriculum')
 
   const TABS = [
+    {
+      id: 'meb-curriculum' as EnglishTabType,
+      label: 'MEB Okul Üniteleri',
+      sublabel: '5-12. Sınıf Ders Kitapları',
+      icon: School,
+      badge: '5-12. Sınıf & LGS/YDT',
+      color: 'from-sky-500 to-blue-600',
+      activeBorder: 'border-sky-500/50 shadow-[0_0_20px_rgba(56,189,248,0.3)] ring-1 ring-sky-500/20',
+      activeText: 'text-sky-300',
+    },
     {
       id: 'tiny-lessons' as EnglishTabType,
       label: 'Durumsal Senaryolar',
       sublabel: 'Mikro Konuşma Dersleri',
       icon: BookOpen,
       badge: 'Pratik Diyalog',
-      color: 'from-sky-500 to-blue-500',
-      activeBorder: 'border-sky-500/50 shadow-[0_0_20px_rgba(56,189,248,0.25)] ring-1 ring-sky-500/20',
-      activeText: 'text-sky-300',
-    },
-    {
-      id: 'slang-hang' as EnglishTabType,
-      label: 'Deyimler & Slang',
-      sublabel: 'Doğal Konuşma & Sokak Dili',
-      icon: Flame,
-      badge: 'US 🇺🇸 • UK 🇬🇧 • AU 🇦🇺',
-      color: 'from-amber-500 to-orange-500',
-      activeBorder: 'border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/20',
-      activeText: 'text-amber-300',
+      color: 'from-blue-500 to-indigo-500',
+      activeBorder: 'border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.25)] ring-1 ring-blue-500/20',
+      activeText: 'text-blue-300',
     },
     {
       id: 'pronunciation' as EnglishTabType,
       label: 'Telaffuz & Fonetik',
       sublabel: 'Tuzak Kelimeler & Doğal Telaffuz',
       icon: Volume2,
-      badge: 'Sessiz Harf Sırları',
+      badge: 'Sessiz Harfler & Vurgu',
       color: 'from-emerald-500 to-teal-500',
       activeBorder: 'border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-500/20',
       activeText: 'text-emerald-300',
@@ -89,27 +89,27 @@ export function IngilizceLabView() {
               <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
                 İngilizceLab —{' '}
                 <span className="bg-gradient-to-r from-sky-400 via-indigo-300 to-amber-400 bg-clip-text text-transparent">
-                  İnteraktif Konuşma & Dil Atölyesi
+                  MEB Müfredat & Dil Atölyesi
                 </span>
               </h1>
               <p className="mt-2 text-slate-400 text-sm sm:text-base max-w-2xl leading-relaxed">
-                Kuru gramer ezberi yerine gerçek yaşam senaryoları, yaşayan sokak jargonu ve deyimler, fonetik tuzak antrenörü ve görsel sahne keşfiyle İngilizceyi doğal refleks haline getirin.
+                5, 6, 7, 8. Sınıf (LGS) ve 9, 10, 11, 12. Sınıf (YKS/YDT) okul ders kitaplarındaki resmi MEB üniteleri, kazanım kelimeleri, hedef dil bilgisi formülleri, ders kitabı dinleme diyalogları ve çıkmış sınav soruları.
               </p>
             </div>
 
             {/* Quick Stats Pill */}
             <div className="grid grid-cols-3 gap-3 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-md self-start md:self-auto">
               <div className="px-3 py-1 text-center">
-                <div className="text-lg font-bold text-sky-400">4</div>
-                <div className="text-[11px] text-slate-400">Canlı Modül</div>
+                <div className="text-lg font-bold text-sky-400">5-12.</div>
+                <div className="text-[11px] text-slate-400">MEB Sınıfları</div>
               </div>
               <div className="px-3 py-1 text-center border-x border-slate-800">
-                <div className="text-lg font-bold text-amber-400">3 Aksan</div>
-                <div className="text-[11px] text-slate-400">US, UK & AU</div>
+                <div className="text-lg font-bold text-amber-400">LGS & YDT</div>
+                <div className="text-[11px] text-slate-400">Çıkmış Sorular</div>
               </div>
               <div className="px-3 py-1 text-center">
-                <div className="text-lg font-bold text-emerald-400">A1 - B2</div>
-                <div className="text-[11px] text-slate-400">Maarif Uyumlu</div>
+                <div className="text-lg font-bold text-emerald-400">US & UK</div>
+                <div className="text-[11px] text-slate-400">Canlı Telaffuz</div>
               </div>
             </div>
           </div>
@@ -122,10 +122,13 @@ export function IngilizceLabView() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    playClickSound()
+                    setActiveTab(tab.id)
+                  }}
                   className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                     isActive
-                      ? `bg-slate-850 text-white ${tab.activeBorder}`
+                      ? `bg-slate-800 text-white ${tab.activeBorder}`
                       : 'bg-slate-900/60 border border-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 hover:border-slate-700'
                   }`}
                 >
@@ -161,8 +164,8 @@ export function IngilizceLabView() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2 }}
           >
+            {activeTab === 'meb-curriculum' && <MEBCurriculumEnglishModule />}
             {activeTab === 'tiny-lessons' && <TinyLessonsModule />}
-            {activeTab === 'slang-hang' && <SlangHangModule />}
             {activeTab === 'pronunciation' && <PronunciationWorkoutModule />}
             {activeTab === 'visual-scenes' && <VisualSceneModule />}
           </motion.div>
@@ -173,10 +176,10 @@ export function IngilizceLabView() {
       <footer className="border-t border-slate-800/80 bg-slate-950/60 py-8 mt-16 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 space-y-2">
           <p>
-            DersoLab İngilizceLab — Yaşayan İngilizce refleksleri ve MEB Maarif Modeli konuşma becerileri odaklı geliştirilmiştir.
+            DersoLab İngilizceLab — MEB Maarif Modeli ve Okul Ders Kitapları (5, 6, 7, 8. Sınıf LGS & 9, 10, 11, 12. Sınıf YDT) odaklı geliştirilmiştir.
           </p>
           <p className="text-[11px] text-slate-600">
-            Kullanılan telaffuz sentezi tarayıcınızın yerel Web Speech API motoru tarafından gerçek zamanlı üretilmektedir.
+            Kelimelerin ve diyalogların sesli okunuşları Web Speech API motoru ile anında sentezlenmektedir.
           </p>
         </div>
       </footer>
