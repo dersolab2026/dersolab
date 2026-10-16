@@ -9,7 +9,7 @@ import { TERMS_VERSION } from '@/lib/legal'
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/register?redirect=/dashboard')
 
   const [{ data: userRow }, { data: termsAcceptance }] = await Promise.all([
     supabase.from('users').select('role, role_confirmed').eq('id', user.id).single(),

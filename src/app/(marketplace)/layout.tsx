@@ -1,5 +1,6 @@
 import type { UserRole } from '@/types'
 import type { ReactNode } from 'react'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/layout/DashboardNav'
 import { getNotifications } from '@/actions/notifications'
@@ -8,7 +9,9 @@ export default async function MarketplaceLayout({ children }: { children: ReactN
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) return <>{children}</>
+  if (!user) {
+    redirect('/register?redirect=/instructors')
+  }
 
   const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
   const role = (userRow?.role ?? 'student') as UserRole

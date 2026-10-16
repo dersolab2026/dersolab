@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useTransition, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Capacitor } from '@capacitor/core'
 import { Browser } from '@capacitor/browser'
@@ -9,8 +9,11 @@ import { AuthShell } from '@/components/auth/AuthShell'
 import { PasswordInput } from '@/components/auth/PasswordInput'
 import { loginUser, signInWithGoogle } from '@/actions/auth'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectParam = searchParams.get('redirect')
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -24,7 +27,7 @@ export default function LoginPage() {
     startTransition(async () => {
       const result = await loginUser(email, password)
       if (!result.success) { setError(result.error); return }
-      router.push('/dashboard')
+      router.push(redirectParam || '/dashboard')
       router.refresh()
     })
   }
@@ -33,7 +36,7 @@ export default function LoginPage() {
     setError(null)
     setIsGooglePending(true)
     const isNative = Capacitor.isNativePlatform()
-    const result = await signInWithGoogle(isNative)
+    const result = await signInWithGoogle(isNative, undefined, redirectParam || undefined)
     if ('url' in result) {
       if (isNative) {
         await Browser.open({ url: result.url })
@@ -49,7 +52,15 @@ export default function LoginPage() {
 
   return (
     <AuthShell baslik="Giriş Yap" role={role}>
-      
+      {redirectParam && (
+        <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-200 text-sm mb-4">
+          <svg className="w-5 h-5 shrink-0 text-blue-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span>DersoLab simülasyonları ve platform içeriklerini kullanabilmek için lütfen giriş yapın veya kayıt olun.</span>
+        </div>
+      )}
+
       {/* Rol Secimi Pill UI */}
       <div className="flex bg-white/[0.02] border border-white/5 rounded-2xl p-1 mb-6 mt-2">
         <button
@@ -141,10 +152,21 @@ export default function LoginPage() {
 
       <div className="mt-6 text-center">
         <span className="text-slate-400">Hesabın yok mu? </span>
-        <Link href="/register" className="text-blue-400 font-bold hover:text-blue-300 transition-colors">
+        <Link
+          href={redirectParam ? `/register?redirect=${encodeURIComponent(redirectParam)}` : '/register'}
+          className="text-blue-400 font-bold hover:text-blue-300 transition-colors"
+        >
           Kaydol
         </Link>
       </div>
     </AuthShell>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#07090E]" />}>
+      <LoginForm />
+    </Suspense>
   )
 }

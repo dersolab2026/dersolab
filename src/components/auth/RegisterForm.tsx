@@ -28,6 +28,7 @@ export function RegisterForm() {
   const searchParams = useSearchParams()
   const initialEmail = searchParams.get('email') ?? ''
   const roleParam = searchParams.get('role')
+  const redirectParam = searchParams.get('redirect')
   const initialRole: Role = roleParam === 'instructor' || roleParam === 'parent' ? roleParam : 'student'
 
   const [name, setName] = useState('')
@@ -55,7 +56,11 @@ export function RegisterForm() {
     }
     setIsGooglePending(true)
     const isNative = Capacitor.isNativePlatform()
-    const result = await signInWithGoogle(isNative, { rol: role, sartSurumu: TERMS_VERSION })
+    const result = await signInWithGoogle(
+      isNative,
+      { rol: role, sartSurumu: TERMS_VERSION },
+      redirectParam || undefined
+    )
     if ('url' in result) {
       if (isNative) {
         await Browser.open({ url: result.url })
@@ -107,7 +112,7 @@ export function RegisterForm() {
           E-postana gönderdiğimiz onay linkine tıklayınca giriş yapabilirsin.
         </p>
         <Link
-          href="/login"
+          href={redirectParam ? `/login?redirect=${encodeURIComponent(redirectParam)}` : '/login'}
           className="mt-6 block w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg rounded-2xl shadow-[0_0_30px_rgba(37,99,235,0.3)] hover:shadow-[0_0_40px_rgba(37,99,235,0.5)] transition-all text-center"
         >
           Giriş Yap
@@ -118,6 +123,14 @@ export function RegisterForm() {
 
   return (
     <AuthShell baslik="Kaydol" role={role}>
+      {redirectParam && (
+        <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-200 text-sm mb-4">
+          <svg className="w-5 h-5 shrink-0 text-blue-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span>DersoLab simülasyonları ve platform içeriklerini kullanabilmek için lütfen ücretsiz kayıt olun veya giriş yapın.</span>
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         
         {/* Rol Secimi Pill UI */}
@@ -301,7 +314,10 @@ export function RegisterForm() {
 
       <div className="mt-6 text-center">
         <span className="text-slate-400">Zaten hesabın var mı? </span>
-        <Link href="/login" className="text-blue-400 font-bold hover:text-blue-300 transition-colors">
+        <Link
+          href={redirectParam ? `/login?redirect=${encodeURIComponent(redirectParam)}` : '/login'}
+          className="text-blue-400 font-bold hover:text-blue-300 transition-colors"
+        >
           Giriş Yap
         </Link>
       </div>

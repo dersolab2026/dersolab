@@ -133,6 +133,7 @@ export async function logoutUser(): Promise<void> {
 export async function signInWithGoogle(
   isNative = false,
   not?: OAuthNotu,
+  nextUrl?: string,
 ): Promise<{ url: string } | { error: string }> {
   const requestHeaders = await headers()
   let appUrl = requestHeaders.get('origin')
@@ -143,10 +144,14 @@ export async function signInWithGoogle(
   }
   appUrl = appUrl.replace(/\/$/, '')
 
+  const callbackUrl = isNative
+    ? 'com.dersolab.app://auth/callback'
+    : `${appUrl}/auth/callback${nextUrl ? `?next=${encodeURIComponent(nextUrl)}` : ''}`
+
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: isNative ? 'com.dersolab.app://auth/callback' : `${appUrl}/auth/callback` },
+    options: { redirectTo: callbackUrl },
   })
   if (error || !data.url) return { error: 'Google girişi başlatılamadı' }
 
