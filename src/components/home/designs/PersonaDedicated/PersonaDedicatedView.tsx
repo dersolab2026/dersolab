@@ -77,17 +77,6 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
     <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-amber-400 selection:text-slate-950 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-6">
       <div className="max-w-6xl mx-auto space-y-8">
         
-        {/* ── KİMYALAB ANNOUNCEMENT PILL ── */}
-        <div className="flex justify-center">
-          <Link
-            href="/lab"
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/15 border border-emerald-500/35 text-emerald-300 text-xs font-bold hover:border-emerald-400 hover:text-white transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)] group cursor-pointer"
-          >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>🧪 Yeni: DersoLab KimyaLab Simülasyonu & 3D Periyodik Tablo Yayında!</span>
-            <span className="group-hover:translate-x-1 transition-transform text-emerald-400 font-black">Hemen Dene →</span>
-          </Link>
-        </div>
 
         {/* ── TOP AUDIENCE SWITCHER (FLOATING MASTER PILL) ── */}
         <div className="flex justify-center">
