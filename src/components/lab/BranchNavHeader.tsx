@@ -13,7 +13,10 @@ import {
   Languages,
   Home,
   ArrowRight,
+  Volume2,
+  VolumeX,
 } from 'lucide-react'
+import { isSoundMuted, toggleSound, playClickSound } from '@/lib/soundFx'
 
 export type BranchId = 'kimya' | 'turkce' | 'fizik' | 'matematik' | 'biyoloji' | 'sosyal' | 'ingilizce'
 
@@ -95,6 +98,18 @@ export const BRANCHES = [
 ]
 
 export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
+  const [muted, setMuted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMuted(isSoundMuted())
+  }, [])
+
+  const handleToggleSound = () => {
+    const next = toggleSound()
+    setMuted(next)
+    if (!next) playClickSound()
+  }
+
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#07090E]/85 border-b border-slate-800/80">
       <div className="max-w-[1440px] mx-auto px-2.5 sm:px-4 lg:px-6">
@@ -166,8 +181,22 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
             })}
           </nav>
 
-          {/* Hesabımın Ana Sayfasına Dön (/dashboard) */}
-          <div className="flex items-center shrink-0">
+          {/* Sound Toggle & Hesabımın Ana Sayfasına Dön (/dashboard) */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleToggleSound}
+              title={muted ? 'Sesi Aç (Web Audio)' : 'Sesi Kapat'}
+              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-amber-400 hover:bg-slate-800/80 border border-slate-800 transition-colors cursor-pointer shrink-0"
+              aria-label={muted ? 'Sesi Aç' : 'Sesi Kapat'}
+            >
+              {muted ? (
+                <VolumeX className="w-4 h-4 text-slate-500" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-amber-400" />
+              )}
+            </button>
+
             <Link
               href="/dashboard"
               className="text-[11px] sm:text-xs font-bold text-slate-200 hover:text-white transition-all flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 hover:border-cyan-500/50 hover:bg-slate-800 shadow-sm whitespace-nowrap"
