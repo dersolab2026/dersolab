@@ -12,17 +12,19 @@ import {
   Zap,
   Layers,
   BookMarked,
+  Tag,
   FlaskConical,
 } from 'lucide-react'
 import { BionicSpeedReader } from './BionicSpeedReader'
 import { LiteratureMatchGame } from './LiteratureMatchGame'
 import { PhoneticInspector } from './PhoneticInspector'
 import { TdkWordOfTheDay } from './TdkWordOfTheDay'
+import { SentenceParserModule } from './SentenceParserModule'
 import { SocialCommunityBar } from '@/components/home/SocialCommunityBar'
 
 import { BranchNavHeader } from '../BranchNavHeader'
 
-type TurkceTabType = 'bionic' | 'tdk' | 'literature' | 'phonetics'
+export type TurkceTabType = 'bionic' | 'tdk' | 'sentence' | 'literature' | 'phonetics'
 
 export function TurkceLabView() {
   const [activeTab, setActiveTab] = useState<TurkceTabType>('bionic')
@@ -47,28 +49,34 @@ export function TurkceLabView() {
     {
       id: 'bionic' as TurkceTabType,
       label: 'Paragraf Hız Antrenörü',
+      badge: '5-12. Sınıf',
       icon: Zap,
     },
     {
+      id: 'sentence' as TurkceTabType,
+      label: 'Cümlenin Ögeleri & Fiilimsiler',
+      badge: '8. Sınıf LGS & TYT',
+      icon: Tag,
+    },
+    {
       id: 'tdk' as TurkceTabType,
-      label: 'Günün Kelimesi',
+      label: 'Günün Kelimesi & Sözlük',
+      badge: 'Canlı TDK',
       icon: BookMarked,
     },
     {
       id: 'literature' as TurkceTabType,
       label: 'Yazar Eser Eşleştirme',
+      badge: 'Edebiyat Kart Oyunu',
       icon: BookOpen,
     },
     {
       id: 'phonetics' as TurkceTabType,
-      label: 'Ses Bilgisi',
+      label: 'Ses Olayları Dedektifi',
+      badge: 'Dil Bilgisi',
       icon: Layers,
     },
   ]
-
-  const currentTabIndex = TABS.findIndex((t) => t.id === activeTab)
-  const prevTab = currentTabIndex > 0 ? TABS[currentTabIndex - 1] : null
-  const nextTab = currentTabIndex < TABS.length - 1 ? TABS[currentTabIndex + 1] : null
 
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-cyan-500 selection:text-slate-950 font-sans">
@@ -91,14 +99,19 @@ export function TurkceLabView() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
                     isActive
-                      ? 'bg-slate-800 text-white border border-cyan-500/60 shadow-[0_0_20px_rgba(6,182,212,0.3)]'
+                      ? 'bg-slate-800 text-white border border-amber-500/60 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
                   <span>{tab.label}</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                    isActive ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-800 text-slate-500'
+                  }`}>
+                    {tab.badge}
+                  </span>
                 </button>
               )
             })}
@@ -108,7 +121,7 @@ export function TurkceLabView() {
           <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs font-semibold text-slate-300">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-slate-400">TürkçeLab Odak Süreniz:</span>
-            <span className="font-mono font-bold text-cyan-400">{formatTimer(sessionSeconds)}</span>
+            <span className="font-mono font-bold text-amber-400">{formatTimer(sessionSeconds)}</span>
           </div>
         </div>
       </div>
@@ -126,85 +139,38 @@ export function TurkceLabView() {
             transition={{ duration: 0.2 }}
           >
             {activeTab === 'bionic' && <BionicSpeedReader />}
+            {activeTab === 'sentence' && <SentenceParserModule />}
             {activeTab === 'tdk' && <TdkWordOfTheDay />}
             {activeTab === 'literature' && <LiteratureMatchGame />}
             {activeTab === 'phonetics' && <PhoneticInspector />}
           </motion.div>
         </AnimatePresence>
 
-        {/* ── Alt Modül Geçiş Çubuğu (Bottom Navigation) ── */}
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            {prevTab ? (
-              <button
-                onClick={() => setActiveTab(prevTab.id)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-bold border border-slate-700 transition-all cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4 text-cyan-400" />
-                <span>Önceki: {prevTab.label}</span>
-              </button>
-            ) : (
-              <div className="text-xs text-slate-500 pl-2">İlk Modüldesiniz</div>
-            )}
-          </div>
-
-          {/* Ortadaki Hızlı Geçiş Butonları */}
-          <div className="flex items-center gap-1.5">
-            {TABS.map((tab, idx) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-3 h-3 rounded-full transition-all cursor-pointer ${
-                  activeTab === tab.id ? 'bg-cyan-400 w-8' : 'bg-slate-700 hover:bg-slate-500'
-                }`}
-                title={tab.label}
-              />
-            ))}
-          </div>
-
-          <div>
-            {nextTab ? (
-              <button
-                onClick={() => setActiveTab(nextTab.id)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-bold border border-slate-700 transition-all cursor-pointer"
-              >
-                <span>Sonraki: {nextTab.label}</span>
-                <ArrowRight className="w-4 h-4 text-cyan-400" />
-              </button>
-            ) : (
-              <div className="text-xs text-slate-500 pr-2">Son Modüldesiniz</div>
-            )}
-          </div>
-        </div>
-
-        {/* ── Sosyal Medya Topluluk Kartı ── */}
-        <SocialCommunityBar />
-
         {/* ── Bottom Callout: Convert Student to Lesson ── */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-cyan-950/40 via-slate-900/90 to-amber-950/40 border border-cyan-500/30 backdrop-blur-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold">
+        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-amber-950/40 via-slate-900/90 to-orange-950/40 border border-amber-500/30 backdrop-blur-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1.5 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
               <Image
                 src="/fox-head.png"
                 alt="DersoLab Maskot"
-                width={18}
-                height={18}
-                className="w-4 h-4 object-contain"
+                width={16}
+                height={16}
+                className="w-3.5 h-3.5 object-contain"
               />
-              <span>DersoLab Bire Bir Türkçe & Paragraf Koçluğu</span>
+              <span>DersoLab Bire Bir Türkçe & Edebiyat Atölyesi</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-black text-white">
-              Türkçe Netlerini Şansa Bırakma.
+              Türkçe ve Edebiyatta Netlerini Katla.
             </h3>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-              Okumanı hızlandır, taktikleri öğren, soruları anla, netleri artır. Deneyimli eğitmenlerimizle bire bir online derste eksiklerini tamamla.
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
+              Cümlenin ögeleri, fiilimsiler, bionic paragraf hızı ve yazar-eser kodlamalarını Türkiye&apos;nin en iyi öğretmenleriyle bire bir canlı derste çalış.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full md:w-auto">
             <Link
-              href="/instructors?category=Sözel"
-              className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-slate-950 font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(6,182,212,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              href="/instructors?subject=Türkçe"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-400 hover:from-amber-400 hover:to-orange-300 text-slate-950 font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Türkçe Öğretmenlerini Keşfet</span>
               <ArrowRight className="w-4 h-4" />
@@ -212,11 +178,13 @@ export function TurkceLabView() {
           </div>
         </div>
 
+        {/* ── Sosyal Topluluk Alanı ── */}
+        <SocialCommunityBar />
       </main>
 
       {/* ── Footer ── */}
       <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
-        DersoLab L.A.B. • Türkiye Yüzyılı Maarif Modeli, Ortaokul & Lise Türkçe Atölyesi
+        DersoLab L.A.B. • Türkiye Yüzyılı Maarif Modeli, Ortaokul & Lise Müfredatına Uygun 5 Türkçe & Edebiyat Simülasyonu
       </footer>
     </div>
   )

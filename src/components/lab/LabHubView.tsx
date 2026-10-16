@@ -59,33 +59,43 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-cyan-500/10',
     borderColor: 'border-cyan-500/30 group-hover:border-cyan-400/60',
     textColor: 'text-cyan-400',
-    tag: '3D Atom & Titrasyon',
+    tag: '3D Atom, Gazlar & Titrasyon',
     category: 'sayisal',
     levels: ['ortaokul', 'lise'],
     levelBadge: '7 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      '3D Bohr atom modeli ve katman elektron dağılımı (2-8-8 kuralı), sanal asit-baz titrasyon deneyi, interaktif periyodik cetvel ve mol/çözelti aracı.',
+      '3D Bohr atom modeli ve katman elektron dağılımı (2-8-8 kuralı), ideal gaz yasaları, sanal asit-baz titrasyon deneyi, tepkime hız/denge ve mol/çözelti aracı.',
     modules: [
       {
         title: '3D Atom Modeli & Katman Dağılımı (Bohr)',
-        desc: 'Çekirdekteki proton ve nötronlar ile yörüngelerdeki elektron katmanlarını (2-8-8 kuralı) 3 boyutta inceleyin; değerlik elektronları ile grup-periyot ilişkisini keşfedin.',
-        badge: '7-12. Sınıf & LGS/YKS',
+        desc: 'Çekirdekteki proton ve nötronlar ile yörüngelerdeki elektron katmanlarını (2-8-8 kuralı) 3 boyutta inceleyin; grup-periyot ilişkisini keşfedin.',
+        badge: '7-9. Sınıf',
       },
       {
-        title: 'Sanal Asit-Baz Titrasyon Deneyi',
+        title: 'İdeal Gaz Yasaları & Pistonlu Kap (P·V = n·R·T)',
+        desc: 'Hareketli piston, ısıtıcı/soğutucu ateşi, basınç manometresi; Boyle, Charles ve Gay-Lussac gaz yasaları simülasyonu.',
+        badge: '11. Sınıf AYT',
+      },
+      {
+        title: 'Sanal Asit-Baz Titrasyon Deneyi & pH',
         desc: 'Büret musluğunu açın; asit-baz nötralleşmesini, pH cetvelini (0-14) ve fenolftalein indikatörünün pembeleşme dönüm noktasını canlı izleyin.',
         badge: '8. Sınıf LGS & Lise',
       },
       {
-        title: 'Kimya-Le: Günün Elementi',
-        desc: 'İlk 18 element ve günlük hayattaki yaygın metalleri/ametalleri ipuçlarıyla periyodik cetvelde tahmin etme oyunu.',
-        badge: '7-12. Sınıf Keşif',
+        title: 'Tepkime Hızı & Le Chatelier Kimyasal Dengesi',
+        desc: 'Aktivasyon enerjisi (Eai, Eag), katalizörün etkisi ve Haber-Bosch denge tepkimesinde sağa/sola kayma simülatörü.',
+        badge: '11. Sınıf AYT',
       },
       {
         title: 'Mol & Çözelti Konsantrasyon Aracı',
         desc: 'M = n/V derişim ve kütle formüllerini interaktif hesaplama laboratuvarı.',
-        badge: 'Lise (10-11. Sınıf)',
+        badge: '10. Sınıf TYT/AYT',
+      },
+      {
+        title: 'Kimya-Le: Günün Elementi',
+        desc: 'İlk 18 element ve günlük hayattaki yaygın metalleri/ametalleri ipuçlarıyla periyodik cetvelde tahmin etme oyunu.',
+        badge: 'Keşif & Oyun',
       },
     ],
   },
@@ -98,13 +108,13 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-blue-500/10',
     borderColor: 'border-blue-500/30 group-hover:border-blue-400/60',
     textColor: 'text-blue-400',
-    tag: 'Optik, Atış & Devre',
+    tag: 'Dinamik, Atış, Optik & Dalga',
     category: 'sayisal',
     levels: ['ortaokul', 'lise'],
     levelBadge: '7 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      'Merceklerde ışın izleme ve kırılma, balistik eğik atış yörüngesi, seri/paralel elektrik devreleri ve Ohm kanunu.',
+      'Newton hareket yasaları, Arşimet kaldırma kuvveti, merceklerde ışın izleme, balistik eğik atış, elektrik devreleri ve basit harmonik hareket.',
     modules: [
       {
         title: 'Elektrik Devresi & Ohm Yasası (V = I·R)',
@@ -112,14 +122,29 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
         badge: '7-10. Sınıf',
       },
       {
+        title: 'Sıvıların Kaldırma Kuvveti & Basınç',
+        desc: 'Arşimet prensibi, cisim ve sıvı yoğunluğu karşılaştırması (dc vs ds), dinamometrede hafifleme ve P = h·d·g sıvı basıncı.',
+        badge: '8. Sınıf LGS & 10. Sınıf',
+      },
+      {
         title: 'Mercekler & Işın İzleme (Optik)',
         desc: 'İnce ve kalın kenarlı merceklerde cismi kaydırın; odak, merkez ve büyüteç sanal görüntülerini anında izleyin.',
-        badge: 'Optik & Işık',
+        badge: '8-10. Sınıf Optik',
+      },
+      {
+        title: 'Newton Hareket Yasaları & Dinamik (F = m·a)',
+        desc: 'Sürtünmeli eğimli düzlem, serbest cisim diyagramı vektörleri, statik/kinetik sürtünme eşiği ve ivmeli hareket.',
+        badge: '9. & 11. Sınıf',
       },
       {
         title: 'Eğik Atış & Balistik Simülatörü',
         desc: 'Fırlatma açısını ve hızını ayarlayın; havada asılı kalma süresini, hMax ve menzili 60 FPS fizikle simüle edin.',
-        badge: 'Mekanik & Hareket',
+        badge: '11. Sınıf Mekanik',
+      },
+      {
+        title: 'Basit Harmonik Hareket & Dalgalar',
+        desc: 'T = 2π√(m/k) yay sarkacı, ipli sarkaç, dalga boyu frekans ilişkisi ve kinetik-potansiyel enerji dönüşümü.',
+        badge: '12. Sınıf AYT',
       },
     ],
   },
@@ -132,23 +157,33 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-emerald-500/10',
     borderColor: 'border-emerald-500/30 group-hover:border-emerald-400/60',
     textColor: 'text-emerald-400',
-    tag: 'Punnett & Ribozom Sentezi',
+    tag: 'Punnett, Bölünme & Fotosentez',
     category: 'sayisal',
     levels: ['ortaokul', 'lise'],
-    levelBadge: '8 - 12. Sınıf & Maarif',
+    levelBadge: '7 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      'Mendel kalıtımı Punnett karesi, ABO kan grubu çaprazlamaları ve ribozomda DNA transkripsiyon / translasyon atölyesi.',
+      'Mendel kalıtımı Punnett karesi, mitoz ve mayoz hücre döngüsü, Engelmann fotosentez deneyi ve ribozomda protein sentezi.',
     modules: [
       {
         title: 'Punnett Karesi & Kalıtım Genetiği',
         desc: 'Monohibrit çaprazlamalar, kan grupları ve fenotip/genotip olasılık oranlarını etkileşimli hesaplayın.',
-        badge: '8-10. Sınıf',
+        badge: '8. Sınıf LGS & 10. Sınıf',
+      },
+      {
+        title: 'Fotosentez & Engelmann Spektrumu',
+        desc: 'Işık rengi (dalga boyu), ışık şiddeti, CO₂ ve sıcaklığın fotosentez hızına ve O₂ çıkışına canlı etkisi.',
+        badge: '8. Sınıf LGS & 12. Sınıf',
+      },
+      {
+        title: 'Mitoz & Mayoz Hücre Bölünmesi',
+        desc: 'İnterfaz, profaz, metafaz, anafaz, krossing-over ve kromozom sayısı (2n → 2n vs 2n → n) değişimi.',
+        badge: '7. & 10. Sınıf',
       },
       {
         title: 'DNA Protein Sentezi & Ribozom Atölyesi',
         desc: 'Kalıp DNA zincirinden mRNA transkripsiyonu yapın, tRNA antikodonlarını eşleştirip polipeptit zinciri örün.',
-        badge: 'Moleküler Biyoloji',
+        badge: '12. Sınıf AYT',
       },
     ],
   },
@@ -161,14 +196,19 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-violet-500/10',
     borderColor: 'border-violet-500/30 group-hover:border-violet-400/60',
     textColor: 'text-violet-400',
-    tag: 'Kesir, Terazi, Pisagor & Türev',
+    tag: '5-12. Sınıf Maarif Cebir & Geometri',
     category: 'sayisal',
     levels: ['ortaokul', 'lise'],
     levelBadge: '5 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      '5-8. sınıf ortaokul için kesirler, tam sayılar, denklem terazisi ve Pisagor/eğim; 11-12. sınıf lise için birim çember ve türev simülatörleri.',
+      '5-8. sınıf ortaokul için kesirler, tam sayılar, denklem terazisi, EBOB-EKOK ve Pisagor/eğim; lise için fonksiyonlar, parabol, birim çember ve türev.',
     modules: [
+      {
+        title: 'Çarpanlar ve Katlar / EBOB-EKOK',
+        desc: 'Asal çarpan ağacı, Venn şeması ortak bölenleri, EBOB-EKOK hesabı ve LGS dikdörtgen tarla problemi.',
+        badge: '8. Sınıf LGS',
+      },
       {
         title: 'Pisagor Bağıntısı & Koordinat Eğimi (m = Δy/Δx)',
         desc: 'a² + b² = c² geometrik kare alanı ispatı, özel dik üçgenler (3-4-5, 5-12-13) ve LGS koordinat eğim hesaplayıcısı.',
@@ -188,6 +228,16 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
         title: 'Kesirler & Pasta/Şerit Modeli',
         desc: 'Birim kesir, basit/bileşik/tam sayılı kesirler ve interaktif pasta dilimi ile denk kesir genişletmesi.',
         badge: '5. Sınıf',
+      },
+      {
+        title: 'Fonksiyonlar & Grafik Dönüşümleri',
+        desc: 'f(x) = ax + b doğrusal fonksiyonu, eksen kesişimleri, tanım/değer kümesi ve girdi-çıktı makinesi.',
+        badge: '9. Sınıf Lise',
+      },
+      {
+        title: 'İkinci Dereceden Parabol Simülatörü',
+        desc: 'Tepe noktası T(r, k), diskriminant (Δ = b² - 4ac), kolların yönü ve reel köklerin kartezyen çizimi.',
+        badge: '10. Sınıf Lise',
       },
       {
         title: 'Trigonometrik Birim Çember (360°)',
@@ -210,14 +260,19 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-amber-500/10',
     borderColor: 'border-amber-500/30 group-hover:border-amber-400/60',
     textColor: 'text-amber-400',
-    tag: 'Bionic Hız & TDK Sözlük',
+    tag: 'Ögeler, Bionic Hız & Edebiyat',
     category: 'sozel',
     levels: ['ortaokul', 'lise'],
     levelBadge: '5 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      'Bionic okuma paragraf hızlandırma antrenörü, canlı TDK günün kelimesi, edebiyat kart oyunu ve ses olayları dedektifi.',
+      'Cümlenin ögeleri ve fiilimsiler çözümleyici, bionic okuma paragraf antrenörü, canlı TDK günün kelimesi ve edebiyat eşleştirme oyunu.',
     modules: [
+      {
+        title: 'Cümlenin Ögeleri & Fiilimsiler Çözümleyici',
+        desc: 'Yüklem, özne, nesne, yer tamlayıcısı ve zarf tümleci tespiti; isim-fiil, sıfat-fiil ve zarf-fiil ekleri.',
+        badge: '8. Sınıf LGS & TYT',
+      },
       {
         title: 'Bionic Paragraf Hız Antrenörü',
         desc: 'Kelimelerin ilk harflerini vurgulayarak göz sıçrama hızınızı artırın; anlama ve kavrama hızınızı katlayın.',
@@ -249,18 +304,28 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-rose-500/10',
     borderColor: 'border-rose-500/30 group-hover:border-rose-400/60',
     textColor: 'text-rose-400',
-    tag: 'Türkiye Atlası & Tarih',
+    tag: 'Atlas, Mevsimler & Demografi',
     category: 'sozel',
     levels: ['ortaokul', 'lise'],
     levelBadge: '5 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      'Türkiye fiziki ve iklim atlası, KAYIP SAKAL rüzgârları, aktif fay hatları ve kronolojik tarih zaman şeridi.',
+      'Türkiye fiziki ve iklim atlası, 23° 27\' eksen eğikliği ve mevsimler, nüfus piramitleri ile kronolojik tarih zaman şeridi.',
     modules: [
       {
         title: 'Türkiye Fiziki & İklim Atlası',
         desc: '81 ilin iklim bölgelerini, yerel rüzgâr yönlerini, fay hatlarını ve masif arazilerini katman katman keşfedin.',
         badge: '5-12. Sınıf',
+      },
+      {
+        title: 'Mevsimlerin Oluşumu & Yörünge Simülatörü',
+        desc: '23° 27\' eksen eğikliği, 21 Haziran/Aralık gün dönümleri, ekinokslar, güneş açısı ve gölge boyu.',
+        badge: '8. Sınıf LGS & 9. Sınıf',
+      },
+      {
+        title: 'Nüfus Piramitleri & Demografik Analiz',
+        desc: 'Doğum/ölüm oranları, gelişmişlik piramitleri (arı kovanı, içe çökük, çan), aktif ve bağımlı nüfus oranları.',
+        badge: '10. Sınıf Coğrafya',
       },
       {
         title: 'Tarih Kronoloji & Antlaşmalar',
