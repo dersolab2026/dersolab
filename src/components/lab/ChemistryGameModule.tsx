@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Trophy, HelpCircle, Check, X, RotateCcw, AlertTriangle, ArrowRight } from 'lucide-react'
+import { Trophy, HelpCircle, Check, X, RotateCcw, AlertTriangle, ArrowRight } from 'lucide-react'
 import { ELEMENTS_DATA, ElementData } from './PeriodicTableModule'
 
 interface MysteryQuestion {
@@ -251,13 +252,13 @@ export function ChemistryGameModule() {
               <RotateCcw className="w-4 h-4" />
               <span>Sonraki Elementi Çöz</span>
             </button>
-            <a
-              href="/instructors"
+            <Link
+              href="/instructors?subject=Kimya"
               className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5"
             >
               <span>Kimya Hocalarımızı Gör</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </a>
+            </Link>
           </div>
         </motion.div>
       )}

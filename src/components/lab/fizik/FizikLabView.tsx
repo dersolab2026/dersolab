@@ -8,7 +8,6 @@ import {
   Eye,
   Rocket,
   ArrowRight,
-  Sparkles,
   Sliders,
   Atom,
   Globe2,

@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Layers, BookOpen, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Layers, BookOpen, CheckCircle2, ArrowRight } from 'lucide-react'
 
 interface WordAnalysis {
   word: string
@@ -124,20 +125,14 @@ export function PhoneticInspector() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* ── Banner ── */}
-      <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold uppercase tracking-wider border border-purple-500/30">
-              Maarif Modeli & MEB
-            </span>
-            <span className="text-xs text-slate-400">5 - 12. Sınıf Dil Bilgisi</span>
-          </div>
-          <h2 className="text-xl font-black text-white mt-1">
-            Cümledeki Ses Olaylarını Keşfet
+      {/* ── Banner: Net ve Geniş Başlık ── */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
+        <div className="space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Ses Bilgisi
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            MEB müfredatında yer alan ünlü düşmesi, ünsüz sertleşmesi ve yumuşamasını kelimeleri parçalayarak inceleyin.
+          <p className="text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed">
+            Kelimeleri kök ve eklerine ayırarak ünlü düşmesi, sertleşme ve yumuşama gibi ses olaylarını etkileşimli olarak keşfet.
           </p>
         </div>
       </div>
@@ -226,13 +221,13 @@ export function PhoneticInspector() {
           {/* Sınav Kuralı Notu */}
           <div className="p-3.5 rounded-xl bg-purple-950/30 border border-purple-800/40 text-xs text-purple-200 flex items-center justify-between">
             <span>Ses olaylarında kök ve ek ayrımını doğru yapmak ÖSYM sorularında %100 doğruluk sağlar.</span>
-            <a
-              href="/instructors"
+            <Link
+              href="/instructors?category=Sözel"
               className="text-xs font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1 shrink-0 ml-4"
             >
               <span>Türkçe Hocalarımız</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </a>
+            </Link>
           </div>
         </motion.div>
       )}

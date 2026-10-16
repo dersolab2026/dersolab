@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Info, BookOpen, Layers, CheckCircle2, Search, ArrowRight, Zap } from 'lucide-react'
+import { Info, BookOpen, Layers, CheckCircle2, Search, ArrowRight, Zap } from 'lucide-react'
 import { AtomVisualizer3D } from './AtomVisualizer3D'
 
 export interface ElementData {
@@ -640,13 +641,13 @@ export function PeriodicTableModule() {
                 <div className="text-[11px] text-slate-400">
                   Kimya konularını tam oturtmak ister misin?
                 </div>
-                <a
-                  href="/instructors"
+                <Link
+                  href="/instructors?subject=Kimya"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 transition-all"
                 >
                   <span>Eğitmenle Çöz</span>
                   <ArrowRight className="w-3.5 h-3.5" />
-                </a>
+                </Link>
               </div>
             </motion.div>
           </AnimatePresence>

@@ -8,7 +8,6 @@ import {
   Compass,
   Activity,
   ArrowRight,
-  Sparkles,
   TrendingUp,
   Globe2,
 } from 'lucide-react'

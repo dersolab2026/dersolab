@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Sparkles,
   Layers,
   Droplet,
   Gamepad2,
@@ -122,20 +122,26 @@ export function KimyaLabView() {
         <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-emerald-950/40 via-slate-900/90 to-cyan-950/40 border border-emerald-500/30 backdrop-blur-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1.5 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>DersoLab 1-e-1 Kimya Atölyesi</span>
+              <Image
+                src="/fox-head.png"
+                alt="DersoLab Maskot"
+                width={16}
+                height={16}
+                className="w-3.5 h-3.5 object-contain"
+              />
+              <span>DersoLab Bire Bir Kimya Atölyesi</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-black text-white">
               Kimyayı Ezberleme, Mantığıyla Öğren.
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-              Simülasyonlarda gördüğün atomun katman elektron dağılımı (Bohr modeli), periyodik cetvel, asit-baz titrasyonları ve mol hesaplarını onaylı kimya öğretmenlerimizle birebir derste pekiştir.
+              Simülasyonlarda gördüğün atomun katman elektron dağılımı (Bohr modeli), periyodik cetvel, asit-baz titrasyonları ve mol hesaplarını onaylı kimya öğretmenlerimizle bire bir derste pekiştir.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full md:w-auto">
             <Link
-              href="/instructors"
+              href="/instructors?subject=Kimya"
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Kimya Öğretmenlerini Keşfet</span>

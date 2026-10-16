@@ -246,7 +246,7 @@ export function StudentLandingView({ examFilter, onExamFilterChange }: StudentLa
                 </div>
                 
                 <h3 className="text-2xl font-bold text-white mb-4 tracking-tight leading-tight">Google AI Destekli Öğrenim</h3>
-                <p className="text-slate-400 font-light">DersoLab & Google işbirliği ile yapılandırılan özel yapay zeka motorumuz, fotoğrafladığın soruları anında ve kusursuz çözer.</p>
+                <p className="text-slate-400 font-light">DersoLab & Google iş birliği ile yapılandırılan özel yapay zeka motorumuz, fotoğrafladığın soruları anında ve kusursuz çözer.</p>
               </div>
             </div>
           </div>

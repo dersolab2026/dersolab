@@ -458,6 +458,33 @@ export function LabHubView() {
           <AnimatePresence>
             {filteredBranches.map((branch) => {
               const Icon = branch.icon
+              const isOrtaokul = activeFilter === 'ortaokul'
+              const isLise = activeFilter === 'lise'
+
+              let displayTitle = branch.name
+              let displayTag = branch.tag
+
+              if (isOrtaokul) {
+                if (branch.id === 'kimya') {
+                  displayTitle = 'Fen Bilimleri (Kimya)'
+                  displayTag = 'Madde, Atom & Periyodik Sistem'
+                } else if (branch.id === 'fizik') {
+                  displayTitle = 'Fen Bilimleri (Fizik)'
+                  displayTag = 'Elektrik Devreleri & Işık'
+                } else if (branch.id === 'biyoloji') {
+                  displayTitle = 'Fen Bilimleri (Biyoloji)'
+                  displayTag = 'Hücre, DNA & Kalıtım'
+                } else if (branch.id === 'sosyal') {
+                  displayTitle = 'Sosyal Bilgiler & İnkılap'
+                  displayTag = 'LGS Sosyal & Tarih Atlası'
+                }
+              } else if (isLise) {
+                if (branch.id === 'sosyal') {
+                  displayTitle = 'Tarih & Coğrafya'
+                  displayTag = 'AYT / TYT Sosyal Bilimler'
+                }
+              }
+
               return (
                 <motion.div
                   key={branch.id}
@@ -483,10 +510,10 @@ export function LabHubView() {
                         </div>
                         <div>
                           <h2 className="text-xl font-black text-white group-hover:text-cyan-300 transition-colors">
-                            {branch.name}
+                            {displayTitle}
                           </h2>
                           <span className="text-[11px] font-semibold text-slate-400">
-                            {branch.tag}
+                            {displayTag}
                           </span>
                         </div>
                       </div>
@@ -535,9 +562,9 @@ export function LabHubView() {
                   {/* Direct Link Button */}
                   <Link
                     href={branch.href}
-                    className={`w-full py-3 px-4 rounded-xl bg-gradient-to-r ${branch.color} text-slate-950 font-black text-xs flex items-center justify-center gap-2 group-hover:opacity-95 shadow-md shadow-cyan-500/10 transition-all cursor-pointer`}
+                    className={`w-full py-3 px-4 rounded-xl bg-gradient-to-r ${branch.color} text-slate-950 font-black text-xs flex items-center justify-center gap-2 group-hover:opacity-95 shadow-md shadow-cyan-500/10 transition-all cursor-pointer tracking-wider`}
                   >
-                    <span>{branch.name} Atölyesine Başla</span>
+                    <span>BAŞLA</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </motion.div>
@@ -582,9 +609,9 @@ export function LabHubView() {
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                 <GraduationCap className="w-5 h-5" />
               </div>
-              <h4 className="text-sm font-bold text-white">Birebir Eğitmen Desteği</h4>
+              <h4 className="text-sm font-bold text-white">Bire Bir Eğitmen Desteği</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Simülasyonda deneyip aklınıza takılan soruları DersoLab’ın onaylı öğretmenleriyle 1-e-1 canlı online derste pekiştirin.
+                Simülasyonda deneyip aklınıza takılan soruları DersoLab’ın onaylı öğretmenleriyle bire bir canlı online derste pekiştirin.
               </p>
             </div>
           </div>
@@ -598,7 +625,7 @@ export function LabHubView() {
               <span>DersoLab Canlı Özel Ders</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-black text-white">
-              Eksik Konunu Birebir Uzman Eğitmenle Kapat.
+              Eksik Konunu Bire Bir Uzman Eğitmenle Kapat.
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
               Fizik, kimya, biyoloji veya matematikteki zorlandığın kazanımları DersoLab öğretmenleriyle canlı Google Meet ortamında çöz.

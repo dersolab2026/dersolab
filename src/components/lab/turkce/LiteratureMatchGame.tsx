@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Trophy, Sparkles, Check, X, RotateCcw, ArrowRight, Zap, BookMarked } from 'lucide-react'
+import { Trophy, Check, X, RotateCcw, ArrowRight, Zap, BookMarked } from 'lucide-react'
 
 interface LiteratureItem {
   work: string
@@ -25,7 +26,7 @@ const LITERATURE_DATA: LiteratureItem[] = [
     wrongOptions: [
       { author: 'Mehmet Rauf', period: 'Servet-i Fünun' },
       { author: 'Recaizade Mahmut Ekrem', period: 'Tanzimat II. Dönem' },
-      { author: 'Yakup Kadri Karaosmanoğlu', period: 'Milli Edebiyat' },
+      { author: 'Yakup Kadri Karaosmanoğlu', period: 'Millî Edebiyat' },
     ],
   },
   {
@@ -44,13 +45,13 @@ const LITERATURE_DATA: LiteratureItem[] = [
   {
     work: 'Yaban',
     author: 'Yakup Kadri Karaosmanoğlu',
-    period: 'Milli Edebiyat / Cumhuriyet',
+    period: 'Millî Edebiyat / Cumhuriyet',
     genre: 'Tezli Roman',
     characters: 'Ahmet Celal, Emine, Salih Ağa',
     osymTip: 'Aydın - köylü çatışmasını ve Kurtuluş Savaşı döneminde Anadolu gerçeğini işleyen en önemli tezli romandır. Ahmet Celal gazi bir subaydır.',
     wrongOptions: [
-      { author: 'Reşat Nuri Güntekin', period: 'Milli Edebiyat' },
-      { author: 'Halide Edib Adıvar', period: 'Milli Edebiyat' },
+      { author: 'Reşat Nuri Güntekin', period: 'Millî Edebiyat' },
+      { author: 'Halide Edib Adıvar', period: 'Millî Edebiyat' },
       { author: 'Peyami Safa', period: 'Cumhuriyet Dönemi' },
     ],
   },
@@ -60,7 +61,7 @@ const LITERATURE_DATA: LiteratureItem[] = [
     period: 'Cumhuriyet (Bireyin İç Dünyası)',
     genre: 'Modernist Roman',
     characters: 'Hayri İrdal, Halit Ayarcı, Pakize',
-    osymTip: 'Doğu ile Batı arasında sıkışmış Türk toplumunu saat metaforu üzerinden hicveden başyapıt. Zaman, rüya ve bilinçaltı temaları hakimdir.',
+    osymTip: 'Doğu ile Batı arasında sıkışmış Türk toplumunu saat metaforu üzerinden hicveden başyapıt. Zaman, rüya ve bilinçaltı temaları hâkimdir.',
     wrongOptions: [
       { author: 'Oğuz Atay', period: 'Cumhuriyet (Postmodern)' },
       { author: 'Tarık Buğra', period: 'Cumhuriyet Dönemi' },
@@ -73,7 +74,7 @@ const LITERATURE_DATA: LiteratureItem[] = [
     period: 'Geçiş Dönemi (11. Yüzyıl)',
     genre: 'Alegorik Mesnevi / Siyasetname',
     characters: 'Kün Togdı (Adalet), Ay Toldı (Mutluluk), Ögdülmiş (Akıl), Odgurmış (Akıbet)',
-    osymTip: 'İslami dönemin İLK eseri, İLK mesnevisi ve İLK siyasetnamesidir. Aruz ölçüsüyle ve Hakaniye lehçesiyle yazılmıştır. 4 alegorik karakter ÖSYM’de doğrudan sorulur!',
+    osymTip: 'İslamî dönemin İLK eseri, İLK mesnevisi ve İLK siyasetnamesidir. Aruz ölçüsüyle ve Hakaniye lehçesiyle yazılmıştır. 4 alegorik karakter ÖSYM’de doğrudan sorulur!',
     wrongOptions: [
       { author: 'Kaşgarlı Mahmud', period: 'Geçiş Dönemi' },
       { author: 'Edip Ahmet Yükneki', period: 'Geçiş Dönemi' },
@@ -151,20 +152,14 @@ export function LiteratureMatchGame() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* ── Banner ── */}
-      <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-wider border border-amber-500/30">
-              AYT Edebiyat Oyunu
-            </span>
-            <span className="text-xs text-slate-400">Yazar — Eser — Dönem Match</span>
-          </div>
-          <h2 className="text-xl font-black text-white mt-1">
-            Edebiyat Sınav Dedektifi
+      {/* ── Banner: Net ve Geniş Başlık ── */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
+        <div className="space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Yazar Eser Eşleştirme
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Eserin yazarını ve edebi dönemini doğru eşleştir, seri yap ve ÖSYM kritik ipuçlarını yakala.
+          <p className="text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed">
+            Eserin yazarını ve edebî dönemini doğru eşleştir, seri yap ve kritik sınav ipuçlarını yakala.
           </p>
         </div>
 
@@ -303,7 +298,7 @@ export function LiteratureMatchGame() {
             </p>
           </div>
           <p className="text-xs text-slate-400 max-w-md mx-auto">
-            AYT Edebiyat'ta yazar-eser ezberini oturtmanın en hızlı yolu düzenli tekrar yapmaktır.
+            AYT Edebiyatta yazar-eser ezberini oturtmanın en hızlı yolu düzenli tekrar yapmaktır.
           </p>
           <div className="flex items-center justify-center gap-3 pt-2">
             <button
@@ -313,13 +308,13 @@ export function LiteratureMatchGame() {
               <RotateCcw className="w-4 h-4" />
               <span>Yeniden Başla</span>
             </button>
-            <a
-              href="/instructors"
+            <Link
+              href="/instructors?category=Sözel"
               className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5"
             >
               <span>Edebiyat Öğretmenlerini Gör</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </a>
+            </Link>
           </div>
         </motion.div>
       )}

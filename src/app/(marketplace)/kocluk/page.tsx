@@ -24,7 +24,7 @@ export default async function CoachingPage() {
             Koçluk
           </h1>
           <p className="mt-2 font-sans font-semibold text-slate-400">
-            Koçlarımızla birebir seans planla.
+            Koçlarımızla bire bir seans planla.
           </p>
         </div>
 

@@ -88,7 +88,7 @@ const SLANG_CONVERSATIONS: SlangConversation[] = [
         accent: 'en-US',
         text: 'Don’t sweat it! At least it’s behind us. Are you going to that rooftop party tonight?',
         highlightedSlang: ['Don’t sweat it'],
-        translation: 'Hiç kafana takma! En azından bitti gitti. Bu gece çatı partisina gidiyor musun?',
+        translation: 'Hiç kafana takma! En azından bitti gitti. Bu gece çatı partisine gidiyor musun?',
       },
       {
         speaker: 'Chloe',
@@ -490,9 +490,6 @@ export function SlangHangModule() {
 
   // Helper to render text with clickable highlighted slang words
   const renderInteractiveLine = (line: SlangDialogueLine) => {
-    let content: React.ReactNode[] = []
-    let remainingText = line.text
-
     // Sort highlighted slang by longest first to match correctly
     const sortedSlang = [...line.highlightedSlang].sort((a, b) => b.length - a.length)
 

@@ -270,7 +270,20 @@ export function PronunciationWorkoutModule() {
   const [userAudioBlobUrl, setUserAudioBlobUrl] = useState<string | null>(null)
   const [isPlayingUserAudio, setIsPlayingUserAudio] = useState<boolean>(false)
   const [customInput, setCustomInput] = useState<string>('')
-  const [browserNotice, setBrowserNotice] = useState<string | null>(null)
+  const [browserNotice] = useState<string | null>(() => {
+    if (typeof navigator !== 'undefined') {
+      const ua = navigator.userAgent
+      const isOpera = /OPR\//.test(ua) || /Opera/.test(ua)
+      const isFirefox = /Firefox\//.test(ua)
+      if (isOpera) {
+        return "Opera tarayıcısı Google'ın ses tanıma (SpeechRecognition) motorunu bünyesinde barındırmaz. Mikrofonla canlı konuşma tanıma için Google Chrome veya Microsoft Edge önerilir. Opera'da aşağıdaki yazılı analiz kutusunu ve tek tıkla test simülasyonlarını eksiksiz kullanabilirsiniz."
+      }
+      if (isFirefox) {
+        return 'Firefox tarayıcısında Web SpeechRecognition varsayılan olarak kapalıdır. Canlı konuşma için Google Chrome veya Microsoft Edge önerilir.'
+      }
+    }
+    return null
+  })
 
   const currentItem = PRONUNCIATION_LIST[selectedWordIndex]
 
@@ -283,32 +296,6 @@ export function PronunciationWorkoutModule() {
   const animFrameRef = useRef<number | null>(null)
   const isListeningRef = useRef<boolean>(false)
   const userAudioPlayerRef = useRef<HTMLAudioElement | null>(null)
-
-  // Detect browser compatibility
-  useEffect(() => {
-    if (typeof navigator !== 'undefined') {
-      const ua = navigator.userAgent
-      const isOpera = /OPR\//.test(ua) || /Opera/.test(ua)
-      const isFirefox = /Firefox\//.test(ua)
-
-      if (isOpera) {
-        setBrowserNotice(
-          'Opera tarayıcısı Google\'ın ses tanıma (SpeechRecognition) motorunu bünyesinde barındırmaz. Mikrofonla canlı konuşma tanıma için Google Chrome veya Microsoft Edge önerilir. Opera\'da aşağıdaki yazılı analiz kutusunu ve tek tıkla test simülasyonlarını eksiksiz kullanabilirsiniz.'
-        )
-      } else if (isFirefox) {
-        setBrowserNotice(
-          'Firefox tarayıcısında Web SpeechRecognition varsayılan olarak kapalıdır. Canlı konuşma için Google Chrome veya Microsoft Edge önerilir.'
-        )
-      }
-    }
-
-    return () => {
-      stopAllMedia()
-      if (userAudioBlobUrl) {
-        URL.revokeObjectURL(userAudioBlobUrl)
-      }
-    }
-  }, [userAudioBlobUrl])
 
   const stopAllMedia = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
@@ -343,6 +330,16 @@ export function PronunciationWorkoutModule() {
     setIsListening(false)
     setMicVolume(0)
   }
+
+  // Cleanup on unmount or audio change
+  useEffect(() => {
+    return () => {
+      stopAllMedia()
+      if (userAudioBlobUrl) {
+        URL.revokeObjectURL(userAudioBlobUrl)
+      }
+    }
+  }, [userAudioBlobUrl])
 
   const handlePlayWord = (text: string, speed = 0.95) => {
     setPlayingSpeed(speed)

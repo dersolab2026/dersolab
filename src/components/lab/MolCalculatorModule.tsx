@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Calculator, Sparkles, ArrowRight, Check } from 'lucide-react'
+import { Calculator, ArrowRight, Check } from 'lucide-react'
 
 const COMMON_COMPOUNDS = [
   { name: 'Su (H₂O)', ma: 18.0 },

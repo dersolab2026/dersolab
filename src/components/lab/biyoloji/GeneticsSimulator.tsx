@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import {
   Dna,
   RotateCcw,
-  Sparkles,
+  Layers,
   HelpCircle,
   PieChart,
   Users,
@@ -92,7 +92,7 @@ export function GeneticsSimulator() {
   function getBloodPhenotype(genotype: string): string {
     if (genotype === 'AA' || genotype === 'A0') return 'A Grubu'
     if (genotype === 'BB' || genotype === 'B0') return 'B Grubu'
-    if (genotype === 'AB') return 'AB Grubu (Eşbaskın)'
+    if (genotype === 'AB') return 'AB Grubu (Eş Baskın)'
     return '0 Grubu (Çekinik)'
   }
 
@@ -254,7 +254,7 @@ export function GeneticsSimulator() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <Layers className="w-4 h-4 text-emerald-400" />
                 Punnett Çaprazlama Karesi ({crossType === 'monohybrid' ? 'Monohibrit' : 'Kan Grubu'})
               </span>
               <span className="text-[11px] text-slate-400">
@@ -460,7 +460,7 @@ export function GeneticsSimulator() {
             </div>
             <ul className="text-slate-300 space-y-1.5 list-disc list-inside leading-relaxed">
               <li>
-                <strong className="text-white">Mendel Kanunları:</strong> Monohibrit çaprazlamada iki heterozigot (<span className="font-mono text-emerald-300">Aa × Aa</span>) bireyin çaprazlanması sonucu fenotip oranı daima <strong className="text-white">3:1</strong>, genotip oranı <strong className="text-white">1:2:1</strong> dir.
+                <strong className="text-white">Mendel Kanunları:</strong> Monohibrit çaprazlamada iki heterozigot (<span className="font-mono text-emerald-300">Aa × Aa</span>) bireyin çaprazlanması sonucu fenotip oranı daima <strong className="text-white">3:1</strong>, genotip oranı <strong className="text-white">1:2:1</strong>'dir.
               </li>
               <li>
                 <strong className="text-teal-300">Eş Baskınlık (Kan Grubu):</strong> A ve B alelleri birbirine üstünlük kuramaz (<span className="font-mono text-white">A = B &gt; 0</span>). Her ikisi bir araya gelince <span className="font-mono text-teal-300">AB</span> fenotipi ortaya çıkar.

@@ -9,7 +9,7 @@ import {
   Sun,
   CloudRain,
   Mountain,
-  Sparkles,
+  Target,
   Info,
   CheckCircle2,
   Layers,
@@ -66,7 +66,7 @@ const CLIMATE_REGIONS: RegionInfo[] = [
     name: 'Erzurum — Kars Sert Karasal',
     badge: 'Yaz Yağışlı, Kış Çok Sert/Karlı',
     color: 'border-cyan-500 bg-cyan-950/40 text-cyan-300',
-    desc: 'Yükseltinin en fazla olduğu bölgedir. Kış mevsimi 6 ay sürer, sıcaklıklar -35°C lere kadar düşer. Çernezyom (kara toprak) bulunur.',
+    desc: 'Yükseltinin en fazla olduğu bölgedir. Kış mevsimi 6 ay sürer, sıcaklıklar -35 °C\'ye kadar düşer. Çernezyom (kara toprak) bulunur.',
     vegetation: 'Yaz yağışlarıyla boy atan gür Çayırlar ve iğne yapraklı sarıçam ormanları.',
     rainRegime: 'En çok yaz mevsiminde konveksiyonel yağış alır.',
     examTip: 'ÖSYM Soru Tipi: Yaz yağışları sayesinde mera ve büyükbaş hayvancılık (sığır) gelişmiştir. Toprağı verimli olsa da iklim sertliğinden tarım kısıtlıdır.',
@@ -104,7 +104,7 @@ export function GeoAtlas() {
           </h2>
           <p className="text-sm text-slate-300 mt-1 max-w-2xl">
             İklim kuşaklarını, aktif fay hatlarını ve <span className="font-mono text-amber-300 font-bold">KAYIP SAKAL</span> yerel
-            rüzgarlar formülünü görsel harita katmanları üzerinde canlı keşfedin!
+            rüzgârlar formülünü görsel harita katmanları üzerinde canlı keşfedin!
           </p>
         </div>
 
@@ -206,7 +206,7 @@ export function GeoAtlas() {
                 {TURKEY_CITIES.map((city) => {
                   let fillColor = '#1e293b'
                   let strokeColor = '#334155'
-                  let strokeWidth = '0.7'
+                  const strokeWidth = '0.7'
                   let opacity = 0.9
 
                   if (activeLayer === 'climate') {
@@ -493,7 +493,7 @@ export function GeoAtlas() {
               {/* Exam Tip */}
               <div className="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/30 text-xs space-y-1">
                 <div className="flex items-center gap-1.5 text-rose-400 font-semibold">
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <Target className="w-3.5 h-3.5" />
                   <span>ÖSYM Sınav Hapı</span>
                 </div>
                 <p className="text-slate-200 leading-relaxed">{selectedClimate.examTip}</p>

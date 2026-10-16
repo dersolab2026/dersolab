@@ -127,7 +127,7 @@ export function CampusReceptionScene({ onBack, onGoToCorridor }: CampusReception
           <div>
             <h3 className="text-base font-bold text-white font-serif">Eğitmen Başvurusu</h3>
             <p className="text-xs text-slate-300 font-light leading-snug">
-              Otomatik takvim, hazır Meet odaları ve aylık düzenli banka IBAN hakedişi.
+              Otomatik takvim, hazır Meet odaları ve aylık düzenli banka IBAN hak edişi.
             </p>
           </div>
         </button>

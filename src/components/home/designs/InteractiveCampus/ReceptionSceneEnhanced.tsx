@@ -217,7 +217,7 @@ export function ReceptionSceneEnhanced({ onBack, onGoToCorridor }: ReceptionScen
           <div>
             <h3 className="text-lg font-bold text-white font-serif">Eğitmen Başvurusu</h3>
             <p className="text-xs text-slate-300 font-light leading-snug">
-              Otomatik takvim, hazır Meet odaları ve aylık düzenli banka IBAN hakedişi.
+              Otomatik takvim, hazır Meet odaları ve aylık düzenli banka IBAN hak edişi.
             </p>
           </div>
         </button>

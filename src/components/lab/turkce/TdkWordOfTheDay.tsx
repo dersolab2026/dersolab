@@ -1,9 +1,11 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Sparkles,
+  Target,
+  Award,
   Volume2,
   BookOpen,
   CheckCircle2,
@@ -140,40 +142,33 @@ export function TdkWordOfTheDay() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* ── Banner ── */}
-      <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-500/30 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              TDK & Maarif Sözlük Atölyesi
-            </span>
-            <span className="text-xs text-slate-400">Canlı Sözlük Verileri</span>
-          </div>
-          <h2 className="text-xl font-black text-white mt-1">
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* ── Banner: Net ve Geniş Başlık ── */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
+        <div className="space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
             Günün Kelimesi & Yazım Kuralları
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Türkçenin zengin söz varlığını keşfedin, TDK güncel yazım ikilemlerinde pratik yapın.
+          <p className="text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed">
+            Türkçenin zengin söz varlığını keşfedin, yazımı karıştırılan sözcüklerde pratik yapın.
           </p>
         </div>
 
         {/* View Switcher Pills */}
-        <div className="flex items-center gap-1.5 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800">
+        <div className="flex items-center gap-2 bg-slate-950/80 p-2 rounded-2xl border border-slate-800 flex-wrap">
           <button
             onClick={() => setActiveTab('yks')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'yks'
                 ? 'bg-emerald-500 text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            YKS Edebi Sözlük
+            YKS Edebî Sözlük
           </button>
           <button
             onClick={() => setActiveTab('tdk_live')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'tdk_live'
                 ? 'bg-emerald-500 text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
                 : 'text-slate-400 hover:text-white'
@@ -183,40 +178,20 @@ export function TdkWordOfTheDay() {
           </button>
           <button
             onClick={() => setActiveTab('spelling')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'spelling'
                 ? 'bg-emerald-500 text-slate-950 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Yazım İkilemleri
+            Yazımı Karıştırılanlar
           </button>
         </div>
       </div>
 
-      {/* ── 1. TAB: YKS EDEBİ SÖZLÜK (PARAGRAFTA ÇIKAN ZOR KELİMELER) ── */}
+      {/* ── 1. TAB: YKS EDEBÎ SÖZLÜK (PARAGRAFTA ÇIKAN ZOR KELİMELER) ── */}
       {activeTab === 'yks' && currentYksWord && (
         <div className="space-y-6">
-          {/* Quick Word Selector Chips */}
-          <div className="flex items-center gap-1.5 overflow-x-auto gizli-kaydirma py-1">
-            {wordsList.map((w, idx) => (
-              <button
-                key={w.madde}
-                onClick={() => {
-                  setSelectedYksIndex(idx)
-                  setIsMeaningRevealed(false)
-                }}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer capitalize ${
-                  selectedYksIndex === idx
-                    ? 'bg-slate-800 text-emerald-400 border border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
-                    : 'bg-slate-900/60 text-slate-400 hover:text-slate-200 border border-slate-800'
-                }`}
-              >
-                {w.madde}
-              </button>
-            ))}
-          </div>
-
           {/* Master Word Card */}
           <motion.div
             key={currentYksWord.madde}
@@ -294,11 +269,29 @@ export function TdkWordOfTheDay() {
 
             {/* ÖSYM Sınav Tuzağı / Notu */}
             <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 leading-relaxed flex items-start gap-2.5">
-              <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <Target className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <div>
                 <strong className="text-amber-300 block mb-0.5 font-bold">ÖSYM Çıkmış İpucu:</strong>
                 {currentYksWord.osymNot}
               </div>
+            </div>
+
+            {/* Next Word Action Button */}
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-xs text-slate-500">
+                Kelime {selectedYksIndex + 1} / {wordsList.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedYksIndex((prev) => (prev + 1) % wordsList.length)
+                  setIsMeaningRevealed(false)
+                }}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border border-slate-700"
+              >
+                <span>Sıradaki Kelimeyi İncele</span>
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
+              </button>
             </div>
           </motion.div>
         </div>
@@ -382,7 +375,7 @@ export function TdkWordOfTheDay() {
 
             {/* Maarif Söz Varlığı & Kültür Notu */}
             <div className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 leading-relaxed flex items-start gap-2.5">
-              <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <Award className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <div>
                 <strong className="text-emerald-300 block mb-0.5 font-bold">
                   Maarif Modeli & Söz Varlığı Notu:
@@ -481,8 +474,8 @@ export function TdkWordOfTheDay() {
           </div>
 
           <div className="text-center py-4 space-y-1">
-            <span className="text-[11px] uppercase tracking-widest text-slate-400 font-bold">
-              Hangisi TDK'ya Göre Doğru Yazılmıştır?
+            <span className="text-xs sm:text-sm uppercase tracking-widest text-emerald-400 font-black">
+              Hangisi TDK'ye Göre Doğru Yazılmıştır?
             </span>
           </div>
 
@@ -552,14 +545,14 @@ export function TdkWordOfTheDay() {
 
       {/* Teacher CTA */}
       <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800 flex items-center justify-between">
-        <span className="text-xs text-slate-300">Yazım kurallarını ve sözcükte anlamı birebir çalış</span>
-        <a
-          href="/instructors"
+        <span className="text-xs text-slate-300">Yazım kurallarını ve sözcükte anlamı bire bir çalış</span>
+        <Link
+          href="/instructors?category=Sözel"
           className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
         >
           <span>Türkçe Öğretmenlerini Gör</span>
           <ArrowRight className="w-3.5 h-3.5" />
-        </a>
+        </Link>
       </div>
     </div>
   )

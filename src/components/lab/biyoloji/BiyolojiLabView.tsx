@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Dna,
   Layers,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   Globe2,

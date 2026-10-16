@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 export const revalidate = 3600 // Cache for 1 hour
 
 // TDK Sosyal Medya (@tdk_govtr) "Her Güne Bir Kelime" Resmî Seçkisi
-export const TODAY_TDK_DAILY_PICK = {
+const TODAY_TDK_DAILY_PICK = {
   madde: 'firik',
   kategori: 'TDK Resmî "Her Güne Bir Kelime" Seçkisi',
   tarih: '15 Ekim 2026',
@@ -70,7 +70,7 @@ const FALLBACK_WORDS = [
     anlam: 'Hayalde canlandırma, göz önüne getirme, imgeleme.',
     ornek: 'Geleceği tahayyül edemeyen bir toplum, bugünü de hakkıyla inşa edemez.',
     yazar: 'Cemil Meriç',
-    osymNot: 'Paragrafta "tasavvur etmek, imgelemek, zihinde canlandırmak" ile eşanlamlı kullanılır.',
+    osymNot: 'Paragrafta "tasavvur etmek, imgelemek, zihinde canlandırmak" ile eş anlamlı olarak kullanılır.',
   },
 ]
 

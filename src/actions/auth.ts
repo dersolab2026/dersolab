@@ -7,6 +7,7 @@ import { TERMS_VERSION } from '@/lib/legal'
 import { gecerliRolMu } from '@/lib/auth/account-type'
 import { OAUTH_NOT_CEREZI, OAUTH_NOT_OMRU, notuYaz, type OAuthNotu } from '@/lib/auth/oauth-hint'
 import { createClient } from '@/lib/supabase/server'
+import { formatTurkishTitleCase } from '@/lib/format/name'
 
 type ActionResult = { success: true } | { success: false; error: string }
 
@@ -67,6 +68,7 @@ export async function registerUser(params: RegisterParams): Promise<ActionResult
   const parsed = registerSchema.safeParse(params)
   if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Form bilgilerini kontrol et' }
   const values = parsed.data
+  const formattedName = formatTurkishTitleCase(values.name)
   const gradeTrack = values.grade ? (values.grade <= 8 ? 'lgs' : 'yks') : undefined
 
   const supabase = await createClient()
@@ -75,7 +77,7 @@ export async function registerUser(params: RegisterParams): Promise<ActionResult
     password: values.password,
     options: {
       data: {
-        name: values.name,
+        name: formattedName,
         role: values.role,
         grade_track: gradeTrack,
         school_name: values.schoolName,

@@ -27,13 +27,13 @@ export default function TermsPage() {
             DersoLab, LGS ve YKS öğrencilerini bağımsız eğitmenlerle buluşturan bir online ders ve
             koçluk platformudur. Dersler, Google Meet üzerinden çevrim içi olarak gerçekleştirilir.
             DersoLab, eğitmenler ile öğrenciler arasında aracılık yapar; eğitmenler platforma
-            bağımsız hizmet sağlayıcı olarak kayıt olur.
+            bağımsız hizmet sağlayıcı olarak kaydolur.
           </p>
 
           <h2>2. Hesap Oluşturma</h2>
           <ul>
-            <li>Öğrenciler platforma kendi hesaplarıyla doğrudan kayıt olur.</li>
-            <li>Eğitmen hesapları, platform tarafından onaylandıktan sonra öğrencilere görünür hale gelir.</li>
+            <li>Öğrenciler platforma kendi hesaplarıyla doğrudan kaydolur.</li>
+            <li>Eğitmen hesapları, platform tarafından onaylandıktan sonra öğrencilere görünür hâle gelir.</li>
             <li>Verdiğiniz bilgilerin doğru ve güncel olmasından siz sorumlusunuz.</li>
             <li>Hesap güvenliğinizden (şifrenizin gizliliğinden) siz sorumlusunuz.</li>
           </ul>
@@ -86,7 +86,7 @@ export default function TermsPage() {
 
           <h2>9. Değişiklikler</h2>
           <p>
-            Bu şartlar zaman zaman güncellenebilir. Güncel şartlar her zaman bu sayfada yayınlanır.
+            Bu şartlar zaman zaman güncellenebilir. Güncel şartlar her zaman bu sayfada yayımlanır.
           </p>
 
           <h2>10. İletişim</h2>

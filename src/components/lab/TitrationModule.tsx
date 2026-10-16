@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Pause, RotateCcw, Droplet, Sparkles, CheckCircle2, Sliders, ArrowRight, Zap } from 'lucide-react'
+import { Play, Pause, RotateCcw, Droplet, CheckCircle2, Sliders, ArrowRight, Zap } from 'lucide-react'
 
 // Chemically exact pH calculation using the quadratic water auto-ionization equation
 function calculateExactPH(vBase: number): number {
@@ -434,7 +435,7 @@ export function TitrationModule() {
               <div className={`p-2.5 rounded-2xl ${
                 isEquivalencePoint ? 'bg-emerald-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'
               }`}>
-                {isEquivalencePoint ? <CheckCircle2 className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+                {isEquivalencePoint ? <CheckCircle2 className="w-5 h-5" /> : <Droplet className="w-5 h-5" />}
               </div>
               <div className="space-y-1">
                 <h4 className="text-sm font-bold text-white flex items-center gap-2">
@@ -458,13 +459,13 @@ export function TitrationModule() {
           {/* Teacher Consultation */}
           <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800 flex items-center justify-between">
             <span className="text-xs text-slate-300">Asit-baz dengesinde takıldığın yerleri çöz</span>
-            <a
-              href="/instructors"
+            <Link
+              href="/instructors?subject=Kimya"
               className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
             >
               <span>Kimya Öğretmenlerini Gör</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </a>
+            </Link>
           </div>
 
         </div>

@@ -20,13 +20,13 @@ export default function AboutPage() {
           <p>
             DersoLab, okul derslerinde desteğe ihtiyacı olan öğrencilerden LGS ve YKS
             sınavlarına hazırlananlara kadar geniş bir kitleyi alanında deneyimli eğitmenlerle bir
-            araya getiren online bir özel ders ve koçluk platformudur. Amacımız, kaliteli birebir
+            araya getiren online bir özel ders ve koçluk platformudur. Amacımız, kaliteli bire bir
             eğitime coğrafi sınır olmadan esnek ve şeffaf bir şekilde erişebilmeni sağlamak.
           </p>
 
           <h2>Ne Sunuyoruz?</h2>
           <ul>
-            <li><strong>Birebir Online Dersler:</strong> Google Meet üzerinden eğitmenin ajandasına göre esnek şekilde planlanan dersler.</li>
+            <li><strong>Bire Bir Online Dersler:</strong> Google Meet üzerinden eğitmenin ajandasına göre esnek şekilde planlanan dersler.</li>
             <li><strong>Koçluk Desteği:</strong> Sınav ve bölüm/kariyer tercihlerinde yol gösteren ayrı bir koçluk hattı.</li>
             <li><strong>Ödev Takibi:</strong> Eğitmenlerin verdiği ödevleri görüntüleme, teslim etme ve eğitmenden geri alma.</li>
             <li><strong>Ders Notları:</strong> Eğitmenlerin ders sonrası paylaştığı materyallere kalıcı erişim.</li>

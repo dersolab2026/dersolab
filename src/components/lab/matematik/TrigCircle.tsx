@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import {
   RotateCcw,
-  Sparkles,
   Compass,
   Sliders,
   Info,
@@ -288,7 +287,7 @@ export function TrigCircle() {
         <div className="lg:col-span-7 flex flex-col rounded-2xl bg-slate-900/70 border border-slate-800 p-5 shadow-xl relative">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-violet-400" />
+              <Compass className="w-4 h-4 text-violet-400" />
               Birim Çember (R = 1)
             </span>
             <span className="text-xs text-slate-400 font-mono">

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Play, RotateCcw, Zap, Sparkles, Sliders, ArrowRight } from 'lucide-react'
+import { Play, RotateCcw, Zap, Sliders, ArrowRight } from 'lucide-react'
 
 export function ProjectileMotion() {
   const [velocity, setVelocity] = useState<number>(30) // m/s

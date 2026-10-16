@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Calendar,
-  Sparkles,
+  Target,
   ShieldAlert,
   Award,
   Scroll,
@@ -48,7 +48,7 @@ const HISTORY_EVENTS: HistoryEvent[] = [
     title: 'Talas Savaşı',
     era: 'İlk Türkler',
     summary: 'Abbasiler ile Çinliler arasındaki savaşta Karluk Türkleri Abbasileri destekledi. Türk-İslam ilişkileri resmen başladı.',
-    examTip: 'ÖSYM: Türklerin kitleler halinde İslamiyet\'e geçişinin başlangıcıdır. Kağıt ilk kez Çin dışına Semerkant\'a taşınmıştır.',
+    examTip: 'ÖSYM: Türklerin kitleler halinde İslamiyet\'e geçişinin başlangıcıdır. Kâğıt ilk kez Çin dışına Semerkant\'a taşınmıştır.',
     tag: 'Kültür & Din',
     color: 'from-emerald-500 to-teal-600',
   },
@@ -94,7 +94,7 @@ const HISTORY_EVENTS: HistoryEvent[] = [
     era: 'Osmanlı',
     summary: 'Kanuni Sultan Süleyman önderliğindeki Osmanlı ordusu, Macaristan Krallığı ordusunu 2 saat gibi kısa bir sürede imha etti.',
     examTip: 'ÖSYM: Dünyanın en kısa süren meydan savaşıdır. Macaristan Osmanlı hâkimiyetine girmiş, Orta Avrupa kapıları açılmıştır.',
-    tag: 'Askeri Deha',
+    tag: 'Askerî Deha',
     color: 'from-violet-500 to-fuchsia-600',
   },
   {
@@ -148,7 +148,7 @@ const HISTORY_EVENTS: HistoryEvent[] = [
     era: 'Kurtuluş Savaşı',
     summary: 'Ankara\'da toplanan Birinci Meclis; millet iradesine dayalı bağımsız yeni Türk Devleti\'nin temellerini attı.',
     examTip: 'ÖSYM: Kurucu, ihtilalci ve savaşçı bir meclistir. Meclis Hükümeti sistemi uygulanmış, güçler birliği (yasama-yürütme) ilkesi benimsenmiştir.',
-    tag: 'Milli İrade',
+    tag: 'Millî İrade',
     color: 'from-blue-600 to-indigo-600',
   },
   {
@@ -157,7 +157,7 @@ const HISTORY_EVENTS: HistoryEvent[] = [
     era: 'Kurtuluş Savaşı',
     summary: 'İtilaf devletlerince Osmanlı hükümetine dayatılan ölüm fermanı. Mebusan Meclisi onaylamadığı için hukuken geçersizdir.',
     examTip: 'ÖSYM: Hukuken geçersizdir (ölü doğmuş antlaşmadır) çünkü meclis onayı yoktur. Türk milleti bu antlaşmayı Kurtuluş Savaşı ile yırtıp atmıştır.',
-    tag: 'Milli Mücadele',
+    tag: 'Millî Mücadele',
     color: 'from-red-500 to-orange-600',
   },
   {
@@ -337,7 +337,7 @@ export function HistoryTimeline() {
             {/* Exam Tip Card */}
             <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/30 text-xs space-y-2">
               <div className="flex items-center gap-1.5 text-amber-400 font-semibold">
-                <Sparkles className="w-4 h-4" />
+                <Target className="w-4 h-4" />
                 <span>ÖSYM Sınav Sorusu Nasıl Gelir?</span>
               </div>
               <p className="text-slate-200 leading-relaxed font-sans">{activeEvent.examTip}</p>

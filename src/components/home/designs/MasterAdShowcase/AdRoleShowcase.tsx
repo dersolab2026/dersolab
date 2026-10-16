@@ -102,7 +102,7 @@ export function AdRoleShowcase({
         {
           icon: Wallet,
           title: 'Aylık Düzenli IBAN Aktarımı',
-          desc: 'Verdiğiniz tüm derslerin hakedişi her ay şeffaf ve eksiksiz biçimde banka hesabınıza yatar.',
+          desc: 'Verdiğiniz tüm derslerin hak edişi her ay şeffaf ve eksiksiz biçimde banka hesabınıza yatar.',
           badge: 'Zamanında Ödeme',
         },
         {

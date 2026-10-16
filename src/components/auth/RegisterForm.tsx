@@ -9,6 +9,7 @@ import { AuthShell } from '@/components/auth/AuthShell'
 import { PasswordInput } from '@/components/auth/PasswordInput'
 import { registerUser, signInWithGoogle } from '@/actions/auth'
 import { TERMS_VERSION } from '@/lib/legal'
+import { formatTurkishTitleCase } from '@/lib/format/name'
 
 type Role = 'student' | 'instructor' | 'parent'
 type Track = 'sayisal' | 'sozel' | 'ea' | 'dil'
@@ -83,8 +84,9 @@ export function RegisterForm() {
     }
 
     startTransition(async () => {
+      const cleanName = formatTurkishTitleCase(name)
       const result = await registerUser({
-        name,
+        name: cleanName,
         email,
         password,
         role,
@@ -191,7 +193,9 @@ export function RegisterForm() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={() => setName(formatTurkishTitleCase(name))}
             className="w-full p-3 rounded-xl border border-white/10 bg-white/[0.03] text-white outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
+            placeholder="Adınız ve Soyadınız"
           />
         </div>
 

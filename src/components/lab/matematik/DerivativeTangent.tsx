@@ -6,7 +6,6 @@ import {
   TrendingUp,
   RotateCcw,
   Sliders,
-  Sparkles,
   Info,
   CheckCircle2,
   AlertCircle,

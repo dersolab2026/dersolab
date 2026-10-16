@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Globe2,
   Scroll,
-  Sparkles,
   ArrowRight,
   Compass,
 } from 'lucide-react'

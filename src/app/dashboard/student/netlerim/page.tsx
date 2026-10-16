@@ -43,7 +43,7 @@ export default async function NetlerimPage() {
       <p className="text-xs font-semibold text-slate-400">
         Net hesabı kesindir (LGS&apos;de 3, diğer sınavlarda 4 yanlış bir doğruyu götürür).
         Puan ve yerleştirme değerleri <strong>tahminidir</strong>: ÖSYM&apos;nin gerçek puanı
-        adayların standart sapmasına göre hesaplandığı için dışarıdan birebir hesaplanamaz.
+        adayların standart sapmasına göre hesaplandığı için dışarıdan bire bir hesaplanamaz.
       </p>
     </DashboardPageShell>
   )

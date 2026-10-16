@@ -42,7 +42,7 @@ const ALL_STAR_INSTRUCTORS = [
     badge: 'Doğrulanmış Eğitmen',
     university: 'Türk Dili ve Edebiyatı',
     avatar: 'https://nkqifjcyudvwfaehgtgp.supabase.co/storage/v1/object/public/avatars/d96a9da2-0057-4c2e-9d74-91c07a5ea9ee/avatar.jpeg',
-    tags: ['TYT Paragraf', 'AYT Edebiyat', 'Birebir Koçluk'],
+    tags: ['TYT Paragraf', 'AYT Edebiyat', 'Bire Bir Koçluk'],
     highlight: 'Paragraf taktikleri ve sınav psikolojisiyle net artırma metodu.',
   },
   {
@@ -559,7 +559,7 @@ export function AllStarLandingView() {
               20 Dakikalık Ücretsiz Tanışma Seansını Başlat
             </h2>
             <p className="text-slate-300 text-sm sm:text-base font-normal">
-              Eğitmeninizle tanışın, hedeflerinizi paylaşın ve DersoLab'ın birebir canlı ders kalitesini ilk elden deneyimleyin.
+              Eğitmeninizle tanışın, hedeflerinizi paylaşın ve DersoLab'ın bire bir canlı ders kalitesini ilk elden deneyimleyin.
             </p>
           </div>
 

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Dna,
   RotateCcw,
-  Sparkles,
+  Zap,
   CheckCircle2,
   AlertCircle,
   Play,
@@ -190,7 +190,7 @@ export function ProteinSynthesis() {
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <Layers className="w-4 h-4 text-emerald-400" />
                 mRNA Kodonları (5&apos; → 3&apos;)
               </span>
               <span className="text-[10px] text-slate-500 font-mono">Ribozoma Taşınan Mesaj</span>
@@ -367,8 +367,8 @@ export function ProteinSynthesis() {
           {/* YKS AYT Biyoloji Kodon Hap Bilgisi */}
           <div className="p-4 rounded-2xl bg-gradient-to-br from-teal-950/30 via-slate-900 to-slate-950 border border-teal-500/20 text-xs space-y-2.5">
             <div className="flex items-center gap-1.5 text-teal-400 font-semibold">
-              <Sparkles className="w-4 h-4" />
-              <span>AYT Biyoloji Santral Dogma Hap Bilgisi</span>
+              <Zap className="w-4 h-4" />
+              <span>Maarif Modeli Santral Dogma Hap Bilgisi</span>
             </div>
             <ul className="text-slate-300 space-y-1.5 list-disc list-inside leading-relaxed">
               <li>

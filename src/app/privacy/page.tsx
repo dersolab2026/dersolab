@@ -116,7 +116,7 @@ export default function PrivacyPage() {
           <p>
             Platform LGS ve YKS öğrencilerine yönelik hizmet verdiği için reşit olmayan
             kullanıcılar bulunabilir. Bir eğitim platformu olarak, reşit olmayan kullanıcılar kendi
-            rızalarıyla platforma kayıt olup hizmetlerimizi kullanabilir.
+            rızalarıyla platforma kaydolup hizmetlerimizi kullanabilir.
           </p>
 
           <h2>7. Veri Saklama</h2>
@@ -129,7 +129,7 @@ export default function PrivacyPage() {
             adresiniz, telefonunuz, doğum tarihiniz, profil fotoğrafınız ve fatura bilgileriniz
             (kimlik numarası, adres, şehir) kaldırılır ve hesabınız kapatılır — tekrar giriş
             yapılamaz. Ders, ödeme ve fatura kayıtları ise, yasal saklama yükümlülükleri ve
-            eğitmenlerin hakediş kayıtları gerektirdiği için, sizinle bağı koparılmış biçimde
+            eğitmenlerin hak ediş kayıtları gerektirdiği için, sizinle bağı koparılmış biçimde
             saklanmaya devam eder. Yani işlem tamamen silme değil, kimliksizleştirmedir.
           </p>
 

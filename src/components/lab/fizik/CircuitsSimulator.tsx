@@ -10,12 +10,92 @@ import {
   Sliders,
   Info,
   Layers,
-  Sparkles,
   Gauge,
   HelpCircle,
 } from 'lucide-react'
 
 type CircuitType = 'single' | 'series' | 'parallel'
+
+function drawBulb(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  brightness: number,
+  label: string
+) {
+  // Glow aura
+  if (brightness > 0) {
+    const radius = 18 + (brightness / 100) * 35
+    const gradient = ctx.createRadialGradient(x, y, 4, x, y, radius)
+    gradient.addColorStop(0, `rgba(250, 204, 21, ${0.4 + (brightness / 100) * 0.5})`)
+    gradient.addColorStop(0.6, `rgba(234, 179, 8, ${0.15 + (brightness / 100) * 0.25})`)
+    gradient.addColorStop(1, 'rgba(234, 179, 8, 0)')
+    ctx.fillStyle = gradient
+    ctx.beginPath()
+    ctx.arc(x, y, radius, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  // Bulb glass circle
+  ctx.fillStyle = brightness > 5 ? '#fef08a' : '#1e293b'
+  ctx.beginPath()
+  ctx.arc(x, y, 16, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.strokeStyle = brightness > 5 ? '#eab308' : '#475569'
+  ctx.lineWidth = 2
+  ctx.stroke()
+
+  // Filament inside
+  ctx.strokeStyle = brightness > 5 ? '#ea580c' : '#64748b'
+  ctx.beginPath()
+  ctx.moveTo(x - 6, y + 6)
+  ctx.lineTo(x - 2, y - 6)
+  ctx.lineTo(x + 2, y - 6)
+  ctx.lineTo(x + 6, y + 6)
+  ctx.stroke()
+
+  // Label
+  ctx.fillStyle = '#cbd5e1'
+  ctx.font = '11px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillText(label, x, y + 30)
+}
+
+function drawElectrons(
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+  midY: number,
+  type: CircuitType,
+  offset: number
+) {
+  ctx.fillStyle = '#38bdf8'
+
+  const drawLineElectrons = (x1: number, y1: number, x2: number, y2: number, reverse = false) => {
+    const dist = Math.hypot(x2 - x1, y2 - y1)
+    const count = Math.floor(dist / 24)
+    for (let i = 0; i <= count; i++) {
+      let frac = ((i * 24 + offset) % dist) / dist
+      if (reverse) frac = 1 - frac
+      const ex = x1 + (x2 - x1) * frac
+      const ey = y1 + (y2 - y1) * frac
+      ctx.beginPath()
+      ctx.arc(ex, ey, 2.5, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }
+
+  drawLineElectrons(left, top, right, top)
+  drawLineElectrons(right, top, right, bottom)
+  drawLineElectrons(right, bottom, left, bottom)
+  drawLineElectrons(left, bottom, left, top)
+
+  if (type === 'parallel') {
+    drawLineElectrons(left, midY, right, midY)
+  }
+}
 
 export function CircuitsSimulator() {
   const [voltage, setVoltage] = useState<number>(12) // Volts
@@ -187,93 +267,6 @@ export function CircuitsSimulator() {
 
     return () => cancelAnimationFrame(animId)
   }, [voltage, resistance1, resistance2, circuitType, switchOpen, current, bulb1Brightness, bulb2Brightness])
-
-  function drawBulb(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    brightness: number,
-    label: string
-  ) {
-    // Glow aura
-    if (brightness > 0) {
-      const radius = 18 + (brightness / 100) * 35
-      const gradient = ctx.createRadialGradient(x, y, 4, x, y, radius)
-      gradient.addColorStop(0, `rgba(250, 204, 21, ${0.4 + (brightness / 100) * 0.5})`)
-      gradient.addColorStop(0.6, `rgba(234, 179, 8, ${0.15 + (brightness / 100) * 0.25})`)
-      gradient.addColorStop(1, 'rgba(234, 179, 8, 0)')
-      ctx.fillStyle = gradient
-      ctx.beginPath()
-      ctx.arc(x, y, radius, 0, Math.PI * 2)
-      ctx.fill()
-    }
-
-    // Bulb glass circle
-    ctx.fillStyle = brightness > 5 ? '#fef08a' : '#1e293b'
-    ctx.beginPath()
-    ctx.arc(x, y, 16, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.strokeStyle = brightness > 5 ? '#eab308' : '#475569'
-    ctx.lineWidth = 2
-    ctx.stroke()
-
-    // Filament inside
-    ctx.strokeStyle = brightness > 5 ? '#ea580c' : '#64748b'
-    ctx.beginPath()
-    ctx.moveTo(x - 6, y + 6)
-    ctx.lineTo(x - 2, y - 6)
-    ctx.lineTo(x + 2, y - 6)
-    ctx.lineTo(x + 6, y + 6)
-    ctx.stroke()
-
-    // Label
-    ctx.fillStyle = '#cbd5e1'
-    ctx.font = '11px sans-serif'
-    ctx.textAlign = 'center'
-    ctx.fillText(label, x, y + 30)
-  }
-
-  function drawElectrons(
-    ctx: CanvasRenderingContext2D,
-    left: number,
-    top: number,
-    right: number,
-    bottom: number,
-    midY: number,
-    type: CircuitType,
-    offset: number
-  ) {
-    ctx.fillStyle = '#38bdf8'
-
-    const drawLineElectrons = (x1: number, y1: number, x2: number, y2: number, reverse = false) => {
-      const dist = Math.hypot(x2 - x1, y2 - y1)
-      const count = Math.floor(dist / 24)
-      for (let i = 0; i <= count; i++) {
-        let frac = (i * 24 + offset) % dist / dist
-        if (reverse) frac = 1 - frac
-        const ex = x1 + (x2 - x1) * frac
-        const ey = y1 + (y2 - y1) * frac
-        ctx.beginPath()
-        ctx.arc(ex, ey, 2.5, 0, Math.PI * 2)
-        ctx.fill()
-      }
-    }
-
-    // Conventional electron flow is negative to positive (or standard loop)
-    // Top wire: left to right
-    drawLineElectrons(left, top, right, top)
-    // Right wire: top to bottom
-    drawLineElectrons(right, top, right, bottom)
-    // Bottom wire: right to left
-    drawLineElectrons(right, bottom, left, bottom)
-    // Left wire: bottom to top
-    drawLineElectrons(left, bottom, left, top)
-
-    // Parallel branch if active
-    if (type === 'parallel') {
-      drawLineElectrons(left, midY, right, midY)
-    }
-  }
 
   return (
     <div className="space-y-6">
