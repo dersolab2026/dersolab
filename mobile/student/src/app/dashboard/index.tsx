@@ -35,9 +35,40 @@ export default function DashboardHome() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Pomodoro State
+  const [timerMode, setTimerMode] = useState<'study' | 'break'>('study');
+  const [timeLeft, setTimeLeft] = useState<number>(25 * 60);
+  const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
+  const [completedSessions, setCompletedSessions] = useState<number>(0);
+
   useEffect(() => {
     loadDashboardData();
   }, []);
+
+  // Timer Tick
+  useEffect(() => {
+    let interval: any = null;
+    if (isTimerRunning && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            if (timerMode === 'study') {
+              setCompletedSessions((c) => c + 1);
+              setTimerMode('break');
+              return 5 * 60;
+            } else {
+              setTimerMode('study');
+              return 25 * 60;
+            }
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isTimerRunning, timeLeft, timerMode]);
 
   const loadDashboardData = async () => {
     try {
@@ -130,6 +161,10 @@ export default function DashboardHome() {
     });
   };
 
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+  const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
@@ -140,21 +175,165 @@ export default function DashboardHome() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00e5ff" />
         }
       >
-        {/* Header */}
+        {/* Top Header with Profile Avatar */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>Merhaba, {studentName} 👋</Text>
-          <Text style={styles.subtitle}>Bugünkü hedeflerine ve derslerine göz at.</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.greeting}>Merhaba, {studentName} 👋</Text>
+            <Text style={styles.subtitle}>Bugünkü hedeflerine ve deneylerine göz at.</Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => router.push('/dashboard/profile')}
+            style={styles.profileBtn}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="person-circle-outline" size={36} color="#00e5ff" />
+          </TouchableOpacity>
+        </View>
+
+        {/* 4 Big Quick Launch Cards */}
+        <View style={styles.quickGrid}>
+          {/* L.A.B. Launch */}
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push('/dashboard/lab' as any)}
+            activeOpacity={0.8}
+          >
+            <LinearGradient colors={['#00e5ff22', '#3b82f611']} style={styles.quickCardGradient}>
+              <View style={[styles.quickCardIcon, { backgroundColor: '#00e5ff22' }]}>
+                <Ionicons name="flask" size={22} color="#00e5ff" />
+              </View>
+              <Text style={styles.quickCardTitle}>L.A.B.</Text>
+              <Text style={styles.quickCardSub}>7 Branş Simülasyonu</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* AI Soru */}
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push('/dashboard/ai' as any)}
+            activeOpacity={0.8}
+          >
+            <LinearGradient colors={['#f59e0b22', '#ef444411']} style={styles.quickCardGradient}>
+              <View style={[styles.quickCardIcon, { backgroundColor: '#f59e0b22' }]}>
+                <Ionicons name="hardware-chip" size={22} color="#f59e0b" />
+              </View>
+              <Text style={styles.quickCardTitle}>DersoAI</Text>
+              <Text style={styles.quickCardSub}>Fotoğraflı Soru Çöz</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Ödevlerim */}
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push('/dashboard/homework' as any)}
+            activeOpacity={0.8}
+          >
+            <LinearGradient colors={['#38bdf822', '#6366f111']} style={styles.quickCardGradient}>
+              <View style={[styles.quickCardIcon, { backgroundColor: '#38bdf822' }]}>
+                <Ionicons name="school" size={22} color="#38bdf8" />
+              </View>
+              <Text style={styles.quickCardTitle}>Ödevlerim</Text>
+              <Text style={styles.quickCardSub}>Görevler & Teslim</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Netlerim */}
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push('/dashboard/netlerim' as any)}
+            activeOpacity={0.8}
+          >
+            <LinearGradient colors={['#10b98122', '#14b8a611']} style={styles.quickCardGradient}>
+              <View style={[styles.quickCardIcon, { backgroundColor: '#10b98122' }]}>
+                <Ionicons name="trending-up" size={22} color="#10b981" />
+              </View>
+              <Text style={styles.quickCardTitle}>Netlerim</Text>
+              <Text style={styles.quickCardSub}>LGS & YKS Takibi</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* Pomodoro Focus Timer Card */}
+        <View style={styles.pomodoroCard}>
+          <View style={styles.pomoTop}>
+            <View style={styles.rowAlign}>
+              <Ionicons name="timer-outline" size={20} color="#f97316" style={{ marginRight: 6 }} />
+              <Text style={styles.pomoTitle}>Pomodoro Odak Masası</Text>
+            </View>
+            <View style={styles.pomoModeSwitch}>
+              <TouchableOpacity
+                onPress={() => {
+                  setTimerMode('study');
+                  setIsTimerRunning(false);
+                  setTimeLeft(25 * 60);
+                }}
+                style={[styles.pomoModeBtn, timerMode === 'study' && styles.pomoModeBtnActive]}
+              >
+                <Text style={[styles.pomoModeText, timerMode === 'study' && styles.pomoModeTextActive]}>
+                  Ders (25dk)
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setTimerMode('break');
+                  setIsTimerRunning(false);
+                  setTimeLeft(5 * 60);
+                }}
+                style={[styles.pomoModeBtn, timerMode === 'break' && styles.pomoModeBtnActive]}
+              >
+                <Text style={[styles.pomoModeText, timerMode === 'break' && styles.pomoModeTextActive]}>
+                  Mola (5dk)
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.pomoDisplayRow}>
+            <Text style={styles.pomoClockText}>{formattedTime}</Text>
+
+            <View style={styles.pomoActions}>
+              <TouchableOpacity
+                onPress={() => setIsTimerRunning(!isTimerRunning)}
+                style={[
+                  styles.pomoPlayBtn,
+                  isTimerRunning ? { backgroundColor: '#f97316' } : { backgroundColor: '#00e5ff' },
+                ]}
+              >
+                <Ionicons
+                  name={isTimerRunning ? 'pause' : 'play'}
+                  size={18}
+                  color="#030712"
+                />
+                <Text style={styles.pomoPlayText}>{isTimerRunning ? 'Durdur' : 'Başlat'}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setIsTimerRunning(false);
+                  setTimeLeft(timerMode === 'study' ? 25 * 60 : 5 * 60);
+                }}
+                style={styles.pomoResetBtn}
+              >
+                <Ionicons name="refresh" size={18} color="#94a3b8" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.pomoFooter}>
+            <Text style={styles.pomoCompletedText}>
+              🔥 Bugün Tamamlanan: <Text style={{ color: '#ffffff', fontWeight: '800' }}>{completedSessions} Odak Seansı</Text>
+            </Text>
+          </View>
         </View>
 
         {/* Credit & Quick Action Card */}
-        <LinearGradient
-          colors={['#0f172a', '#1e293b']}
-          style={styles.creditCard}
-        >
+        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.creditCard}>
           <View style={styles.creditTop}>
             <View>
-              <Text style={styles.creditLabel}>Kalan Ders Kredin</Text>
-              <Text style={styles.creditValue}>{creditBalance} <Text style={styles.creditUnit}>Kredi</Text></Text>
+              <Text style={styles.creditLabel}>Kalan Birebir Ders Kredin</Text>
+              <Text style={styles.creditValue}>
+                {creditBalance} <Text style={styles.creditUnit}>Kredi</Text>
+              </Text>
             </View>
             <View style={styles.creditIconBox}>
               <Ionicons name="sparkles" size={24} color="#00e5ff" />
@@ -162,36 +341,17 @@ export default function DashboardHome() {
           </View>
           <Text style={styles.creditSub}>
             {creditBalance > 0
-              ? 'Onaylı eğitmenlerinden dilediğin zaman randevu alabilirsin.'
+              ? 'Onaylı eğitmenlerinden dilediğin zaman canlı ders randevusu alabilirsin.'
               : 'Ders kredisi yükleyerek birebir canlı derslere hemen başla.'}
           </Text>
 
-          {/* Quick Shortcuts */}
-          <View style={styles.quickNavRow}>
-            <TouchableOpacity
-              style={styles.quickNavBtn}
-              onPress={() => router.push('/dashboard/diary')}
-            >
-              <Ionicons name="book" size={16} color="#00e5ff" />
-              <Text style={styles.quickNavText}>Günlüğüm</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.quickNavBtn}
-              onPress={() => router.push('/dashboard/ai')}
-            >
-              <Ionicons name="hardware-chip" size={16} color="#f59e0b" />
-              <Text style={styles.quickNavText}>AI Soru Çöz</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.quickNavBtn}
-              onPress={() => router.push('/explore')}
-            >
-              <Ionicons name="search" size={16} color="#10b981" />
-              <Text style={styles.quickNavText}>Eğitmen Bul</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.findInstructorFullBtn}
+            onPress={() => router.push('/explore')}
+          >
+            <Ionicons name="search" size={16} color="#030712" style={{ marginRight: 6 }} />
+            <Text style={styles.findInstructorFullBtnText}>Eğitmen Bul & Ders Ayarla</Text>
+          </TouchableOpacity>
         </LinearGradient>
 
         {loading ? (
@@ -201,7 +361,7 @@ export default function DashboardHome() {
             {/* Upcoming Bookings */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Yaklaşan Dersler</Text>
+                <Text style={styles.sectionTitle}>Yaklaşan Canlı Derslerin</Text>
                 {upcoming.length > 0 ? (
                   <View style={styles.countBadge}>
                     <Text style={styles.countBadgeText}>{upcoming.length}</Text>
@@ -213,12 +373,6 @@ export default function DashboardHome() {
                 <View style={styles.emptyCard}>
                   <Ionicons name="calendar-outline" size={28} color="#475569" style={{ marginBottom: 6 }} />
                   <Text style={styles.emptyText}>Henüz planlanmış aktif bir dersin yok.</Text>
-                  <TouchableOpacity
-                    style={styles.findInstructorBtn}
-                    onPress={() => router.push('/explore')}
-                  >
-                    <Text style={styles.findInstructorBtnText}>Eğitmenleri Keşfet</Text>
-                  </TouchableOpacity>
                 </View>
               ) : (
                 upcoming.map((b) => (
@@ -245,7 +399,7 @@ export default function DashboardHome() {
                     ) : (
                       <View style={[styles.joinButton, { backgroundColor: '#1e293b' }]}>
                         <Text style={[styles.joinButtonText, { color: '#64748b' }]}>
-                          Meet Linki Oluşturuluyor...
+                          Meet Linki Bekleniyor...
                         </Text>
                       </View>
                     )}
@@ -270,13 +424,6 @@ export default function DashboardHome() {
                       </Text>
                     </View>
                     <Text style={styles.bookingInfo}>Eğitmen: {b.instructor_name}</Text>
-
-                    <TouchableOpacity
-                      style={styles.reviewButton}
-                      onPress={() => router.push(`/dashboard/lessons?id=${b.id}`)}
-                    >
-                      <Text style={styles.reviewButtonText}>Ders Notları & Materyaller</Text>
-                    </TouchableOpacity>
                   </View>
                 ))
               )}
@@ -284,7 +431,7 @@ export default function DashboardHome() {
           </>
         )}
 
-        <View style={{ height: 80 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -296,56 +443,188 @@ const styles = StyleSheet.create({
     backgroundColor: '#030712',
   },
   content: {
-    padding: 20,
+    padding: 16,
     paddingTop: Platform.OS === 'android' ? 40 : 10,
   },
   header: {
-    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
   },
   greeting: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '900',
     color: '#ffffff',
     letterSpacing: -0.5,
     marginBottom: 4,
   },
   subtitle: {
+    fontSize: 13,
+    color: '#94a3b8',
+  },
+  profileBtn: {
+    padding: 4,
+  },
+  quickGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 18,
+  },
+  quickCard: {
+    width: '48%',
+    borderRadius: 18,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#1e293b',
+  },
+  quickCardGradient: {
+    padding: 14,
+    borderRadius: 18,
+  },
+  quickCardIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  quickCardTitle: {
     fontSize: 14,
+    fontWeight: '900',
+    color: '#ffffff',
+  },
+  quickCardSub: {
+    fontSize: 11,
+    color: '#94a3b8',
+    marginTop: 2,
+  },
+  pomodoroCard: {
+    backgroundColor: '#0f172a',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#1e293b',
+    padding: 16,
+    marginBottom: 18,
+  },
+  pomoTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  rowAlign: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pomoTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#ffffff',
+  },
+  pomoModeSwitch: {
+    flexDirection: 'row',
+    backgroundColor: '#1e293b',
+    borderRadius: 10,
+    padding: 2,
+  },
+  pomoModeBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  pomoModeBtnActive: {
+    backgroundColor: '#f97316',
+  },
+  pomoModeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#94a3b8',
+  },
+  pomoModeTextActive: {
+    color: '#030712',
+    fontWeight: '900',
+  },
+  pomoDisplayRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#1e293b66',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  pomoClockText: {
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#ffffff',
+  },
+  pomoActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  pomoPlayBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  pomoPlayText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#030712',
+  },
+  pomoResetBtn: {
+    padding: 8,
+    borderRadius: 10,
+    backgroundColor: '#1e293b',
+  },
+  pomoFooter: {
+    marginTop: 10,
+  },
+  pomoCompletedText: {
+    fontSize: 11,
     color: '#94a3b8',
   },
   creditCard: {
     borderRadius: 20,
-    padding: 20,
+    padding: 18,
     borderWidth: 1,
     borderColor: 'rgba(0, 229, 255, 0.2)',
-    marginBottom: 28,
+    marginBottom: 20,
   },
   creditTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   creditLabel: {
     color: '#94a3b8',
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
   },
   creditValue: {
     color: '#ffffff',
-    fontSize: 30,
+    fontSize: 26,
     fontWeight: '900',
     letterSpacing: -0.5,
   },
   creditUnit: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#00e5ff',
     fontWeight: '700',
   },
   creditIconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: 'rgba(0, 229, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -354,39 +633,31 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     fontSize: 12,
     lineHeight: 18,
-    marginBottom: 16,
+    marginBottom: 14,
   },
-  quickNavRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  quickNavBtn: {
-    flex: 1,
+  findInstructorFullBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#00e5ff',
     paddingVertical: 10,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  quickNavText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '700',
-    marginLeft: 6,
+  findInstructorFullBtnText: {
+    color: '#030712',
+    fontSize: 13,
+    fontWeight: '900',
   },
   section: {
-    marginBottom: 28,
+    marginBottom: 24,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '800',
     color: '#ffffff',
   },
@@ -405,37 +676,25 @@ const styles = StyleSheet.create({
   emptyCard: {
     backgroundColor: 'rgba(30, 41, 59, 0.2)',
     borderRadius: 16,
-    padding: 24,
+    padding: 20,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   emptyText: {
     color: '#64748b',
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  findInstructorBtn: {
-    backgroundColor: 'rgba(0, 229, 255, 0.15)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  findInstructorBtnText: {
-    color: '#00e5ff',
     fontSize: 13,
-    fontWeight: '700',
+    textAlign: 'center',
   },
   emptyMutedText: {
     color: '#64748b',
-    fontSize: 14,
+    fontSize: 13,
     fontStyle: 'italic',
   },
   bookingCard: {
     backgroundColor: '#0f172a',
     borderRadius: 16,
-    padding: 18,
+    padding: 16,
     borderWidth: 1,
     borderColor: '#1e293b',
     marginBottom: 12,
@@ -450,7 +709,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   bookingSubject: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#ffffff',
   },
@@ -473,33 +732,20 @@ const styles = StyleSheet.create({
   },
   bookingInfo: {
     color: '#94a3b8',
-    fontSize: 13,
-    marginBottom: 14,
+    fontSize: 12,
+    marginBottom: 12,
   },
   joinButton: {
     backgroundColor: '#00e5ff',
     flexDirection: 'row',
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   joinButtonText: {
     color: '#030712',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
-  },
-  reviewButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#334155',
-  },
-  reviewButtonText: {
-    color: '#cbd5e1',
-    fontSize: 13,
-    fontWeight: '600',
   },
 });
