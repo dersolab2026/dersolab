@@ -26,8 +26,15 @@ const TABAN = process.env.NEXT_PUBLIC_APP_URL ?? 'https://dersolab.com'
  * gore otomatik olarak og:image ve twitter:image yapiyor, elle url
  * yazmaya gerek yok.
  */
+export const viewport = {
+  themeColor: '#07090E',
+  width: 'device-width',
+  initialScale: 1,
+}
+
 export const metadata = {
   metadataBase: new URL(TABAN),
+  manifest: '/manifest.json',
   title: {
     default: 'DersoLab — Öğrenciler İçin Online Özel Ders ve Koçluk',
     template: '%s — DersoLab',

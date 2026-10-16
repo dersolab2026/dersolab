@@ -11,5 +11,5 @@ export default async function DashboardRedirectPage() {
   if (userRow?.role === 'instructor') redirect('/dashboard/instructor')
   if (userRow?.role === 'admin') redirect('/dashboard/admin')
   if (userRow?.role === 'parent') redirect('/dashboard/parent')
-  redirect('/dashboard/student/bookings')
+  redirect('/dashboard/student')
 }
