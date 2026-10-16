@@ -60,7 +60,7 @@ export const BRANCHES = [
     color: 'from-violet-500 to-indigo-400',
     borderActive: 'border-violet-500/50 text-violet-300 bg-violet-950/40',
     accentColor: 'text-violet-400',
-    tag: 'Birim Çember & Türev',
+    tag: '5-12. Sınıf Geometri & Cebir',
   },
   {
     id: 'biyoloji' as BranchId,

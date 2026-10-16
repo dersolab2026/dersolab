@@ -161,23 +161,43 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-violet-500/10',
     borderColor: 'border-violet-500/30 group-hover:border-violet-400/60',
     textColor: 'text-violet-400',
-    tag: 'Birim Çember & Türev',
+    tag: 'Kesir, Terazi, Pisagor & Türev',
     category: 'sayisal',
     levels: ['ortaokul', 'lise'],
     levelBadge: '5 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      '360° trigonometrik birim çember izdüşümleri, dinamik sinüs dalgası ve teğet eğimi ile fonksiyon türevi keşfi.',
+      '5-8. sınıf ortaokul için kesirler, tam sayılar, denklem terazisi ve Pisagor/eğim; 11-12. sınıf lise için birim çember ve türev simülatörleri.',
     modules: [
+      {
+        title: 'Pisagor Bağıntısı & Koordinat Eğimi (m = Δy/Δx)',
+        desc: 'a² + b² = c² geometrik kare alanı ispatı, özel dik üçgenler (3-4-5, 5-12-13) ve LGS koordinat eğim hesaplayıcısı.',
+        badge: '8. Sınıf LGS',
+      },
+      {
+        title: 'Eşit Kollu Denklem Terazisi Laboratuvarı',
+        desc: 'Bilinmeyen x kutuları ve birim ağırlıklarla eşitliğin korunumu ve 1. dereceden denklem çözümü.',
+        badge: '7. Sınıf Cebir',
+      },
+      {
+        title: 'Tam Sayılar & Sayı Doğrusu Termometre',
+        desc: 'Yönlü sayılar, sıfır çifti pulları, termometre dondurucu sıcaklıkları ve mutlak değer (|x|).',
+        badge: '6. Sınıf',
+      },
+      {
+        title: 'Kesirler & Pasta/Şerit Modeli',
+        desc: 'Birim kesir, basit/bileşik/tam sayılı kesirler ve interaktif pasta dilimi ile denk kesir genişletmesi.',
+        badge: '5. Sınıf',
+      },
       {
         title: 'Trigonometrik Birim Çember (360°)',
         desc: 'Açıyı döndürün; sinüs, kosinüs, tanjant eksen izdüşümlerini ve canlı sinüs dalgasını anlık kavrayın.',
-        badge: 'Trigonometri & Açı',
+        badge: '11. Sınıf Lise',
       },
       {
         title: 'Türev & Teğet Doğrusu Simülatörü',
-        desc: 'Eğri üzerinde noktayı kaydırın, m = f\'(x) teğet eğimini ve f\'(x) = 0 yerel ekstremum zirvelerini görün.',
-        badge: 'Fonksiyon & Eğim',
+        desc: 'Eğri üzerinde noktayı kaydırın, m = f\'(x) teğet eğimini ve f\'(x) = 0 yerel ekstremum zirvelerini keşfedin.',
+        badge: '12. Sınıf AYT',
       },
     ],
   },
