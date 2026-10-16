@@ -125,7 +125,7 @@ export default function AiScreen() {
         
         <View style={styles.header}>
           <View style={styles.titleRow}>
-            <Ionicons name="sparkles" size={28} color="#3b82f6" />
+            <Ionicons name="hardware-chip-outline" size={28} color="#00e5ff" />
             <Text style={styles.title}>AI Soru Asistanı</Text>
           </View>
           <Text style={styles.subtitle}>Gemini ile güçlendirilmiş adım adım çözüm asistanı</Text>
@@ -232,7 +232,7 @@ export default function AiScreen() {
         {solution ? (
           <View style={styles.solutionCard}>
             <View style={styles.solutionHeader}>
-              <Ionicons name="sparkles" size={20} color="#f59e0b" />
+              <Ionicons name="bulb-outline" size={20} color="#f59e0b" />
               <Text style={styles.solutionTitle}>Çözüm</Text>
             </View>
             <Text style={styles.solutionText}>{solution}</Text>

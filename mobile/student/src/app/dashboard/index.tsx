@@ -336,7 +336,7 @@ export default function DashboardHome() {
               </Text>
             </View>
             <View style={styles.creditIconBox}>
-              <Ionicons name="sparkles" size={24} color="#00e5ff" />
+              <Ionicons name="wallet-outline" size={24} color="#00e5ff" />
             </View>
           </View>
           <Text style={styles.creditSub}>
