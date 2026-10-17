@@ -44,7 +44,7 @@ function InstagramIcon({ className = 'w-4 h-4' }: { className?: string }) {
   )
 }
 
-const STORAGE_KEY = 'dersolab_social_posts_v1'
+const STORAGE_KEY = 'dersolab_social_posts_v2'
 
 const INITIAL_DEMO_POSTS: SocialPostItem[] = [
   {
@@ -185,6 +185,45 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
       stickerQuestion: 'Aralarında asal iki sayının EKOK\'u nedir?',
       stickerOptions: ['Sayıların Çarpımı', 'Her zaman 1', 'Sayıların Toplamı'],
       themeVariant: 'purple_matrix',
+    },
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo_5',
+    title: 'Pazar Hikayesi: Ortaokul & Lise Haftalık Kitap Önerisi',
+    type: 'story',
+    topic: 'book_recommendation',
+    topicLabel: 'Pazar Kitap Kulübü • Çift Öneri',
+    status: 'approved',
+    targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
+    caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) adaylarımız için okuma hızını, odaklanmayı ve sınav paragraf netlerini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2026 #yks2026 #paragrafhizi #dersolab #kitapkurdu`,
+    hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2026', '#yks2026', '#paragrafhizi', '#dersolab'],
+    storyData: {
+      badge: 'PAZAR KİTAP KULÜBÜ 📚',
+      headline: 'Haftanın Kitap Önerileri',
+      subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
+      stickerType: 'poll',
+      stickerQuestion: 'Bu hafta hangisini okuyacaksın?',
+      stickerOptions: ['Ortaokul: Momo 📘', 'Lise: Simyacı 📕'],
+      stickerLinkText: 'Kitap Listesi & İpuçları',
+      stickerLinkUrl: 'https://dersolab.com/lab',
+      themeVariant: 'purple_matrix',
+      dualBookData: {
+        ortaokul: {
+          title: 'Momo',
+          author: 'Michael Ende',
+          genre: 'Felsefi Masal & Zaman Macerası',
+          whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
+          highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+        },
+        lise: {
+          title: 'Simyacı',
+          author: 'Paulo Coelho',
+          genre: 'Alegorik Roman',
+          whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
+          highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+        },
+      },
     },
     createdAt: new Date().toISOString(),
   },

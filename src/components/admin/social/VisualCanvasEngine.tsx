@@ -290,7 +290,11 @@ export function VisualCanvasEngine({
 
     // STORY ÇIKARTMASI (STORY MODUNDA İSE)
     if (isStory && storyData) {
-      cursorY = drawStorySticker(ctx, storyData, cursorY, width, theme)
+      if (storyData.dualBookData) {
+        cursorY = drawDualBookStoryCards(ctx, storyData, cursorY, width, height, theme)
+      } else {
+        cursorY = drawStorySticker(ctx, storyData, cursorY, width, theme)
+      }
     } else if (isCarousel && currentSlide?.bodyPoints && currentSlide.bodyPoints.length > 0) {
       // CAROUSEL MADDELERİ
       currentSlide.bodyPoints.forEach((point, idx) => {
@@ -507,6 +511,149 @@ export function VisualCanvasEngine({
     ctx.textAlign = 'left'
 
     return cursorY + cardH + 60
+  }
+
+  // Pazar Kitap Önerisi (Ortaokul + Lise Çift Kart) Çizici
+  function drawDualBookStoryCards(
+    ctx: CanvasRenderingContext2D,
+    story: StoryData,
+    cursorY: number,
+    width: number,
+    height: number,
+    theme: any
+  ): number {
+    const { ortaokul, lise } = story.dualBookData!
+    const cardW = width - 160 // 920px
+    const cardH = 360
+
+    // 1. ORTAOKUL & LGS KARTI (Cyan/Mavi Neon Vurgu)
+    const card1Y = cursorY
+    ctx.save()
+    ctx.fillStyle = 'rgba(6, 182, 212, 0.08)'
+    roundRect(ctx, 80, card1Y, cardW, cardH, 26)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(6, 182, 212, 0.45)'
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Ortaokul Rozeti
+    ctx.fillStyle = '#0891b2'
+    roundRect(ctx, 110, card1Y + 26, 320, 36, 10)
+    ctx.fill()
+    ctx.font = '900 16px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#ffffff'
+    ctx.fillText('📘 ' + (ortaokul.highlightTag || 'ORTAOKUL & LGS (10-14 YAŞ)'), 125, card1Y + 50)
+
+    // Kitap Başlığı
+    ctx.font = 'bold 36px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#ffffff'
+    ctx.fillText(ortaokul.title, 110, card1Y + 105)
+
+    // Yazar & Tür
+    ctx.font = '600 21px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#38bdf8'
+    ctx.fillText(`Yazar: ${ortaokul.author}${ortaokul.genre ? ` • ${ortaokul.genre}` : ''}`, 110, card1Y + 142)
+
+    // Ayırıcı çizgi
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(110, card1Y + 165)
+    ctx.lineTo(110 + cardW - 60, card1Y + 165)
+    ctx.stroke()
+
+    // Neden Okunmalı / Paragraf Katkısı
+    ctx.font = 'bold 18px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#94a3b8'
+    ctx.fillText('🎯 LGS Paragraf & Odaklanma Katkısı:', 110, card1Y + 198)
+
+    ctx.font = '500 22px Inter, system-ui, sans-serif'
+    ctx.fillStyle = 'rgba(241, 245, 249, 0.95)'
+    wrapText(ctx, ortaokul.whyRead, 110, card1Y + 234, cardW - 60, 32, 3)
+    ctx.restore()
+
+    // 2. LİSE & YKS KARTI (Turuncu/Amber Neon Vurgu)
+    const card2Y = card1Y + cardH + 28
+    ctx.save()
+    ctx.fillStyle = 'rgba(249, 115, 22, 0.08)'
+    roundRect(ctx, 80, card2Y, cardW, cardH, 26)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(249, 115, 22, 0.5)'
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Lise Rozeti
+    ctx.fillStyle = '#ea580c'
+    roundRect(ctx, 110, card2Y + 26, 290, 36, 10)
+    ctx.fill()
+    ctx.font = '900 16px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#ffffff'
+    ctx.fillText('📕 ' + (lise.highlightTag || 'LİSE & YKS (14-18 YAŞ)'), 125, card2Y + 50)
+
+    // Kitap Başlığı
+    ctx.font = 'bold 36px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#ffffff'
+    ctx.fillText(lise.title, 110, card2Y + 105)
+
+    // Yazar & Tür
+    ctx.font = '600 21px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#fb923c'
+    ctx.fillText(`Yazar: ${lise.author}${lise.genre ? ` • ${lise.genre}` : ''}`, 110, card2Y + 142)
+
+    // Ayırıcı çizgi
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(110, card2Y + 165)
+    ctx.lineTo(110 + cardW - 60, card2Y + 165)
+    ctx.stroke()
+
+    // Neden Okunmalı / YKS Katkısı
+    ctx.font = 'bold 18px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#94a3b8'
+    ctx.fillText('🎯 YKS Derin Anlama & Analiz Katkısı:', 110, card2Y + 198)
+
+    ctx.font = '500 22px Inter, system-ui, sans-serif'
+    ctx.fillStyle = 'rgba(241, 245, 249, 0.95)'
+    wrapText(ctx, lise.whyRead, 110, card2Y + 234, cardW - 60, 32, 3)
+    ctx.restore()
+
+    // 3. İNTERAKTİF ANKET / OYLAMA ÇIKARTMASI
+    const pollY = card2Y + cardH + 28
+    const pollH = 175
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
+    roundRect(ctx, 80, pollY, cardW, pollH, 26)
+    ctx.fill()
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.35)'
+    ctx.shadowBlur = 20
+
+    ctx.font = 'bold 24px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#0f172a'
+    ctx.textAlign = 'center'
+    ctx.fillText(story.stickerQuestion || 'Bu hafta hangisini okuyacaksın? 📚', width / 2, pollY + 44)
+
+    const btnW = (cardW - 60) / 2
+
+    // Ortaokul Oylama Butonu
+    ctx.fillStyle = '#0284c7'
+    roundRect(ctx, 100, pollY + 74, btnW, 68, 18)
+    ctx.fill()
+    ctx.font = 'bold 20px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#ffffff'
+    const opt1 = (story.stickerOptions && story.stickerOptions[0]) || `📘 ${ortaokul.title}`
+    ctx.fillText(opt1, 100 + btnW / 2, pollY + 115)
+
+    // Lise Oylama Butonu
+    ctx.fillStyle = '#ea580c'
+    roundRect(ctx, 100 + btnW + 20, pollY + 74, btnW, 68, 18)
+    ctx.fill()
+    ctx.fillStyle = '#ffffff'
+    const opt2 = (story.stickerOptions && story.stickerOptions[1]) || `📕 ${lise.title}`
+    ctx.fillText(opt2, 100 + btnW + 20 + btnW / 2, pollY + 115)
+    ctx.textAlign = 'left'
+
+    return pollY + pollH + 30
   }
 
   // Metin Sarmalama

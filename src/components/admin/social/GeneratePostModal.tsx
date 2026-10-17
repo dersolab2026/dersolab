@@ -13,6 +13,7 @@ import {
   Image as ImageIcon,
   Trash2,
   Loader2,
+  BookOpen,
 } from 'lucide-react'
 import type {
   ContentTopic,
@@ -189,6 +190,37 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
         <form onSubmit={handleGenerate} className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
           {mode === 'single' ? (
             <>
+              {/* HIZLI ŞABLON: PAZAR KİTAP ÖNERİSİ STORYSİ */}
+              <div
+                onClick={() => {
+                  setContentType('story')
+                  setTopic('book_recommendation')
+                  setStoryStickerType('poll')
+                  setSubject('Türkçe, Edebiyat & Paragraf')
+                  setSubTopic('Haftalık Kitap Kulübü')
+                  setTargetGrade('Genel')
+                  toast.success('Pazar Kitap Önerisi (Ortaokul + Lise) şablonu aktif edildi!')
+                }}
+                className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-500/15 via-orange-500/10 to-transparent border border-purple-500/30 hover:border-purple-500/60 cursor-pointer flex items-center justify-between transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform shrink-0">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-white group-hover:text-purple-300 transition-colors block">
+                      ⚡ Hızlı Şablon: Pazar Kitap Önerisi (Ortaokul + Lise)
+                    </span>
+                    <span className="text-[11px] text-slate-400">
+                      Tek bir 9:16 Story içerisinde hem Ortaokul (LGS) hem Lise (YKS) için 2 kitap ve anket üretir
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 shrink-0">
+                  Şablonu Seç
+                </span>
+              </div>
+
               {/* Format Seçimi (Carousel, Reels, Post, Story) */}
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-slate-300">İçerik Formatı</label>
@@ -377,16 +409,23 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {[
                     { id: 'exam_tactics', label: '🎯 Sınav Taktikleri' },
+                    { id: 'book_recommendation', label: '📚 Pazar Kitap Önerisi (Ortaokul + Lise)' },
+                    { id: 'daily_question', label: '❓ Şaşırtmalı Soru' },
                     { id: 'dersolab_features', label: '⚡ L.A.B. Araçları' },
                     { id: 'motivation', label: '🔥 Disiplin & Motivasyon' },
-                    { id: 'daily_question', label: '❓ Şaşırtmalı Soru' },
                     { id: 'weekly_plan', label: '📅 Koçluk & Planlama' },
                     { id: 'custom', label: '✍️ Özel Konu' },
                   ].map((t) => (
                     <button
                       key={t.id}
                       type="button"
-                      onClick={() => setTopic(t.id as ContentTopic)}
+                      onClick={() => {
+                        setTopic(t.id as ContentTopic)
+                        if (t.id === 'book_recommendation') {
+                          setContentType('story')
+                          setStoryStickerType('poll')
+                        }
+                      }}
                       className={`px-3 py-2 rounded-xl text-xs font-medium border text-left transition-all ${
                         topic === t.id
                           ? 'border-orange-500/50 bg-orange-500/20 text-orange-300'

@@ -8,6 +8,7 @@ export type ContentTopic =
   | 'motivation'
   | 'daily_question'
   | 'weekly_plan'
+  | 'book_recommendation'
   | 'custom'
 
 export type PostStatus = 'draft' | 'approved' | 'scheduled' | 'published'
@@ -38,6 +39,19 @@ export interface SinglePostData {
   uploadedImageUrl?: string
 }
 
+export interface DualBookItem {
+  title: string
+  author: string
+  genre?: string
+  whyRead: string
+  highlightTag?: string
+}
+
+export interface DualBookData {
+  ortaokul: DualBookItem
+  lise: DualBookItem
+}
+
 export interface StoryData {
   badge: string
   headline: string
@@ -49,6 +63,7 @@ export interface StoryData {
   stickerLinkUrl?: string
   themeVariant: SlideThemeVariant
   uploadedImageUrl?: string
+  dualBookData?: DualBookData
 }
 
 export interface ReelsStoryboard {

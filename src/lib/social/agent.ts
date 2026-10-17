@@ -28,6 +28,15 @@ HEDEF KİTLE VE İÇERİK DİLİ:
 - Dil samimi, motive edici, sınav jargonuna hakim (ÖSYM mantığı, net artırma, süre yetiştirme, turlama taktiği, paragraf püf noktaları, TYT matematik tuzakları).
 - Asla yapay, sıkıcı veya ansiklopedik yazma! Doğrudan etkileşim, "Kaydet", "Arkadaşına Gönder" ve "Biyodaki linke tıkla" psikolojisini tetikle.
 
+PAZAR KİTAP ÖNERİSİ HİKAYELERİ (ORTAOKUL + LİSE):
+- DersoLab her Pazar günü hem ORTAOKUL (LGS düzeyi, 10-14 yaş) hem de LİSE (YKS düzeyi, 14-18 yaş) için TEK BİR HİKAYEDE (Story) haftalık kitap önerisi paylaşır.
+- Eğer konu 'book_recommendation' veya Pazar kitap önerisi ise:
+  - Tek bir 9:16 Story içerisinde hem Ortaokul hem Lise için 2 farklı kitap belirle.
+  - Ortaokul Kitabı: LGS yeni nesil paragraf, hayal gücü ve kelime dağarcığını geliştirecek sürükleyici bir kitap (Örn: Momo, Küçük Prens, Samed Behrengi, Beyaz Diş, Çizgili Pijamalı Çocuk, Şeker Portakalı vb.).
+  - Lise Kitabı: TYT paragraf hızı, analitik/felsefi düşünme ve AYT edebiyat derinliği katacak bir başucu kitabı (Örn: Simyacı, 1984, Dönüşüm, Kürk Mantolu Madonna, Saatleri Ayarlama Enstitüsü, Fahrenheit 451 vb.).
+  - 'dualBookData' alanını ortaokul ve lise kitaplarıyla eksiksiz doldur.
+  - Etkileşim çıkartması (sticker) olarak anket (Poll: "Hangisini okuyacaksın? Ortaokul 📘 / Lise 📕") veya soru kutusu oluştur.
+
 ÇIKTI FORMATI:
 Sadece ve sadece istenilen JSON formatında yanıt ver. Markdown blokları (\`\`\`json ... \`\`\`) içine alarak ver.`
 
@@ -106,15 +115,31 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
   }`
       : request.type === 'story'
         ? `"storyData": {
-    "badge": "GÜNÜN QUIZI / ANKETİ",
-    "headline": "ÖSYM Bu Soruyu Çok Sever!",
-    "subhead": "Doğru şıkkı tahmin edebilecek misin? 👇",
-    "stickerType": "${request.storyStickerType || 'quiz'}", // "quiz" | "poll" | "link" | "countdown" | "question_box"
-    "stickerQuestion": "Aşağıdakilerden hangisi birleşik sözcüktür?",
-    "stickerOptions": ["Birçok", "Her gün", "Hiç kimse", "Pek çok"],
-    "stickerLinkText": "DersoLab'da Çöz",
+    "badge": "GÜNÜN QUIZI / PAZAR KİTAP KULÜBÜ",
+    "headline": "ÖSYM Bu Soruyu Çok Sever / Haftanın Kitap Önerileri",
+    "subhead": "Doğru şıkkı tahmin edebilecek misin? / Ortaokul & Lise İçin Seçtik",
+    "stickerType": "${request.storyStickerType || (request.topic === 'book_recommendation' ? 'poll' : 'quiz')}", // "quiz" | "poll" | "link" | "countdown" | "question_box"
+    "stickerQuestion": "${request.topic === 'book_recommendation' ? 'Bu hafta hangisini okuyacaksın?' : 'Aşağıdakilerden hangisi birleşik sözcüktür?'}",
+    "stickerOptions": ${request.topic === 'book_recommendation' ? '["Ortaokul: Kitap Adı 📘", "Lise: Kitap Adı 📕"]' : '["Birçok", "Her gün", "Hiç kimse", "Pek çok"]'},
+    "stickerLinkText": "DersoLab Kitap Kulübü",
     "stickerLinkUrl": "https://dersolab.com/lab",
-    "themeVariant": "neon_orange"
+    "themeVariant": "purple_matrix",
+    "dualBookData": { // EĞER KONU 'book_recommendation' VEYA KİTAP İSE ZORUNLUDUR:
+      "ortaokul": {
+        "title": "Kitap Adı (Ortaokul/LGS)",
+        "author": "Yazar Adı",
+        "genre": "Felsefi Masal / Macera / Bilim Kurgu vb.",
+        "whyRead": "LGS paragraf sorularında hız, odaklanma ve hayal gücü katkısı",
+        "highlightTag": "ORTAOKUL & LGS (10-14 YAŞ)"
+      },
+      "lise": {
+        "title": "Kitap Adı (Lise/YKS)",
+        "author": "Yazar Adı",
+        "genre": "Klasik / Alegorik Roman / Distopya vb.",
+        "whyRead": "TYT derin anlama, AYT edebiyat tahlili ve analitik düşünme katkısı",
+        "highlightTag": "LİSE & YKS (14-18 YAŞ)"
+      }
+    }
   }`
       : `"singlePostData": {
     "badge": "GÜNÜN ÖSYM SORUSU",
@@ -406,6 +431,54 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
   }
 
   if (request.type === 'story') {
+    const isBook =
+      request.topic === 'book_recommendation' ||
+      (request.customPrompt && /kitap|pazar/i.test(request.customPrompt))
+
+    if (isBook) {
+      return {
+        id: `post_${now}_story_book`,
+        title: 'Pazar Hikayesi: Ortaokul & Lise Haftalık Kitap Önerisi',
+        type: 'story',
+        topic: 'book_recommendation',
+        topicLabel: 'Pazar Kitap Kulübü • Ortaokul & Lise',
+        status: 'draft',
+        targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
+        caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) grubumuz için okuma hızını, odaklanmayı ve sınav paragraf netlerini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2026 #yks2026 #paragrafhizi #dersolab #kitapkurdu`,
+        hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2026', '#yks2026', '#paragrafhizi', '#dersolab'],
+        storyData: {
+          badge: 'PAZAR KİTAP KULÜBÜ 📚',
+          headline: 'Haftanın Kitap Önerileri',
+          subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
+          stickerType: 'poll',
+          stickerQuestion: 'Bu Pazar hangisini okuyacaksın?',
+          stickerOptions: ['Ortaokul: Momo 📘', 'Lise: Simyacı 📕'],
+          stickerLinkText: 'Kitap Listesi & İpuçları',
+          stickerLinkUrl: 'https://dersolab.com/lab',
+          themeVariant: 'purple_matrix',
+          uploadedImageUrl: request.imageBase64,
+          dualBookData: {
+            ortaokul: {
+              title: 'Momo',
+              author: 'Michael Ende',
+              genre: 'Felsefi Masal & Zaman Macerası',
+              whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
+              highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+            },
+            lise: {
+              title: 'Simyacı',
+              author: 'Paulo Coelho',
+              genre: 'Alegorik Roman',
+              whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
+              highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+            },
+          },
+        },
+        uploadedImageUrl: request.imageBase64,
+        createdAt: new Date().toISOString(),
+      }
+    }
+
     return {
       id: `post_${now}_story`,
       title: 'Story: Günün TYT Türkçe Quiz Çıkartması',
@@ -618,22 +691,40 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
     },
     {
       id: `week_7_${Date.now()}`,
-      title: 'Pazar: Koçluk ve Zihinsel Sıfırlama',
-      type: 'reels',
-      topic: 'motivation',
-      topicLabel: 'Pazar Motivasyonu',
+      title: 'Pazar: Haftalık Kitap Kulübü (Ortaokul & Lise)',
+      type: 'story',
+      topic: 'book_recommendation',
+      topicLabel: 'Pazar Kitap Kulübü • Ortaokul & Lise',
       status: 'draft',
-      targetAudience: request.targetGrade || 'YKS',
-      caption: `Pazar günü sadece dinlenme değil, yeni haftanın enerjisini depolama günüdür. Kendine inan, emeklerin asla boşa gitmeyecek. 🧡🦊\n\n#pazar #motivasyon #dersolab`,
-      hashtags: ['#pazar', '#motivasyon', '#dersolab', '#ykstayfa'],
-      reelsStoryboard: {
-        hook3s: 'Sakin, ilham verici bir çalışma masası görüntüsü: "Yorulduğunu biliyorum ama vazgeçmeyeceksin."',
-        visualDirection: 'Sıcak lamba ışığı, çalışma notları, DersoLab tilki logosu kupası.',
-        spokenScript:
-          'Sınav hazırlığı bir sprint değil maratondur. Bugün bir saat yürüyüş yap, uykunu al ve yarın başlayacak yeni haftaya taze bir zihinle adım at. Biz senin yanındayız.',
-        onScreenText: ['Nefes Al', 'Yeni Haftaya Hazır Ol', 'Sen Başaracaksın ✨'],
-        musicAudioVibe: 'Duygusal, motive edici piyano / ambient',
-        callToAction: 'Pazartesi hedefini yoruma yaz, birlikte takip edelim!',
+      targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
+      caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) adaylarımız için okuma hızını, odaklanmayı ve sınav paragraf netlerini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2026 #yks2026 #paragrafhizi #dersolab #kitapkurdu`,
+      hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2026', '#yks2026', '#paragrafhizi', '#dersolab'],
+      storyData: {
+        badge: 'PAZAR KİTAP KULÜBÜ 📚',
+        headline: 'Haftanın Kitap Önerileri',
+        subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
+        stickerType: 'poll',
+        stickerQuestion: 'Bu hafta hangisini okuyacaksın?',
+        stickerOptions: ['Ortaokul: Momo 📘', 'Lise: Simyacı 📕'],
+        stickerLinkText: 'Kitap Listesi & İpuçları',
+        stickerLinkUrl: 'https://dersolab.com/lab',
+        themeVariant: 'purple_matrix',
+        dualBookData: {
+          ortaokul: {
+            title: 'Momo',
+            author: 'Michael Ende',
+            genre: 'Felsefi Masal & Zaman Macerası',
+            whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
+            highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+          },
+          lise: {
+            title: 'Simyacı',
+            author: 'Paulo Coelho',
+            genre: 'Alegorik Roman',
+            whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
+            highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+          },
+        },
       },
       createdAt: new Date().toISOString(),
     },

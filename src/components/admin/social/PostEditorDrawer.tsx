@@ -19,6 +19,7 @@ import {
   Upload,
   Image as ImageIcon,
   Eye,
+  BookOpen,
 } from 'lucide-react'
 import type { CarouselSlide, PostStatus, SocialPostItem, StoryStickerType } from '@/types/social'
 import { VisualCanvasEngine } from './VisualCanvasEngine'
@@ -540,6 +541,228 @@ export function PostEditorDrawer({
                           </div>
                         )}
                       </div>
+
+                      {/* PAZAR KİTAP KULÜBÜ DÜZENLEME (ORTAOKUL & LİSE) */}
+                      {post.storyData.dualBookData ? (
+                        <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/25 space-y-4">
+                          <div className="flex items-center justify-between border-b border-purple-500/20 pb-2">
+                            <div className="flex items-center gap-2">
+                              <BookOpen className="w-4 h-4 text-purple-400" />
+                              <span className="text-xs font-bold text-purple-300">
+                                Pazar Kitap Kulübü (Ortaokul + Lise)
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newStory = { ...post.storyData! }
+                                delete newStory.dualBookData
+                                onUpdatePost({ ...post, storyData: newStory })
+                                toast.success('Kitap kulübü modu kaldırıldı.')
+                              }}
+                              className="text-[10px] text-red-400 hover:text-red-300"
+                            >
+                              Kitap Modunu Kaldır
+                            </button>
+                          </div>
+
+                          {/* 1. ORTAOKUL KİTABI */}
+                          <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 space-y-2">
+                            <span className="text-[11px] font-bold text-sky-400 block">
+                              📘 1. Ortaokul Kitabı (LGS - 10-14 Yaş)
+                            </span>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="text-[10px] text-slate-400">Kitap Adı</label>
+                                <input
+                                  type="text"
+                                  value={post.storyData.dualBookData.ortaokul.title}
+                                  onChange={(e) =>
+                                    onUpdatePost({
+                                      ...post,
+                                      storyData: {
+                                        ...post.storyData!,
+                                        dualBookData: {
+                                          ...post.storyData!.dualBookData!,
+                                          ortaokul: {
+                                            ...post.storyData!.dualBookData!.ortaokul,
+                                            title: e.target.value,
+                                          },
+                                        },
+                                      },
+                                    })
+                                  }
+                                  className="w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] text-slate-400">Yazar</label>
+                                <input
+                                  type="text"
+                                  value={post.storyData.dualBookData.ortaokul.author}
+                                  onChange={(e) =>
+                                    onUpdatePost({
+                                      ...post,
+                                      storyData: {
+                                        ...post.storyData!,
+                                        dualBookData: {
+                                          ...post.storyData!.dualBookData!,
+                                          ortaokul: {
+                                            ...post.storyData!.dualBookData!.ortaokul,
+                                            author: e.target.value,
+                                          },
+                                        },
+                                      },
+                                    })
+                                  }
+                                  className="w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="text-[10px] text-slate-400">Neden Okunmalı? (LGS Katkısı)</label>
+                              <textarea
+                                value={post.storyData.dualBookData.ortaokul.whyRead}
+                                onChange={(e) =>
+                                  onUpdatePost({
+                                    ...post,
+                                    storyData: {
+                                      ...post.storyData!,
+                                      dualBookData: {
+                                        ...post.storyData!.dualBookData!,
+                                        ortaokul: {
+                                          ...post.storyData!.dualBookData!.ortaokul,
+                                          whyRead: e.target.value,
+                                        },
+                                      },
+                                    },
+                                  })
+                                }
+                                rows={2}
+                                className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-xs text-white outline-none resize-none"
+                              />
+                            </div>
+                          </div>
+
+                          {/* 2. LİSE KİTABI */}
+                          <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 space-y-2">
+                            <span className="text-[11px] font-bold text-orange-400 block">
+                              📕 2. Lise Kitabı (YKS - 14-18 Yaş)
+                            </span>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="text-[10px] text-slate-400">Kitap Adı</label>
+                                <input
+                                  type="text"
+                                  value={post.storyData.dualBookData.lise.title}
+                                  onChange={(e) =>
+                                    onUpdatePost({
+                                      ...post,
+                                      storyData: {
+                                        ...post.storyData!,
+                                        dualBookData: {
+                                          ...post.storyData!.dualBookData!,
+                                          lise: {
+                                            ...post.storyData!.dualBookData!.lise,
+                                            title: e.target.value,
+                                          },
+                                        },
+                                      },
+                                    })
+                                  }
+                                  className="w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] text-slate-400">Yazar</label>
+                                <input
+                                  type="text"
+                                  value={post.storyData.dualBookData.lise.author}
+                                  onChange={(e) =>
+                                    onUpdatePost({
+                                      ...post,
+                                      storyData: {
+                                        ...post.storyData!,
+                                        dualBookData: {
+                                          ...post.storyData!.dualBookData!,
+                                          lise: {
+                                            ...post.storyData!.dualBookData!.lise,
+                                            author: e.target.value,
+                                          },
+                                        },
+                                      },
+                                    })
+                                  }
+                                  className="w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="text-[10px] text-slate-400">Neden Okunmalı? (YKS Katkısı)</label>
+                              <textarea
+                                value={post.storyData.dualBookData.lise.whyRead}
+                                onChange={(e) =>
+                                  onUpdatePost({
+                                    ...post,
+                                    storyData: {
+                                      ...post.storyData!,
+                                      dualBookData: {
+                                        ...post.storyData!.dualBookData!,
+                                        lise: {
+                                          ...post.storyData!.dualBookData!.lise,
+                                          whyRead: e.target.value,
+                                        },
+                                      },
+                                    },
+                                  })
+                                }
+                                rows={2}
+                                className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-xs text-white outline-none resize-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onUpdatePost({
+                              ...post,
+                              storyData: {
+                                ...post.storyData!,
+                                badge: 'PAZAR KİTAP KULÜBÜ 📚',
+                                headline: 'Haftanın Kitap Önerileri',
+                                subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
+                                stickerType: 'poll',
+                                stickerQuestion: 'Bu hafta hangisini okuyacaksın?',
+                                stickerOptions: ['Ortaokul: Momo 📘', 'Lise: Simyacı 📕'],
+                                themeVariant: 'purple_matrix',
+                                dualBookData: {
+                                  ortaokul: {
+                                    title: 'Momo',
+                                    author: 'Michael Ende',
+                                    genre: 'Felsefi Masal & Zaman Macerası',
+                                    whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
+                                    highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+                                  },
+                                  lise: {
+                                    title: 'Simyacı',
+                                    author: 'Paulo Coelho',
+                                    genre: 'Alegorik Roman',
+                                    whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
+                                    highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+                                  },
+                                },
+                              },
+                            })
+                            toast.success('Pazar Kitap Kulübü (Ortaokul + Lise) şablonu eklendi!')
+                          }}
+                          className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold transition-all"
+                        >
+                          <BookOpen className="w-4 h-4" />
+                          <span>📚 Pazar Kitap Kulübüne Dönüştür (Ortaokul & Lise Ekle)</span>
+                        </button>
+                      )}
                     </div>
                   ) : isCarousel && post.carouselSlides ? (
                     // Carousel Slaytları
