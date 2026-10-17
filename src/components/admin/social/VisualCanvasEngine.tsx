@@ -99,6 +99,8 @@ export function VisualCanvasEngine({
   const [copied, setCopied] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null)
+  const [loadedOrtaokulImg, setLoadedOrtaokulImg] = useState<HTMLImageElement | null>(null)
+  const [loadedLiseImg, setLoadedLiseImg] = useState<HTMLImageElement | null>(null)
 
   const isCarousel = Boolean(slides && slides.length > 0)
   const currentSlide = isCarousel ? slides![activeSlideIndex] : null
@@ -118,6 +120,32 @@ export function VisualCanvasEngine({
     img.onload = () => setLoadedImage(img)
     img.src = effectiveImageUrl
   }, [effectiveImageUrl])
+
+  // Pazar Kitap Kulübü Görsellerini Yükle
+  const ortaokulImgUrl = storyData?.dualBookData?.ortaokul?.imageUrl
+  const liseImgUrl = storyData?.dualBookData?.lise?.imageUrl
+
+  useEffect(() => {
+    if (!ortaokulImgUrl) {
+      setLoadedOrtaokulImg(null)
+      return
+    }
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => setLoadedOrtaokulImg(img)
+    img.src = ortaokulImgUrl
+  }, [ortaokulImgUrl])
+
+  useEffect(() => {
+    if (!liseImgUrl) {
+      setLoadedLiseImg(null)
+      return
+    }
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => setLoadedLiseImg(img)
+    img.src = liseImgUrl
+  }, [liseImgUrl])
 
   // Canvas çizim fonksiyonu
   const renderCanvas = useCallback(() => {
@@ -291,7 +319,16 @@ export function VisualCanvasEngine({
     // STORY ÇIKARTMASI (STORY MODUNDA İSE)
     if (isStory && storyData) {
       if (storyData.dualBookData) {
-        cursorY = drawDualBookStoryCards(ctx, storyData, cursorY, width, height, theme)
+        cursorY = drawDualBookStoryCards(
+          ctx,
+          storyData,
+          cursorY,
+          width,
+          height,
+          theme,
+          loadedOrtaokulImg,
+          loadedLiseImg
+        )
       } else {
         cursorY = drawStorySticker(ctx, storyData, cursorY, width, theme)
       }
@@ -395,8 +432,18 @@ export function VisualCanvasEngine({
     ctx.fillStyle = theme.accentColor
     ctx.textAlign = 'right'
     ctx.fillText(footerRightText, width - 80, height - 75)
-    ctx.textAlign = 'left'
-  }, [currentSlide, singlePost, storyData, isStory, activeSlideIndex, totalSlides, isCarousel, loadedImage])
+  }, [
+    currentSlide,
+    singlePost,
+    storyData,
+    isStory,
+    activeSlideIndex,
+    totalSlides,
+    isCarousel,
+    loadedImage,
+    loadedOrtaokulImg,
+    loadedLiseImg,
+  ])
 
   useEffect(() => {
     renderCanvas()
@@ -520,11 +567,13 @@ export function VisualCanvasEngine({
     cursorY: number,
     width: number,
     height: number,
-    theme: any
+    theme: any,
+    loadedOrtaokulImg?: HTMLImageElement | null,
+    loadedLiseImg?: HTMLImageElement | null
   ): number {
     const { ortaokul, lise } = story.dualBookData!
     const cardW = width - 160 // 920px
-    const cardH = 360
+    const cardH = 370
 
     // 1. ORTAOKUL & LGS KARTI (Cyan/Mavi Neon Vurgu)
     const card1Y = cursorY
@@ -536,40 +585,127 @@ export function VisualCanvasEngine({
     ctx.lineWidth = 2
     ctx.stroke()
 
-    // Ortaokul Rozeti
-    ctx.fillStyle = '#0891b2'
-    roundRect(ctx, 110, card1Y + 26, 320, 36, 10)
-    ctx.fill()
-    ctx.font = '900 16px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText('📘 ' + (ortaokul.highlightTag || 'ORTAOKUL & LGS (10-14 YAŞ)'), 125, card1Y + 50)
+    if (loadedOrtaokulImg) {
+      // 📷 GÖRSEL MODU (Kitap Kapağı)
+      const imgX = 110
+      const imgY = card1Y + 25
+      const imgW = 215
+      const imgH = 320
 
-    // Kitap Başlığı
-    ctx.font = 'bold 36px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(ortaokul.title, 110, card1Y + 105)
+      // 3D Gölge ve Kapak Çizimi
+      ctx.save()
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)'
+      ctx.shadowBlur = 25
+      ctx.shadowOffsetX = 8
+      ctx.shadowOffsetY = 10
+      roundRect(ctx, imgX, imgY, imgW, imgH, 16)
+      ctx.clip()
 
-    // Yazar & Tür
-    ctx.font = '600 21px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#38bdf8'
-    ctx.fillText(`Yazar: ${ortaokul.author}${ortaokul.genre ? ` • ${ortaokul.genre}` : ''}`, 110, card1Y + 142)
+      const r = Math.max(imgW / loadedOrtaokulImg.width, imgH / loadedOrtaokulImg.height)
+      const sw = imgW / r
+      const sh = imgH / r
+      const sx = (loadedOrtaokulImg.width - sw) / 2
+      const sy = (loadedOrtaokulImg.height - sh) / 2
+      ctx.drawImage(loadedOrtaokulImg, sx, sy, sw, sh, imgX, imgY, imgW, imgH)
+      ctx.restore()
 
-    // Ayırıcı çizgi
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.moveTo(110, card1Y + 165)
-    ctx.lineTo(110 + cardW - 60, card1Y + 165)
-    ctx.stroke()
+      // Çerçeve
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.6)'
+      ctx.lineWidth = 2
+      roundRect(ctx, imgX, imgY, imgW, imgH, 16)
+      ctx.stroke()
 
-    // Neden Okunmalı / Paragraf Katkısı
-    ctx.font = 'bold 18px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#94a3b8'
-    ctx.fillText('🎯 LGS Paragraf & Odaklanma Katkısı:', 110, card1Y + 198)
+      // Kitap Sırtı Parlaması
+      const spineGrad = ctx.createLinearGradient(imgX, imgY, imgX + 18, imgY)
+      spineGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)')
+      spineGrad.addColorStop(1, 'rgba(255, 255, 255, 0)')
+      ctx.fillStyle = spineGrad
+      roundRect(ctx, imgX, imgY, 18, imgH, 16)
+      ctx.fill()
 
-    ctx.font = '500 22px Inter, system-ui, sans-serif'
-    ctx.fillStyle = 'rgba(241, 245, 249, 0.95)'
-    wrapText(ctx, ortaokul.whyRead, 110, card1Y + 234, cardW - 60, 32, 3)
+      // Sağ Taraf Metin ve Rozetler
+      const rightX = 355
+      const rightW = cardW - 275
+
+      ctx.fillStyle = '#0891b2'
+      roundRect(ctx, rightX, card1Y + 28, 290, 34, 10)
+      ctx.fill()
+      ctx.font = '900 15px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText('📘 ' + (ortaokul.highlightTag || 'ORTAOKUL & LGS (10-14 YAŞ)'), rightX + 14, card1Y + 51)
+
+      ctx.font = 'bold 36px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      wrapText(ctx, ortaokul.title, rightX, card1Y + 110, rightW, 40, 2)
+
+      ctx.font = '600 21px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#38bdf8'
+      ctx.fillText(`Yazar: ${ortaokul.author}`, rightX, card1Y + 168)
+
+      if (ortaokul.genre) {
+        ctx.font = '500 18px Inter, system-ui, sans-serif'
+        ctx.fillStyle = '#94a3b8'
+        ctx.fillText(`Tür: ${ortaokul.genre}`, rightX, card1Y + 198)
+      }
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(rightX, card1Y + 218)
+      ctx.lineTo(rightX + rightW, card1Y + 218)
+      ctx.stroke()
+
+      // Vurgu Kutusu
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.12)'
+      roundRect(ctx, rightX, card1Y + 236, rightW, 82, 14)
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.25)'
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      ctx.font = '600 18px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#e2e8f0'
+      wrapText(
+        ctx,
+        ortaokul.whyRead || 'LGS yeni nesil paragraf sorularında hız ve dikkat süresini geliştirir ⚡',
+        rightX + 16,
+        card1Y + 268,
+        rightW - 32,
+        25,
+        2
+      )
+    } else {
+      // 📝 METİN MODU (Görsel henüz yoksa)
+      ctx.fillStyle = '#0891b2'
+      roundRect(ctx, 110, card1Y + 26, 320, 36, 10)
+      ctx.fill()
+      ctx.font = '900 16px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText('📘 ' + (ortaokul.highlightTag || 'ORTAOKUL & LGS (10-14 YAŞ)'), 125, card1Y + 50)
+
+      ctx.font = 'bold 36px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(ortaokul.title, 110, card1Y + 105)
+
+      ctx.font = '600 21px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#38bdf8'
+      ctx.fillText(`Yazar: ${ortaokul.author}${ortaokul.genre ? ` • ${ortaokul.genre}` : ''}`, 110, card1Y + 142)
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(110, card1Y + 165)
+      ctx.lineTo(110 + cardW - 60, card1Y + 165)
+      ctx.stroke()
+
+      ctx.font = 'bold 18px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#94a3b8'
+      ctx.fillText('🎯 LGS Paragraf & Odaklanma Katkısı:', 110, card1Y + 198)
+
+      ctx.font = '500 22px Inter, system-ui, sans-serif'
+      ctx.fillStyle = 'rgba(241, 245, 249, 0.95)'
+      wrapText(ctx, ortaokul.whyRead || 'Kitap kapağı yüklemek için sağdaki çekmeceden görsel ekleyin.', 110, card1Y + 234, cardW - 60, 32, 3)
+    }
     ctx.restore()
 
     // 2. LİSE & YKS KARTI (Turuncu/Amber Neon Vurgu)
@@ -582,40 +718,127 @@ export function VisualCanvasEngine({
     ctx.lineWidth = 2
     ctx.stroke()
 
-    // Lise Rozeti
-    ctx.fillStyle = '#ea580c'
-    roundRect(ctx, 110, card2Y + 26, 290, 36, 10)
-    ctx.fill()
-    ctx.font = '900 16px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText('📕 ' + (lise.highlightTag || 'LİSE & YKS (14-18 YAŞ)'), 125, card2Y + 50)
+    if (loadedLiseImg) {
+      // 📷 GÖRSEL MODU (Kitap Kapağı)
+      const imgX = 110
+      const imgY = card2Y + 25
+      const imgW = 215
+      const imgH = 320
 
-    // Kitap Başlığı
-    ctx.font = 'bold 36px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(lise.title, 110, card2Y + 105)
+      // 3D Gölge ve Kapak Çizimi
+      ctx.save()
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)'
+      ctx.shadowBlur = 25
+      ctx.shadowOffsetX = 8
+      ctx.shadowOffsetY = 10
+      roundRect(ctx, imgX, imgY, imgW, imgH, 16)
+      ctx.clip()
 
-    // Yazar & Tür
-    ctx.font = '600 21px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#fb923c'
-    ctx.fillText(`Yazar: ${lise.author}${lise.genre ? ` • ${lise.genre}` : ''}`, 110, card2Y + 142)
+      const r = Math.max(imgW / loadedLiseImg.width, imgH / loadedLiseImg.height)
+      const sw = imgW / r
+      const sh = imgH / r
+      const sx = (loadedLiseImg.width - sw) / 2
+      const sy = (loadedLiseImg.height - sh) / 2
+      ctx.drawImage(loadedLiseImg, sx, sy, sw, sh, imgX, imgY, imgW, imgH)
+      ctx.restore()
 
-    // Ayırıcı çizgi
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.moveTo(110, card2Y + 165)
-    ctx.lineTo(110 + cardW - 60, card2Y + 165)
-    ctx.stroke()
+      // Çerçeve
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.6)'
+      ctx.lineWidth = 2
+      roundRect(ctx, imgX, imgY, imgW, imgH, 16)
+      ctx.stroke()
 
-    // Neden Okunmalı / YKS Katkısı
-    ctx.font = 'bold 18px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#94a3b8'
-    ctx.fillText('🎯 YKS Derin Anlama & Analiz Katkısı:', 110, card2Y + 198)
+      // Kitap Sırtı Parlaması
+      const spineGrad = ctx.createLinearGradient(imgX, imgY, imgX + 18, imgY)
+      spineGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)')
+      spineGrad.addColorStop(1, 'rgba(255, 255, 255, 0)')
+      ctx.fillStyle = spineGrad
+      roundRect(ctx, imgX, imgY, 18, imgH, 16)
+      ctx.fill()
 
-    ctx.font = '500 22px Inter, system-ui, sans-serif'
-    ctx.fillStyle = 'rgba(241, 245, 249, 0.95)'
-    wrapText(ctx, lise.whyRead, 110, card2Y + 234, cardW - 60, 32, 3)
+      // Sağ Taraf Metin ve Rozetler
+      const rightX = 355
+      const rightW = cardW - 275
+
+      ctx.fillStyle = '#ea580c'
+      roundRect(ctx, rightX, card2Y + 28, 270, 34, 10)
+      ctx.fill()
+      ctx.font = '900 15px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText('📕 ' + (lise.highlightTag || 'LİSE & YKS (14-18 YAŞ)'), rightX + 14, card2Y + 51)
+
+      ctx.font = 'bold 36px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      wrapText(ctx, lise.title, rightX, card2Y + 110, rightW, 40, 2)
+
+      ctx.font = '600 21px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#fb923c'
+      ctx.fillText(`Yazar: ${lise.author}`, rightX, card2Y + 168)
+
+      if (lise.genre) {
+        ctx.font = '500 18px Inter, system-ui, sans-serif'
+        ctx.fillStyle = '#94a3b8'
+        ctx.fillText(`Tür: ${lise.genre}`, rightX, card2Y + 198)
+      }
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(rightX, card2Y + 218)
+      ctx.lineTo(rightX + rightW, card2Y + 218)
+      ctx.stroke()
+
+      // Vurgu Kutusu
+      ctx.fillStyle = 'rgba(249, 115, 22, 0.12)'
+      roundRect(ctx, rightX, card2Y + 236, rightW, 82, 14)
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.25)'
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      ctx.font = '600 18px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#e2e8f0'
+      wrapText(
+        ctx,
+        lise.whyRead || 'TYT derin anlama ve AYT edebiyat tahlil gücü kazandırır ✨',
+        rightX + 16,
+        card2Y + 268,
+        rightW - 32,
+        25,
+        2
+      )
+    } else {
+      // 📝 METİN MODU (Görsel henüz yoksa)
+      ctx.fillStyle = '#ea580c'
+      roundRect(ctx, 110, card2Y + 26, 290, 36, 10)
+      ctx.fill()
+      ctx.font = '900 16px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText('📕 ' + (lise.highlightTag || 'LİSE & YKS (14-18 YAŞ)'), 125, card2Y + 50)
+
+      ctx.font = 'bold 36px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(lise.title, 110, card2Y + 105)
+
+      ctx.font = '600 21px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#fb923c'
+      ctx.fillText(`Yazar: ${lise.author}${lise.genre ? ` • ${lise.genre}` : ''}`, 110, card2Y + 142)
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(110, card2Y + 165)
+      ctx.lineTo(110 + cardW - 60, card2Y + 165)
+      ctx.stroke()
+
+      ctx.font = 'bold 18px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#94a3b8'
+      ctx.fillText('🎯 YKS Derin Anlama & Analiz Katkısı:', 110, card2Y + 198)
+
+      ctx.font = '500 22px Inter, system-ui, sans-serif'
+      ctx.fillStyle = 'rgba(241, 245, 249, 0.95)'
+      wrapText(ctx, lise.whyRead || 'Kitap kapağı yüklemek için sağdaki çekmeceden görsel ekleyin.', 110, card2Y + 234, cardW - 60, 32, 3)
+    }
     ctx.restore()
 
     // 3. İNTERAKTİF ANKET / OYLAMA ÇIKARTMASI

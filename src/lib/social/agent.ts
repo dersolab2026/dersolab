@@ -464,6 +464,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
               genre: 'Felsefi Masal & Zaman Macerası',
               whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
               highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+              imageUrl: '/books/momo.jpg',
             },
             lise: {
               title: 'Simyacı',
@@ -471,6 +472,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
               genre: 'Alegorik Roman',
               whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
               highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+              imageUrl: '/books/simyaci.jpg',
             },
           },
         },
@@ -716,6 +718,7 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
             genre: 'Felsefi Masal & Zaman Macerası',
             whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
             highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+            imageUrl: '/books/momo.jpg',
           },
           lise: {
             title: 'Simyacı',
@@ -723,6 +726,7 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
             genre: 'Alegorik Roman',
             whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
             highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+            imageUrl: '/books/simyaci.jpg',
           },
         },
       },

@@ -215,6 +215,7 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
           genre: 'Felsefi Masal & Zaman Macerası',
           whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
           highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+          imageUrl: '/books/momo.jpg',
         },
         lise: {
           title: 'Simyacı',
@@ -222,6 +223,7 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
           genre: 'Alegorik Roman',
           whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
           highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+          imageUrl: '/books/simyaci.jpg',
         },
       },
     },
@@ -245,7 +247,31 @@ export default function SocialStudioPage() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
-        setPosts(JSON.parse(saved))
+        const parsed = JSON.parse(saved) as SocialPostItem[]
+        const updated = parsed.map((p) => {
+          if (p.id === 'demo_5' && p.storyData?.dualBookData) {
+            return {
+              ...p,
+              storyData: {
+                ...p.storyData,
+                dualBookData: {
+                  ...p.storyData.dualBookData,
+                  ortaokul: {
+                    ...p.storyData.dualBookData.ortaokul,
+                    imageUrl: p.storyData.dualBookData.ortaokul.imageUrl || '/books/momo.jpg',
+                  },
+                  lise: {
+                    ...p.storyData.dualBookData.lise,
+                    imageUrl: p.storyData.dualBookData.lise.imageUrl || '/books/simyaci.jpg',
+                  },
+                },
+              },
+            }
+          }
+          return p
+        })
+        setPosts(updated)
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
       } else {
         setPosts(INITIAL_DEMO_POSTS)
         localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DEMO_POSTS))

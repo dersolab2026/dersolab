@@ -43,7 +43,8 @@ export interface DualBookItem {
   title: string
   author: string
   genre?: string
-  whyRead: string
+  whyRead?: string
+  imageUrl?: string
   highlightTag?: string
 }
 

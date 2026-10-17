@@ -47,6 +47,8 @@ export function PostEditorDrawer({
   const [copiedCaption, setCopiedCaption] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const ortaokulFileRef = useRef<HTMLInputElement | null>(null)
+  const liseFileRef = useRef<HTMLInputElement | null>(null)
 
   if (!isOpen || !post) return null
 
@@ -104,6 +106,60 @@ export function PostEditorDrawer({
           uploadedImageUrl: base64,
         })
         toast.success('Fotoğraf başarıyla eklendi!')
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Pazar Kitap Kulübü: Ortaokul Kitap Kapağı Yükleme
+  function handleOrtaokulBookImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !post?.storyData?.dualBookData) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const base64 = ev.target?.result as string
+      if (base64) {
+        onUpdatePost({
+          ...post,
+          storyData: {
+            ...post.storyData!,
+            dualBookData: {
+              ...post.storyData!.dualBookData!,
+              ortaokul: {
+                ...post.storyData!.dualBookData!.ortaokul,
+                imageUrl: base64,
+              },
+            },
+          },
+        })
+        toast.success('Ortaokul kitap kapağı eklendi!')
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Pazar Kitap Kulübü: Lise Kitap Kapağı Yükleme
+  function handleLiseBookImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !post?.storyData?.dualBookData) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const base64 = ev.target?.result as string
+      if (base64) {
+        onUpdatePost({
+          ...post,
+          storyData: {
+            ...post.storyData!,
+            dualBookData: {
+              ...post.storyData!.dualBookData!,
+              lise: {
+                ...post.storyData!.dualBookData!.lise,
+                imageUrl: base64,
+              },
+            },
+          },
+        })
+        toast.success('Lise kitap kapağı eklendi!')
       }
     }
     reader.readAsDataURL(file)
@@ -567,10 +623,82 @@ export function PostEditorDrawer({
                           </div>
 
                           {/* 1. ORTAOKUL KİTABI */}
-                          <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 space-y-2">
-                            <span className="text-[11px] font-bold text-sky-400 block">
-                              📘 1. Ortaokul Kitabı (LGS - 10-14 Yaş)
-                            </span>
+                          <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-sky-400 block">
+                                📘 1. Ortaokul Kitabı (LGS - 10-14 Yaş)
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => ortaokulFileRef.current?.click()}
+                                className="flex items-center gap-1 text-[10px] font-bold text-sky-300 hover:text-sky-200"
+                              >
+                                <Upload className="w-3 h-3" />
+                                <span>{post.storyData.dualBookData.ortaokul.imageUrl ? 'Kapağı Değiştir' : 'Kapak Görseli Yükle'}</span>
+                              </button>
+                            </div>
+
+                            <input
+                              ref={ortaokulFileRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handleOrtaokulBookImage}
+                              className="hidden"
+                            />
+
+                            {/* Kitap Kapağı Önizleme / Durum */}
+                            {post.storyData.dualBookData.ortaokul.imageUrl ? (
+                              <div className="flex items-center justify-between gap-3 p-2 rounded-xl bg-white/5 border border-sky-500/30">
+                                <img
+                                  src={post.storyData.dualBookData.ortaokul.imageUrl}
+                                  alt="Ortaokul Kitap Kapağı"
+                                  className="w-10 h-14 rounded-md object-cover border border-white/20 shadow-sm"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <span className="text-[11px] font-semibold text-sky-300 block truncate">
+                                    Kitap Kapağı Görseli Ekli
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 block">
+                                    Tuvalde metin yerine kapak resmi gösterilir
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    onUpdatePost({
+                                      ...post,
+                                      storyData: {
+                                        ...post.storyData!,
+                                        dualBookData: {
+                                          ...post.storyData!.dualBookData!,
+                                          ortaokul: {
+                                            ...post.storyData!.dualBookData!.ortaokul,
+                                            imageUrl: undefined,
+                                          },
+                                        },
+                                      },
+                                    })
+                                  }
+                                  className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                  title="Görseli Kaldır"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <div
+                                onClick={() => ortaokulFileRef.current?.click()}
+                                className="border border-dashed border-sky-500/30 hover:border-sky-500/60 p-2.5 rounded-xl text-center cursor-pointer bg-sky-500/5 transition-all"
+                              >
+                                <span className="text-[11px] font-bold text-sky-300 block">
+                                  📷 Kitap Kapağı Görseli Yükle
+                                </span>
+                                <span className="text-[10px] text-slate-400 block">
+                                  Yüklendiğinde 'Neden Okunmalı' metni yerine kapak resmi çizilir
+                                </span>
+                              </div>
+                            )}
+
                             <div className="grid grid-cols-2 gap-2">
                               <div>
                                 <label className="text-[10px] text-slate-400">Kitap Adı</label>
@@ -620,9 +748,9 @@ export function PostEditorDrawer({
                               </div>
                             </div>
                             <div>
-                              <label className="text-[10px] text-slate-400">Neden Okunmalı? (LGS Katkısı)</label>
+                              <label className="text-[10px] text-slate-400">Vurgu / LGS Paragraf Katkısı</label>
                               <textarea
-                                value={post.storyData.dualBookData.ortaokul.whyRead}
+                                value={post.storyData.dualBookData.ortaokul.whyRead || ''}
                                 onChange={(e) =>
                                   onUpdatePost({
                                     ...post,
@@ -645,10 +773,82 @@ export function PostEditorDrawer({
                           </div>
 
                           {/* 2. LİSE KİTABI */}
-                          <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 space-y-2">
-                            <span className="text-[11px] font-bold text-orange-400 block">
-                              📕 2. Lise Kitabı (YKS - 14-18 Yaş)
-                            </span>
+                          <div className="p-3.5 rounded-xl bg-orange-500/10 border border-orange-500/20 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-orange-400 block">
+                                📕 2. Lise Kitabı (YKS - 14-18 Yaş)
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => liseFileRef.current?.click()}
+                                className="flex items-center gap-1 text-[10px] font-bold text-orange-300 hover:text-orange-200"
+                              >
+                                <Upload className="w-3 h-3" />
+                                <span>{post.storyData.dualBookData.lise.imageUrl ? 'Kapağı Değiştir' : 'Kapak Görseli Yükle'}</span>
+                              </button>
+                            </div>
+
+                            <input
+                              ref={liseFileRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handleLiseBookImage}
+                              className="hidden"
+                            />
+
+                            {/* Kitap Kapağı Önizleme / Durum */}
+                            {post.storyData.dualBookData.lise.imageUrl ? (
+                              <div className="flex items-center justify-between gap-3 p-2 rounded-xl bg-white/5 border border-orange-500/30">
+                                <img
+                                  src={post.storyData.dualBookData.lise.imageUrl}
+                                  alt="Lise Kitap Kapağı"
+                                  className="w-10 h-14 rounded-md object-cover border border-white/20 shadow-sm"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <span className="text-[11px] font-semibold text-orange-300 block truncate">
+                                    Kitap Kapağı Görseli Ekli
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 block">
+                                    Tuvalde metin yerine kapak resmi gösterilir
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    onUpdatePost({
+                                      ...post,
+                                      storyData: {
+                                        ...post.storyData!,
+                                        dualBookData: {
+                                          ...post.storyData!.dualBookData!,
+                                          lise: {
+                                            ...post.storyData!.dualBookData!.lise,
+                                            imageUrl: undefined,
+                                          },
+                                        },
+                                      },
+                                    })
+                                  }
+                                  className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                  title="Görseli Kaldır"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <div
+                                onClick={() => liseFileRef.current?.click()}
+                                className="border border-dashed border-orange-500/30 hover:border-orange-500/60 p-2.5 rounded-xl text-center cursor-pointer bg-orange-500/5 transition-all"
+                              >
+                                <span className="text-[11px] font-bold text-orange-300 block">
+                                  📷 Kitap Kapağı Görseli Yükle
+                                </span>
+                                <span className="text-[10px] text-slate-400 block">
+                                  Yüklendiğinde 'Neden Okunmalı' metni yerine kapak resmi çizilir
+                                </span>
+                              </div>
+                            )}
+
                             <div className="grid grid-cols-2 gap-2">
                               <div>
                                 <label className="text-[10px] text-slate-400">Kitap Adı</label>
@@ -698,9 +898,9 @@ export function PostEditorDrawer({
                               </div>
                             </div>
                             <div>
-                              <label className="text-[10px] text-slate-400">Neden Okunmalı? (YKS Katkısı)</label>
+                              <label className="text-[10px] text-slate-400">Vurgu / YKS Analiz Katkısı</label>
                               <textarea
-                                value={post.storyData.dualBookData.lise.whyRead}
+                                value={post.storyData.dualBookData.lise.whyRead || ''}
                                 onChange={(e) =>
                                   onUpdatePost({
                                     ...post,
