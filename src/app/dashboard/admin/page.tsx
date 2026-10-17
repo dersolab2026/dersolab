@@ -38,6 +38,17 @@ export default async function AdminOverviewPage() {
           <CardHeader><CardTitle className="text-sm font-normal text-muted-foreground">Bu Ay Ciro</CardTitle></CardHeader>
           <CardContent><p className="text-2xl font-semibold">{stats.revenueThisMonth.toLocaleString('tr-TR')} ₺</p></CardContent>
         </Card>
+        <Card className="border-orange-500/30 bg-orange-500/[0.05]">
+          <CardHeader>
+            <CardTitle className="text-sm font-semibold text-orange-400">✨ Sosyal Medya Ajanı</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1.5">
+            <p className="text-xs text-muted-foreground">Instagram için AI içerik üretimi, şablon tasarımı ve onay merkezi</p>
+            <Link href="/social" className="inline-block text-xs font-bold text-orange-400 hover:underline pt-1">
+              Stüdyoyu Aç →
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

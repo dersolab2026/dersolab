@@ -1,0 +1,211 @@
+/**
+ * DersoLab Instagram Publishing Client (Meta Graph API)
+ * 
+ * Instagram Graph API Resmi Akışı:
+ * 1. Single Image/Video Container oluşturma: POST /{ig-user-id}/media
+ * 2. Carousel Container oluşturma: POST /{ig-user-id}/media?children=id1,id2,id3&media_type=CAROUSEL
+ * 3. Container'ı yayına alma: POST /{ig-user-id}/media_publish?creation_id={container-id}
+ */
+
+export interface InstagramPublishResult {
+  success: boolean
+  postId?: string
+  permalink?: string
+  mode: 'api' | 'manual_fallback'
+  message: string
+}
+
+export function getInstagramConfig() {
+  const token = process.env.INSTAGRAM_ACCESS_TOKEN
+  const accountId = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID
+
+  return {
+    isConfigured: Boolean(token && accountId),
+    token,
+    accountId,
+  }
+}
+
+/**
+ * Tekli görsel veya carousel gönderisini Instagram'a gönderir
+ */
+export async function publishToInstagram({
+  caption,
+  imageUrls,
+  videoUrl,
+  isReels = false,
+}: {
+  caption: string
+  imageUrls?: string[]
+  videoUrl?: string
+  isReels?: boolean
+}): Promise<InstagramPublishResult> {
+  const { isConfigured, token, accountId } = getInstagramConfig()
+
+  if (!isConfigured) {
+    return {
+      success: true,
+      mode: 'manual_fallback',
+      message:
+        'Instagram API kimlik bilgileri (INSTAGRAM_ACCESS_TOKEN & INSTAGRAM_BUSINESS_ACCOUNT_ID) henüz .env ortamına eklenmediği için gönderi "Manuel Paylaşım Modu"nda hazırlandı. Metin ve görselleri panodan kopyalayıp Instagram uygulamasında veya Creator Studio üzerinden hemen paylaşabilirsiniz.',
+    }
+  }
+
+  try {
+    const GRAPH_API_BASE = 'https://graph.facebook.com/v21.0'
+
+    // REELS / VIDEO PAYLAŞIMI
+    if (isReels && videoUrl) {
+      const containerRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          media_type: 'REELS',
+          video_url: videoUrl,
+          caption,
+          access_token: token,
+        }),
+      })
+
+      const containerData = await containerRes.json()
+      if (!containerRes.ok || !containerData.id) {
+        throw new Error(containerData.error?.message || 'Reels container oluşturulamadı')
+      }
+
+      // Yayınla
+      const publishRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media_publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creation_id: containerData.id,
+          access_token: token,
+        }),
+      })
+
+      const publishData = await publishRes.json()
+      if (!publishRes.ok || !publishData.id) {
+        throw new Error(publishData.error?.message || 'Reels yayınlanamadı')
+      }
+
+      return {
+        success: true,
+        postId: publishData.id,
+        mode: 'api',
+        message: 'Reels başarıyla Instagram hesabınızda yayınlandı!',
+      }
+    }
+
+    // CAROUSEL GÖNDERİSİ
+    if (imageUrls && imageUrls.length > 1) {
+      // 1. Her bir slayt için alt container (item) oluştur
+      const itemContainerIds: string[] = []
+
+      for (const imgUrl of imageUrls) {
+        const itemRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_url: imgUrl,
+            is_carousel_item: true,
+            access_token: token,
+          }),
+        })
+        const itemData = await itemRes.json()
+        if (itemData.id) {
+          itemContainerIds.push(itemData.id)
+        }
+      }
+
+      if (itemContainerIds.length < 2) {
+        throw new Error('Carousel için en az 2 slayt görseli gereklidir.')
+      }
+
+      // 2. Ana Carousel Container oluştur
+      const carouselRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          media_type: 'CAROUSEL',
+          children: itemContainerIds.join(','),
+          caption,
+          access_token: token,
+        }),
+      })
+
+      const carouselData = await carouselRes.json()
+      if (!carouselRes.ok || !carouselData.id) {
+        throw new Error(carouselData.error?.message || 'Carousel container oluşturulamadı')
+      }
+
+      // 3. Yayınla
+      const publishRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media_publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creation_id: carouselData.id,
+          access_token: token,
+        }),
+      })
+
+      const publishData = await publishRes.json()
+      if (!publishRes.ok || !publishData.id) {
+        throw new Error(publishData.error?.message || 'Carousel yayınlanamadı')
+      }
+
+      return {
+        success: true,
+        postId: publishData.id,
+        mode: 'api',
+        message: 'Carousel gönderisi başarıyla Instagram hesabınızda yayınlandı!',
+      }
+    }
+
+    // TEKLİ FOTOĞRAF GÖNDERİSİ
+    if (imageUrls && imageUrls.length === 1) {
+      const containerRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image_url: imageUrls[0],
+          caption,
+          access_token: token,
+        }),
+      })
+
+      const containerData = await containerRes.json()
+      if (!containerRes.ok || !containerData.id) {
+        throw new Error(containerData.error?.message || 'Görsel container oluşturulamadı')
+      }
+
+      const publishRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media_publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creation_id: containerData.id,
+          access_token: token,
+        }),
+      })
+
+      const publishData = await publishRes.json()
+      if (!publishRes.ok || !publishData.id) {
+        throw new Error(publishData.error?.message || 'Gönderi yayınlanamadı')
+      }
+
+      return {
+        success: true,
+        postId: publishData.id,
+        mode: 'api',
+        message: 'Gönderi başarıyla Instagram hesabınızda yayınlandı!',
+      }
+    }
+
+    throw new Error('Yayınlanacak geçerli görsel veya video bulunamadı.')
+  } catch (error: any) {
+    console.error('Instagram API publish error:', error)
+    return {
+      success: false,
+      mode: 'api',
+      message: error?.message || 'Instagram API çağrısı sırasında bir hata oluştu.',
+    }
+  }
+}

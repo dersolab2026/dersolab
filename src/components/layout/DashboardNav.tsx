@@ -42,6 +42,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   student: [
     { href: '/dashboard/student/bookings', label: 'Derslerim' },
     { href: '/lab', label: 'L.A.B.' },
+    { href: '/social', label: 'Sosyal Medya Ajanı' },
     { href: '/dashboard/student/gunluk', label: 'Günlük' },
     { href: '/dashboard/student/netlerim', label: 'Netlerim' },
     { href: '/dashboard/student/kocluk-formu', label: 'Koçluk Formu' },
@@ -64,6 +65,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/instructor', label: 'Derslerim' },
     { href: '/dashboard/instructor/ogrencilerim', label: 'Öğrencilerim' },
     { href: '/lab', label: 'L.A.B.' },
+    { href: '/social', label: 'Sosyal Medya' },
     { href: '/dashboard/instructor/homework', label: 'Ödevler' },
     { href: '/dashboard/instructor/availability', label: 'Ajanda' },
     { href: '/dashboard/instructor/profile', label: 'Profilim' },
@@ -73,6 +75,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
   admin: [
     { href: '/dashboard/admin', label: 'Genel Bakış' },
+    { href: '/social', label: 'Sosyal Medya' },
     { href: '/lab', label: 'L.A.B.' },
     { href: '/dashboard/admin/users', label: 'Kullanıcılar' },
     { href: '/dashboard/admin/instructors', label: 'Eğitmen Onayları' },
