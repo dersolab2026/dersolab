@@ -34,11 +34,13 @@ export async function publishToInstagram({
   imageUrls,
   videoUrl,
   isReels = false,
+  isStory = false,
 }: {
   caption: string
   imageUrls?: string[]
   videoUrl?: string
   isReels?: boolean
+  isStory?: boolean
 }): Promise<InstagramPublishResult> {
   const { isConfigured, token, accountId } = getInstagramConfig()
 
@@ -53,6 +55,45 @@ export async function publishToInstagram({
 
   try {
     const GRAPH_API_BASE = 'https://graph.facebook.com/v21.0'
+
+    // STORY (HİKAYE) PAYLAŞIMI
+    if (isStory && imageUrls && imageUrls.length > 0) {
+      const containerRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          media_type: 'STORIES',
+          image_url: imageUrls[0],
+          access_token: token,
+        }),
+      })
+
+      const containerData = await containerRes.json()
+      if (!containerRes.ok || !containerData.id) {
+        throw new Error(containerData.error?.message || 'Story container oluşturulamadı')
+      }
+
+      const publishRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media_publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creation_id: containerData.id,
+          access_token: token,
+        }),
+      })
+
+      const publishData = await publishRes.json()
+      if (!publishRes.ok || !publishData.id) {
+        throw new Error(publishData.error?.message || 'Story yayınlanamadı')
+      }
+
+      return {
+        success: true,
+        postId: publishData.id,
+        mode: 'api',
+        message: 'Story başarıyla Instagram hesabınızda yayınlandı!',
+      }
+    }
 
     // REELS / VIDEO PAYLAŞIMI
     if (isReels && videoUrl) {

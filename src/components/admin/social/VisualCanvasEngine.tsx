@@ -1,16 +1,31 @@
 'use client'
 
 import React, { useRef, useEffect, useState, useCallback } from 'react'
-import { Download, Copy, Check, Sparkles, ChevronLeft, ChevronRight, Layers, Palette } from 'lucide-react'
-import type { CarouselSlide, SinglePostData, SlideThemeVariant } from '@/types/social'
+import {
+  Download,
+  Copy,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Layers,
+  Palette,
+  Upload,
+  Image as ImageIcon,
+  Sparkles,
+} from 'lucide-react'
+import type { CarouselSlide, SinglePostData, SlideThemeVariant, StoryData } from '@/types/social'
 import { toast } from 'sonner'
 
 interface VisualCanvasEngineProps {
   slides?: CarouselSlide[]
   singlePost?: SinglePostData
+  storyData?: StoryData
+  isStory?: boolean
+  customImageUrl?: string
   activeSlideIndex?: number
   onSlideChange?: (index: number) => void
   onSlideUpdate?: (index: number, updated: CarouselSlide) => void
+  onImageUpload?: (base64: string) => void
 }
 
 const THEME_STYLES: Record<
@@ -71,31 +86,53 @@ const THEME_STYLES: Record<
 export function VisualCanvasEngine({
   slides,
   singlePost,
+  storyData,
+  isStory = false,
+  customImageUrl,
   activeSlideIndex = 0,
   onSlideChange,
   onSlideUpdate,
+  onImageUpload,
 }: VisualCanvasEngineProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [copied, setCopied] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null)
 
   const isCarousel = Boolean(slides && slides.length > 0)
   const currentSlide = isCarousel ? slides![activeSlideIndex] : null
   const totalSlides = isCarousel ? slides!.length : 1
 
-  // Canvas çizim fonksiyonu (1080 x 1350 - Instagram Portrait 4:5 formatı)
+  // Görsel URL değiştiğinde HTMLImageElement olarak yükle
+  const effectiveImageUrl =
+    currentSlide?.uploadedImageUrl || singlePost?.uploadedImageUrl || storyData?.uploadedImageUrl || customImageUrl
+
+  useEffect(() => {
+    if (!effectiveImageUrl) {
+      setLoadedImage(null)
+      return
+    }
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => setLoadedImage(img)
+    img.src = effectiveImageUrl
+  }, [effectiveImageUrl])
+
+  // Canvas çizim fonksiyonu
   const renderCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // Story ise 1080x1920 (9:16), Değilse 1080x1350 (4:5)
     const width = 1080
-    const height = 1350
+    const height = isStory ? 1920 : 1350
     canvas.width = width
     canvas.height = height
 
-    const themeKey = (currentSlide?.themeVariant || singlePost?.themeVariant || 'lab_dark') as SlideThemeVariant
+    const themeKey = (currentSlide?.themeVariant || singlePost?.themeVariant || storyData?.themeVariant || 'lab_dark') as SlideThemeVariant
     const theme = THEME_STYLES[themeKey] || THEME_STYLES.lab_dark
 
     // 1. Arka Plan Gradient
@@ -123,14 +160,14 @@ export function VisualCanvasEngine({
     }
 
     // 3. Neon Işıma Küreleri (Glow Orbs)
-    const orbGrad1 = ctx.createRadialGradient(width * 0.85, height * 0.15, 20, width * 0.85, height * 0.15, 450)
+    const orbGrad1 = ctx.createRadialGradient(width * 0.85, height * 0.15, 20, width * 0.85, height * 0.15, 500)
     orbGrad1.addColorStop(0, theme.glowColor)
     orbGrad1.addColorStop(1, 'transparent')
     ctx.fillStyle = orbGrad1
     ctx.fillRect(0, 0, width, height)
 
-    const orbGrad2 = ctx.createRadialGradient(width * 0.15, height * 0.85, 20, width * 0.15, height * 0.85, 500)
-    orbGrad2.addColorStop(0, 'rgba(249, 115, 22, 0.15)')
+    const orbGrad2 = ctx.createRadialGradient(width * 0.15, height * 0.85, 20, width * 0.15, height * 0.85, 600)
+    orbGrad2.addColorStop(0, 'rgba(249, 115, 22, 0.18)')
     orbGrad2.addColorStop(1, 'transparent')
     ctx.fillStyle = orbGrad2
     ctx.fillRect(0, 0, width, height)
@@ -138,44 +175,85 @@ export function VisualCanvasEngine({
     // 4. Kenarlık / İç Çerçeve
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
     ctx.lineWidth = 2
-    roundRect(ctx, 40, 40, width - 80, height - 80, 32)
+    roundRect(ctx, 40, 40, width - 80, height - 80, 36)
     ctx.stroke()
 
-    // 5. ÜST HEADER: DersoLab Logo ve Slayt Sayacı
-    // Logo Metni
-    ctx.font = 'bold 36px Inter, system-ui, sans-serif'
+    // 5. ÜST HEADER: DersoLab Logo ve Sayfa Sayacı
+    ctx.font = 'bold 38px Inter, system-ui, sans-serif'
     ctx.fillStyle = '#ffffff'
-    ctx.fillText('Derso', 80, 110)
+    ctx.fillText('Derso', 80, 115)
 
-    const logoGrad = ctx.createLinearGradient(190, 0, 260, 0)
+    const logoGrad = ctx.createLinearGradient(190, 0, 270, 0)
     logoGrad.addColorStop(0, theme.accentColor)
     logoGrad.addColorStop(1, theme.secondaryAccent)
     ctx.fillStyle = logoGrad
-    ctx.fillText('Lab', 190, 110)
+    ctx.fillText('Lab', 195, 115)
 
-    // Slayt Sayacı (Carousel ise)
-    if (isCarousel) {
+    if (isStory) {
+      ctx.font = 'bold 22px Inter, system-ui, sans-serif'
+      ctx.fillStyle = theme.accentColor
+      ctx.textAlign = 'right'
+      ctx.fillText('⚡ DERSOLAB STORY', width - 80, 115)
+      ctx.textAlign = 'left'
+    } else if (isCarousel) {
       const pageText = `${activeSlideIndex + 1} / ${totalSlides}`
       ctx.font = 'bold 24px Inter, system-ui, sans-serif'
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
       ctx.textAlign = 'right'
-      ctx.fillText(pageText, width - 80, 110)
+      ctx.fillText(pageText, width - 80, 115)
       ctx.textAlign = 'left'
     }
 
-    // Üst Ayraç Çizgisi
+    // Üst Ayraç
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
     ctx.lineWidth = 1.5
     ctx.beginPath()
-    ctx.moveTo(80, 145)
-    ctx.lineTo(width - 80, 145)
+    ctx.moveTo(80, 150)
+    ctx.lineTo(width - 80, 150)
     ctx.stroke()
 
-    // 6. İÇERİK ALANI
-    let cursorY = 220
+    let cursorY = 230
 
-    // Rozet (Badge)
-    const badgeText = currentSlide?.badge || singlePost?.badge || 'DERSOLAB • TAKTİK'
+    // YÜKLENEN FOTOĞRAF VARSA ÇİZ
+    if (loadedImage) {
+      const imgBoxW = width - 160
+      const imgBoxH = isStory ? 550 : 380
+
+      ctx.save()
+      roundRect(ctx, 80, cursorY, imgBoxW, imgBoxH, 24)
+      ctx.clip()
+
+      // Orantılı kaplama (object-cover)
+      const hRatio = imgBoxW / loadedImage.width
+      const vRatio = imgBoxH / loadedImage.height
+      const ratio = Math.max(hRatio, vRatio)
+      const centerShiftX = (imgBoxW - loadedImage.width * ratio) / 2
+      const centerShiftY = (imgBoxH - loadedImage.height * ratio) / 2
+
+      ctx.drawImage(
+        loadedImage,
+        0,
+        0,
+        loadedImage.width,
+        loadedImage.height,
+        80 + centerShiftX,
+        cursorY + centerShiftY,
+        loadedImage.width * ratio,
+        loadedImage.height * ratio
+      )
+      ctx.restore()
+
+      // Çerçeve
+      ctx.strokeStyle = theme.accentColor
+      ctx.lineWidth = 2
+      roundRect(ctx, 80, cursorY, imgBoxW, imgBoxH, 24)
+      ctx.stroke()
+
+      cursorY += imgBoxH + 40
+    }
+
+    // ROZET (BADGE)
+    const badgeText = currentSlide?.badge || singlePost?.badge || storyData?.badge || 'DERSOLAB • TAKTİK'
     ctx.font = 'bold 22px Inter, system-ui, sans-serif'
     const badgeWidth = ctx.measureText(badgeText).width + 36
     const badgeHeight = 44
@@ -190,17 +268,18 @@ export function VisualCanvasEngine({
     ctx.fillStyle = theme.badgeText
     ctx.fillText(badgeText, 98, cursorY + 30)
 
-    cursorY += 90
+    cursorY += 85
 
-    // Vurucu Başlık (Headline)
-    const headline = currentSlide?.headline || singlePost?.headline || 'Sınavda Başarıyı Getiren Strateji'
-    ctx.font = '900 56px Inter, system-ui, sans-serif'
+    // VURUCU BAŞLIK
+    const headline =
+      currentSlide?.headline || singlePost?.headline || storyData?.headline || 'Sınavda Başarıyı Getiren Strateji'
+    ctx.font = '900 54px Inter, system-ui, sans-serif'
     ctx.fillStyle = '#ffffff'
     cursorY = wrapText(ctx, headline, 80, cursorY, width - 160, 68)
 
-    // Alt Başlık (Subhead)
-    cursorY += 25
-    const subhead = currentSlide?.subhead || singlePost?.questionOrSummary || ''
+    // ALT BAŞLIK
+    cursorY += 20
+    const subhead = currentSlide?.subhead || singlePost?.questionOrSummary || storyData?.subhead || ''
     if (subhead) {
       ctx.font = '500 28px Inter, system-ui, sans-serif'
       ctx.fillStyle = 'rgba(226, 232, 240, 0.85)'
@@ -209,12 +288,14 @@ export function VisualCanvasEngine({
 
     cursorY += 40
 
-    // Madde İşaretleri / Şıklar / Açıklama Kutuları
-    if (isCarousel && currentSlide?.bodyPoints && currentSlide.bodyPoints.length > 0) {
+    // STORY ÇIKARTMASI (STORY MODUNDA İSE)
+    if (isStory && storyData) {
+      cursorY = drawStorySticker(ctx, storyData, cursorY, width, theme)
+    } else if (isCarousel && currentSlide?.bodyPoints && currentSlide.bodyPoints.length > 0) {
+      // CAROUSEL MADDELERİ
       currentSlide.bodyPoints.forEach((point, idx) => {
-        // Madde Kartı
         const cardY = cursorY
-        const cardHeight = 110
+        const cardHeight = 105
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.03)'
         roundRect(ctx, 80, cardY, width - 160, cardHeight, 20)
@@ -223,7 +304,6 @@ export function VisualCanvasEngine({
         ctx.lineWidth = 1
         ctx.stroke()
 
-        // İkon / Numara Çemberi
         ctx.fillStyle = theme.accentColor
         ctx.beginPath()
         ctx.arc(130, cardY + cardHeight / 2, 22, 0, Math.PI * 2)
@@ -235,63 +315,62 @@ export function VisualCanvasEngine({
         ctx.fillText(String(idx + 1), 130, cardY + cardHeight / 2 + 8)
         ctx.textAlign = 'left'
 
-        // Madde Metni
-        ctx.font = '600 26px Inter, system-ui, sans-serif'
+        ctx.font = '600 25px Inter, system-ui, sans-serif'
         ctx.fillStyle = '#f8fafc'
         wrapText(ctx, point, 180, cardY + 45, width - 290, 34, 2)
 
-        cursorY += cardHeight + 20
+        cursorY += cardHeight + 18
       })
     } else if (singlePost?.options && singlePost.options.length > 0) {
-      // Çoktan Seçmeli Soru Şıkları
+      // ÇOKTAN SEÇMELİ POST
       singlePost.options.forEach((opt) => {
         const cardY = cursorY
-        const cardHeight = 85
+        const cardHeight = 82
 
-        ctx.fillStyle = opt.isCorrect ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255, 255, 255, 0.03)'
+        ctx.fillStyle = opt.isCorrect ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255, 255, 255, 0.03)'
         roundRect(ctx, 80, cardY, width - 160, cardHeight, 16)
         ctx.fill()
-        ctx.strokeStyle = opt.isCorrect ? 'rgba(34, 197, 94, 0.5)' : 'rgba(255, 255, 255, 0.08)'
+        ctx.strokeStyle = opt.isCorrect ? '#22c55e' : 'rgba(255, 255, 255, 0.08)'
         ctx.lineWidth = 1.5
         ctx.stroke()
 
-        // Şık Harfi Kutusu
         ctx.fillStyle = opt.isCorrect ? '#22c55e' : 'rgba(255, 255, 255, 0.1)'
-        roundRect(ctx, 95, cardY + 18, 48, 48, 12)
+        roundRect(ctx, 95, cardY + 16, 50, 50, 12)
         ctx.fill()
 
         ctx.font = 'bold 24px Inter, system-ui, sans-serif'
         ctx.fillStyle = opt.isCorrect ? '#052e16' : '#ffffff'
         ctx.textAlign = 'center'
-        ctx.fillText(opt.key, 119, cardY + 50)
+        ctx.fillText(opt.key, 120, cardY + 49)
         ctx.textAlign = 'left'
 
-        // Şık Metni
         ctx.font = '500 24px Inter, system-ui, sans-serif'
         ctx.fillStyle = '#f8fafc'
-        wrapText(ctx, opt.text, 165, cardY + 50, width - 270, 30, 1)
+        wrapText(ctx, opt.text, 170, cardY + 49, width - 280, 30, 1)
 
-        cursorY += cardHeight + 16
+        cursorY += cardHeight + 14
       })
     }
 
-    // Vurgu Etiketi (Örn: "KAYDETMELİK" veya "+3 NET")
-    const tagText = currentSlide?.highlightTag || singlePost?.keyTakeaway || 'LİNK BİYODA'
-    if (tagText) {
-      ctx.font = '900 20px Inter, system-ui, sans-serif'
-      const tagW = ctx.measureText(tagText).width + 36
-      const tagH = 44
-      const tagY = height - 190
+    // ALT VURGU ETİKETİ (Story harici)
+    if (!isStory) {
+      const tagText = currentSlide?.highlightTag || singlePost?.keyTakeaway || 'LİNK BİYODA'
+      if (tagText) {
+        ctx.font = '900 20px Inter, system-ui, sans-serif'
+        const tagW = ctx.measureText(tagText).width + 36
+        const tagH = 44
+        const tagY = height - 190
 
-      ctx.fillStyle = theme.tagBg
-      roundRect(ctx, 80, tagY, tagW, tagH, 12)
-      ctx.fill()
+        ctx.fillStyle = theme.tagBg
+        roundRect(ctx, 80, tagY, tagW, tagH, 12)
+        ctx.fill()
 
-      ctx.fillStyle = theme.tagText
-      ctx.fillText(tagText, 98, tagY + 29)
+        ctx.fillStyle = theme.tagText
+        ctx.fillText(tagText, 98, tagY + 29)
+      }
     }
 
-    // 7. ALT FOOTER: Çağrı & Kaydır İpucu
+    // 7. ALT FOOTER
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
     ctx.lineWidth = 1.5
     ctx.beginPath()
@@ -299,26 +378,138 @@ export function VisualCanvasEngine({
     ctx.lineTo(width - 80, height - 125)
     ctx.stroke()
 
-    // Sol Footer: Marka ve Kullanıcı Adı
     ctx.font = '600 22px Inter, system-ui, sans-serif'
     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
     ctx.fillText('@dersolabegitim', 80, height - 75)
 
-    // Sağ Footer: Kaydır veya Harekete Geç
-    const footerRightText =
-      isCarousel && activeSlideIndex < totalSlides - 1 ? 'Kaydır 👉' : 'Profildeki Linke Tıkla 🦊'
+    const footerRightText = isStory
+      ? 'Yanıt Gönder 💬'
+      : isCarousel && activeSlideIndex < totalSlides - 1
+        ? 'Kaydır 👉'
+        : 'Profildeki Linke Tıkla 🦊'
     ctx.font = 'bold 22px Inter, system-ui, sans-serif'
     ctx.fillStyle = theme.accentColor
     ctx.textAlign = 'right'
     ctx.fillText(footerRightText, width - 80, height - 75)
     ctx.textAlign = 'left'
-  }, [currentSlide, singlePost, activeSlideIndex, totalSlides, isCarousel])
+  }, [currentSlide, singlePost, storyData, isStory, activeSlideIndex, totalSlides, isCarousel, loadedImage])
 
   useEffect(() => {
     renderCanvas()
   }, [renderCanvas])
 
-  // Metin Sarmalama Yardımcısı
+  // Story Çıkartması Çizici
+  function drawStorySticker(
+    ctx: CanvasRenderingContext2D,
+    story: StoryData,
+    cursorY: number,
+    width: number,
+    theme: any
+  ): number {
+    const cardW = width - 160
+    const stickerType = story.stickerType || 'quiz'
+
+    if (stickerType === 'quiz') {
+      // Instagram Quiz Çıkartması
+      const options = story.stickerOptions || ['A Seçeneği', 'B Seçeneği', 'C Seçeneği', 'D Seçeneği']
+      const cardH = 140 + options.length * 75
+
+      // Beyaz / Neon kart tabanı
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+      roundRect(ctx, 80, cursorY, cardW, cardH, 28)
+      ctx.fill()
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
+      ctx.shadowBlur = 30
+
+      // Quiz Başlığı
+      ctx.font = 'bold 28px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#0f172a'
+      wrapText(ctx, story.stickerQuestion || 'Sence doğru cevap hangisi?', 115, cursorY + 60, cardW - 70, 36, 2)
+
+      let optY = cursorY + 120
+      options.forEach((opt, idx) => {
+        ctx.fillStyle = idx === 0 ? 'rgba(59, 130, 246, 0.12)' : 'rgba(241, 245, 249, 0.9)'
+        roundRect(ctx, 115, optY, cardW - 70, 60, 16)
+        ctx.fill()
+        ctx.strokeStyle = idx === 0 ? '#3b82f6' : 'rgba(203, 213, 225, 0.8)'
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+
+        // Harf dairesi
+        ctx.fillStyle = idx === 0 ? '#3b82f6' : '#94a3b8'
+        ctx.beginPath()
+        ctx.arc(148, optY + 30, 16, 0, Math.PI * 2)
+        ctx.fill()
+
+        ctx.font = 'bold 18px Inter, system-ui, sans-serif'
+        ctx.fillStyle = '#ffffff'
+        ctx.textAlign = 'center'
+        ctx.fillText(['A', 'B', 'C', 'D'][idx] || String(idx + 1), 148, optY + 36)
+        ctx.textAlign = 'left'
+
+        ctx.font = '600 22px Inter, system-ui, sans-serif'
+        ctx.fillStyle = '#1e293b'
+        ctx.fillText(opt, 180, optY + 37)
+
+        optY += 72
+      })
+
+      return cursorY + cardH + 30
+    }
+
+    if (stickerType === 'poll') {
+      // Instagram Anket Çıkartması (2 Şıklı)
+      const cardH = 210
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+      roundRect(ctx, 80, cursorY, cardW, cardH, 28)
+      ctx.fill()
+
+      ctx.font = 'bold 28px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#0f172a'
+      ctx.textAlign = 'center'
+      ctx.fillText(story.stickerQuestion || 'Bu taktiği denemende deneyecek misin?', width / 2, cursorY + 65)
+      ctx.textAlign = 'left'
+
+      const btnW = (cardW - 80) / 2
+      // Evet
+      ctx.fillStyle = '#10b981'
+      roundRect(ctx, 110, cursorY + 105, btnW, 70, 20)
+      ctx.fill()
+      ctx.font = 'bold 24px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.textAlign = 'center'
+      ctx.fillText('Evet! 🔥', 110 + btnW / 2, cursorY + 148)
+
+      // Hayır / Kararsız
+      ctx.fillStyle = '#64748b'
+      roundRect(ctx, 110 + btnW + 20, cursorY + 105, btnW, 70, 20)
+      ctx.fill()
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText('Henüz Değil 🤔', 110 + btnW + 20 + btnW / 2, cursorY + 148)
+      ctx.textAlign = 'left'
+
+      return cursorY + cardH + 30
+    }
+
+    // Link Çıkartması
+    const cardH = 100
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+    roundRect(ctx, width / 2 - 220, cursorY + 40, 440, cardH, 28)
+    ctx.fill()
+    ctx.strokeStyle = '#38bdf8'
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    ctx.font = 'bold 26px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#0284c7'
+    ctx.textAlign = 'center'
+    ctx.fillText(`🔗 ${story.stickerLinkText || 'dersolab.com'} ↗`, width / 2, cursorY + 102)
+    ctx.textAlign = 'left'
+
+    return cursorY + cardH + 60
+  }
+
+  // Metin Sarmalama
   function wrapText(
     ctx: CanvasRenderingContext2D,
     text: string,
@@ -353,7 +544,6 @@ export function VisualCanvasEngine({
     return y + lineHeight
   }
 
-  // Yuvarlatılmış Dikdörtgen Çizici
   function roundRect(
     ctx: CanvasRenderingContext2D,
     x: number,
@@ -375,6 +565,27 @@ export function VisualCanvasEngine({
     ctx.closePath()
   }
 
+  // Görsel Yükleme İşleyicisi
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Lütfen geçerli bir resim dosyası seçin.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string
+      if (base64) {
+        onImageUpload?.(base64)
+        toast.success('Fotoğraf başarıyla şablona eklendi!')
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
   // PNG İndirme
   function handleDownload() {
     const canvas = canvasRef.current
@@ -383,13 +594,15 @@ export function VisualCanvasEngine({
     try {
       const imageUri = canvas.toDataURL('image/png')
       const link = document.createElement('a')
-      const fileName = `dersolab_${isCarousel ? `slide_${activeSlideIndex + 1}` : 'post'}_${Date.now()}.png`
+      const fileName = `dersolab_${isStory ? 'story' : isCarousel ? `slide_${activeSlideIndex + 1}` : 'post'}_${Date.now()}.png`
       link.download = fileName
       link.href = imageUri
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      toast.success('Görsel başarıyla 1080x1350 PNG olarak indirildi!')
+      toast.success(
+        `Görsel başarıyla ${isStory ? '1080x1920 (Story)' : '1080x1350 (Post)'} PNG olarak indirildi!`
+      )
     } catch {
       toast.error('Görsel indirilemedi.')
     } finally {
@@ -406,11 +619,11 @@ export function VisualCanvasEngine({
         if (!blob) return
         await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
         setCopied(true)
-        toast.success('Görsel panoya kopyalandı! (Instagram Web veya Photoshop içine yapıştırabilirsiniz)')
+        toast.success('Görsel panoya kopyalandı!')
         setTimeout(() => setCopied(false), 2500)
       })
     } catch {
-      toast.error('Panoya kopyalama tarayıcınızda desteklenmiyor. Lütfen "İndir" butonunu kullanın.')
+      toast.error('Panoya kopyalama desteklenmiyor. Lütfen "İndir" butonunu kullanın.')
     }
   }
 
@@ -428,17 +641,42 @@ export function VisualCanvasEngine({
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
+      {/* Gizli Dosya Seçici */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+
       {/* Üst Kontrol Barı */}
       <div className="flex items-center justify-between w-full max-w-[420px] px-2">
         <div className="flex items-center gap-2">
-          {isCarousel && (
+          {isStory ? (
+            <div className="flex items-center gap-1.5 bg-purple-500/15 border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs font-bold text-purple-400">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Story (9:16)</span>
+            </div>
+          ) : isCarousel ? (
             <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-300">
               <Layers className="w-3.5 h-3.5 text-cyan-400" />
               <span>
                 Slayt {activeSlideIndex + 1} / {totalSlides}
               </span>
             </div>
-          )}
+          ) : null}
+
+          {/* Görsel Yükle Butonu */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs font-medium text-slate-300 transition-colors"
+            title="Kendi görselinizi / soru fotoğrafınızı yükleyin"
+          >
+            <Upload className="w-3.5 h-3.5 text-blue-400" />
+            <span>Fotoğraf Ekle</span>
+          </button>
+
           {isCarousel && onSlideUpdate && (
             <button
               onClick={cycleTheme}
@@ -446,7 +684,7 @@ export function VisualCanvasEngine({
               title="Temayı Değiştir"
             >
               <Palette className="w-3.5 h-3.5 text-orange-400" />
-              <span>Renk Teması</span>
+              <span>Tema</span>
             </button>
           )}
         </div>
@@ -471,8 +709,12 @@ export function VisualCanvasEngine({
         </div>
       </div>
 
-      {/* Canvas Önizleme Çerçevesi (Instagram 4:5 Portrait) */}
-      <div className="relative group w-full max-w-[420px] aspect-[4/5] rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/15 bg-black">
+      {/* Canvas Çerçevesi (Story ise 9:16, Post ise 4:5) */}
+      <div
+        className={`relative group w-full max-w-[420px] ${
+          isStory ? 'aspect-[9/16]' : 'aspect-[4/5]'
+        } rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/15 bg-black`}
+      >
         <canvas
           ref={canvasRef}
           className="w-full h-full object-contain select-none"

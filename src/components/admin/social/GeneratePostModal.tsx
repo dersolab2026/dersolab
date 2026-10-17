@@ -1,8 +1,27 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Sparkles, Calendar, X, Film, Layers, HelpCircle, Flame, CheckCircle2, Loader2 } from 'lucide-react'
-import type { ContentTopic, GeneratePostRequest, InstagramContentType, SocialPostItem, WeeklyCalendarRequest } from '@/types/social'
+import React, { useState, useRef } from 'react'
+import {
+  Sparkles,
+  Calendar,
+  X,
+  Film,
+  Layers,
+  HelpCircle,
+  Smartphone,
+  Upload,
+  Image as ImageIcon,
+  Trash2,
+  Loader2,
+} from 'lucide-react'
+import type {
+  ContentTopic,
+  GeneratePostRequest,
+  InstagramContentType,
+  SocialPostItem,
+  StoryStickerType,
+  WeeklyCalendarRequest,
+} from '@/types/social'
 import { toast } from 'sonner'
 
 interface GeneratePostModalProps {
@@ -19,11 +38,35 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
   const [subTopic, setSubTopic] = useState('')
   const [targetGrade, setTargetGrade] = useState<'YKS (TYT/AYT)' | 'LGS' | 'Genel'>('YKS (TYT/AYT)')
   const [tone, setTone] = useState<'energetic' | 'informative' | 'coaching' | 'humorous'>('energetic')
+  const [storyStickerType, setStoryStickerType] = useState<StoryStickerType>('quiz')
   const [customPrompt, setCustomPrompt] = useState('')
   const [focusSubject, setFocusSubject] = useState('')
+  const [imageBase64, setImageBase64] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
   if (!isOpen) return null
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Lütfen geçerli bir resim dosyası seçin.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string
+      if (result) {
+        setImageBase64(result)
+        toast.success('Görsel yüklendi! Yapay zeka bu görseli analiz ederek içeriği oluşturacak.')
+      }
+    }
+    reader.readAsDataURL(file)
+  }
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault()
@@ -40,6 +83,8 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
           targetGrade,
           tone,
           customPrompt: customPrompt.trim() || undefined,
+          imageBase64: imageBase64 || undefined,
+          storyStickerType: contentType === 'story' ? storyStickerType : undefined,
         }
 
         const res = await fetch('/api/admin/social/generate', {
@@ -123,7 +168,7 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
               }`}
             >
               <Sparkles className="w-4 h-4" />
-              <span>Tekil Gönderi Üret</span>
+              <span>Tekil Gönderi & Story</span>
             </button>
             <button
               type="button"
@@ -144,10 +189,10 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
         <form onSubmit={handleGenerate} className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
           {mode === 'single' ? (
             <>
-              {/* Format Seçimi */}
+              {/* Format Seçimi (Carousel, Reels, Post, Story) */}
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-slate-300">İçerik Formatı</label>
-                <div className="grid grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                   <button
                     type="button"
                     onClick={() => setContentType('carousel')}
@@ -158,8 +203,22 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                     }`}
                   >
                     <Layers className="w-5 h-5 text-orange-400" />
-                    <span className="text-xs font-bold">Kaydırmalı Carousel</span>
-                    <span className="text-[10px] text-slate-400">4-5 Slayt Rehber</span>
+                    <span className="text-xs font-bold">Carousel</span>
+                    <span className="text-[10px] text-slate-400">4-5 Slayt</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setContentType('story')}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border text-center transition-all ${
+                      contentType === 'story'
+                        ? 'border-purple-500 bg-purple-500/15 text-white shadow-[0_0_15px_rgba(168,85,247,0.15)]'
+                        : 'border-white/10 bg-white/[0.02] text-slate-400 hover:border-white/20'
+                    }`}
+                  >
+                    <Smartphone className="w-5 h-5 text-purple-400" />
+                    <span className="text-xs font-bold">Story (Hikaye)</span>
+                    <span className="text-[10px] text-slate-400">Quiz / Anket / Link</span>
                   </button>
 
                   <button
@@ -172,7 +231,7 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                     }`}
                   >
                     <Film className="w-5 h-5 text-blue-400" />
-                    <span className="text-xs font-bold">Reels Senaryosu</span>
+                    <span className="text-xs font-bold">Reels</span>
                     <span className="text-[10px] text-slate-400">Kanca + Script</span>
                   </button>
 
@@ -186,38 +245,94 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                     }`}
                   >
                     <HelpCircle className="w-5 h-5 text-emerald-400" />
-                    <span className="text-xs font-bold">Günün Sorusu / Post</span>
-                    <span className="text-[10px] text-slate-400">Quiz & Püf Nokta</span>
+                    <span className="text-xs font-bold">Günün Sorusu</span>
+                    <span className="text-[10px] text-slate-400">Şıklı Test</span>
                   </button>
                 </div>
               </div>
 
-              {/* Konu Kategorisi */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-300">Konu Kategorisi</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {[
-                    { id: 'exam_tactics', label: '🎯 Sınav Taktikleri' },
-                    { id: 'dersolab_features', label: '⚡ L.A.B. Araçları' },
-                    { id: 'motivation', label: '🔥 Disiplin & Motivasyon' },
-                    { id: 'daily_question', label: '❓ Şaşırtmalı Soru' },
-                    { id: 'weekly_plan', label: '📅 Koçluk & Planlama' },
-                    { id: 'custom', label: '✍️ Özel Konu' },
-                  ].map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setTopic(t.id as ContentTopic)}
-                      className={`px-3 py-2 rounded-xl text-xs font-medium border text-left transition-all ${
-                        topic === t.id
-                          ? 'border-orange-500/50 bg-orange-500/20 text-orange-300'
-                          : 'border-white/10 bg-white/[0.02] text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
+              {/* Story Seçilmişse: Çıkartma Tipi Seçici */}
+              {contentType === 'story' && (
+                <div className="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 space-y-2">
+                  <label className="text-xs font-bold text-purple-300">Story Çıkartma Türü (Sticker)</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'quiz', label: '📊 4 Şıklı Quiz' },
+                      { id: 'poll', label: '🗳️ 2 Şıklı Anket' },
+                      { id: 'link', label: '🔗 Link Çıkartması' },
+                    ].map((st) => (
+                      <button
+                        key={st.id}
+                        type="button"
+                        onClick={() => setStoryStickerType(st.id as StoryStickerType)}
+                        className={`py-2 px-2.5 rounded-xl text-xs font-semibold border transition-all ${
+                          storyStickerType === st.id
+                            ? 'bg-purple-500 text-white border-purple-400 shadow-md'
+                            : 'bg-white/5 border-white/10 text-slate-300 hover:text-white'
+                        }`}
+                      >
+                        {st.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              {/* KENDİ GÖRSELİNİ YÜKLEME ALANI */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                  <span>Kendi Görselinizi / Soru Fotoğrafınızı Ekleyin</span>
+                  <span className="text-slate-500 font-normal">İsteğe bağlı</span>
+                </label>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+
+                {imageBase64 ? (
+                  <div className="relative rounded-2xl border border-orange-500/40 bg-orange-500/5 p-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={imageBase64}
+                        alt="Yüklenen Görsel"
+                        className="w-14 h-14 rounded-xl object-cover border border-white/20 shadow-md"
+                      />
+                      <div>
+                        <span className="text-xs font-bold text-white block">Görsel Seçildi</span>
+                        <span className="text-[11px] text-slate-400">Yapay zeka bu görseli analiz edip içeriğe entegre edecek</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setImageBase64(null)}
+                      className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors"
+                      title="Görseli Kaldır"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="group border border-dashed border-white/20 hover:border-orange-500/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer bg-white/[0.02] hover:bg-orange-500/[0.03] transition-all"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/5 group-hover:bg-orange-500/20 flex items-center justify-center text-slate-400 group-hover:text-orange-400 transition-colors">
+                      <Upload className="w-4 h-4" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-xs font-bold text-white group-hover:text-orange-300">
+                        Soru fotoğrafı, kitap sayfası veya afiş yükleyin
+                      </span>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        PNG, JPG veya WEBP (Görseli doğrudan analiz eder)
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Ders & Odak Konu Seçimi */}
@@ -253,6 +368,34 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                     placeholder="Örn: Türev, Logaritma, Paragraf Hızı, Optik..."
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-orange-500"
                   />
+                </div>
+              </div>
+
+              {/* Konu Kategorisi */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-slate-300">Konu Kategorisi</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[
+                    { id: 'exam_tactics', label: '🎯 Sınav Taktikleri' },
+                    { id: 'dersolab_features', label: '⚡ L.A.B. Araçları' },
+                    { id: 'motivation', label: '🔥 Disiplin & Motivasyon' },
+                    { id: 'daily_question', label: '❓ Şaşırtmalı Soru' },
+                    { id: 'weekly_plan', label: '📅 Koçluk & Planlama' },
+                    { id: 'custom', label: '✍️ Özel Konu' },
+                  ].map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setTopic(t.id as ContentTopic)}
+                      className={`px-3 py-2 rounded-xl text-xs font-medium border text-left transition-all ${
+                        topic === t.id
+                          ? 'border-orange-500/50 bg-orange-500/20 text-orange-300'
+                          : 'border-white/10 bg-white/[0.02] text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 

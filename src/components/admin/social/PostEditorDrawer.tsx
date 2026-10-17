@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   X,
   Sparkles,
   Layers,
   Film,
   HelpCircle,
+  Smartphone,
   Copy,
   Check,
   Download,
@@ -15,12 +16,11 @@ import {
   ExternalLink,
   Calendar,
   Send,
-  Sliders,
-  Smartphone,
+  Upload,
+  Image as ImageIcon,
   Eye,
-  Clock,
 } from 'lucide-react'
-import type { CarouselSlide, PostStatus, SocialPostItem } from '@/types/social'
+import type { CarouselSlide, PostStatus, SocialPostItem, StoryStickerType } from '@/types/social'
 import { VisualCanvasEngine } from './VisualCanvasEngine'
 import { InstagramMockup } from './InstagramMockup'
 import { toast } from 'sonner'
@@ -45,11 +45,13 @@ export function PostEditorDrawer({
   const [activeSlideIndex, setActiveSlideIndex] = useState(0)
   const [copiedCaption, setCopiedCaption] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   if (!isOpen || !post) return null
 
   const isCarousel = post.type === 'carousel'
   const isReels = post.type === 'reels'
+  const isStory = post.type === 'story'
 
   // Caption Kopyalama
   function handleCopyCaption() {
@@ -82,6 +84,30 @@ export function PostEditorDrawer({
     })
   }
 
+  // Fotoğraf Yükleme
+  function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Lütfen geçerli bir resim dosyası seçin.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const base64 = ev.target?.result as string
+      if (base64) {
+        onUpdatePost({
+          ...post!,
+          uploadedImageUrl: base64,
+        })
+        toast.success('Fotoğraf başarıyla eklendi!')
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
   // Instagram Doğrudan Yayınlama Çağrısı
   async function handlePublishToInstagram() {
     setIsPublishing(true)
@@ -92,6 +118,8 @@ export function PostEditorDrawer({
         body: JSON.stringify({
           caption: `${post!.caption}\n\n${(post!.hashtags || []).join(' ')}`,
           isReels: post!.type === 'reels',
+          isStory: post!.type === 'story',
+          imageUrls: post!.uploadedImageUrl ? [post!.uploadedImageUrl] : undefined,
         }),
       })
 
@@ -128,6 +156,15 @@ export function PostEditorDrawer({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+      {/* Gizli dosya seçici */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden"
+      />
+
       <div className="relative w-full max-w-6xl h-[92vh] rounded-3xl bg-[#0d0f15] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col">
         {/* Üst Bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.02]">
@@ -136,12 +173,22 @@ export function PostEditorDrawer({
               className={`w-10 h-10 rounded-2xl flex items-center justify-center border ${
                 isCarousel
                   ? 'bg-orange-500/20 border-orange-500/30 text-orange-400'
-                  : isReels
-                    ? 'bg-blue-500/20 border-blue-500/30 text-blue-400'
-                    : 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'
+                  : isStory
+                    ? 'bg-purple-500/20 border-purple-500/30 text-purple-400'
+                    : isReels
+                      ? 'bg-blue-500/20 border-blue-500/30 text-blue-400'
+                      : 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'
               }`}
             >
-              {isCarousel ? <Layers className="w-5 h-5" /> : isReels ? <Film className="w-5 h-5" /> : <HelpCircle className="w-5 h-5" />}
+              {isCarousel ? (
+                <Layers className="w-5 h-5" />
+              ) : isStory ? (
+                <Smartphone className="w-5 h-5" />
+              ) : isReels ? (
+                <Film className="w-5 h-5" />
+              ) : (
+                <HelpCircle className="w-5 h-5" />
+              )}
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -161,7 +208,14 @@ export function PostEditorDrawer({
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                {post.topicLabel} • {post.targetAudience} • {isCarousel ? 'Kaydırmalı Carousel' : isReels ? 'Reels' : 'Günün Sorusu / Post'}
+                {post.topicLabel} • {post.targetAudience} •{' '}
+                {isCarousel
+                  ? 'Kaydırmalı Carousel'
+                  : isStory
+                    ? 'Instagram Story'
+                    : isReels
+                      ? 'Reels'
+                      : 'Günün Sorusu / Post'}
               </p>
             </div>
           </div>
@@ -184,9 +238,9 @@ export function PostEditorDrawer({
           </div>
         </div>
 
-        {/* Ana İçerik Grid (Sol: Editör, Sağ: Canlı Önizleme) */}
+        {/* Ana İçerik Grid */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-          {/* SOL PANEL: Editör ve Ayarlar (7 Kolon) */}
+          {/* SOL PANEL (7 Kolon) */}
           <div className="lg:col-span-7 flex flex-col border-r border-white/10 overflow-hidden bg-black/20">
             {/* Sekme Seçici */}
             <div className="flex items-center gap-1 px-6 pt-4 pb-2 border-b border-white/5">
@@ -208,7 +262,15 @@ export function PostEditorDrawer({
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <span>{isCarousel ? 'Slayt İçerikleri' : isReels ? 'Reels Senaryosu' : 'Soru Detayları'}</span>
+                <span>
+                  {isCarousel
+                    ? 'Slayt İçerikleri'
+                    : isStory
+                      ? 'Story & Çıkartma'
+                      : isReels
+                        ? 'Reels Senaryosu'
+                        : 'Soru Detayları'}
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab('publish')}
@@ -237,6 +299,44 @@ export function PostEditorDrawer({
                     />
                   </div>
 
+                  {/* Görsel Yönetimi */}
+                  <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-slate-300">Fotoğraf / Görsel</span>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex items-center gap-1 text-[11px] font-bold text-blue-400 hover:text-blue-300"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{post.uploadedImageUrl ? 'Fotoğrafı Değiştir' : 'Fotoğraf Yükle'}</span>
+                      </button>
+                    </div>
+
+                    {post.uploadedImageUrl ? (
+                      <div className="flex items-center justify-between gap-3 p-2 rounded-xl bg-white/5 border border-white/10">
+                        <img
+                          src={post.uploadedImageUrl}
+                          alt="Önizleme"
+                          className="w-12 h-12 rounded-lg object-cover border border-white/20"
+                        />
+                        <span className="text-xs text-slate-300 truncate flex-1">Özel Görsel Ekli</span>
+                        <button
+                          type="button"
+                          onClick={() => onUpdatePost({ ...post, uploadedImageUrl: undefined })}
+                          className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                          title="Görseli Kaldır"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-slate-500">
+                        Şablona kendi soru fotoğrafınızı veya afişinizi eklemek için yukarıdaki butonu kullanın.
+                      </p>
+                    )}
+                  </div>
+
                   {/* Instagram Açıklaması */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
@@ -252,7 +352,7 @@ export function PostEditorDrawer({
                     <textarea
                       value={post.caption}
                       onChange={(e) => onUpdatePost({ ...post, caption: e.target.value })}
-                      rows={9}
+                      rows={8}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl p-3.5 text-xs text-white leading-relaxed outline-none focus:border-orange-500 resize-none font-sans"
                     />
                     <div className="flex items-center justify-between text-[11px] text-slate-500">
@@ -285,10 +385,165 @@ export function PostEditorDrawer({
 
               {activeTab === 'slides' && (
                 <div className="space-y-5">
-                  {isCarousel && post.carouselSlides ? (
-                    // Carousel Slaytları Düzenleme
+                  {/* STORY DÜZENLEME FORMU */}
+                  {isStory && post.storyData ? (
+                    <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-4">
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-purple-400">Story Üst Başlığı (Badge)</label>
+                        <input
+                          type="text"
+                          value={post.storyData.badge}
+                          onChange={(e) =>
+                            onUpdatePost({
+                              ...post,
+                              storyData: { ...post.storyData!, badge: e.target.value },
+                            })
+                          }
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-300">Ana Başlık</label>
+                        <input
+                          type="text"
+                          value={post.storyData.headline}
+                          onChange={(e) =>
+                            onUpdatePost({
+                              ...post,
+                              storyData: { ...post.storyData!, headline: e.target.value },
+                            })
+                          }
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-bold outline-none focus:border-purple-500"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-300">Alt Açıklama</label>
+                        <input
+                          type="text"
+                          value={post.storyData.subhead || ''}
+                          onChange={(e) =>
+                            onUpdatePost({
+                              ...post,
+                              storyData: { ...post.storyData!, subhead: e.target.value },
+                            })
+                          }
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-purple-500"
+                        />
+                      </div>
+
+                      {/* Çıkartma Ayarları */}
+                      <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-bold text-purple-300">Çıkartma Türü</label>
+                          <select
+                            value={post.storyData.stickerType}
+                            onChange={(e) =>
+                              onUpdatePost({
+                                ...post,
+                                storyData: {
+                                  ...post.storyData!,
+                                  stickerType: e.target.value as StoryStickerType,
+                                },
+                              })
+                            }
+                            className="bg-neutral-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white outline-none"
+                          >
+                            <option value="quiz">4 Şıklı Quiz</option>
+                            <option value="poll">2 Şıklı Anket</option>
+                            <option value="link">Link Çıkartması</option>
+                          </select>
+                        </div>
+
+                        {post.storyData.stickerType === 'quiz' && (
+                          <div className="space-y-2">
+                            <label className="text-[11px] font-semibold text-slate-400">Quiz Sorusu</label>
+                            <input
+                              type="text"
+                              value={post.storyData.stickerQuestion || ''}
+                              onChange={(e) =>
+                                onUpdatePost({
+                                  ...post,
+                                  storyData: { ...post.storyData!, stickerQuestion: e.target.value },
+                                })
+                              }
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
+                            />
+                            <label className="text-[11px] font-semibold text-slate-400 block pt-1">
+                              Şıklar (Virgülle ayırın)
+                            </label>
+                            <input
+                              type="text"
+                              value={(post.storyData.stickerOptions || []).join(', ')}
+                              onChange={(e) =>
+                                onUpdatePost({
+                                  ...post,
+                                  storyData: {
+                                    ...post.storyData!,
+                                    stickerOptions: e.target.value.split(',').map((s) => s.trim()),
+                                  },
+                                })
+                              }
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
+                            />
+                          </div>
+                        )}
+
+                        {post.storyData.stickerType === 'poll' && (
+                          <div className="space-y-2">
+                            <label className="text-[11px] font-semibold text-slate-400">Anket Sorusu</label>
+                            <input
+                              type="text"
+                              value={post.storyData.stickerQuestion || ''}
+                              onChange={(e) =>
+                                onUpdatePost({
+                                  ...post,
+                                  storyData: { ...post.storyData!, stickerQuestion: e.target.value },
+                                })
+                              }
+                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
+                            />
+                          </div>
+                        )}
+
+                        {post.storyData.stickerType === 'link' && (
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <label className="text-[11px] font-semibold text-slate-400">Link Metni</label>
+                              <input
+                                type="text"
+                                value={post.storyData.stickerLinkText || ''}
+                                onChange={(e) =>
+                                  onUpdatePost({
+                                    ...post,
+                                    storyData: { ...post.storyData!, stickerLinkText: e.target.value },
+                                  })
+                                }
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[11px] font-semibold text-slate-400">Hedef URL</label>
+                              <input
+                                type="text"
+                                value={post.storyData.stickerLinkUrl || ''}
+                                onChange={(e) =>
+                                  onUpdatePost({
+                                    ...post,
+                                    storyData: { ...post.storyData!, stickerLinkUrl: e.target.value },
+                                  })
+                                }
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : isCarousel && post.carouselSlides ? (
+                    // Carousel Slaytları
                     <div className="space-y-4">
-                      {/* Slayt Seçim Sekmeleri */}
                       <div className="flex items-center gap-2 overflow-x-auto pb-1">
                         {post.carouselSlides.map((slide, idx) => (
                           <button
@@ -305,7 +560,6 @@ export function PostEditorDrawer({
                         ))}
                       </div>
 
-                      {/* Aktif Slayt Formu */}
                       {post.carouselSlides[activeSlideIndex] && (
                         <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3.5">
                           <div className="grid grid-cols-2 gap-3">
@@ -370,9 +624,8 @@ export function PostEditorDrawer({
                             />
                           </div>
 
-                          {/* Maddeler */}
                           <div className="space-y-1.5">
-                            <label className="text-[11px] font-semibold text-slate-400">İçerik Maddeleri (Her satır bir madde)</label>
+                            <label className="text-[11px] font-semibold text-slate-400">İçerik Maddeleri</label>
                             <textarea
                               value={(post.carouselSlides[activeSlideIndex].bodyPoints || []).join('\n')}
                               onChange={(e) =>
@@ -389,7 +642,7 @@ export function PostEditorDrawer({
                       )}
                     </div>
                   ) : isReels && post.reelsStoryboard ? (
-                    // Reels Storyboard Düzenleme
+                    // Reels
                     <div className="space-y-4">
                       <div className="space-y-1">
                         <label className="text-xs font-semibold text-orange-400">🎬 İlk 3 Saniye Kancası (Hook)</label>
@@ -407,7 +660,7 @@ export function PostEditorDrawer({
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">🎙️ Konuşma Metni (Word-for-Word Script)</label>
+                        <label className="text-xs font-semibold text-slate-300">🎙️ Konuşma Metni</label>
                         <textarea
                           value={post.reelsStoryboard.spokenScript}
                           onChange={(e) =>
@@ -420,42 +673,12 @@ export function PostEditorDrawer({
                           className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-orange-500 resize-none leading-relaxed"
                         />
                       </div>
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">👀 Görsel / Sahne Yönlendirmesi</label>
-                        <textarea
-                          value={post.reelsStoryboard.visualDirection}
-                          onChange={(e) =>
-                            onUpdatePost({
-                              ...post,
-                              reelsStoryboard: { ...post.reelsStoryboard!, visualDirection: e.target.value },
-                            })
-                          }
-                          rows={2}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white outline-none focus:border-orange-500"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">🎵 Önerilen Ses / Vibe</label>
-                        <input
-                          type="text"
-                          value={post.reelsStoryboard.musicAudioVibe}
-                          onChange={(e) =>
-                            onUpdatePost({
-                              ...post,
-                              reelsStoryboard: { ...post.reelsStoryboard!, musicAudioVibe: e.target.value },
-                            })
-                          }
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-orange-500"
-                        />
-                      </div>
                     </div>
                   ) : post.singlePostData ? (
-                    // Tekli Soru Düzenleme
+                    // Soru / Post
                     <div className="space-y-3.5">
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">Soru / Püf Nokta Başlığı</label>
+                        <label className="text-xs font-semibold text-slate-300">Soru / Başlık</label>
                         <input
                           type="text"
                           value={post.singlePostData.headline}
@@ -519,7 +742,7 @@ export function PostEditorDrawer({
                       <div>
                         <h4 className="text-sm font-bold text-white">Instagram Yayınlama</h4>
                         <p className="text-[11px] text-slate-400">
-                          Meta Graph API ile hesabınıza otomatik gönderin veya manuel kopyalayın
+                          {isStory ? 'Hikaye (Story) olarak paylaş' : 'Hesabınızda gönderi olarak yayınlayın'}
                         </p>
                       </div>
                     </div>
@@ -531,7 +754,13 @@ export function PostEditorDrawer({
                         className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:opacity-90 text-white font-bold text-xs shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                       >
                         <Send className="w-4 h-4" />
-                        <span>{isPublishing ? 'Yayınlanıyor...' : 'Instagram’a Doğrudan Gönder'}</span>
+                        <span>
+                          {isPublishing
+                            ? 'Yayınlanıyor...'
+                            : isStory
+                              ? 'Story Olarak Instagram’a Gönder'
+                              : 'Instagram’a Doğrudan Gönder'}
+                        </span>
                       </button>
 
                       <a
@@ -583,9 +812,13 @@ export function PostEditorDrawer({
                 <VisualCanvasEngine
                   slides={post.carouselSlides}
                   singlePost={post.singlePostData}
+                  storyData={post.storyData}
+                  isStory={post.type === 'story'}
+                  customImageUrl={post.uploadedImageUrl}
                   activeSlideIndex={activeSlideIndex}
                   onSlideChange={setActiveSlideIndex}
                   onSlideUpdate={handleSlideUpdate}
+                  onImageUpload={(b64) => onUpdatePost({ ...post, uploadedImageUrl: b64 })}
                 />
               ) : (
                 <InstagramMockup

@@ -104,7 +104,19 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
     "musicAudioVibe": "Hızlı, dinamik Lo-Fi veya trend Synthwave beat",
     "callToAction": "Paragraf hızını 2 katına çıkarmak için profildeki L.A.B. Bionic Reader'ı hemen test et!"
   }`
-        : `"singlePostData": {
+      : request.type === 'story'
+        ? `"storyData": {
+    "badge": "GÜNÜN QUIZI / ANKETİ",
+    "headline": "ÖSYM Bu Soruyu Çok Sever!",
+    "subhead": "Doğru şıkkı tahmin edebilecek misin? 👇",
+    "stickerType": "${request.storyStickerType || 'quiz'}", // "quiz" | "poll" | "link" | "countdown" | "question_box"
+    "stickerQuestion": "Aşağıdakilerden hangisi birleşik sözcüktür?",
+    "stickerOptions": ["Birçok", "Her gün", "Hiç kimse", "Pek çok"],
+    "stickerLinkText": "DersoLab'da Çöz",
+    "stickerLinkUrl": "https://dersolab.com/lab",
+    "themeVariant": "neon_orange"
+  }`
+      : `"singlePostData": {
     "badge": "GÜNÜN ÖSYM SORUSU",
     "headline": "Bu Soruyu Adayların %80'i Yanlış Çözdü!",
     "questionOrSummary": "Sorunun metni veya özet ipucu...",
@@ -121,6 +133,34 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
 }
 `
 
+    let contents: Parameters<typeof ai.models.generateContent>[0]['contents']
+
+    if (request.imageBase64) {
+      const mimeMatch = request.imageBase64.match(/^data:(image\/[a-zA-Z0-9.+_-]+);base64,/)
+      const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg'
+      const base64Data = request.imageBase64.replace(/^data:image\/[a-zA-Z0-9.+_-]+;base64,/, '')
+      contents = [
+        {
+          role: 'user',
+          parts: [
+            {
+              text:
+                userPrompt +
+                '\n\nÖNEMLİ: Kullanıcı bir görsel/soru yükledi. Bu görseldeki soruyu/içeriği dikkatle incele ve bu görsele göre Instagram postu/hikayesi üret.',
+            },
+            {
+              inlineData: {
+                mimeType,
+                data: base64Data,
+              },
+            },
+          ],
+        },
+      ]
+    } else {
+      contents = [{ role: 'user', parts: [{ text: userPrompt }] }]
+    }
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       config: {
@@ -128,7 +168,7 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
         temperature: 0.7,
         maxOutputTokens: 2500,
       },
-      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+      contents,
     })
 
     const rawText = response.text || ''
@@ -147,7 +187,9 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
       targetAudience: parsed.targetAudience || request.targetGrade || 'YKS Adayları',
       carouselSlides: parsed.carouselSlides,
       singlePostData: parsed.singlePostData,
+      storyData: parsed.storyData,
       reelsStoryboard: parsed.reelsStoryboard,
+      uploadedImageUrl: request.imageBase64,
       createdAt: new Date().toISOString(),
     }
   } catch (err) {
@@ -359,6 +401,34 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
         callToAction:
           'DersoLab Fonetik Müfettişini hemen profildeki linkten ücretsiz dene, yazım kurallarını fullle!',
       },
+      createdAt: new Date().toISOString(),
+    }
+  }
+
+  if (request.type === 'story') {
+    return {
+      id: `post_${now}_story`,
+      title: 'Story: Günün TYT Türkçe Quiz Çıkartması',
+      type: 'story',
+      topic: request.topic,
+      topicLabel: 'Story • Günün Quizi',
+      status: 'draft',
+      targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
+      caption: 'Doğru şıkkı bulanlar kimler? Hikayedeki ankete katıl, cevabı gör! 🦊 #yks2026',
+      hashtags: ['#yks2026', '#tyt', '#dersolab'],
+      storyData: {
+        badge: 'GÜNÜN QUIZI • TYT TÜRKÇE',
+        headline: 'Hangisi Bitişik Yazılır?',
+        subhead: 'ÖSYM her yıl soruyor, şıkkını hemen işaretle! 👇',
+        stickerType: request.storyStickerType || 'quiz',
+        stickerQuestion: 'Aşağıdakilerden hangisinin yazımı DOĞRUDUR?',
+        stickerOptions: ['Birçok', 'Herşey', 'Hiç kimse', 'Pek çok'],
+        stickerLinkText: 'dersolab.com/lab',
+        stickerLinkUrl: 'https://dersolab.com/lab',
+        themeVariant: 'neon_orange',
+        uploadedImageUrl: request.imageBase64,
+      },
+      uploadedImageUrl: request.imageBase64,
       createdAt: new Date().toISOString(),
     }
   }

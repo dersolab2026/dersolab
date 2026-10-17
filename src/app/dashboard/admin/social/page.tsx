@@ -7,6 +7,7 @@ import {
   Layers,
   Film,
   HelpCircle,
+  Smartphone,
   Plus,
   CheckCircle2,
   Clock,
@@ -164,6 +165,27 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
       themeVariant: 'neon_orange',
     },
     publishedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo_4',
+    title: 'Günün Story Testi: Aralarında Asal Sayılar',
+    type: 'story',
+    topic: 'daily_question',
+    topicLabel: 'Instagram Story • Mini Quiz',
+    status: 'draft',
+    targetAudience: 'YKS 2026',
+    caption: 'Bugünün YKS matematik hikaye sorusu geldi! Hikayedeki test çıkartmasına dokunarak doğru cevabı işaretle 🔥 #yks2026 #matematik #dersolab',
+    hashtags: ['#yks2026', '#matematik', '#dersolab', '#storyquiz'],
+    storyData: {
+      badge: 'GÜNÜN HİKAYE TESTİ',
+      headline: 'Aralarında Asal İki Sayının EKOK\'u Kaçtır?',
+      subhead: 'Doğru cevaba dokun, sonucunu gör! 🎯',
+      stickerType: 'quiz',
+      stickerQuestion: 'Aralarında asal iki sayının EKOK\'u nedir?',
+      stickerOptions: ['Sayıların Çarpımı', 'Her zaman 1', 'Sayıların Toplamı'],
+      themeVariant: 'purple_matrix',
+    },
     createdAt: new Date().toISOString(),
   },
 ]
@@ -343,6 +365,7 @@ export default function SocialStudioPage() {
             { id: 'carousel', label: 'Kaydırmalı Carousel', icon: Layers },
             { id: 'reels', label: 'Reels Senaryoları', icon: Film },
             { id: 'post', label: 'Günün Sorusu / Post', icon: HelpCircle },
+            { id: 'story', label: 'Instagram Story (9:16)', icon: Smartphone },
           ].map((tab) => {
             const Icon = tab.icon
             const active = typeFilter === tab.id
@@ -415,6 +438,7 @@ export default function SocialStudioPage() {
           {filteredPosts.map((post) => {
             const isCar = post.type === 'carousel'
             const isRel = post.type === 'reels'
+            const isStory = post.type === 'story'
             const isApproved = post.status === 'approved'
             const isPublished = post.status === 'published'
 
@@ -434,11 +458,21 @@ export default function SocialStudioPage() {
                             ? 'bg-orange-500/15 border-orange-500/30 text-orange-400'
                             : isRel
                               ? 'bg-blue-500/15 border-blue-500/30 text-blue-400'
-                              : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                              : isStory
+                                ? 'bg-purple-500/15 border-purple-500/30 text-purple-400'
+                                : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
                         }`}
                       >
-                        {isCar ? <Layers className="w-3 h-3" /> : isRel ? <Film className="w-3 h-3" /> : <HelpCircle className="w-3 h-3" />}
-                        <span>{isCar ? 'Carousel' : isRel ? 'Reels' : 'Post / Soru'}</span>
+                        {isCar ? (
+                          <Layers className="w-3 h-3" />
+                        ) : isRel ? (
+                          <Film className="w-3 h-3" />
+                        ) : isStory ? (
+                          <Smartphone className="w-3 h-3" />
+                        ) : (
+                          <HelpCircle className="w-3 h-3" />
+                        )}
+                        <span>{isCar ? 'Carousel' : isRel ? 'Reels' : isStory ? 'Story (9:16)' : 'Post / Soru'}</span>
                       </span>
 
                       <span className="text-[11px] text-slate-400 font-medium truncate max-w-[120px]">
@@ -475,6 +509,7 @@ export default function SocialStudioPage() {
                   <div className="flex items-center gap-1 text-[11px] text-slate-500">
                     {isCar && <span>{post.carouselSlides?.length || 4} Slayt</span>}
                     {isRel && <span>Viral Kanca</span>}
+                    {isStory && <span>{post.storyData?.stickerType?.toUpperCase() || 'STORY'} Çıkartması</span>}
                     {post.type === 'post' && <span>Şıklı Test</span>}
                   </div>
 

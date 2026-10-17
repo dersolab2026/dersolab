@@ -28,17 +28,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { caption, imageUrls, videoUrl, isReels } = body
+    const { caption, imageUrls, videoUrl, isReels, isStory } = body
 
-    if (!caption) {
+    if (!caption && !isStory) {
       return NextResponse.json({ error: 'Paylaşım için açıklama (caption) gereklidir.' }, { status: 400 })
     }
 
     const result = await publishToInstagram({
-      caption,
+      caption: caption || '',
       imageUrls,
       videoUrl,
       isReels,
+      isStory,
     })
 
     return NextResponse.json(result)
