@@ -15,6 +15,8 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
   const [mode, setMode] = useState<'single' | 'weekly'>('single')
   const [contentType, setContentType] = useState<InstagramContentType>('carousel')
   const [topic, setTopic] = useState<ContentTopic>('exam_tactics')
+  const [subject, setSubject] = useState('')
+  const [subTopic, setSubTopic] = useState('')
   const [targetGrade, setTargetGrade] = useState<'YKS (TYT/AYT)' | 'LGS' | 'Genel'>('YKS (TYT/AYT)')
   const [tone, setTone] = useState<'energetic' | 'informative' | 'coaching' | 'humorous'>('energetic')
   const [customPrompt, setCustomPrompt] = useState('')
@@ -33,6 +35,8 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
           action: 'generate_single',
           type: contentType,
           topic,
+          subject: subject.trim() || undefined,
+          subTopic: subTopic.trim() || undefined,
           targetGrade,
           tone,
           customPrompt: customPrompt.trim() || undefined,
@@ -213,6 +217,42 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                       {t.label}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Ders & Odak Konu Seçimi */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-300">İlgili Ders / Branş</label>
+                  <select
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-orange-500"
+                  >
+                    <option value="" className="bg-neutral-900">✨ Otomatik (Yapay Zeka Seçsin)</option>
+                    <option value="Matematik & Geometri" className="bg-neutral-900">📐 Matematik & Geometri</option>
+                    <option value="Türkçe, Edebiyat & Paragraf" className="bg-neutral-900">📖 Türkçe, Edebiyat & Paragraf</option>
+                    <option value="Fizik" className="bg-neutral-900">⚡ Fizik</option>
+                    <option value="Kimya" className="bg-neutral-900">🧪 Kimya</option>
+                    <option value="Biyoloji" className="bg-neutral-900">🧬 Biyoloji</option>
+                    <option value="Tarih & Coğrafya (Sosyal Bilimler)" className="bg-neutral-900">🌍 Tarih & Coğrafya (Sosyal)</option>
+                    <option value="İngilizce (YDT / LGS)" className="bg-neutral-900">🇬🇧 İngilizce</option>
+                    <option value="Sınav Koçluğu & Rehberlik" className="bg-neutral-900">🧠 Sınav Koçluğu & Rehberlik</option>
+                    <option value="DersoLab L.A.B. Araçları" className="bg-neutral-900">🦊 DersoLab L.A.B. Araçları</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-300">
+                    Odak Konu / Ünite <span className="text-slate-500 font-normal">(İsteğe bağlı)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={subTopic}
+                    onChange={(e) => setSubTopic(e.target.value)}
+                    placeholder="Örn: Türev, Logaritma, Paragraf Hızı, Optik..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-orange-500"
+                  />
                 </div>
               </div>
 

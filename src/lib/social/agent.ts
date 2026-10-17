@@ -48,9 +48,11 @@ export async function generateSocialPost(request: GeneratePostRequest): Promise<
 Lütfen aşağıdaki parametrelere göre 1 adet yüksek etkileşimli Instagram içeriği üret:
 - İçerik Tipi: ${request.type} (${request.type === 'carousel' ? 'Kaydırmalı Carousel' : request.type === 'reels' ? 'Reels / Kısa Video Senaryosu' : 'Tekli Görsel / Günün Sorusu'})
 - Konu Kategorisi: ${request.topic}
+${request.subject ? `- İlgili Ders / Branş: ${request.subject}` : '- İlgili Ders: İlgili sınav seviyesine göre en uygun branşı kendin seç'}
+${request.subTopic ? `- Odak Konu / Ünite: ${request.subTopic}` : ''}
 - Hedef Kitle: ${request.targetGrade || 'YKS (TYT/AYT)'}
 - Ton: ${request.tone || 'energetic'}
-${request.customPrompt ? `- Özel Talimat / Konu: ${request.customPrompt}` : ''}
+${request.customPrompt ? `- Özel Talimat / Ekstra Not: ${request.customPrompt}` : ''}
 
 Yanıtını kesinlikle şu JSON şemasına uygun döndür:
 {

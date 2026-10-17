@@ -65,6 +65,8 @@ export interface SocialPostItem {
 export interface GeneratePostRequest {
   type: InstagramContentType
   topic: ContentTopic
+  subject?: string
+  subTopic?: string
   customPrompt?: string
   targetGrade?: 'YKS (TYT/AYT)' | 'LGS' | 'Genel'
   tone?: 'energetic' | 'informative' | 'coaching' | 'humorous'
