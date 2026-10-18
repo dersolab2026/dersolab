@@ -243,7 +243,7 @@ export function GrokAgentTerminal({ onPostsGenerated, currentPostCount }: GrokAg
   async function handleAutoPilotTrigger() {
     setIsRunning(true)
     setActiveTab('stream')
-    addLog(`[AUTONOMOUS LOOP] 5-Ajanlı Swarm Auto-Pilot başlatıldı!`)
+    addLog(`[AUTONOMOUS LOOP] Gemini 4 Argon • 5-Ajanlı Swarm Auto-Pilot başlatıldı!`)
     addLog(`[1/4 RADAR] 2026 ÖSYM sınav takvimi ve kazanım radar analizi yapılıyor...`)
 
     const timer1 = setTimeout(() => {
@@ -303,8 +303,8 @@ export function GrokAgentTerminal({ onPostsGenerated, currentPostCount }: GrokAg
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-black text-white tracking-tight flex items-center gap-2">
                   <span>DersoLab 5-Ajanlı Otonom İçerik & Görsel Swarm</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono font-bold">
-                    v4.5 PRO
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono font-bold tracking-wider">
+                    GEMINI 4 ARGON
                   </span>
                 </h2>
               </div>

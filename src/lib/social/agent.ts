@@ -52,6 +52,43 @@ PAZAR KİTAP ÖNERİSİ HİKAYELERİ (ORTAOKUL + LİSE):
 ÇIKTI FORMATI:
 Sadece ve sadece istenilen JSON formatında yanıt ver. Markdown blokları (\`\`\`json ... \`\`\`) içine alarak ver.`
 
+// Gemini 4 Argon - Google'ın en yeni frontier reasoning modeli
+const PRIMARY_MODEL = 'gemini-4-argon'
+const FALLBACK_MODEL = 'gemini-2.5-flash'
+
+async function callGenAIModel(
+  ai: GoogleGenAI,
+  params: {
+    contents: any
+    systemInstruction: string
+    temperature: number
+    maxOutputTokens: number
+  }
+) {
+  try {
+    return await ai.models.generateContent({
+      model: PRIMARY_MODEL,
+      config: {
+        systemInstruction: params.systemInstruction,
+        temperature: params.temperature,
+        maxOutputTokens: params.maxOutputTokens,
+      },
+      contents: params.contents,
+    })
+  } catch (err) {
+    console.warn(`[Gemini 4 Argon] API uyarısı, ${FALLBACK_MODEL} modeline geçiliyor:`, err)
+    return await ai.models.generateContent({
+      model: FALLBACK_MODEL,
+      config: {
+        systemInstruction: params.systemInstruction,
+        temperature: params.temperature,
+        maxOutputTokens: params.maxOutputTokens,
+      },
+      contents: params.contents,
+    })
+  }
+}
+
 /**
  * Tekil Instagram Gönderisi Üretir
  */
@@ -198,14 +235,11 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
       contents = [{ role: 'user', parts: [{ text: userPrompt }] }]
     }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.7,
-        maxOutputTokens: 2500,
-      },
+    const response = await callGenAIModel(ai, {
       contents,
+      systemInstruction: SYSTEM_INSTRUCTION,
+      temperature: 0.7,
+      maxOutputTokens: 2500,
     })
 
     const rawText = response.text || ''
@@ -315,14 +349,11 @@ Yanıtını kesinlikle 7 elemanlı bir JSON dizisi [ ... ] olarak döndür. Her 
 ]
 `
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.7,
-        maxOutputTokens: 6000,
-      },
+    const response = await callGenAIModel(ai, {
       contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+      systemInstruction: SYSTEM_INSTRUCTION,
+      temperature: 0.7,
+      maxOutputTokens: 6000,
     })
 
     const rawText = response.text || ''
@@ -1271,14 +1302,11 @@ Yanıtını kesinlikle şu JSON şemasına uygun 5 elemanlı dizi olarak döndü
 ]
 `
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.8,
-        maxOutputTokens: 2000,
-      },
+    const response = await callGenAIModel(ai, {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      systemInstruction: SYSTEM_INSTRUCTION,
+      temperature: 0.8,
+      maxOutputTokens: 2000,
     })
 
     const cleanJson = extractJsonFromText(response.text || '')
@@ -1525,7 +1553,7 @@ export async function processNaturalLanguageAgentCommand(request: GrokAgentComma
   const command = request.command.trim().toLowerCase()
   const logs: string[] = []
 
-  logs.push(`[DERSOLAB-AI-CORE v4.5] Doğal dil komutu algılandı: "${request.command}"`)
+  logs.push(`[DERSOLAB-AI-CORE • GEMINI 4 ARGON] Doğal dil komutu algılandı: "${request.command}"`)
   logs.push(`[PERSONA] Aktif Karakter Modu: ${persona.toUpperCase()}`)
 
   // 0. AI Görsel & Bilimsel Şema & İllüstrasyon Üretimi (Görsel Öncelikli Motor)

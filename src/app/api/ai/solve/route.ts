@@ -160,15 +160,29 @@ export async function POST(request: NextRequest) {
       contents = [{ role: 'user', parts: [{ text: userPrompt }] }]
     }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        temperature: 0.3,
-        maxOutputTokens: 1024,
-      },
-      contents,
-    })
+    let response
+    try {
+      response = await ai.models.generateContent({
+        model: 'gemini-4-argon',
+        config: {
+          systemInstruction: SYSTEM_PROMPT,
+          temperature: 0.3,
+          maxOutputTokens: 1024,
+        },
+        contents,
+      })
+    } catch (argonErr) {
+      console.warn('Gemini 4 Argon fallback to gemini-2.5-flash:', argonErr)
+      response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        config: {
+          systemInstruction: SYSTEM_PROMPT,
+          temperature: 0.3,
+          maxOutputTokens: 1024,
+        },
+        contents,
+      })
+    }
 
     const text = response.text
 
