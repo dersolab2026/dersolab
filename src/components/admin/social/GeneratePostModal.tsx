@@ -280,7 +280,7 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                 <ul className="list-disc list-inside mt-2 space-y-1 text-slate-300">
                   <li><strong>08:30 Sabah Story Testi:</strong> Güne uyanma sorusu ve hikaye çıkartması.</li>
                   <li><strong>13:00 Öğlen Carousel:</strong> 4-5 slaytlık derin taktik rehberi ve L.A.B. dönüşümü.</li>
-                  <li><strong>20:30 Akşam X (Twitter) Flood:</strong> 5 tweetlik viral sınav analizi ve tartışma zinciri.</li>
+                  <li><strong>20:30 Akşam TikTok & Reels:</strong> Viral kancalı 9:16 dikey video senaryosu ve L.A.B. dönüşümü.</li>
                 </ul>
               </div>
 
@@ -352,7 +352,7 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
               {/* Format Seçimi (Carousel, X Thread, Reels, Story, Post) */}
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-slate-300">İçerik Formatı</label>
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <button
                     type="button"
                     onClick={() => setContentType('carousel')}
@@ -364,21 +364,7 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                   >
                     <Layers className="w-5 h-5 text-orange-400" />
                     <span className="text-xs font-bold">Carousel</span>
-                    <span className="text-[10px] text-slate-400">4-5 Slayt</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setContentType('x_thread')}
-                    className={`flex flex-col items-center gap-1.5 p-2.5 rounded-2xl border text-center transition-all ${
-                      contentType === 'x_thread'
-                        ? 'border-cyan-500 bg-cyan-500/15 text-white shadow-[0_0_15px_rgba(6,182,212,0.15)]'
-                        : 'border-white/10 bg-white/[0.02] text-slate-400 hover:border-white/20'
-                    }`}
-                  >
-                    <XPlatformIcon className="w-5 h-5 text-cyan-400" />
-                    <span className="text-xs font-bold">X Flood</span>
-                    <span className="text-[10px] text-slate-400">5-7 Tweet</span>
+                    <span className="text-[10px] text-slate-400">Instagram 4-5 Slayt</span>
                   </button>
 
                   <button
@@ -392,7 +378,7 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                   >
                     <Smartphone className="w-5 h-5 text-purple-400" />
                     <span className="text-xs font-bold">Story (9:16)</span>
-                    <span className="text-[10px] text-slate-400">Quiz / Anket</span>
+                    <span className="text-[10px] text-slate-400">Instagram Quiz/Anket</span>
                   </button>
 
                   <button
@@ -400,13 +386,13 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                     onClick={() => setContentType('reels')}
                     className={`flex flex-col items-center gap-1.5 p-2.5 rounded-2xl border text-center transition-all ${
                       contentType === 'reels'
-                        ? 'border-blue-500 bg-blue-500/15 text-white shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                        ? 'border-cyan-500 bg-cyan-500/15 text-white shadow-[0_0_15px_rgba(6,182,212,0.15)]'
                         : 'border-white/10 bg-white/[0.02] text-slate-400 hover:border-white/20'
                     }`}
                   >
-                    <Film className="w-5 h-5 text-blue-400" />
-                    <span className="text-xs font-bold">Reels</span>
-                    <span className="text-[10px] text-slate-400">Kanca + Script</span>
+                    <Film className="w-5 h-5 text-cyan-400" />
+                    <span className="text-xs font-bold">TikTok & Reels</span>
+                    <span className="text-[10px] text-slate-400">9:16 Video Senaryosu</span>
                   </button>
 
                   <button
@@ -420,7 +406,7 @@ export function GeneratePostModal({ isOpen, onClose, onPostsGenerated }: Generat
                   >
                     <HelpCircle className="w-5 h-5 text-emerald-400" />
                     <span className="text-xs font-bold">Soru / Post</span>
-                    <span className="text-[10px] text-slate-400">Şıklı Test</span>
+                    <span className="text-[10px] text-slate-400">1:1 Şıklı Test</span>
                   </button>
                 </div>
               </div>

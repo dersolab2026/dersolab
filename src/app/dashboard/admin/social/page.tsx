@@ -55,42 +55,43 @@ function XPlatformIcon({ className = 'w-4 h-4' }: { className?: string }) {
   )
 }
 
-const STORAGE_KEY = 'dersolab_social_posts_v4'
+const STORAGE_KEY = 'dersolab_social_posts_v5'
 
 const INITIAL_DEMO_POSTS: SocialPostItem[] = [
   {
-    id: 'demo_x_1',
-    title: 'X Flood: ÖSYM Paragrafta Neden Eleniyorsun? (Acı Gerçekler)',
-    type: 'x_thread',
-    platform: 'x',
+    id: 'demo_tiktok_1',
+    title: 'TikTok & Reels: Paragrafta Süre Yetiştiremeyenlerin 3 Hatası (9:16)',
+    type: 'reels',
+    platform: 'tiktok',
     persona: 'grok_witty',
     isAutoPilot: true,
     topic: 'exam_tactics',
-    topicLabel: 'X Flood • Taktik Dizisi',
+    topicLabel: 'TikTok & Reels • 9:16 Video',
     status: 'approved',
     targetAudience: 'YKS 2026',
-    caption: `ÖSYM Türkçede süre yetiştiremeyip son 5 soruyu sallayan tayfa, toplanın. Size kimsenin anlatmadığı acı gerçeği söylüyorum: Sorun senin hızlı okuyamaman değil, beyninin "okuduğunu unutma" refleksi. Flood devamında netini +5 artıran şifre 👇🧵\n\n#yks2026 #tytturkce #paragraftaktikleri #dersolab #ykstayfa`,
-    hashtags: ['#yks2026', '#tytturkce', '#paragraftaktikleri', '#dersolab', '#ykstayfa'],
+    caption: `Paragraflarda son şıkka gelince soruyu unutanlar buraya! 🎬⚡ 30 saniyede paragraf süreni yarıya indirecek 3 püf nokta!\n\nSen denemelerde en çok hangi derse süre yetiştiremiyorsun? Yorumlara yaz 👇\n\n#yks2026 #tiktokegitim #reels #paragraftaktikleri #dersolab #ykstayfa`,
+    hashtags: ['#yks2026', '#tiktokegitim', '#reels', '#paragraftaktikleri', '#dersolab', '#ykstayfa'],
     virality: {
-      score: 95,
-      hookStrength: 97,
-      shareability: 94,
-      savePotential: 96,
-      commentBait: 91,
-      verdict: 'Sınav süre paniği ve acı gerçekle yüzleşme. Çok yüksek kaydetme ve alıntılama potansiyeli.',
+      score: 97,
+      hookStrength: 98,
+      shareability: 96,
+      savePotential: 97,
+      commentBait: 95,
+      verdict: 'Çok yüksek izlenme ve paylaşım potansiyeli. Sınav süre paniği kancası son derece etkili.',
     },
-    xThreadData: {
-      threadHook: 'ÖSYM Türkçede süre yetiştiremeyip son 5 soruyu sallayan tayfa, toplanın.',
-      totalTweets: 5,
-      estimatedReadTime: '2 dk',
-      callToAction: 'DersoLab Bionic Reader ve Fonetik Müfettişini profildeki linkten test et.',
-      tweets: [
-        { tweetNumber: 1, text: 'ÖSYM Türkçede süre yetiştiremeyip son 5 soruyu sallayan tayfa, toplanın. Size kimsenin anlatmadığı acı gerçeği söylüyorum: Sorun senin hızlı okuyamaman değil, beyninin "okuduğunu unutma" refleksi. Flood devamında netini +5 artıran şifre 👇🧵', charCount: 247 },
-        { tweetNumber: 2, text: '1/ Paragrafı roman okur gibi baştan sona tek nefeste okuyorsun. Sonra şıklara iniyorsun: "A mıydı C miydi?" hop, tekrar metne dön. Tebrikler, aynı soruya 2.5 dakika ve 400 kalori beyin enerjisi harcadın.', charCount: 211 },
-        { tweetNumber: 3, text: '2/ Kural 1: Önce soru kökü, sonra şıkların İLK KELİMELERİ. Beynine metne girmeden önce "neyi avlayacağını" söylemezsen, metindeki her detay beyninde çöp bilgiye dönüşür.', charCount: 172 },
-        { tweetNumber: 4, text: '3/ İç seslendirme tuzağı: Her kelimeyi boğazında fısıldayarak okuduğun sürece dakikada max 180 kelime okursun. Göz kasın ise dakikada 450 kelime algılayabilir. DersoLab L.A.B. Bionic Reader modülü tam olarak bu kası çalıştırıyor.', charCount: 236 },
-        { tweetNumber: 5, text: 'Özet: Paragraf soru bankası eritmekle hızlanmazsın. Teknikle hızlanırsın. DersoLab Bionic Reader ve Fonetik Müfettişini profildeki linkten ücretsiz dene, süreni 15 dakika geri kazan 🦊👇\nhttps://dersolab.com/lab', charCount: 226 }
+    reelsStoryboard: {
+      hook3s: 'Paragrafta son şıkka gelince başını unutanlar, bu taktik tam size göre!',
+      visualDirection: 'Hızlı zoom, ekranda neon kronometre ve soru kökü vurgusu.',
+      spokenScript:
+        'Paragrafı roman gibi baştan sona okumayı hemen bırak. İlk iş: Soru kökünü daireye al ve şıkların ilk kelimelerini tara. Zihnine arama emri ver!',
+      onScreenText: [
+        '⏱️ Paragraf Süreni Yarıya İndir',
+        '❌ Hata: Roman gibi okumak',
+        '✅ Taktik: Şıklardan arama emri ver',
+        '🚀 Biyodaki linkten Bionic Reader dene',
       ],
+      musicAudioVibe: 'Trending Phonk / Fast BPM',
+      callToAction: 'Profildeki linkten DersoLab Bionic Reader ücretsiz dene 🦊⚡',
     },
     createdAt: new Date().toISOString(),
   },
@@ -483,10 +484,9 @@ export default function SocialStudioPage() {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
           {[
             { id: 'all', label: 'Tüm Formatlar', icon: Filter },
-            { id: 'x_thread', label: 'X (Twitter) Flood', icon: XPlatformIcon },
+            { id: 'reels', label: 'TikTok & Reels (9:16)', icon: Film },
             { id: 'carousel', label: 'Kaydırmalı Carousel', icon: Layers },
             { id: 'story', label: 'Story (9:16)', icon: Smartphone },
-            { id: 'reels', label: 'Reels Senaryoları', icon: Film },
             { id: 'post', label: 'Günün Sorusu / Post', icon: HelpCircle },
           ].map((tab) => {
             const Icon = tab.icon
@@ -577,37 +577,37 @@ export default function SocialStudioPage() {
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold border ${
-                          isX
+                          isRel || post.platform === 'tiktok'
                             ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300'
                             : isCar
                               ? 'bg-orange-500/15 border-orange-500/30 text-orange-400'
-                              : isRel
-                                ? 'bg-blue-500/15 border-blue-500/30 text-blue-400'
-                                : isStory
-                                  ? 'bg-purple-500/15 border-purple-500/30 text-purple-400'
+                              : isStory
+                                ? 'bg-purple-500/15 border-purple-500/30 text-purple-400'
+                                : isX
+                                  ? 'bg-slate-500/15 border-slate-500/30 text-slate-300'
                                   : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
                         }`}
                       >
-                        {isX ? (
-                          <XPlatformIcon className="w-3 h-3 text-cyan-400" />
+                        {isRel || post.platform === 'tiktok' ? (
+                          <Film className="w-3 h-3 text-cyan-400" />
                         ) : isCar ? (
                           <Layers className="w-3 h-3" />
-                        ) : isRel ? (
-                          <Film className="w-3 h-3" />
                         ) : isStory ? (
                           <Smartphone className="w-3 h-3" />
+                        ) : isX ? (
+                          <XPlatformIcon className="w-3 h-3 text-slate-400" />
                         ) : (
                           <HelpCircle className="w-3 h-3" />
                         )}
                         <span>
-                          {isX
-                            ? 'X Flood'
+                          {isRel || post.platform === 'tiktok'
+                            ? 'TikTok & Reels'
                             : isCar
                               ? 'Carousel'
-                              : isRel
-                                ? 'Reels'
-                                : isStory
-                                  ? 'Story'
+                              : isStory
+                                ? 'Story (9:16)'
+                                : isX
+                                  ? 'X Flood'
                                   : 'Post / Soru'}
                         </span>
                       </span>

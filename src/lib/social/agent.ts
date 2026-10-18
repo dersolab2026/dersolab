@@ -1453,48 +1453,34 @@ export async function generateAutonomousDailyBatch(
     persona
   )
 
-  // 3. Akşam Viral X Thread / Reels (20:00)
+  // 3. Akşam Viral TikTok & Reels Senaryosu (20:00)
   const eveningPost: SocialPostItem = attachGrokEnhancements(
     {
       id: `autopilot_${now}_evening`,
-      title: 'Akşam 20:00 • X Flood: ÖSYM Komisyonunun Asla Söylemediği 3 Sır',
-      type: 'x_thread',
-      platform: 'x',
+      title: 'Akşam 20:00 • TikTok & Reels: ÖSYM Komisyonunun 3 Gizli Hilesi',
+      type: 'reels',
+      platform: 'tiktok',
       topic: 'exam_tactics',
-      topicLabel: 'Akşam Prime Time • Viral X Flood',
+      topicLabel: 'Akşam Prime Time • TikTok & Reels (9:16)',
       status: 'approved',
       isAutoPilot: true,
       targetAudience: targetGrade,
-      caption: `ÖSYM soru yazarlarının çeldirici hazırlarken başvurduğu 3 psikolojik hile ve masadan netle kalkma rehberi 🧵👇 #yks2026 #ykstayfa #dersolab`,
-      hashtags: ['#yks2026', '#ykstayfa', '#dersolab', '#sinavtaktikleri'],
-      xThreadData: {
-        threadHook:
-          'ÖSYM soru yazarları senin neyi bildiğini değil, nerede acele edip dikkatsizleşeceğini test eder. İşte çeldirici şıkların arkasındaki 3 psikolojik mekanizma 🧵👇',
-        totalTweets: 4,
-        estimatedReadTime: '2 dk',
-        callToAction: 'DersoLab L.A.B. soru asistanı ile soruların röntgenini çek: dersolab.com/lab 🦊⚡',
-        tweets: [
-          {
-            tweetNumber: 1,
-            text: '1/4 — En cazip şık genellikle A veya B şıkkına konur.\n\nAday soruyu okur okumaz ilk gördüğü tanıdık kelimeye atlar. Kural: Şıkların tamamını okumadan işaretlenen her soru %50 risk taşır.',
-            charCount: 198,
-          },
-          {
-            tweetNumber: 2,
-            text: '2/4 — Çeldiricilerde aşırı genelleme kelimeleri gizlidir.\n\n"Daima", "yalnızca", "hiçbir zaman", "kesinlikle". Paragrafta veya felsefe sorularında bu kelimeleri gördüğün an kırmızı alarm çalmalı.',
-            charCount: 204,
-          },
-          {
-            tweetNumber: 3,
-            text: '3/4 — İşlem hatası yapılan ara sonuçlar şıklara eklenir.\n\nMatematikte sorunun yarısında bulduğun sayıyı şıklarda görüp işaretlediysen geçmiş olsun. Soru senden x\'i değil, 2x+1\'i istiyordu.',
-            charCount: 201,
-          },
-          {
-            tweetNumber: 4,
-            text: '4/4 — Özet:\n\nAcele etme, soru kökünü oku, çeldiricileri ele.\nDersoLab L.A.B.\'da soru analizlerini yapay zeka ile yapmak için profildeki linke tıkla: dersolab.com/lab 🦊🚀\n\n#yks2026 #dersolab',
-            charCount: 198,
-          },
+      caption: `ÖSYM soru yazarlarının çeldirici hazırlarken başvurduğu 3 gizli psikolojik hile! 🎬⚡\n\nVideodaki taktiği kaydedip denemede uygula, netini kurtar!\n\nSen en çok hangi şıkta eleniyorsun? Yorumlara yaz 👇\n\n#yks2026 #ykstayfa #dersolab #tiktokegitim #reels`,
+      hashtags: ['#yks2026', '#ykstayfa', '#dersolab', '#tiktokegitim', '#reels'],
+      reelsStoryboard: {
+        hook3s: 'ÖSYM soru yazarları senin neyi bildiğini değil, nerede acele edeceğini test eder. İşte 3 psikolojik hile:',
+        visualDirection: 'Hızlı zoom-in, neon kırmızı soru işareti flaşı ve DersoLab soru röntgeni animasyonu.',
+        spokenScript:
+          '1. En cazip çeldirici şık daima A veya B şıkkına konur. İlk tanıdık kelimeye atlayan adayın sorusu %50 riske girer.\n2. "Daima", "kesinlikle", "hiçbir zaman" gibi aşırı genelleme kelimeleri gördüğün an kırmızı alarm çalmalı.\n3. Sorunun yarısında bulduğun ara işlem sonucu şıklara tuzak olarak konur.\n\nAcele etme, soru kökünü oku, çeldiricileri ele! Soruların röntgenini çekmek için profildeki linke tıkla.',
+        onScreenText: [
+          '⚠️ 0-3s: Çeldirici Tuzağına Düşme!',
+          '🎯 1: Cazip Şık Tuzağı (A & B)',
+          '🚨 2: Aşırı Genelleme Kelimeleri',
+          '🧮 3: Ara İşlem Sonucu Şıkta!',
+          '🦊 Profildeki Linkten Ücretsiz Dene',
         ],
+        musicAudioVibe: 'Trending Phonk / Mysterious Suspense Beats (Bpm: 128)',
+        callToAction: 'Profildeki linkten DersoLab L.A.B. modülünü hemen dene 🦊🚀',
       },
       createdAt: new Date().toISOString(),
       scheduledFor: new Date(Date.now() + 1000 * 60 * 60 * 11).toISOString(),
@@ -1504,7 +1490,7 @@ export async function generateAutonomousDailyBatch(
 
   // Otonom AI Görselleri Entegrasyonu (Paralel Hızlı Üretim)
   try {
-    const [mathImgResult, bionicImgResult] = await Promise.allSettled([
+    const [mathImgResult, bionicImgResult, reelsCoverResult] = await Promise.allSettled([
       generateSocialImage({
         prompt: 'Matematik koordinat düzlemi, köklü ifadeler ve çift kök mutlak değer grafik şeması',
         subject: 'TYT Matematik',
@@ -1516,6 +1502,12 @@ export async function generateAutonomousDailyBatch(
         subject: 'TYT Türkçe Hızlı Okuma',
         stylePreset: 'cyber_lab',
         aspectRatio: '1:1',
+      }),
+      generateSocialImage({
+        prompt: 'TikTok ve Reels dikey video kapağı, neon soru işareti ve soru analiz siber grafiği',
+        subject: 'YKS Sınav Taktikleri',
+        stylePreset: 'cyber_lab',
+        aspectRatio: '9:16',
       }),
     ])
 
@@ -1532,6 +1524,13 @@ export async function generateAutonomousDailyBatch(
     ) {
       middayPost.carouselSlides[0].uploadedImageUrl = bionicImgResult.value.imageUrl
       middayPost.carouselSlides[0].aiImagePrompt = bionicImgResult.value.prompt
+    }
+
+    if (reelsCoverResult.status === 'fulfilled' && reelsCoverResult.value?.imageUrl) {
+      eveningPost.uploadedImageUrl = reelsCoverResult.value.imageUrl
+      if (eveningPost.reelsStoryboard) {
+        eveningPost.reelsStoryboard.uploadedImageUrl = reelsCoverResult.value.imageUrl
+      }
     }
   } catch (e) {
     console.warn('Daily batch visuals parallel error:', e)

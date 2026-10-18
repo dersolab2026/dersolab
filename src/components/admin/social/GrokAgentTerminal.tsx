@@ -247,10 +247,10 @@ export function GrokAgentTerminal({ onPostsGenerated, currentPostCount }: GrokAg
     addLog(`[1/4 RADAR] 2026 ÖSYM sınav takvimi ve kazanım radar analizi yapılıyor...`)
 
     const timer1 = setTimeout(() => {
-      addLog(`[2/4 VISUAL] Sabah Story 9:16 Şeması ve Öğle Biyonik Okuma 1:1 görselleri paralel derleniyor...`)
+      addLog(`[2/4 VISUAL] Sabah Story 9:16 Quizi + Öğle 1:1 Carousel + Akşam 9:16 TikTok/Reels görselleri paralel derleniyor...`)
     }, 700)
     const timer2 = setTimeout(() => {
-      addLog(`[3/4 COPYWRITING] Viral kancalar ve pedagojik açıklamalar sentezleniyor...`)
+      addLog(`[3/4 COPYWRITING] Viral kancalar, TikTok senaryosu ve pedagojik açıklamalar sentezleniyor...`)
     }, 1500)
 
     try {
@@ -269,7 +269,7 @@ export function GrokAgentTerminal({ onPostsGenerated, currentPostCount }: GrokAg
         throw new Error(data.error || 'Auto-Pilot içeriği üretilemedi.')
       }
 
-      addLog(`[4/4 BATCH READY] 3 Adet koordineli gönderi üretildi: Sabah 9:16 Quizi + Öğle Biyonik Carousel + Akşam X Flood.`)
+      addLog(`[4/4 BATCH READY] 3 Adet koordineli gönderi üretildi: Sabah 9:16 Story + Öğle Biyonik Carousel + Akşam TikTok & Reels.`)
       addLog(`[VIRALITY] Viralite Puanı: 97.4 / 100. Pedagojik onay mührü basıldı.`)
       onPostsGenerated(data.items)
       toast.success('DersoLab Swarm: Günün 3 içerik paketi ve görselleri hazır!')
