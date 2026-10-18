@@ -199,7 +199,7 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
     }
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         temperature: 0.7,
@@ -316,7 +316,7 @@ Yanıtını kesinlikle 7 elemanlı bir JSON dizisi [ ... ] olarak döndür. Her 
 `
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         temperature: 0.7,
@@ -1272,7 +1272,7 @@ Yanıtını kesinlikle şu JSON şemasına uygun 5 elemanlı dizi olarak döndü
 `
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         temperature: 0.8,
@@ -1474,35 +1474,39 @@ export async function generateAutonomousDailyBatch(
     persona
   )
 
-  // Otonom AI Görselleri Entegrasyonu (Metinden Ziyade Görsel Önceliği)
+  // Otonom AI Görselleri Entegrasyonu (Paralel Hızlı Üretim)
   try {
-    const mathImg = await generateSocialImage({
-      prompt: 'Matematik koordinat düzlemi, köklü ifadeler ve çift kök mutlak değer grafik şeması',
-      subject: 'TYT Matematik',
-      stylePreset: 'scientific_diagram',
-      aspectRatio: '9:16',
-    })
-    if (mathImg?.imageUrl && morningPost.storyData) {
-      morningPost.storyData.uploadedImageUrl = mathImg.imageUrl
-      morningPost.uploadedImageUrl = mathImg.imageUrl
-    }
-  } catch (e) {
-    console.warn('Daily batch morning visual error:', e)
-  }
+    const [mathImgResult, bionicImgResult] = await Promise.allSettled([
+      generateSocialImage({
+        prompt: 'Matematik koordinat düzlemi, köklü ifadeler ve çift kök mutlak değer grafik şeması',
+        subject: 'TYT Matematik',
+        stylePreset: 'scientific_diagram',
+        aspectRatio: '9:16',
+      }),
+      generateSocialImage({
+        prompt: 'Biyonik hızlı okuma göz kası odaklanma HUD şeması ve neon siber tarama ışınları',
+        subject: 'TYT Türkçe Hızlı Okuma',
+        stylePreset: 'cyber_lab',
+        aspectRatio: '1:1',
+      }),
+    ])
 
-  try {
-    const bionicImg = await generateSocialImage({
-      prompt: 'Biyonik hızlı okuma göz kası odaklanma HUD şeması ve neon siber tarama ışınları',
-      subject: 'TYT Türkçe Hızlı Okuma',
-      stylePreset: 'cyber_lab',
-      aspectRatio: '1:1',
-    })
-    if (bionicImg?.imageUrl && middayPost.carouselSlides && middayPost.carouselSlides.length > 0) {
-      middayPost.carouselSlides[0].uploadedImageUrl = bionicImg.imageUrl
-      middayPost.carouselSlides[0].aiImagePrompt = bionicImg.prompt
+    if (mathImgResult.status === 'fulfilled' && mathImgResult.value?.imageUrl && morningPost.storyData) {
+      morningPost.storyData.uploadedImageUrl = mathImgResult.value.imageUrl
+      morningPost.uploadedImageUrl = mathImgResult.value.imageUrl
+    }
+
+    if (
+      bionicImgResult.status === 'fulfilled' &&
+      bionicImgResult.value?.imageUrl &&
+      middayPost.carouselSlides &&
+      middayPost.carouselSlides.length > 0
+    ) {
+      middayPost.carouselSlides[0].uploadedImageUrl = bionicImgResult.value.imageUrl
+      middayPost.carouselSlides[0].aiImagePrompt = bionicImgResult.value.prompt
     }
   } catch (e) {
-    console.warn('Daily batch midday visual error:', e)
+    console.warn('Daily batch visuals parallel error:', e)
   }
 
   return [morningPost, middayPost, eveningPost]

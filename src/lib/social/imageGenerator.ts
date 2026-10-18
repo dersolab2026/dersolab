@@ -251,13 +251,14 @@ Requirements:
 - Include visual concepts matching the topic (e.g. geometric angles, optical prisms, wave formulas, neural paths, DNA spirals, or student desk elements).
 - Do not include markdown code block ticks, no \`\`\`xml or \`\`\`svg, and no preamble text. Output must begin directly with <svg.`
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: systemInstruction }] }],
         }),
+        signal: AbortSignal.timeout(5000),
       })
 
       if (response.ok) {

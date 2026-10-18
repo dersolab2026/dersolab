@@ -243,9 +243,15 @@ export function GrokAgentTerminal({ onPostsGenerated, currentPostCount }: GrokAg
   async function handleAutoPilotTrigger() {
     setIsRunning(true)
     setActiveTab('stream')
-    addLog(`[AUTONOMOUS LOOP] 5-Ajanlı Swarm Auto-Pilot tetiklendi!`)
-    addLog(`[SYLLABUS SCAN] Günün en yüksek getirili sınav konuları taranıyor...`)
-    addLog(`[VISUAL ENGINE] 9:16 Sabah Quizi + 1:1 Öğle Şeması + X Kartı hazırlanıyor...`)
+    addLog(`[AUTONOMOUS LOOP] 5-Ajanlı Swarm Auto-Pilot başlatıldı!`)
+    addLog(`[1/4 RADAR] 2026 ÖSYM sınav takvimi ve kazanım radar analizi yapılıyor...`)
+
+    const timer1 = setTimeout(() => {
+      addLog(`[2/4 VISUAL] Sabah Story 9:16 Şeması ve Öğle Biyonik Okuma 1:1 görselleri paralel derleniyor...`)
+    }, 700)
+    const timer2 = setTimeout(() => {
+      addLog(`[3/4 COPYWRITING] Viral kancalar ve pedagojik açıklamalar sentezleniyor...`)
+    }, 1500)
 
     try {
       const res = await fetch('/api/admin/social/generate', {
@@ -263,7 +269,7 @@ export function GrokAgentTerminal({ onPostsGenerated, currentPostCount }: GrokAg
         throw new Error(data.error || 'Auto-Pilot içeriği üretilemedi.')
       }
 
-      addLog(`[BATCH READY] 3 Adet koordineli gönderi üretildi: Sabah 9:16 Quizi + Öğle Biyonik Carousel + Akşam X Flood.`)
+      addLog(`[4/4 BATCH READY] 3 Adet koordineli gönderi üretildi: Sabah 9:16 Quizi + Öğle Biyonik Carousel + Akşam X Flood.`)
       addLog(`[VIRALITY] Viralite Puanı: 97.4 / 100. Pedagojik onay mührü basıldı.`)
       onPostsGenerated(data.items)
       toast.success('DersoLab Swarm: Günün 3 içerik paketi ve görselleri hazır!')
@@ -271,6 +277,8 @@ export function GrokAgentTerminal({ onPostsGenerated, currentPostCount }: GrokAg
       addLog(`[ERROR] Auto-pilot başarısız: ${err.message}`)
       toast.error(err.message || 'Auto-pilot yürütülemedi.')
     } finally {
+      clearTimeout(timer1)
+      clearTimeout(timer2)
       setIsRunning(false)
     }
   }
@@ -314,11 +322,16 @@ export function GrokAgentTerminal({ onPostsGenerated, currentPostCount }: GrokAg
               className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-black text-xs shadow-[0_0_25px_rgba(16,185,129,0.35)] transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
             >
               {isRunning ? (
-                <Loader2 className="w-4 h-4 animate-spin text-black" />
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-black" />
+                  <span>⚡ Swarm Çiziyor ve Derliyor...</span>
+                </>
               ) : (
-                <Zap className="w-4 h-4 fill-black" />
+                <>
+                  <Zap className="w-4 h-4 fill-black" />
+                  <span>⚡ Otonom Swarm Paket (3'lü + Görseller)</span>
+                </>
               )}
-              <span>⚡ Otonom Swarm Paket (3'lü + Görseller)</span>
             </button>
           </div>
         </div>
