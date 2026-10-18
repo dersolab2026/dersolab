@@ -1,6 +1,8 @@
 export type SocialPlatform = 'instagram' | 'tiktok' | 'youtube' | 'x' | 'linkedin'
 
-export type InstagramContentType = 'carousel' | 'post' | 'reels' | 'story'
+export type InstagramContentType = 'carousel' | 'post' | 'reels' | 'story' | 'x_thread'
+
+export type AgentPersona = 'grok_witty' | 'sherlock_exam' | 'growth_mentor' | 'direct_no_bs'
 
 export type ContentTopic =
   | 'exam_tactics'
@@ -13,9 +15,16 @@ export type ContentTopic =
 
 export type PostStatus = 'draft' | 'approved' | 'scheduled' | 'published'
 
-export type SlideThemeVariant = 'lab_dark' | 'neon_orange' | 'cyan_cyber' | 'purple_matrix'
+export type SlideThemeVariant = 'lab_dark' | 'neon_orange' | 'cyan_cyber' | 'purple_matrix' | 'grok_cyber'
 
 export type StoryStickerType = 'quiz' | 'poll' | 'link' | 'countdown' | 'question_box'
+
+export type ImageStylePreset =
+  | 'cyber_lab'
+  | 'scientific_diagram'
+  | 'minimal_vector'
+  | 'realistic_study'
+  | 'mascot_fox'
 
 export interface CarouselSlide {
   slideNumber: number
@@ -27,6 +36,7 @@ export interface CarouselSlide {
   footerNote?: string
   themeVariant: SlideThemeVariant
   uploadedImageUrl?: string
+  aiImagePrompt?: string
 }
 
 export interface SinglePostData {
@@ -77,6 +87,71 @@ export interface ReelsStoryboard {
   uploadedImageUrl?: string
 }
 
+export interface HookVariation {
+  id: string
+  type: 'curiosity' | 'contrarian' | 'fomo' | 'grok_witty' | 'direct_value'
+  title: string
+  hookText: string
+  viralityScore: number
+  reason: string
+}
+
+export interface ViralityAnalysis {
+  score: number // 0 - 100
+  hookStrength: number // 0 - 100
+  savePotential: number // 0 - 100
+  shareability: number // 0 - 100
+  commentBait: number // 0 - 100
+  verdict: string
+}
+
+export interface XTweetItem {
+  tweetNumber: number
+  text: string
+  charCount: number
+  mediaPrompt?: string
+}
+
+export interface XThreadData {
+  threadHook: string
+  tweets: XTweetItem[]
+  totalTweets: number
+  estimatedReadTime: string
+  callToAction: string
+}
+
+export interface SimulatedComment {
+  id: string
+  userHandle: string
+  commentText: string
+  userType: 'stressed_student' | 'curious' | 'doubtful' | 'parent'
+  suggestedReplies: {
+    persona: AgentPersona
+    personaLabel: string
+    replyText: string
+  }[]
+}
+
+export interface PedagogicalAudit {
+  isApproved: boolean
+  mebCurriculumMatch: boolean
+  osymRelevanceScore: number // 0 - 100
+  checkedRules: string[]
+  pedagogyNotes: string
+  verifiedByAgent: string
+  lastCheckedAt: string
+}
+
+export interface AgentLearningInsight {
+  id: string
+  title: string
+  category: 'visual' | 'timing' | 'hooks' | 'stickers'
+  metricBoost: string
+  confidenceScore: number
+  actionableTip: string
+  appliedPattern: string
+}
+
 export interface SocialPostItem {
   id: string
   title: string
@@ -87,6 +162,14 @@ export interface SocialPostItem {
   caption: string
   hashtags: string[]
   targetAudience: string
+  platform?: SocialPlatform
+  persona?: AgentPersona
+  virality?: ViralityAnalysis
+  hookMatrix?: HookVariation[]
+  pedagogicalAudit?: PedagogicalAudit
+  xThreadData?: XThreadData
+  simulatedComments?: SimulatedComment[]
+  isAutoPilot?: boolean
   carouselSlides?: CarouselSlide[]
   singlePostData?: SinglePostData
   storyData?: StoryData
@@ -106,6 +189,8 @@ export interface GeneratePostRequest {
   customPrompt?: string
   targetGrade?: 'YKS (TYT/AYT)' | 'LGS' | 'Genel'
   tone?: 'energetic' | 'informative' | 'coaching' | 'humorous'
+  persona?: AgentPersona
+  platform?: SocialPlatform
   imageBase64?: string
   storyStickerType?: StoryStickerType
 }
@@ -114,4 +199,31 @@ export interface WeeklyCalendarRequest {
   targetGrade?: 'YKS (TYT/AYT)' | 'LGS' | 'Genel'
   focusSubject?: string
   customInstructions?: string
+  persona?: AgentPersona
 }
+
+export interface GrokAgentCommandRequest {
+  command: string
+  persona?: AgentPersona
+  targetPlatform?: SocialPlatform
+  targetGrade?: 'YKS (TYT/AYT)' | 'LGS' | 'Genel'
+  focusSubject?: string
+  autoEnqueue?: boolean
+}
+
+export interface GenerateImageRequest {
+  prompt: string
+  stylePreset?: ImageStylePreset
+  aspectRatio?: '1:1' | '9:16' | '16:9'
+  subject?: string
+  slideNumber?: number
+}
+
+export interface GenerateImageResponse {
+  success: boolean
+  imageUrl: string
+  prompt: string
+  stylePreset: ImageStylePreset
+  aspectRatio: '1:1' | '9:16' | '16:9'
+}
+

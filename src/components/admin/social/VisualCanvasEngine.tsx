@@ -12,8 +12,12 @@ import {
   Upload,
   Image as ImageIcon,
   Sparkles,
+  Wand2,
+  X,
+  Loader2,
+  Trash2,
 } from 'lucide-react'
-import type { CarouselSlide, SinglePostData, SlideThemeVariant, StoryData } from '@/types/social'
+import type { CarouselSlide, ImageStylePreset, SinglePostData, SlideThemeVariant, StoryData } from '@/types/social'
 import { toast } from 'sonner'
 
 interface VisualCanvasEngineProps {
@@ -81,6 +85,16 @@ const THEME_STYLES: Record<
     tagBg: '#a855f7',
     tagText: '#ffffff',
   },
+  grok_cyber: {
+    bgGradient: ['#030708', '#071317'],
+    accentColor: '#10b981',
+    secondaryAccent: '#06b6d4',
+    badgeBg: 'rgba(16, 185, 129, 0.15)',
+    badgeText: '#34d399',
+    glowColor: 'rgba(16, 185, 129, 0.35)',
+    tagBg: '#10b981',
+    tagText: '#021e14',
+  },
 }
 
 export function VisualCanvasEngine({
@@ -102,9 +116,62 @@ export function VisualCanvasEngine({
   const [loadedOrtaokulImg, setLoadedOrtaokulImg] = useState<HTMLImageElement | null>(null)
   const [loadedLiseImg, setLoadedLiseImg] = useState<HTMLImageElement | null>(null)
 
+  // AI Görsel Üretici Durumları
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false)
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [aiStylePreset, setAiStylePreset] = useState<ImageStylePreset>('cyber_lab')
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false)
+
   const isCarousel = Boolean(slides && slides.length > 0)
   const currentSlide = isCarousel ? slides![activeSlideIndex] : null
   const totalSlides = isCarousel ? slides!.length : 1
+
+  async function handleGenerateAiImage() {
+    const promptToUse =
+      aiPrompt.trim() ||
+      currentSlide?.headline ||
+      singlePost?.headline ||
+      storyData?.headline ||
+      'DersoLab Eğitici Bilimsel İllüstrasyon'
+
+    setIsGeneratingImage(true)
+    try {
+      const res = await fetch('/api/admin/social/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate_image',
+          prompt: promptToUse,
+          stylePreset: aiStylePreset,
+          aspectRatio: isStory ? '9:16' : '1:1',
+          subject: currentSlide?.badge || singlePost?.badge,
+          slideNumber: isCarousel ? activeSlideIndex + 1 : 1,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok || !data.imageUrl) {
+        throw new Error(data.error || 'Görsel üretilemedi.')
+      }
+
+      onImageUpload?.(data.imageUrl)
+      if (isCarousel && onSlideUpdate && currentSlide) {
+        onSlideUpdate(activeSlideIndex, {
+          ...currentSlide,
+          uploadedImageUrl: data.imageUrl,
+          aiImagePrompt: promptToUse,
+        })
+      }
+
+      toast.success('Yapay zeka görseli başarıyla üretildi ve slayta yerleştirildi!')
+      setIsAiModalOpen(false)
+    } catch (err: any) {
+      console.error(err)
+      toast.error(err?.message || 'Görsel üretilirken bir hata oluştu.')
+    } finally {
+      setIsGeneratingImage(false)
+    }
+  }
 
   // Görsel URL değiştiğinde HTMLImageElement olarak yükle
   const effectiveImageUrl =
@@ -419,9 +486,9 @@ export function VisualCanvasEngine({
     ctx.lineTo(width - 80, height - 125)
     ctx.stroke()
 
-    ctx.font = '600 22px Inter, system-ui, sans-serif'
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
-    ctx.fillText('@dersolabegitim', 80, height - 75)
+    ctx.font = '600 20px Inter, system-ui, sans-serif'
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
+    ctx.fillText('@dersolabegitim  •  🛡️ ÖSYM KAZANIM ONAYLI', 80, height - 75)
 
     const footerRightText = isStory
       ? 'Yanıt Gönder 💬'
@@ -1000,13 +1067,44 @@ export function VisualCanvasEngine({
   // Tema Değiştirme
   function cycleTheme() {
     if (!isCarousel || !currentSlide || !onSlideUpdate) return
-    const themes: SlideThemeVariant[] = ['lab_dark', 'neon_orange', 'cyan_cyber', 'purple_matrix']
+    const themes: SlideThemeVariant[] = ['lab_dark', 'neon_orange', 'cyan_cyber', 'purple_matrix', 'grok_cyber']
     const currentIndex = themes.indexOf(currentSlide.themeVariant)
     const nextTheme = themes[(currentIndex + 1) % themes.length]
     onSlideUpdate(activeSlideIndex, {
       ...currentSlide,
       themeVariant: nextTheme,
     })
+  }
+
+  // Tüm Slaytları Sırayla İndirme
+  async function handleDownloadAll() {
+    if (!isCarousel || !slides || slides.length === 0) return
+    setIsExporting(true)
+    toast.info(`Tüm slaytlar (${slides.length} adet) sırayla indiriliyor...`)
+
+    try {
+      const originalIndex = activeSlideIndex
+      for (let i = 0; i < slides.length; i++) {
+        onSlideChange?.(i)
+        await new Promise((r) => setTimeout(r, 220))
+        const canvas = canvasRef.current
+        if (canvas) {
+          const imageUri = canvas.toDataURL('image/png')
+          const link = document.createElement('a')
+          link.download = `dersolab_carousel_slayt_${i + 1}_${Date.now()}.png`
+          link.href = imageUri
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        }
+      }
+      onSlideChange?.(originalIndex)
+      toast.success(`Tüm ${slides.length} slayt başarıyla indirildi!`)
+    } catch {
+      toast.error('Toplu indirme sırasında bir hata oluştu.')
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   return (
@@ -1044,14 +1142,45 @@ export function VisualCanvasEngine({
             title="Kendi görselinizi / soru fotoğrafınızı yükleyin"
           >
             <Upload className="w-3.5 h-3.5 text-blue-400" />
-            <span>Fotoğraf Ekle</span>
+            <span>Fotoğraf</span>
           </button>
+
+          {/* AI Görsel Üret Butonu */}
+          <button
+            onClick={() => {
+              const defaultP = currentSlide?.headline || singlePost?.headline || storyData?.headline || ''
+              setAiPrompt(defaultP)
+              setIsAiModalOpen(true)
+            }}
+            className="flex items-center gap-1.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 border border-purple-500/40 text-purple-300 rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+            title="Yapay zeka ile bu slayt/içerik için özel görsel üret"
+          >
+            <Wand2 className="w-3.5 h-3.5 text-purple-400" />
+            <span>AI Görsel</span>
+          </button>
+
+          {/* Görsel Kaldır Butonu (Varsa) */}
+          {Boolean(effectiveImageUrl) && (
+            <button
+              onClick={() => {
+                onImageUpload?.('')
+                if (isCarousel && onSlideUpdate && currentSlide) {
+                  onSlideUpdate(activeSlideIndex, { ...currentSlide, uploadedImageUrl: undefined })
+                }
+                toast.success('Görsel kaldırıldı.')
+              }}
+              className="p-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 transition-colors"
+              title="Slayt görselini kaldır"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
 
           {isCarousel && onSlideUpdate && (
             <button
               onClick={cycleTheme}
               className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs font-medium text-slate-300 transition-colors"
-              title="Temayı Değiştir"
+              title="Temayı Değiştir (Grok Cyber, Lab Dark, Neon Orange, Cyan Cyber, Purple Matrix)"
             >
               <Palette className="w-3.5 h-3.5 text-orange-400" />
               <span>Tema</span>
@@ -1062,7 +1191,7 @@ export function VisualCanvasEngine({
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-200 transition-all hover:scale-105 active:scale-95"
             title="Panoya Kopyala"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-300" />}
@@ -1071,11 +1200,22 @@ export function VisualCanvasEngine({
           <button
             onClick={handleDownload}
             disabled={isExporting}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl px-3.5 py-1.5 text-xs font-bold shadow-[0_0_20px_rgba(249,115,22,0.3)] transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl px-3 py-1.5 text-xs font-bold shadow-[0_0_20px_rgba(249,115,22,0.3)] transition-all hover:scale-105 active:scale-95"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>İndir (PNG)</span>
+            <span>İndir</span>
           </button>
+          {isCarousel && totalSlides > 1 && (
+            <button
+              onClick={handleDownloadAll}
+              disabled={isExporting}
+              className="flex items-center gap-1 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 rounded-xl px-2.5 py-1.5 text-[11px] font-bold transition-all hover:scale-105 active:scale-95"
+              title="Tüm slaytları PNG olarak seri indir"
+            >
+              <Download className="w-3 h-3" />
+              <span>Tüm ({totalSlides})</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1129,6 +1269,102 @@ export function VisualCanvasEngine({
               aria-label={`Slayt ${i + 1}`}
             />
           ))}
+        </div>
+      )}
+
+      {/* AI GÖRSEL ÜRETİCİ MODAL */}
+      {isAiModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg rounded-3xl bg-[#0f111a] border border-purple-500/30 shadow-[0_20px_70px_rgba(168,85,247,0.3)] p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                  <Wand2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Yapay Zeka ile Görsel Üret</h3>
+                  <p className="text-[11px] text-slate-400">
+                    {isStory ? 'Story (9:16) formatında' : 'Slayt & Post (1:1) formatında'} özel illüstrasyon üretir
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAiModalOpen(false)}
+                className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Prompt Girişi */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Görsel Konusu / Prompt</label>
+              <textarea
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                placeholder="Örn: TYT Fizik optik prizma ışık kırılması, türev grafiği ve teğet eğimi, biyonik hızlı okuma gözü..."
+                rows={3}
+                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-500 outline-none focus:border-purple-500 resize-none"
+              />
+            </div>
+
+            {/* Stil Seçimi */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Görsel İllüstrasyon Stili</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {[
+                  { id: 'cyber_lab', label: '🔮 Cyber Lab', desc: 'Neon & 3D Lab' },
+                  { id: 'scientific_diagram', label: '📐 Bilimsel Şema', desc: 'Optik, Formül, Eğri' },
+                  { id: 'minimal_vector', label: '🎨 Vektör Sanatı', desc: 'Modern & Düz' },
+                  { id: 'realistic_study', label: '📸 Çalışma Odası', desc: 'Masa, Kitap, Odak' },
+                  { id: 'mascot_fox', label: '🦊 Zeki Tilki', desc: 'DersoLab Maskotu' },
+                ].map((st) => (
+                  <button
+                    key={st.id}
+                    type="button"
+                    onClick={() => setAiStylePreset(st.id as ImageStylePreset)}
+                    className={`p-2 rounded-xl text-left border transition-all ${
+                      aiStylePreset === st.id
+                        ? 'bg-purple-500/20 border-purple-400 text-white shadow-md'
+                        : 'bg-white/5 border-white/5 text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <span className="text-xs font-bold block">{st.label}</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">{st.desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Aksiyon Butonları */}
+            <div className="pt-2 flex items-center justify-end gap-2 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(false)}
+                className="px-3 py-2 rounded-xl border border-white/10 text-xs font-semibold text-slate-300 hover:bg-white/5"
+              >
+                Vazgeç
+              </button>
+              <button
+                type="button"
+                disabled={isGeneratingImage}
+                onClick={handleGenerateAiImage}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold text-xs shadow-[0_0_20px_rgba(168,85,247,0.35)] transition-all disabled:opacity-50"
+              >
+                {isGeneratingImage ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Görsel Üretiliyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Görseli Üret &amp; Slayta Ekle</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

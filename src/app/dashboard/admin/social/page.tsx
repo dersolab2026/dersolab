@@ -20,10 +20,13 @@ import {
   Trash2,
   ArrowRight,
   TrendingUp,
+  Zap,
+  Bot,
 } from 'lucide-react'
 import type { InstagramContentType, PostStatus, SocialPostItem } from '@/types/social'
 import { GeneratePostModal } from '@/components/admin/social/GeneratePostModal'
 import { PostEditorDrawer } from '@/components/admin/social/PostEditorDrawer'
+import { GrokAgentTerminal } from '@/components/admin/social/GrokAgentTerminal'
 import { toast } from 'sonner'
 
 function InstagramIcon({ className = 'w-4 h-4' }: { className?: string }) {
@@ -44,9 +47,53 @@ function InstagramIcon({ className = 'w-4 h-4' }: { className?: string }) {
   )
 }
 
-const STORAGE_KEY = 'dersolab_social_posts_v2'
+function XPlatformIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  )
+}
+
+const STORAGE_KEY = 'dersolab_social_posts_v4'
 
 const INITIAL_DEMO_POSTS: SocialPostItem[] = [
+  {
+    id: 'demo_x_1',
+    title: 'X Flood: ÖSYM Paragrafta Neden Eleniyorsun? (Acı Gerçekler)',
+    type: 'x_thread',
+    platform: 'x',
+    persona: 'grok_witty',
+    isAutoPilot: true,
+    topic: 'exam_tactics',
+    topicLabel: 'X Flood • Taktik Dizisi',
+    status: 'approved',
+    targetAudience: 'YKS 2026',
+    caption: `ÖSYM Türkçede süre yetiştiremeyip son 5 soruyu sallayan tayfa, toplanın. Size kimsenin anlatmadığı acı gerçeği söylüyorum: Sorun senin hızlı okuyamaman değil, beyninin "okuduğunu unutma" refleksi. Flood devamında netini +5 artıran şifre 👇🧵\n\n#yks2026 #tytturkce #paragraftaktikleri #dersolab #ykstayfa`,
+    hashtags: ['#yks2026', '#tytturkce', '#paragraftaktikleri', '#dersolab', '#ykstayfa'],
+    virality: {
+      score: 95,
+      hookStrength: 97,
+      shareability: 94,
+      savePotential: 96,
+      commentBait: 91,
+      verdict: 'Sınav süre paniği ve acı gerçekle yüzleşme. Çok yüksek kaydetme ve alıntılama potansiyeli.',
+    },
+    xThreadData: {
+      threadHook: 'ÖSYM Türkçede süre yetiştiremeyip son 5 soruyu sallayan tayfa, toplanın.',
+      totalTweets: 5,
+      estimatedReadTime: '2 dk',
+      callToAction: 'DersoLab Bionic Reader ve Fonetik Müfettişini profildeki linkten test et.',
+      tweets: [
+        { tweetNumber: 1, text: 'ÖSYM Türkçede süre yetiştiremeyip son 5 soruyu sallayan tayfa, toplanın. Size kimsenin anlatmadığı acı gerçeği söylüyorum: Sorun senin hızlı okuyamaman değil, beyninin "okuduğunu unutma" refleksi. Flood devamında netini +5 artıran şifre 👇🧵', charCount: 247 },
+        { tweetNumber: 2, text: '1/ Paragrafı roman okur gibi baştan sona tek nefeste okuyorsun. Sonra şıklara iniyorsun: "A mıydı C miydi?" hop, tekrar metne dön. Tebrikler, aynı soruya 2.5 dakika ve 400 kalori beyin enerjisi harcadın.', charCount: 211 },
+        { tweetNumber: 3, text: '2/ Kural 1: Önce soru kökü, sonra şıkların İLK KELİMELERİ. Beynine metne girmeden önce "neyi avlayacağını" söylemezsen, metindeki her detay beyninde çöp bilgiye dönüşür.', charCount: 172 },
+        { tweetNumber: 4, text: '3/ İç seslendirme tuzağı: Her kelimeyi boğazında fısıldayarak okuduğun sürece dakikada max 180 kelime okursun. Göz kasın ise dakikada 450 kelime algılayabilir. DersoLab L.A.B. Bionic Reader modülü tam olarak bu kası çalıştırıyor.', charCount: 236 },
+        { tweetNumber: 5, text: 'Özet: Paragraf soru bankası eritmekle hızlanmazsın. Teknikle hızlanırsın. DersoLab Bionic Reader ve Fonetik Müfettişini profildeki linkten ücretsiz dene, süreni 15 dakika geri kazan 🦊👇\nhttps://dersolab.com/lab', charCount: 226 }
+      ],
+    },
+    createdAt: new Date().toISOString(),
+  },
   {
     id: 'demo_1',
     title: 'TYT Türkçede Süre Kazandıran 4 Altın Taktik',
@@ -63,6 +110,9 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
         badge: 'TYT TÜRKÇE • PARAGRAF',
         headline: 'Paragrafta Süre Yetiştiremeyenlerin Yaptığı 3 Hata',
         subhead: 'Son şıkta ilk şıkkı unutanlar için kurtarıcı rehber',
+        uploadedImageUrl:
+          'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDgwIDEwODAiIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEwODAiPjxkZWZzPjxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjYwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzE4MGUyOSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBhMDUxMiIvPjwvcmFkaWFsR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJnbG93IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMzhiZGY4Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjYTg1NWY3Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTA4MCIgZmlsbD0idXJsKCNiZykiLz48Y2lyY2xlIGN4PSI1NDAiIGN5PSI1MDAiIHI9IjI4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDU2LCAxODksIDI0OCwgMC4yKSIgc3Ryb2tlLXdpZHRoPSI0Ii8+PGNpcmNsZSBjeD0iNTQwIiBjeT0iNTAwIiIgcj0iMjIwIiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZ2xvdykiIHN0cm9rZS13aWR0aD0iOCIgc3Ryb2tlLWRhc2hhcnJheT0iMTYsMTIiLz48Y2lyY2xlIGN4PSI1NDAiIGN5PSI1MDAiIHI9IjE0MCIgZmlsbD0icmdiYSgxNjgsIDg1LCAyNDcsIDAuMTUpIiBzdHJva2U9IiMzOGJkZjgiIHN0cm9rZS13aWR0aD0iNCIvPjxjaXJjbGUgY3g9IjU0MCIgY3k9IjUwMCIgcj0iNDAiIGZpbGw9IiNmOTczMTYiLz48dGV4dCB4PSI1NDAiIHk9Ijg4MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIzNiIgZmlsbD0iIzM4YmRmOCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TC5BLkIuIEJJT05JQyBSRUFERVIg4oCiIEhJWkxJIE9EQUs8L3RleHQ+PHRleHQgeD0iNTQwIiB5PSI5MzAiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXNpemU9IjI0IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuNykiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkfDllogS0FTSSBUQVJBTUEgVkUgQkxPSyBPS1VNQSDFnkVNQVNJPC90ZXh0Pjwvc3ZnPg==',
+        aiImagePrompt: 'Bionic Eye reading focus diagram, futuristic HUD interface',
         bodyPoints: [
           'Metni baştan sona roman gibi okumak',
           'Şıkları elemeden önce soru köküne dönmemek',
@@ -368,14 +418,17 @@ export default function SocialStudioPage() {
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-400 text-xs font-bold">
               <Sparkles className="w-3.5 h-3.5 animate-spin" />
-              <span>DersoLab Sosyal Medya Ajanı</span>
+              <span>DersoLab Sosyal Medya & AI Görsel Stüdyosu</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-              Instagram İçerik Fabrikası & Stüdyosu
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight flex items-center gap-3">
+              <span>Otonom Sosyal Medya & Görsel Fabrikası</span>
+              <span className="text-xs px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono font-normal">
+                v4.5 Visual-Agent
+              </span>
             </h1>
             <p className="text-sm text-slate-300 leading-relaxed">
-              YKS ve LGS adayları için yüksek etkileşimli Kaydırmalı Carousel rehberler, Reels senaryoları ve günün
-              sorularını yapay zeka ile üretin; tek tıkla şablon görselini alıp hesabınızı büyütün.
+              YKS ve LGS adayları için yüksek çözünürlüklü yapay zeka illüstrasyonları, bilimsel şemalar ve virallik kancalarıyla
+              Instagram & X içeriklerini otonom üretin, öğrenci yorumlarını yanıtlayın ve markanızı büyütün.
             </p>
           </div>
 
@@ -386,7 +439,7 @@ export default function SocialStudioPage() {
               className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs shadow-[0_0_25px_rgba(249,115,22,0.4)] transition-all hover:scale-105 active:scale-95"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Yeni İçerik Üret</span>
+              <span>Yeni İçerik & AI Görsel Paketi</span>
             </button>
             <a
               href="https://www.instagram.com/dersolabegitim/"
@@ -421,16 +474,20 @@ export default function SocialStudioPage() {
         </div>
       </div>
 
+      {/* 1.5. GROK AGENT OTONOM KOMUTA MERKEZİ & TERMİNAL */}
+      <GrokAgentTerminal onPostsGenerated={handlePostsGenerated} currentPostCount={posts.length} />
+
       {/* 2. FİLTRE VE ARAMA ÇUBUĞU */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/10">
         {/* Format Sekmeleri */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
           {[
             { id: 'all', label: 'Tüm Formatlar', icon: Filter },
+            { id: 'x_thread', label: 'X (Twitter) Flood', icon: XPlatformIcon },
             { id: 'carousel', label: 'Kaydırmalı Carousel', icon: Layers },
+            { id: 'story', label: 'Story (9:16)', icon: Smartphone },
             { id: 'reels', label: 'Reels Senaryoları', icon: Film },
             { id: 'post', label: 'Günün Sorusu / Post', icon: HelpCircle },
-            { id: 'story', label: 'Instagram Story (9:16)', icon: Smartphone },
           ].map((tab) => {
             const Icon = tab.icon
             const active = typeFilter === tab.id
@@ -504,6 +561,7 @@ export default function SocialStudioPage() {
             const isCar = post.type === 'carousel'
             const isRel = post.type === 'reels'
             const isStory = post.type === 'story'
+            const isX = post.type === 'x_thread' || post.platform === 'x'
             const isApproved = post.status === 'approved'
             const isPublished = post.status === 'published'
 
@@ -515,20 +573,24 @@ export default function SocialStudioPage() {
               >
                 {/* Kart Üst Bilgileri */}
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <span
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold border ${
-                          isCar
-                            ? 'bg-orange-500/15 border-orange-500/30 text-orange-400'
-                            : isRel
-                              ? 'bg-blue-500/15 border-blue-500/30 text-blue-400'
-                              : isStory
-                                ? 'bg-purple-500/15 border-purple-500/30 text-purple-400'
-                                : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                          isX
+                            ? 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300'
+                            : isCar
+                              ? 'bg-orange-500/15 border-orange-500/30 text-orange-400'
+                              : isRel
+                                ? 'bg-blue-500/15 border-blue-500/30 text-blue-400'
+                                : isStory
+                                  ? 'bg-purple-500/15 border-purple-500/30 text-purple-400'
+                                  : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
                         }`}
                       >
-                        {isCar ? (
+                        {isX ? (
+                          <XPlatformIcon className="w-3 h-3 text-cyan-400" />
+                        ) : isCar ? (
                           <Layers className="w-3 h-3" />
                         ) : isRel ? (
                           <Film className="w-3 h-3" />
@@ -537,16 +599,49 @@ export default function SocialStudioPage() {
                         ) : (
                           <HelpCircle className="w-3 h-3" />
                         )}
-                        <span>{isCar ? 'Carousel' : isRel ? 'Reels' : isStory ? 'Story (9:16)' : 'Post / Soru'}</span>
+                        <span>
+                          {isX
+                            ? 'X Flood'
+                            : isCar
+                              ? 'Carousel'
+                              : isRel
+                                ? 'Reels'
+                                : isStory
+                                  ? 'Story'
+                                  : 'Post / Soru'}
+                        </span>
                       </span>
 
-                      <span className="text-[11px] text-slate-400 font-medium truncate max-w-[120px]">
-                        {post.topicLabel}
+                      {post.isAutoPilot && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                          <Zap className="w-2.5 h-2.5" />
+                          <span>Auto-Pilot</span>
+                        </span>
+                      )}
+
+                      {post.virality && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          <span>🔥 %{post.virality.score}</span>
+                        </span>
+                      )}
+
+                      {Boolean(
+                        post.uploadedImageUrl ||
+                          post.storyData?.uploadedImageUrl ||
+                          post.carouselSlides?.[0]?.uploadedImageUrl
+                      ) && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                          <span>🎨 AI Görselli</span>
+                        </span>
+                      )}
+
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                        <span>🛡️ ÖSYM %{post.pedagogicalAudit?.osymRelevanceScore || 98}</span>
                       </span>
                     </div>
 
                     <span
-                      className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider ${
+                      className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider shrink-0 ${
                         isPublished
                           ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                           : isApproved
@@ -572,6 +667,7 @@ export default function SocialStudioPage() {
                 {/* Kart Alt Aksiyonları */}
                 <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between">
                   <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                    {isX && <span>{post.xThreadData?.tweets?.length || 5} Tweet Flood</span>}
                     {isCar && <span>{post.carouselSlides?.length || 4} Slayt</span>}
                     {isRel && <span>Viral Kanca</span>}
                     {isStory && <span>{post.storyData?.stickerType?.toUpperCase() || 'STORY'} Çıkartması</span>}

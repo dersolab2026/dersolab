@@ -79,7 +79,7 @@ export function InstagramMockup({ post, activeSlideIndex, onSlideChange }: Insta
                 <VisualCanvasEngine
                   storyData={post.storyData}
                   isStory={true}
-                  customImageUrl={post.uploadedImageUrl}
+                  customImageUrl={post.storyData?.uploadedImageUrl || post.uploadedImageUrl}
                 />
               </div>
 
