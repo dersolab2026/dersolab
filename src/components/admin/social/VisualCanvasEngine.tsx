@@ -85,6 +85,16 @@ const THEME_STYLES: Record<
     tagBg: '#a855f7',
     tagText: '#ffffff',
   },
+  emerald_glow: {
+    bgGradient: ['#030708', '#071317'],
+    accentColor: '#10b981',
+    secondaryAccent: '#06b6d4',
+    badgeBg: 'rgba(16, 185, 129, 0.15)',
+    badgeText: '#34d399',
+    glowColor: 'rgba(16, 185, 129, 0.35)',
+    tagBg: '#10b981',
+    tagText: '#021e14',
+  },
   grok_cyber: {
     bgGradient: ['#030708', '#071317'],
     accentColor: '#10b981',
@@ -1067,7 +1077,7 @@ export function VisualCanvasEngine({
   // Tema Değiştirme
   function cycleTheme() {
     if (!isCarousel || !currentSlide || !onSlideUpdate) return
-    const themes: SlideThemeVariant[] = ['lab_dark', 'neon_orange', 'cyan_cyber', 'purple_matrix', 'grok_cyber']
+    const themes: SlideThemeVariant[] = ['lab_dark', 'neon_orange', 'cyan_cyber', 'purple_matrix', 'emerald_glow']
     const currentIndex = themes.indexOf(currentSlide.themeVariant)
     const nextTheme = themes[(currentIndex + 1) % themes.length]
     onSlideUpdate(activeSlideIndex, {
@@ -1180,7 +1190,7 @@ export function VisualCanvasEngine({
             <button
               onClick={cycleTheme}
               className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs font-medium text-slate-300 transition-colors"
-              title="Temayı Değiştir (Grok Cyber, Lab Dark, Neon Orange, Cyan Cyber, Purple Matrix)"
+              title="Temayı Değiştir (Emerald Glow, Lab Dark, Neon Orange, Cyan Cyber, Purple Matrix)"
             >
               <Palette className="w-3.5 h-3.5 text-orange-400" />
               <span>Tema</span>

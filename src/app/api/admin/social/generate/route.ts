@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(result)
     }
 
-    // 1. Grok Doğal Dil Komut Motoru
+    // 1. Yapay Zeka Doğal Dil Komut & İçerik Sihirbazı
     if (action === 'command') {
       const cmdParams = body as GrokAgentCommandRequest
       const result = await processNaturalLanguageAgentCommand(cmdParams)

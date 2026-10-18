@@ -533,12 +533,68 @@ export function PostEditorDrawer({
     }
   }
 
+  // Görsel İndirme Fonksiyonu
+  function triggerDownload(urlOrData: string, filename: string) {
+    const link = document.createElement('a')
+    link.href = urlOrData
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  function handleDownloadAllMedia() {
+    let downloadedCount = 0
+
+    if (isCarousel && post?.carouselSlides) {
+      post.carouselSlides.forEach((s, idx) => {
+        const src = s.uploadedImageUrl
+        if (src) {
+          triggerDownload(src, `dersolab_slayt_${idx + 1}.png`)
+          downloadedCount++
+        }
+      })
+    } else if (post?.uploadedImageUrl) {
+      triggerDownload(post.uploadedImageUrl, `dersolab_gonderi.png`)
+      downloadedCount++
+    } else if (isStory && post?.storyData?.uploadedImageUrl) {
+      triggerDownload(post.storyData.uploadedImageUrl, `dersolab_story.png`)
+      downloadedCount++
+    }
+
+    if (downloadedCount > 0) {
+      toast.success(`${downloadedCount} adet görsel indirildi!`)
+    } else {
+      toast.info('İndirilecek kayıtlı görsel bulunamadı. Şablon üzerinden AI görseli üretebilirsiniz.')
+    }
+  }
+
+  // 1 Tıkla Paketi İndir + Metni Kopyala + Instagram'ı Aç
+  function handleOneClickShare() {
+    // 1. Metni kopyala
+    const fullText = `${post!.caption}\n\n${(post!.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
+    navigator.clipboard.writeText(fullText)
+
+    // 2. Görselleri indir
+    handleDownloadAllMedia()
+
+    // 3. Instagram'ı aç
+    window.open('https://www.instagram.com/', '_blank')
+
+    // 4. Durumu güncelle
+    if (post!.status !== 'published') {
+      handleStatusChange('approved')
+    }
+
+    toast.success('🎉 Paylaşım paketi hazır! Görseller indirildi, açıklama kopyalandı ve Instagram açıldı.')
+  }
+
   function getStatusLabel(status: PostStatus) {
     switch (status) {
       case 'draft':
         return 'Taslak'
       case 'approved':
-        return 'Onaylandı'
+        return 'Paylaşıma Hazır'
       case 'scheduled':
         return 'Planlandı'
       case 'published':
@@ -616,7 +672,7 @@ export function PostEditorDrawer({
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/15 to-cyan-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)]">
               <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-              <span>Grok Viralite: %{post.virality?.score || 96}</span>
+              <span>Etkileşim Skoru: %{post.virality?.score || 96}</span>
             </div>
 
             <button
@@ -1711,7 +1767,7 @@ export function PostEditorDrawer({
                     <div>
                       <h3 className="text-xs font-bold text-white flex items-center gap-2">
                         <Zap className="w-4 h-4 text-cyan-400" />
-                        <span>Grok 5x Viral Kanca Matrisi</span>
+                        <span>5x Dikkat Çekici Kanca & Başlık Matrisi</span>
                       </h3>
                       <p className="text-[11px] text-slate-400">
                         İçeriğin ilk 3 saniyesini veya kapak başlığını bu kancalardan biriyle tek tıkla güncelleyin.
@@ -1988,7 +2044,7 @@ export function PostEditorDrawer({
                       <span>Etkileşim & Topluluk Copilot</span>
                     </h3>
                     <p className="text-[11px] text-slate-400">
-                      Öğrencilerden gelebilecek sorular ve Grok karakterine göre hazırlanmış hazır yanıt önerileri.
+                      Öğrencilerden gelebilecek sorular ve seçilen tona göre hazırlanmış hazır yanıt önerileri.
                     </p>
                   </div>
 
@@ -2011,7 +2067,7 @@ export function PostEditorDrawer({
 
                         <div className="space-y-2 pt-1">
                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                            Grok Yanıt Önerileri (Kopyalamak İçin Tıklayın):
+                            Hazır Yanıt Önerileri (Kopyalamak İçin Tıklayın):
                           </span>
                           <div className="space-y-1.5">
                             {sc.suggestedReplies.map((sr, idx) => (
@@ -2151,45 +2207,108 @@ export function PostEditorDrawer({
                     </div>
                   </div>
 
-                  {/* Instagram Yayınlama Aksiyonları */}
-                  <div className="p-5 rounded-2xl bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-amber-500/10 border border-pink-500/20 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white">
-                        <Share2 className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-white">Instagram Yayınlama</h4>
-                        <p className="text-[11px] text-slate-400">
-                          {isStory ? 'Hikaye (Story) olarak paylaş' : 'Hesabınızda gönderi olarak yayınlayın'}
-                        </p>
+                  {/* 1 Tıkla Paylaşım Paketi (Tavsiye Edilen & %100 Garantili) */}
+                  <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/30 space-y-4 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+                          <Zap className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-white">1 Tıkla Hazırla & Paylaş</h4>
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold">
+                              Önerilen & Kesin Çözüm
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-300">
+                            Görseller bilgisayarınıza indirilir, açıklama panoya kopyalanır ve Instagram açılır.
+                          </p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
+                    <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-2 text-xs text-slate-300">
+                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                        <span>Slayt / kapak görselleri anında tam çözünürlükte indirilir</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                        <span>Metin + etiketler (hashtag'ler) otomatik kopyalanır</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                        <span>Instagram tek tıkla açılır; görseli sürükleyip Ctrl+V ile metni yapıştırıp paylaşabilirsiniz</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleOneClickShare}
+                      className="w-full flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-sm shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.01] active:scale-95"
+                    >
+                      <Sparkles className="w-4 h-4 fill-slate-950" />
+                      <span>1 Tıkla Paylaşım Paketini Başlat</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+
+                    <div className="flex items-center gap-2 pt-1">
                       <button
-                        onClick={handlePublishToInstagram}
-                        disabled={isPublishing}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:opacity-90 text-white font-bold text-xs shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        onClick={() => {
+                          const fullText = `${post.caption}\n\n${(post.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
+                          navigator.clipboard.writeText(fullText)
+                          toast.success('Açıklama ve hashtag\'ler panoya kopyalandı!')
+                        }}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-colors"
                       >
-                        <Send className="w-4 h-4" />
-                        <span>
-                          {isPublishing
-                            ? 'Yayınlanıyor...'
-                            : isStory
-                              ? 'Story Olarak Instagram’a Gönder'
-                              : 'Instagram’a Doğrudan Gönder'}
-                        </span>
+                        <Copy className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>Sadece Metni Kopyala</span>
+                      </button>
+
+                      <button
+                        onClick={handleDownloadAllMedia}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Görselleri İndir</span>
                       </button>
 
                       <a
                         href="https://www.instagram.com/"
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs border border-white/15 transition-all"
+                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold transition-colors"
                       >
-                        <ExternalLink className="w-4 h-4" />
-                        <span>Instagram Web’i Aç</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Instagram Web</span>
                       </a>
+                    </div>
+                  </div>
+
+                  {/* Meta Graph API ile Doğrudan Gönderim */}
+                  <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-500 to-indigo-600 flex items-center justify-center text-white">
+                        <Send className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-white">Meta Graph API ile Doğrudan Gönderim</h4>
+                        <p className="text-[10px] text-slate-400">
+                          Hesabınıza bağlı resmi Facebook / Instagram Business API üzerinden otomatik paylaşım
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-white/5 text-[11px] text-slate-400">
+                      <span>API doğrudan gönderim için sunucuda Instagram Business hesabı ve internete açık görsel URL'si gerekir.</span>
+                      <button
+                        onClick={handlePublishToInstagram}
+                        disabled={isPublishing}
+                        className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/40 text-pink-300 text-xs font-bold transition-all disabled:opacity-50"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>{isPublishing ? 'İletiliyor...' : 'Doğrudan Gönder'}</span>
+                      </button>
                     </div>
                   </div>
                 </div>

@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Sosyal Medya Stüdyosu & Ajanı — DersoLab',
-  description: 'DersoLab Instagram içerik fabrikası, kaydırmalı carousel oluşturucu ve reels senaryo ajanı.',
+  title: 'Sosyal Medya Asistanı — DersoLab',
+  description: 'DersoLab Instagram & TikTok içerik asistanı, kaydırmalı carousel ve reels senaryo oluşturucu.',
 }
 
 export default function StandaloneSocialPage() {
@@ -28,7 +28,7 @@ export default function StandaloneSocialPage() {
               Derso<span className="text-orange-400">Lab</span>
             </span>
             <span className="hidden sm:inline-block px-2 py-0.5 rounded-md bg-orange-500/15 border border-orange-500/30 text-orange-400 text-[10px] font-bold">
-              SOSYAL MEDYA AJANI
+              SOSYAL MEDYA ASİSTANI
             </span>
           </div>
         </div>

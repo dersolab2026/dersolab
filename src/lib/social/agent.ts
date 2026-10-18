@@ -4,6 +4,7 @@ import type {
   AgentPersona,
   CarouselSlide,
   GeneratePostRequest,
+  SocialAgentCommandRequest,
   GrokAgentCommandRequest,
   HookVariation,
   ImageStylePreset,
@@ -257,7 +258,7 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
       hashtags: parsed.hashtags || ['#dersolab', '#yks2026'],
       targetAudience: parsed.targetAudience || request.targetGrade || 'YKS Adayları',
       platform: request.platform || (request.type === 'x_thread' ? 'x' : 'instagram'),
-      persona: request.persona || 'grok_witty',
+      persona: request.persona || 'derso_friendly',
       carouselSlides: parsed.carouselSlides,
       singlePostData: parsed.singlePostData,
       storyData: parsed.storyData,
@@ -373,7 +374,7 @@ Yanıtını kesinlikle 7 elemanlı bir JSON dizisi [ ... ] olarak döndür. Her 
           hashtags: item.hashtags || ['#dersolab', '#yks'],
           targetAudience: item.targetAudience || request.targetGrade || 'YKS Adayları',
           platform: 'instagram',
-          persona: request.persona || 'grok_witty',
+          persona: request.persona || 'derso_friendly',
           carouselSlides: item.carouselSlides,
           singlePostData: item.singlePostData,
           reelsStoryboard: item.reelsStoryboard,
@@ -596,7 +597,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
       title: 'X / Twitter Flood: ÖSYM Paragrafında 15 Dakika Kazandıran 5 Kural',
       type: 'x_thread',
       platform: 'x',
-      persona: request.persona || 'grok_witty',
+      persona: request.persona || 'derso_friendly',
       topic: request.topic,
       topicLabel: 'X / Twitter Flood • YKS 2026',
       status: 'draft',
@@ -874,27 +875,33 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
 }
 
 // ============================================================================
-// GROK BOT OTOMASYON AJANI & YÜKSEK ETKİLEŞİM MOTORU (CORE AGENT ENGINE)
+// DERSOLAB ASİSTAN OTOMASYON AJANI & ETKİLEŞİM MOTORU (CORE AGENT ENGINE)
 // ============================================================================
 
 export const PERSONA_PROMPTS: Record<AgentPersona, string> = {
-  grok_witty: `PERSONA: "Grok Sınav Zekası (Witty & High-IQ Sarcastic)"
-- Tıpkı xAI Grok gibi: Zeki, espritüel, dobra, gençlerin sınav sancılarını (gece 2'de başlayıp saat 3'te pes edilen dersler, turlama taktiğini unutup bir soruya 15 dakika gömülmeler, son 3 ay paniği) aşırı iyi yakalayan ve hicveden bir ton.
-- Asla resmi veya kuru olma. "Kaydet bunu, sınav sabahı dua edersin" tarzı tatlı-sert bir bağ kur.
-- Öğrencinin dikkat süresi 2 saniye; ilk cümlede şok, merak veya kahkaha yarat.`,
+  derso_friendly: `PERSONA: "DersoLab Samimi & Genç Sınav Koçu"
+- Gençlerin sınav dilini ve duygu durumunu (gece çalışıp pes etmeler, net dalgalanmaları, turlama taktiğini unutup 1 soruya takılmalar) çok iyi anlayan sıcak, motive edici ve enerjik bir dil.
+- Asla resmi veya sıkıcı olma. "Bunu hemen kaydet, denemede çok dua edersin" tarzında arkadaşça ve içten bir bağ kur.
+- İlk 2 saniyede öğrencinin dikkatini yakala.`,
 
-  sherlock_exam: `PERSONA: "ÖSYM & Sınav Komisyonu Dedektifi (Sherlock Examiner)"
-- Soru yazarlarının psikolojisini deşifre eden bir araştırmacı tonu.
-- Çıkmış soru istatistikleri, çeldirici şıkların matematiği, kelime oyunları ve ÖSYM'nin her yıl banko sorduğu ama adayların %70'inin düştüğü tuzaklar.
-- Kanıt odaklı, analitik ve net kazandıran tüyolar.`,
+  exam_coach: `PERSONA: "ÖSYM Sınav ve Taktik Uzmanı"
+- Soru yazarlarının psikolojisini, çeldirici şıkların mantığını ve sınav tuzaklarını çözen araştırmacı bir üslup.
+- Çıkmış soru analizleri, kelime oyunları ve en çok net kazandıran püf noktalar.
+- Kanıt odaklı, analitik ve somut sınav tüyoları.`,
 
-  growth_mentor: `PERSONA: "DersoLab Baş Büyüme ve Performans Koçu (Science & Growth Lead)"
-- Bilimsel öğrenme teknikleri (biyonik okuma, aralıklı tekrar, aktif hatırlama, deneme hata analizi).
-- Sıcak, vizyoner, öğrenciye rehberlik eden ve DersoLab L.A.B. araçlarını birer süper güç olarak sunan bir koç.`,
+  scientific_guide: `PERSONA: "DersoLab Bilimsel & Görsel Rehber"
+- Biyonik okuma, formüller, şemalar, aralıklı tekrar ve görsel infografik odaklı anlatım.
+- Net, anlaşılır ve eğitici bir anlatım dili.`,
 
-  direct_no_bs: `PERSONA: "Net ve Tavizsiz Disiplin Modu (No-BS Reality Check)"
+  direct_punchy: `PERSONA: "Net ve Tavizsiz Sonuç Modu"
 - "Bahaneler net getirmez." Tavizsiz, motive edici, doğrudan aksiyona geçiren bir stil.
-- Netlerin yükselmesi için gereken somut adımları madde madde sıralar.`,
+- Netlerin yükselmesi için gereken adımları madde madde sıralar.`,
+
+  // Geriye dönük uyumluluk takma adları:
+  grok_witty: `PERSONA: "DersoLab Samimi & Genç Sınav Koçu" (Esprili, enerjik ve gençlerin dilinden anlayan üslup)`,
+  sherlock_exam: `PERSONA: "ÖSYM Sınav ve Taktik Uzmanı" (Analitik ve net odaklı)`,
+  growth_mentor: `PERSONA: "DersoLab Bilimsel & Görsel Rehber" (Eğitici şemalar ve püf noktalar)`,
+  direct_no_bs: `PERSONA: "Net ve Tavizsiz Sonuç Modu" (Sıfır laf kalabalığı, doğrudan sonuç)`,
 }
 
 export function computeViralityMetrics(post: Partial<SocialPostItem>): ViralityAnalysis {
@@ -928,14 +935,14 @@ export function computeViralityMetrics(post: Partial<SocialPostItem>): ViralityA
     savePotential,
     shareability,
     commentBait,
-    verdict: score >= 94 ? '🔥 Viral Potansiyeli Çok Yüksek (Grok Onaylı)' : '⚡ Güçlü Etkileşim Skoru',
+    verdict: score >= 94 ? '🔥 Yüksek Etkileşim & Kaydetme Potansiyeli' : '⚡ Güçlü Etkileşim Skoru',
   }
 }
 
 export function buildDefaultHookMatrix(
   title: string,
   topicLabel: string,
-  persona: AgentPersona = 'grok_witty'
+  persona: AgentPersona = 'derso_friendly'
 ): HookVariation[] {
   const isMath = /matematik|sayı|fonksiyon|geometri/i.test(`${title} ${topicLabel}`)
   const isTr = /türkçe|paragraf|ses|yazım|edebiyat/i.test(`${title} ${topicLabel}`)
@@ -969,7 +976,7 @@ export function buildDefaultHookMatrix(
       {
         id: 'hook_4',
         type: 'grok_witty',
-        title: 'Grok İğnesi (Mizah)',
+        title: 'Mizahi & Dikkat Çekici',
         hookText: 'Gece 3\'te gelen "Ben Boğaziçi kazanırım" motivasyonu değil, yarın sabah net getirecek taktik!',
         viralityScore: 95,
         reason: 'Gençlerin gece çalışma psikolojisiyle doğrudan duygusal bağ kurar.',
@@ -1014,7 +1021,7 @@ export function buildDefaultHookMatrix(
       {
         id: 'hook_4',
         type: 'grok_witty',
-        title: 'Grok İğnesi (Mizah)',
+        title: 'Mizahi & Dikkat Çekici',
         hookText: 'Son şıkka geldiğinde ilk şıkkı unutanlar derneği başkanı mısın? Gel kurtaralım seni :)',
         viralityScore: 98,
         reason: 'Sınav stresini yüksek empati ve mizahla hafifletip etkileşimi patlatır.',
@@ -1059,7 +1066,7 @@ export function buildDefaultHookMatrix(
     {
       id: 'hook_4',
       type: 'grok_witty',
-      title: 'Grok İğnesi (Mizah)',
+      title: 'Mizahi & Dikkat Çekici',
       hookText: 'Alarmı erteleyip 10 saat çalışma planı yapanlar burada mı? Pratik bir plan yapalım.',
       viralityScore: 97,
       reason: 'Öğrencinin erteleme psikolojisini yakalar.',
@@ -1084,8 +1091,8 @@ export function buildDefaultComments(title: string, caption: string): SimulatedC
       userType: 'doubtful',
       suggestedReplies: [
         {
-          persona: 'grok_witty',
-          personaLabel: 'Grok Witty',
+          persona: 'derso_friendly',
+          personaLabel: 'Samimi Koç',
           replyText:
             'Çünkü ÖSYM senin gibi uykusuz ve aceleci öğrencilerin ilk kelimeye atlayacağını adı gibi biliyor :) Açıklamadaki püf noktaya dikkat et, 1 netin cebinde kalsın!',
         },
@@ -1110,8 +1117,8 @@ export function buildDefaultComments(title: string, caption: string): SimulatedC
       userType: 'stressed_student',
       suggestedReplies: [
         {
-          persona: 'grok_witty',
-          personaLabel: 'Grok Witty',
+          persona: 'derso_friendly',
+          personaLabel: 'Samimi Koç',
           replyText:
             'Ağlamak kalori yakar ama maalesef net kazandırmaz dostum :) Sorun hızında değil, iç seslendirmende. Biyodaki linkten biyonik okumayı hemen test et, gözün kelimeleri tek tek değil blok blok yutsun.',
         },
@@ -1142,8 +1149,8 @@ export function buildDefaultComments(title: string, caption: string): SimulatedC
             'Son 6 yılın çıkmış soru istatistiği: TYT\'de banko 2 soru, AYT\'de 1 soru. Yani soru kaçırma lüksün olmayan kilit konulardan biri.',
         },
         {
-          persona: 'grok_witty',
-          personaLabel: 'Grok Witty',
+          persona: 'derso_friendly',
+          personaLabel: 'Samimi Koç',
           replyText:
             'ÖSYM soru havuzu komisyonunun vazgeçilmez aşkıdır bu konu. Gelmeme ihtimali denemede tüm şıkları A işaretleyip fulleme ihtimalinle aynı :)',
         },
@@ -1239,7 +1246,7 @@ export function getAgentLearningInsights(): AgentLearningInsight[] {
 
 export function attachGrokEnhancements(
   post: SocialPostItem,
-  persona: AgentPersona = 'grok_witty'
+  persona: AgentPersona = 'derso_friendly'
 ): SocialPostItem {
   const chosenPersona = post.persona || persona
   const virality = post.virality || computeViralityMetrics(post)
@@ -1258,13 +1265,15 @@ export function attachGrokEnhancements(
   }
 }
 
+export const attachSocialEnhancements = attachGrokEnhancements
+
 /**
  * 5 Farklı Viral Kanca Matrisi Üretir
  */
 export async function generateHookMatrix(
   topic: string,
   subject?: string,
-  persona: AgentPersona = 'grok_witty'
+  persona: AgentPersona = 'derso_friendly'
 ): Promise<HookVariation[]> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -1285,7 +1294,7 @@ Format:
 1. curiosity: Merak Uçurumu
 2. contrarian: Zıtlık / Şok Edici Gerçek
 3. fomo: Net Kaybı / FOMO Korkusu
-4. grok_witty: Mizahi Grok İğnesi
+4. derso_friendly: Samimi ve Esprili Gençlik Dili
 5. direct_value: Kestirme Hile / Doğrudan Değer
 
 Yanıtını kesinlikle şu JSON şemasına uygun 5 elemanlı dizi olarak döndür:
@@ -1327,7 +1336,7 @@ Yanıtını kesinlikle şu JSON şemasına uygun 5 elemanlı dizi olarak döndü
 export async function generateEngagementReplies(
   postTitle: string,
   caption: string,
-  persona: AgentPersona = 'grok_witty'
+  persona: AgentPersona = 'derso_friendly'
 ): Promise<SimulatedComment[]> {
   return buildDefaultComments(postTitle, caption)
 }
@@ -1354,7 +1363,7 @@ export async function generateXThread(request: GeneratePostRequest): Promise<Soc
 export async function generateAutonomousDailyBatch(
   targetGrade: 'YKS (TYT/AYT)' | 'LGS' | 'Genel' = 'YKS (TYT/AYT)',
   focusSubject?: string,
-  persona: AgentPersona = 'grok_witty'
+  persona: AgentPersona = 'derso_friendly'
 ): Promise<SocialPostItem[]> {
   const now = Date.now()
 
@@ -1542,13 +1551,13 @@ export async function generateAutonomousDailyBatch(
 /**
  * Doğal Dil ile Otonom Sosyal Medya ve Görsel Ajanı Komut Yöneticisi
  */
-export async function processNaturalLanguageAgentCommand(request: GrokAgentCommandRequest): Promise<{
+export async function processNaturalLanguageAgentCommand(request: SocialAgentCommandRequest): Promise<{
   post?: SocialPostItem
   posts?: SocialPostItem[]
   logs: string[]
   message: string
 }> {
-  const persona = request.persona || 'grok_witty'
+  const persona = request.persona || 'derso_friendly'
   const command = request.command.trim().toLowerCase()
   const logs: string[] = []
 

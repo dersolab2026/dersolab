@@ -2,7 +2,15 @@ export type SocialPlatform = 'instagram' | 'tiktok' | 'youtube' | 'x' | 'linkedi
 
 export type InstagramContentType = 'carousel' | 'post' | 'reels' | 'story' | 'x_thread'
 
-export type AgentPersona = 'grok_witty' | 'sherlock_exam' | 'growth_mentor' | 'direct_no_bs'
+export type AgentPersona =
+  | 'derso_friendly'
+  | 'exam_coach'
+  | 'scientific_guide'
+  | 'direct_punchy'
+  | 'grok_witty'
+  | 'sherlock_exam'
+  | 'growth_mentor'
+  | 'direct_no_bs'
 
 export type ContentTopic =
   | 'exam_tactics'
@@ -15,7 +23,13 @@ export type ContentTopic =
 
 export type PostStatus = 'draft' | 'approved' | 'scheduled' | 'published'
 
-export type SlideThemeVariant = 'lab_dark' | 'neon_orange' | 'cyan_cyber' | 'purple_matrix' | 'grok_cyber'
+export type SlideThemeVariant =
+  | 'lab_dark'
+  | 'neon_orange'
+  | 'cyan_cyber'
+  | 'purple_matrix'
+  | 'emerald_glow'
+  | 'grok_cyber'
 
 export type StoryStickerType = 'quiz' | 'poll' | 'link' | 'countdown' | 'question_box'
 
@@ -202,7 +216,7 @@ export interface WeeklyCalendarRequest {
   persona?: AgentPersona
 }
 
-export interface GrokAgentCommandRequest {
+export interface SocialAgentCommandRequest {
   command: string
   persona?: AgentPersona
   targetPlatform?: SocialPlatform
@@ -210,6 +224,8 @@ export interface GrokAgentCommandRequest {
   focusSubject?: string
   autoEnqueue?: boolean
 }
+
+export type GrokAgentCommandRequest = SocialAgentCommandRequest
 
 export interface GenerateImageRequest {
   prompt: string
