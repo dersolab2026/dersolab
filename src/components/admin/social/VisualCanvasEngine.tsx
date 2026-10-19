@@ -185,9 +185,10 @@ export function VisualCanvasEngine({
     }
   }
 
-  // Görsel URL değiştiğinde HTMLImageElement olarak yükle
-  const effectiveImageUrl =
-    currentSlide?.uploadedImageUrl || singlePost?.uploadedImageUrl || storyData?.uploadedImageUrl || customImageUrl
+  // Görsel URL: Carousel modunda sadece kapak slaytı (slide 0) veya bu slayta özel atanmış görseli göster
+  const effectiveImageUrl = isCarousel
+    ? currentSlide?.uploadedImageUrl || (activeSlideIndex === 0 ? customImageUrl : undefined)
+    : (singlePost?.uploadedImageUrl || storyData?.uploadedImageUrl || customImageUrl)
 
   useEffect(() => {
     if (!effectiveImageUrl) {
@@ -421,13 +422,17 @@ export function VisualCanvasEngine({
       ctx.fillText(highlightTag, tagX + 16, badgeY + 25)
     }
 
-    cursorY += badgeH + 16
+    cursorY += badgeH + 20
 
-    // VURUCU BAŞLIK (Resim varsa daha kompakt, resim yoksa daha büyük ve havalı)
+    // VURUCU BAŞLIK (Resim varsa daha kompakt, resim yoksa daha büyük ve ferah)
     const headline =
       currentSlide?.headline || singlePost?.headline || storyData?.headline || 'Sınavda Başarıyı Getiren Strateji'
     const headlineFontSize = hasImage ? 42 : 50
     const headlineLineHeight = hasImage ? 52 : 62
+
+    // Canvas alphabetic baseline'da ilk satır yukarı taşmasın ve rozetle çakışmasın diye font yüksekliğini ekliyoruz
+    cursorY += Math.round(headlineFontSize * 0.85)
+
     ctx.font = `900 ${headlineFontSize}px Inter, system-ui, sans-serif`
     ctx.fillStyle = '#ffffff'
     cursorY = wrapText(ctx, headline, 80, cursorY, width - 160, headlineLineHeight, 2)
@@ -435,15 +440,15 @@ export function VisualCanvasEngine({
     // ALT BAŞLIK (varsa)
     const subhead = currentSlide?.subhead || singlePost?.questionOrSummary || storyData?.subhead || ''
     if (subhead) {
-      cursorY += 8
       const subheadFontSize = hasImage ? 23 : 26
       const subheadLineHeight = hasImage ? 32 : 36
+      cursorY += 12 + Math.round(subheadFontSize * 0.85)
       ctx.font = `500 ${subheadFontSize}px Inter, system-ui, sans-serif`
       ctx.fillStyle = 'rgba(226, 232, 240, 0.85)'
       cursorY = wrapText(ctx, subhead, 80, cursorY, width - 160, subheadLineHeight, 2)
     }
 
-    cursorY += 18
+    cursorY += 22
 
     // Güvenli İçerik Alt Sınırı (Footer çizgisinin 20px yukarısı)
     const safeContentBottom = height - 130
@@ -1349,44 +1354,45 @@ export function VisualCanvasEngine({
           style={{ imageRendering: 'auto' }}
         />
 
-        {/* Carousel Navigasyon Okları */}
-        {isCarousel && totalSlides > 1 && (
-          <>
-            {activeSlideIndex > 0 && (
-              <button
-                onClick={() => onSlideChange?.(activeSlideIndex - 1)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform active:scale-90"
-                aria-label="Önceki Slayt"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-            )}
-            {activeSlideIndex < totalSlides - 1 && (
-              <button
-                onClick={() => onSlideChange?.(activeSlideIndex + 1)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-transform active:scale-90"
-                aria-label="Sonraki Slayt"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            )}
-          </>
-        )}
       </div>
 
-      {/* Slayt Nokta Göstergesi */}
+      {/* Slayt Alt Navigasyon & Nokta Barı (İçeriği örtmez, butonlar temiz dışarıdadır) */}
       {isCarousel && totalSlides > 1 && (
-        <div className="flex items-center gap-1.5">
-          {slides!.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => onSlideChange?.(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === activeSlideIndex ? 'w-6 bg-orange-500' : 'w-2 bg-white/20 hover:bg-white/40'
-              }`}
-              aria-label={`Slayt ${i + 1}`}
-            />
-          ))}
+        <div className="flex items-center justify-between w-full max-w-[420px] px-2 pt-1">
+          <button
+            onClick={() => onSlideChange?.(Math.max(0, activeSlideIndex - 1))}
+            disabled={activeSlideIndex === 0}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-all hover:scale-105 active:scale-95"
+            aria-label="Önceki Slayt"
+          >
+            <ChevronLeft className="w-4 h-4 text-orange-400" />
+            <span>Önceki</span>
+          </button>
+
+          <div className="flex items-center gap-1.5">
+            {slides!.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => onSlideChange?.(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === activeSlideIndex
+                    ? 'w-6 bg-gradient-to-r from-orange-500 to-amber-500'
+                    : 'w-2 bg-white/20 hover:bg-white/40'
+                }`}
+                aria-label={`Slayt ${i + 1}`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => onSlideChange?.(Math.min(totalSlides - 1, activeSlideIndex + 1))}
+            disabled={activeSlideIndex === totalSlides - 1}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 disabled:opacity-30 disabled:pointer-events-none transition-all hover:scale-105 active:scale-95"
+            aria-label="Sonraki Slayt"
+          >
+            <span>Sonraki</span>
+            <ChevronRight className="w-4 h-4 text-orange-400" />
+          </button>
         </div>
       )}
 
