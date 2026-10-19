@@ -38,8 +38,12 @@ DERSOLAB HAKKINDA:
 
 HEDEF KİTLE VE İÇERİK DİLİ:
 - 14-19 yaş arası sınav hazırlığı yapan öğrenciler ve ebeveynler.
-- Dil samimi, motive edici, sınav jargonuna hakim (ÖSYM mantığı, net artırma, süre yetiştirme, turlama taktiği, paragraf püf noktaları, TYT matematik tuzakları).
+- Dil samimi, motive edici, sınav jargonuna hakim (ÖSYM soru tipleri, kazanım mantığı, net artırma, formül ve kavram püf noktaları).
 - Asla yapay, sıkıcı veya ansiklopedik yazma! Doğrudan etkileşim, "Kaydet", "Arkadaşına Gönder" ve "Biyodaki linke tıkla" psikolojisini tetikle.
+
+KONU UYUMU (EN KRİTİK KURAL):
+- Kullanıcının talep ettiği ders ve konuya %100 SADIK KAL.
+- Örneğin kullanıcı "Organik Kimya", "Kimya", "Biyoloji", "Fizik", "Matematik" veya "Tarih" istediyse, BAŞLIK, SLAYTLAR VE TÜM METİNLER KESİNLİKLE O KONU HAKKINDA OLMALIDIR. Asla alakasız başka bir ders veya Türkçe paragraf taktiği YAZMA!
 
 PAZAR KİTAP ÖNERİSİ HİKAYELERİ (ORTAOKUL + LİSE):
 - DersoLab her Pazar günü hem ORTAOKUL (LGS düzeyi, 10-14 yaş) hem de LİSE (YKS düzeyi, 14-18 yaş) için TEK BİR HİKAYEDE (Story) haftalık kitap önerisi paylaşır.
@@ -53,9 +57,19 @@ PAZAR KİTAP ÖNERİSİ HİKAYELERİ (ORTAOKUL + LİSE):
 ÇIKTI FORMATI:
 Sadece ve sadece istenilen JSON formatında yanıt ver. Markdown blokları (\`\`\`json ... \`\`\`) içine alarak ver.`
 
-// Gemini 4 Argon - Google'ın en yeni frontier reasoning modeli
-const PRIMARY_MODEL = 'gemini-4-argon'
-const FALLBACK_MODEL = 'gemini-2.5-flash'
+// Model Hiyerarşisi:
+// 1. gemini-3.6-flash: 503 vermeyen, ultra kararlı ve hızlı üretim modeli
+// 2. gemini-3.5-flash: İkinci kademe yüksek hızlı flash model
+// 3. gemini-flash-lite-latest: Düşük gecikmeli hafif model
+// 4. gemini-3.8-flash: Yoğunluk bittiğinde devreye girecek model
+// 5. gemini-4-argon: Ücretli kota açıldığında devreye girecek frontier reasoning modeli
+const MODEL_CASCADE = [
+  'gemini-3.6-flash',
+  'gemini-3.5-flash',
+  'gemini-flash-lite-latest',
+  'gemini-3.8-flash',
+  'gemini-4-argon',
+]
 
 async function callGenAIModel(
   ai: GoogleGenAI,
@@ -66,28 +80,24 @@ async function callGenAIModel(
     maxOutputTokens: number
   }
 ) {
-  try {
-    return await ai.models.generateContent({
-      model: PRIMARY_MODEL,
-      config: {
-        systemInstruction: params.systemInstruction,
-        temperature: params.temperature,
-        maxOutputTokens: params.maxOutputTokens,
-      },
-      contents: params.contents,
-    })
-  } catch (err) {
-    console.warn(`[Gemini 4 Argon] API uyarısı, ${FALLBACK_MODEL} modeline geçiliyor:`, err)
-    return await ai.models.generateContent({
-      model: FALLBACK_MODEL,
-      config: {
-        systemInstruction: params.systemInstruction,
-        temperature: params.temperature,
-        maxOutputTokens: params.maxOutputTokens,
-      },
-      contents: params.contents,
-    })
+  let lastError: any = null
+  for (const model of MODEL_CASCADE) {
+    try {
+      return await ai.models.generateContent({
+        model,
+        config: {
+          systemInstruction: params.systemInstruction,
+          temperature: params.temperature,
+          maxOutputTokens: params.maxOutputTokens,
+        },
+        contents: params.contents,
+      })
+    } catch (err: any) {
+      lastError = err
+      console.warn(`[${model}] API uyarısı, sonraki modele geçiliyor:`, err?.message || err)
+    }
   }
+  throw lastError
 }
 
 /**
@@ -103,29 +113,35 @@ export async function generateSocialPost(request: GeneratePostRequest): Promise<
   try {
     const ai = new GoogleGenAI({ apiKey })
 
+    const topicFocus = (request.customPrompt || request.subTopic || request.subject || 'Sınav Hazırlığı').trim()
+
     const userPrompt = `
 Lütfen aşağıdaki parametrelere göre 1 adet yüksek etkileşimli Instagram içeriği üret:
-- İçerik Tipi: ${request.type} (${request.type === 'carousel' ? 'Kaydırmalı Carousel' : request.type === 'reels' ? 'Reels / Kısa Video Senaryosu' : 'Tekli Görsel / Günün Sorusu'})
+- İçerik Tipi: ${request.type} (${request.type === 'carousel' ? 'Kaydırmalı Carousel' : request.type === 'reels' ? 'Reels / Kısa Video Senaryosu' : request.type === 'story' ? 'Instagram Story' : 'Tekli Görsel / Günün Sorusu'})
+- KESİNLİKLE ODAKLANILACAK KONU: "${topicFocus}"
 - Konu Kategorisi: ${request.topic}
-${request.subject ? `- İlgili Ders / Branş: ${request.subject}` : '- İlgili Ders: İlgili sınav seviyesine göre en uygun branşı kendin seç'}
+${request.subject ? `- İlgili Ders / Branş: ${request.subject}` : `- İlgili Ders: "${topicFocus}" konusunun ait olduğu ders (Örn: Kimya, Matematik, Biyoloji, Türkçe vb.)`}
 ${request.subTopic ? `- Odak Konu / Ünite: ${request.subTopic}` : ''}
 - Hedef Kitle: ${request.targetGrade || 'YKS (TYT/AYT)'}
 - Ton: ${request.tone || 'energetic'}
 ${request.customPrompt ? `- Özel Talimat / Ekstra Not: ${request.customPrompt}` : ''}
 
+ÖNEMLİ KURAL:
+İçeriğin başlığı, slaytları, kancası, maddeleri ve tüm metinleri KESİNLİKLE "${topicFocus}" konusu üzerine olmalıdır! Konuyla alakasız başka ders veya paragraf taktikleri YAZMA!
+
 Yanıtını kesinlikle şu JSON şemasına uygun döndür:
 {
-  "title": "İçerik başlığı",
-  "topicLabel": "Konu etiketi (örn: TYT Matematik, Hızlı Okuma, vb.)",
+  "title": "İçerik başlığı (${topicFocus} ile doğrudan ilgili)",
+  "topicLabel": "Konu etiketi (Örn: AYT Kimya • Organik Kimya, TYT Matematik vb.)",
   "targetAudience": "YKS 2026 Adayları",
-  "caption": "Instagram gönderi açıklaması (Emojili, kancalı, CTA'li)",
-  "hashtags": ["#yks2026", "#tytmatematik", "#dersolab", "#ykskocluk"],
+  "caption": "Instagram gönderi açıklaması (${topicFocus} ile ilgili, emojili, kancalı, CTA'li)",
+  "hashtags": ["#yks2026", "#dersolab"],
   ${
     request.type === 'carousel'
       ? `"carouselSlides": [
     {
       "slideNumber": 1,
-      "badge": "TYT MATEMATİK",
+      "badge": "DERS VEYA KONU ADI",
       "headline": "Vurucu Kapak Başlığı",
       "subhead": "Merak uyandırıcı alt başlık",
       "bodyPoints": ["Neden bu konuyu kaçırıyorsun?", "Kaydır ve püf noktayı kap 👉"],
@@ -138,7 +154,7 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
       "badge": "1. ADIM",
       "headline": "Kural veya Püf Nokta Başlığı",
       "subhead": "Önemli açıklama",
-      "bodyPoints": ["Madde 1", "Madde 2", "Örnek soru mantığı"],
+      "bodyPoints": ["Madde 1", "Madde 2", "Örnek mantık"],
       "highlightTag": "ÖNEMLİ",
       "footerNote": "DersoLab",
       "themeVariant": "neon_orange"
@@ -156,22 +172,22 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
   ]`
       : request.type === 'reels'
         ? `"reelsStoryboard": {
-    "hook3s": "İlk 3 saniye kancası: (Kameraya şaşkın bakarak) 'Hala paragraf sorularını baştan sona okuyorsan bu 15 dakikanı çöpe atıyorsun!'",
-    "visualDirection": "Kamera masada, arkada DersoLab açık ekranı var. Ekrana hızlı okuma grafiği geliyor.",
-    "spokenScript": "Tam konuşma metni...",
-    "onScreenText": ["Paragrafa Baştan Başlama!", "Önce Soru Kökü!", "+5 Net Garantisi"],
-    "musicAudioVibe": "Hızlı, dinamik Lo-Fi veya trend Synthwave beat",
-    "callToAction": "Paragraf hızını 2 katına çıkarmak için profildeki L.A.B. Bionic Reader'ı hemen test et!"
+    "hook3s": "İlk 3 saniye kancası: (${topicFocus} ile ilgili şaşırtıcı kanca veya tuzak uyarısı)",
+    "visualDirection": "Dinamik sunum veya DersoLab ekranı ile görsel animasyon.",
+    "spokenScript": "Tam konuşma metni (${topicFocus} mantığını anlatan)...",
+    "onScreenText": ["Kritik Kural!", "Hata Yapma!", "Link Biyoda 🦊"],
+    "musicAudioVibe": "Hızlı, dinamik trend beat",
+    "callToAction": "${topicFocus} konusunda eksiklerini kapatmak için profildeki linke tıkla!"
   }`
       : request.type === 'story'
         ? `"storyData": {
     "badge": "GÜNÜN QUIZI / PAZAR KİTAP KULÜBÜ",
-    "headline": "ÖSYM Bu Soruyu Çok Sever / Haftanın Kitap Önerileri",
+    "headline": "${topicFocus} Püf Noktası / Haftanın Kitap Önerileri",
     "subhead": "Doğru şıkkı tahmin edebilecek misin? / Ortaokul & Lise İçin Seçtik",
     "stickerType": "${request.storyStickerType || (request.topic === 'book_recommendation' ? 'poll' : 'quiz')}", // "quiz" | "poll" | "link" | "countdown" | "question_box"
-    "stickerQuestion": "${request.topic === 'book_recommendation' ? 'Bu hafta hangisini okuyacaksın?' : 'Aşağıdakilerden hangisi birleşik sözcüktür?'}",
-    "stickerOptions": ${request.topic === 'book_recommendation' ? '["Ortaokul: Kitap Adı 📘", "Lise: Kitap Adı 📕"]' : '["Birçok", "Her gün", "Hiç kimse", "Pek çok"]'},
-    "stickerLinkText": "DersoLab Kitap Kulübü",
+    "stickerQuestion": "${request.topic === 'book_recommendation' ? 'Bu hafta hangisini okuyacaksın?' : `${topicFocus} sorusu?`}",
+    "stickerOptions": ${request.topic === 'book_recommendation' ? '["Ortaokul: Kitap Adı 📘", "Lise: Kitap Adı 📕"]' : '["Şık A", "Şık B", "Şık C", "Şık D"]'},
+    "stickerLinkText": "DersoLab",
     "stickerLinkUrl": "https://dersolab.com/lab",
     "themeVariant": "purple_matrix",
     "dualBookData": { // EĞER KONU 'book_recommendation' VEYA KİTAP İSE ZORUNLUDUR:
@@ -179,7 +195,7 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
         "title": "Kitap Adı (Ortaokul/LGS)",
         "author": "Yazar Adı",
         "genre": "Felsefi Masal / Macera / Bilim Kurgu vb.",
-        "whyRead": "LGS paragraf sorularında hız, odaklanma ve hayal gücü katkısı",
+        "whyRead": "LGS yeni nesil paragraf sorularında hız, odaklanma ve hayal gücü katkısı",
         "highlightTag": "ORTAOKUL & LGS (10-14 YAŞ)"
       },
       "lise": {
@@ -193,14 +209,14 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
   }`
       : `"singlePostData": {
     "badge": "GÜNÜN ÖSYM SORUSU",
-    "headline": "Bu Soruyu Adayların %80'i Yanlış Çözdü!",
-    "questionOrSummary": "Sorunun metni veya özet ipucu...",
-    "keyTakeaway": "Püf nokta: ÖSYM burada kelime oyununa başvuruyor.",
+    "headline": "${topicFocus} Tuzağı!",
+    "questionOrSummary": "${topicFocus} ile ilgili soru metni veya özet ipucu...",
+    "keyTakeaway": "Püf nokta: Bu soru tipinde dikkat edilmesi gereken kural.",
     "options": [
-      { "key": "A", "text": "Cevap seçeneği A", "isCorrect": false },
-      { "key": "B", "text": "Cevap seçeneği B", "isCorrect": true },
-      { "key": "C", "text": "Cevap seçeneği C", "isCorrect": false },
-      { "key": "D", "text": "Cevap seçeneği D", "isCorrect": false }
+      { "key": "A", "text": "Doğru Şık", "isCorrect": true },
+      { "key": "B", "text": "Çeldirici Şık 1", "isCorrect": false },
+      { "key": "C", "text": "Çeldirici Şık 2", "isCorrect": false },
+      { "key": "D", "text": "Çeldirici Şık 3", "isCorrect": false }
     ],
     "themeVariant": "neon_orange"
   }`
@@ -391,44 +407,74 @@ Yanıtını kesinlikle 7 elemanlı bir JSON dizisi [ ... ] olarak döndür. Her 
 }
 
 function extractJsonFromText(text: string): string {
-  const match = text.match(/```json([\s\S]*?)```/)
-  if (match && match[1]) {
-    return match[1].trim()
+  if (!text) return '{}'
+
+  // 1. ```json veya ```js veya ```javascript bloğu
+  const fencedMatch = text.match(/```(?:json|js|javascript)?\s*([\s\S]*?)```/i)
+  if (fencedMatch && fencedMatch[1]) {
+    const candidate = fencedMatch[1].trim()
+    try {
+      JSON.parse(candidate)
+      return candidate
+    } catch {
+      const first = candidate.indexOf('{')
+      const last = candidate.lastIndexOf('}')
+      if (first !== -1 && last !== -1 && last > first) {
+        const sub = candidate.substring(first, last + 1)
+        try {
+          JSON.parse(sub)
+          return sub
+        } catch {}
+      }
+    }
   }
-  const genericMatch = text.match(/```([\s\S]*?)```/)
-  if (genericMatch && genericMatch[1]) {
-    return genericMatch[1].trim()
+
+  // 2. Metin içinde ilk { ile son } arasını dene
+  const firstBrace = text.indexOf('{')
+  const lastBrace = text.lastIndexOf('}')
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    const candidate = text.substring(firstBrace, lastBrace + 1).trim()
+    try {
+      JSON.parse(candidate)
+      return candidate
+    } catch {}
   }
+
   return text.trim()
 }
 
 /**
  * Zengin Yedek / Yerel İçerik Üreteci (API Anahtarı olmadığı veya hata durumunda)
+ * Konu ne olursa olsun (Organik Kimya, Biyoloji, Matematik vb.) %100 o konuya adapte olur.
  */
 function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem {
   const now = Date.now()
+  const custom = (request.customPrompt || request.subTopic || request.subject || '').trim()
+  const focus = custom || (request.topic === 'book_recommendation' ? 'Haftalık Kitap Önerisi' : 'Sınav Başarı Taktikleri')
+  const displayTitle = focus.length > 55 ? `${focus.slice(0, 52)}...` : focus
+  const badgeText = (request.subject || request.subTopic || (request.targetGrade === 'LGS' ? 'LGS 2026' : 'AYT & TYT')).toUpperCase()
 
   if (request.type === 'carousel') {
     return {
       id: `post_${now}_car`,
-      title: 'TYT Türkçede Süre Kazandıran 4 Altın Taktik',
+      title: `${displayTitle} • En Kritik 4 Kural & Püf Nokta`,
       type: 'carousel',
       topic: request.topic,
-      topicLabel: 'TYT Türkçe & Hızlı Okuma',
+      topicLabel: request.subject || focus,
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `Paragraf sorularında son şıkka geldiğinde ilk şıkkı unutanlar burada mı? 🙋‍♂️\n\nÖSYM paragraf sorularını bilgi değil, "odaklanma ve hız" testi olarak sorar. Bu 4 kuralı denemelerinde uygula, sürenden en az 12 dakika tasarruf et!\n\n💡 Biyonik hızlı okuma modülümüzü denemek için profildeki linke tıkla!\n\n#yks2026 #tytturkce #paragraftaktikleri #dersolab #ykstayfa #studygram`,
-      hashtags: ['#yks2026', '#tytturkce', '#paragraftaktikleri', '#dersolab', '#ykstayfa'],
+      caption: `${focus} konusunda sınavda en çok puan kaybettiren hatalar ve net kazandıran pratik çözümler! 🎯\n\nBu taktikleri denemelerinde uygula, soru kaçırma!\n\n💡 DersoLab L.A.B. araçlarıyla eksiklerini kapatmak için profildeki linke tıkla!\n\n#yks2026 #dersolab #ykstayfa #${focus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}`,
+      hashtags: ['#yks2026', '#dersolab', '#ykstayfa', '#sinavtaktikleri'],
       carouselSlides: [
         {
           slideNumber: 1,
-          badge: 'TYT TÜRKÇE • PARAGRAF',
-          headline: 'Paragrafta Süre Yetiştiremeyenlerin Yaptığı 3 Hata',
-          subhead: 'Son şıkta ilk şıkkı unutanlar için kurtarıcı rehber',
+          badge: badgeText,
+          headline: `${displayTitle}: En Sık Yapılan Hatalar`,
+          subhead: 'Öğrencilerin en çok puan kaybettiği kritik tuzaklar ve püf noktalar',
           bodyPoints: [
-            'Metni baştan sona roman gibi okumak',
-            'Şıkları elemeden önce soru köküne dönmemek',
-            'Kaydır, 12 dakika kazandıran tekniği öğren 👉',
+            'Temel kavram ve kural mantığını ezberle geçiştirmek',
+            'Soru kökü ve öncüllerdeki kritik detayları atlamak',
+            'Kaydır, netlerini artıracak 3 adımlı stratejiyi öğren 👉',
           ],
           highlightTag: 'KAYDETMELİK',
           footerNote: 'DersoLab Sınav Laboratuvarı • @dersolabegitim',
@@ -437,36 +483,36 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
         {
           slideNumber: 2,
           badge: '1. ALTIN KURAL',
-          headline: 'Önce Soru Kökü, Sonra Şıkların İlk Kelimesi',
-          subhead: 'Beynine ne aradığını önceden söyle!',
+          headline: 'Soru Kökünü ve Anahtar Kavramları İyi Tara',
+          subhead: `${focus} sorularında ÖSYM tuzaklarına düşmemek için önlem al!`,
           bodyPoints: [
-            'Soru kökündeki olumsuz ifadeyi (değinilmemiştir/çıkarılamaz) daire içine al.',
-            'Şıkların anahtar kelimelerini hızlıca tara.',
-            'Metne girdiğinde beynin sadece o anahtar kelimeleri arar.',
+            'Soru kökündeki sınırlayıcı koşulları mutlaka belirle.',
+            'Temel formül ve kuralları soru üzerinde adım adım uygula.',
+            'Şıkları elerken en net ve kesin verilerden başla.',
           ],
-          highlightTag: '+3 NET',
+          highlightTag: '+ NET',
           footerNote: 'DersoLab Taktikleri',
           themeVariant: 'neon_orange',
         },
         {
           slideNumber: 3,
           badge: '2. ALTIN KURAL',
-          headline: 'Biyonik Odaklanma: Kelime Kelime Değil Blok Oku',
-          subhead: 'Göz kaslarını eğitmenin en hızlı yolu',
+          headline: 'Mantığı Özümse ve Çeldiricileri Ayıkla',
+          subhead: 'Ezberleme, konunun altında yatan mantığı kavra',
           bodyPoints: [
-            'İç seslendirme yapmayı bırak, hızını 2 katına çıkar.',
-            'DersoLab L.A.B. Bionic Reader modülüyle günde 10 dk pratik yap.',
-            'Paragraf başına harcadığın süre 1.5 dakikadan 45 saniyeye düşsün.',
+            'Hangi soru tipinde hangi çözüm yolunun çalışacağını bil.',
+            'Denemelerdeki hatalarını analiz et ve not al.',
+            'DersoLab L.A.B. modülleriyle benzer soru pratikleri yap.',
           ],
-          highlightTag: 'HIZ REHBERİ',
+          highlightTag: 'PÜF NOKTA',
           footerNote: 'DersoLab L.A.B.',
           themeVariant: 'cyan_cyber',
         },
         {
           slideNumber: 4,
           badge: 'ÖZET & HAREKETE GEÇ',
-          headline: 'Bu Taktikleri Denemende Uygula!',
-          subhead: 'Unutmamak için bu postu kaydet ve arkadaşına gönder.',
+          headline: 'Bu Stratejiyi Hemen Denemende Test Et!',
+          subhead: 'Unutmamak için bu postu kaydet ve çalışma arkadaşına gönder.',
           bodyPoints: [
             '💾 Kaydetmeyi unutma!',
             '🦊 DersoLab L.A.B. araçlarını ücretsiz test et',
@@ -484,30 +530,26 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
   if (request.type === 'reels') {
     return {
       id: `post_${now}_reel`,
-      title: 'Reels: 30 Saniyede Fonetik Müfettişi ile Yazım Kuralı Hilesi',
+      title: `Reels: 30 Saniyede ${displayTitle} Hilesi`,
       type: 'reels',
       topic: request.topic,
-      topicLabel: 'Reels • TYT Türkçe',
+      topicLabel: `Reels • ${focus}`,
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `ÖSYM'nin her yıl banko sorduğu ama adayların %60'ının takıldığı yazım kuralı! 🤯\n\nSen doğru bildiğini sanıyordun değil mi? Yorumlarda cevabını yaz, bakalım kimler doğru bildi! 👇\n\n#reels #yksreels #tyt2026 #yazımkuralları #dersolab #ykstayfa`,
-      hashtags: ['#reels', '#yksreels', '#tyt2026', '#yazımkuralları', '#dersolab'],
+      caption: `ÖSYM'nin en çok sorduğu ve adayların sıklıkla takıldığı ${focus} konusu! 🤯\n\nSen bu soruda hangi yöntemi kullanıyorsun? Yorumlarda cevabını yaz! 👇\n\n#reels #yksreels #yks2026 #dersolab #ykstayfa`,
+      hashtags: ['#reels', '#yksreels', '#yks2026', '#dersolab'],
       reelsStoryboard: {
-        hook3s:
-          'Kameraya şaşkınlıkla bakarak ekrana "BİRÇOK mu BİR ÇOK mu?" yazısını vur: "Eğer buna ayrı yazılır dediysen sınavda 1 netin gitti bile!"',
-        visualDirection:
-          'Ön planda dinamik konuşmacı. Arkada DersoLab L.A.B. Fonetik Müfettişi ekranı açık. Yanlış şık kırmızı, doğru şık parlak yeşil yanıp söner.',
-        spokenScript:
-          'ÖSYM her yıl istisnasız bitişik yazılan birleşik sözcüklerden en az bir soru soruyor. Şifre çok basit: Belirsizlik bildiren "birkaç, birtakım, birçok, hiçbir" sözcükleri daima bitişik yazılır! DersoLab Fonetik Müfettişine cümleyi at, hangi ses olayının ve yazım kuralının olduğunu saniyesinde yakalasın. Profildeki linkten ücretsiz dene!',
+        hook3s: `Kameraya bakarak ekrana "${displayTitle}" yazısını vur: "Eğer bu konuyu hala böyle çözüyorsan sınavda netlerin gidebilir!"`,
+        visualDirection: 'Ön planda dinamik anlatıcı, arkada DersoLab L.A.B. soru çözüm ekranı. Kritik noktalar parlak yeşil ve turuncu ile vurgulanır.',
+        spokenScript: `${focus} konusunda ÖSYM'nin her yıl yokladığı en kritik nokta burada gizli! Soruyu çözerken yapılan en büyük hata öncülleri aceleyle okumak. Şifre çok basit: Temel kuralı doğrudan uygula ve çeldiricileri adım adım ele. DersoLab L.A.B.'a gir, benzer soruları anında çöz. Profildeki linkten ücretsiz dene!`,
         onScreenText: [
-          '🚨 1 NETİ KURTAR!',
-          'Birçok / Birkaç / Hiçbir = BİTİŞİK',
-          'ÖSYM BU TUZAĞI ÇOK SEVER',
+          `🚨 ${displayTitle.toUpperCase()}`,
+          '❌ Hata: Ezbere çözmek',
+          '✅ Çözüm: Kuralı adım adım uygula',
           'Link Biyoda 🦊',
         ],
-        musicAudioVibe: 'Enerjik TikTok/Instagram trend hip-hop veya lofi beat (orta tempo)',
-        callToAction:
-          'DersoLab Fonetik Müfettişini hemen profildeki linkten ücretsiz dene, yazım kurallarını fullle!',
+        musicAudioVibe: 'Enerjik TikTok/Instagram trend hip-hop veya synthwave beat',
+        callToAction: `DersoLab L.A.B. modüllerini hemen profildeki linkten ücretsiz dene, ${focus} netlerini katla!`,
       },
       createdAt: new Date().toISOString(),
     }
@@ -527,8 +569,8 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
         topicLabel: 'Pazar Kitap Kulübü • Ortaokul & Lise',
         status: 'draft',
         targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
-        caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) grubumuz için okuma hızını, odaklanmayı ve sınav paragraf netlerini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2026 #yks2026 #paragrafhizi #dersolab #kitapkurdu`,
-        hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2026', '#yks2026', '#paragrafhizi', '#dersolab'],
+        caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) grubumuz için okuma hızını, odaklanmayı ve sınav derinliğini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2026 #yks2026 #dersolab #kitapkurdu`,
+        hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2026', '#yks2026', '#dersolab'],
         storyData: {
           badge: 'PAZAR KİTAP KULÜBÜ 📚',
           headline: 'Haftanın Kitap Önerileri',
@@ -545,7 +587,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
               title: 'Momo',
               author: 'Michael Ende',
               genre: 'Felsefi Masal & Zaman Macerası',
-              whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
+              whyRead: 'LGS yeni nesil sorularda zaman algısı ve dikkat süresini geliştirir.',
               highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
               imageUrl: '/books/momo.jpg',
             },
@@ -553,7 +595,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
               title: 'Simyacı',
               author: 'Paulo Coelho',
               genre: 'Alegorik Roman',
-              whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
+              whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve derin anlama becerisi kazandırır.',
               highlightTag: 'LİSE & YKS (14-18 YAŞ)',
               imageUrl: '/books/simyaci.jpg',
             },
@@ -566,21 +608,21 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
 
     return {
       id: `post_${now}_story`,
-      title: 'Story: Günün TYT Türkçe Quiz Çıkartması',
+      title: `Story: Günün ${displayTitle} Quizi`,
       type: 'story',
       topic: request.topic,
-      topicLabel: 'Story • Günün Quizi',
+      topicLabel: `Story • ${focus}`,
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: 'Doğru şıkkı bulanlar kimler? Hikayedeki ankete katıl, cevabı gör! 🦊 #yks2026',
-      hashtags: ['#yks2026', '#tyt', '#dersolab'],
+      caption: `Doğru şıkkı bulanlar kimler? Hikayedeki teste katıl, cevabı gör! 🦊 #${focus.toLowerCase().replace(/[^a-z0-9]/gi, '')}`,
+      hashtags: ['#yks2026', '#dersolab', '#gununsorusu'],
       storyData: {
-        badge: 'GÜNÜN QUIZI • TYT TÜRKÇE',
-        headline: 'Hangisi Bitişik Yazılır?',
-        subhead: 'ÖSYM her yıl soruyor, şıkkını hemen işaretle! 👇',
+        badge: `GÜNÜN QUIZI • ${badgeText}`,
+        headline: `${displayTitle} Püf Noktası`,
+        subhead: 'ÖSYM bu kuralı çok sever, hemen doğru şıkkı işaretle! 👇',
         stickerType: request.storyStickerType || 'quiz',
-        stickerQuestion: 'Aşağıdakilerden hangisinin yazımı DOĞRUDUR?',
-        stickerOptions: ['Birçok', 'Herşey', 'Hiç kimse', 'Pek çok'],
+        stickerQuestion: `${focus} konusunda hangisi doğrudur?`,
+        stickerOptions: ['Doğru Kural / Yöntem ✅', 'Sık Yapılan Yanılgı ❌', 'İkisi de Geçerlidir', 'Emin Değilim'],
         stickerLinkText: 'dersolab.com/lab',
         stickerLinkUrl: 'https://dersolab.com/lab',
         themeVariant: 'neon_orange',
@@ -594,47 +636,46 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
   if (request.type === 'x_thread') {
     const xItem: SocialPostItem = {
       id: `post_${now}_xthread`,
-      title: 'X / Twitter Flood: ÖSYM Paragrafında 15 Dakika Kazandıran 5 Kural',
+      title: `X / Twitter Flood: ${displayTitle} Konusunda Hayat Kurtaran 5 Bilgi`,
       type: 'x_thread',
       platform: 'x',
       persona: request.persona || 'derso_friendly',
       topic: request.topic,
-      topicLabel: 'X / Twitter Flood • YKS 2026',
+      topicLabel: `X / Twitter Flood • ${focus}`,
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `Paragraflarda süre yetiştiremeyen adayların yaptığı en büyük 5 hata ve net kurtaran çözümü 🧵👇 #yks2026 #paragraf #dersolab`,
-      hashtags: ['#yks2026', '#tytturkce', '#dersolab', '#ykstayfa'],
+      caption: `${focus} konusunda en çok yapılan 5 hata ve net kurtaran çözümleri 🧵👇 #yks2026 #dersolab`,
+      hashtags: ['#yks2026', '#dersolab', '#ykstayfa'],
       xThreadData: {
-        threadHook:
-          'ÖSYM son 5 yılda paragraf sorularını "okuma değil, göz kası ve odaklanma testi" haline getirdi. Denemede süren yetmiyorsa sorun sende değil, okuma stilinde. İşte +12 dakika kazandıran 5 kural 🧵👇',
+        threadHook: `${focus} sınavda en çok belirleyici olan konulardan biri. Sorularda süre ve net kaybediyorsan işte bilmen gereken 5 kritik kural 🧵👇`,
         totalTweets: 5,
         estimatedReadTime: '2 dk',
-        callToAction: 'DersoLab L.A.B. Biyonik Hızlı Okuma modülünü profildeki linkten test et: dersolab.com/lab 🦊⚡',
+        callToAction: `DersoLab L.A.B. modüllerini profildeki linkten test et: dersolab.com/lab 🦊⚡`,
         tweets: [
           {
             tweetNumber: 1,
-            text: '1/5 — Paragrafı roman okur gibi baştan sona okumak en büyük tuzaktır.\n\nÖnce soru kökünü oku, olumsuz ifadeyi (değinilmemiştir) daire içine al. Sonra şıkların ilk kelimelerini tara. Beynine ne arayacağını söylemezsen 40 satır içinde kaybolursun.',
-            charCount: 247,
+            text: `1/5 — ${focus} konusunu ezbere çalışmak en büyük yanılgıdır.\n\nTemel kuralları ve kavramları soru üzerinden eşleştirmeyi öğren. Sorunun kökündeki şartı iyi anla.`,
+            charCount: 180,
           },
           {
             tweetNumber: 2,
-            text: '2/5 — İç seslendirme hızını dakikada 150 kelimeye zincirler.\n\nKafanın içinde kelimeleri tek tek seslendirmeyi bıraktığında, gözün blok blok görmeye başlar. Günde 10 dk biyonik okuma pratiği, 1.5 dakikalık paragrafı 45 saniyeye indirir.',
-            charCount: 242,
+            text: `2/5 — ÖSYM bu konuda çeldiricileri benzer formüller ve kelime oyunları üzerine kurar.\n\nŞıklar arasında tereddüt ettiğinde soru öncülüne dönüp kesin bilgiyi doğrula.`,
+            charCount: 185,
           },
           {
             tweetNumber: 3,
-            text: '3/5 — İki şık arasında kaldığında metne baştan dönme!\n\nMetne baştan dönmek 45 saniyeni daha yakar. İki şıkkın yüklemlerini ve niteleme sıfatlarını karşılaştır. ÖSYM çeldiricileri genellikle bir aşırı genelleme ("daima", "yalnızca") içerir.',
-            charCount: 251,
+            text: `3/5 — Klasik soru tiplerini çözdükten sonra mutlaka yeni nesil hibrit sorulara geç.\n\nDersoLab L.A.B. modülleriyle soru tarzlarını çeşitlendir.`,
+            charCount: 160,
           },
           {
             tweetNumber: 4,
-            text: '4/5 — Turlama taktiği uygulamayan öğrenci denemede batar.\n\nBir paragrafta 50 saniyede ana fikri yakalayamadıysan soruya inatlaşma. Soru işaretini koy ve geç. 1 inat sorusu = arkada bekleyen 4 kolay sorunun katili.',
-            charCount: 226,
+            text: `4/5 — Yanlış yaptığın her sorunun konusunu deneme analiz defterine not et.\n\n2 hafta sonra aynı soruyu tekrar çözerek kalıcılığı test et.`,
+            charCount: 155,
           },
           {
             tweetNumber: 5,
-            text: '5/5 — Özet & Harekete Geç:\n\nBu flood\'u kaydet (Bookmark).\nDersoLab L.A.B. Bionic Reader modülünü hemen test et, paragrafları fırına verip netlerini katla: dersolab.com/lab 🦊🚀\n\n#yks2026 #tyt #dersolab',
-            charCount: 218,
+            text: `5/5 — Özet & Harekete Geç:\n\nBu flood'u kaydet (Bookmark).\nDersoLab L.A.B. modüllerini hemen test et, netlerini katla: dersolab.com/lab 🦊🚀`,
+            charCount: 150,
           },
         ],
       },
@@ -646,25 +687,24 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
   // Single post
   const singleItem: SocialPostItem = {
     id: `post_${now}_single`,
-    title: 'Günün TYT Sorusu: Ses Olayları Tuzağı',
+    title: `Günün Sorusu: ${displayTitle}`,
     type: 'post',
     topic: request.topic,
-    topicLabel: 'Günün Sorusu',
+    topicLabel: `Günün Sorusu • ${focus}`,
     status: 'draft',
     targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-    caption: `Günün ÖSYM Sorusu geldi! Bakalım kimler ilk seferde doğru şıkkı bulacak? 🧠\n\nCevabını yoruma bırak, doğru cevabı ve detaylı çözümü sabitlediğimiz yorumda açıkla! 🎯\n\n#gununsorusu #yks #tyt #dersolab #sorucozumu`,
-    hashtags: ['#gununsorusu', '#yks', '#tyt', '#dersolab', '#sorucozumu'],
+    caption: `${focus} konusunda ÖSYM tarzı günün sorusu geldi! Bakalım kimler ilk seferde doğru şıkkı bulacak? 🧠\n\nCevabını yoruma bırak, çözümü sabitlediğimiz yorumda incele! 🎯\n\n#gununsorusu #yks2026 #dersolab #sorucozumu`,
+    hashtags: ['#gununsorusu', '#yks2026', '#dersolab', '#sorucozumu'],
     singlePostData: {
-      badge: 'GÜNÜN ÖSYM SORUSU',
-      headline: '"Kaybolduğunu" Sözcüğündeki Ses Olayları Nelerdir?',
-      questionOrSummary:
-        'Aşağıdaki seçeneklerden hangisinde "kaybolduğunu" sözcüğünde meydana gelen ses olaylarının tamamı doğru verilmiştir?',
-      keyTakeaway: 'İpucu: Kayıp + olmak + dık + ı -> Ünlü düşmesi + Ünsüz türemesi/yumuşaması',
+      badge: `GÜNÜN ÖSYM SORUSU • ${badgeText}`,
+      headline: `${displayTitle} Tuzağı`,
+      questionOrSummary: `${focus} konusunda adayların en çok takıldığı soru tipi. Aşağıdaki seçeneklerden hangisi doğru verilmiştir?`,
+      keyTakeaway: `İpucu: ${focus} kuralını doğrudan soru köküyle eşleştir.`,
       options: [
-        { key: 'A', text: 'Ünlü düşmesi - Ünsüz yumuşaması', isCorrect: true },
-        { key: 'B', text: 'Sadece Ünsüz yumuşaması', isCorrect: false },
-        { key: 'C', text: 'Ünsüz benzeşmesi - Ünlü daralması', isCorrect: false },
-        { key: 'D', text: 'Ünlü türemesi - Kaynaştırma', isCorrect: false },
+        { key: 'A', text: 'Doğru Yargı / Çözüm', isCorrect: true },
+        { key: 'B', text: 'Sık Yapılan Çeldirici', isCorrect: false },
+        { key: 'C', text: 'Eksik Bilgi Şıkkı', isCorrect: false },
+        { key: 'D', text: 'Hatalı Yorum', isCorrect: false },
       ],
       themeVariant: 'neon_orange',
     },
@@ -1561,7 +1601,7 @@ export async function processNaturalLanguageAgentCommand(request: SocialAgentCom
   const command = request.command.trim().toLowerCase()
   const logs: string[] = []
 
-  logs.push(`[DERSOLAB-AI-CORE • GEMINI 4 ARGON] Doğal dil komutu algılandı: "${request.command}"`)
+  logs.push(`[DERSOLAB-AI-CORE • GEMINI 3.8 FLASH] Doğal dil komutu algılandı: "${request.command}"`)
   logs.push(`[PERSONA] Aktif Karakter Modu: ${persona.toUpperCase()}`)
 
   // 0. AI Görsel & Bilimsel Şema & İllüstrasyon Üretimi (Görsel Öncelikli Motor)

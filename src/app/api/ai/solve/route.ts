@@ -160,28 +160,36 @@ export async function POST(request: NextRequest) {
       contents = [{ role: 'user', parts: [{ text: userPrompt }] }]
     }
 
-    let response
-    try {
-      response = await ai.models.generateContent({
-        model: 'gemini-4-argon',
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-          temperature: 0.3,
-          maxOutputTokens: 1024,
-        },
-        contents,
-      })
-    } catch (argonErr) {
-      console.warn('Gemini 4 Argon fallback to gemini-2.5-flash:', argonErr)
-      response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-          temperature: 0.3,
-          maxOutputTokens: 1024,
-        },
-        contents,
-      })
+    const solveModels = [
+      'gemini-3.6-flash',
+      'gemini-3.5-flash',
+      'gemini-flash-lite-latest',
+      'gemini-3.8-flash',
+      'gemini-4-argon',
+    ]
+    let response: any = null
+    let lastError: any = null
+
+    for (const m of solveModels) {
+      try {
+        response = await ai.models.generateContent({
+          model: m,
+          config: {
+            systemInstruction: SYSTEM_PROMPT,
+            temperature: 0.3,
+            maxOutputTokens: 1024,
+          },
+          contents,
+        })
+        if (response?.text) break
+      } catch (err: any) {
+        lastError = err
+        console.warn(`[AI Solve] ${m} hatası, sonrakine geçiliyor:`, err?.message || err)
+      }
+    }
+
+    if (!response?.text && lastError) {
+      throw lastError
     }
 
     const text = response.text

@@ -125,7 +125,46 @@ function getProceduralSvg(
 </svg>`
   }
 
-  // 3. Türkçe / Bionic Reader / Paragraf Hızı
+  // 3. Kimya & Organik Kimya & Moleküler Yapılar
+  if (pLower.includes('kimya') || pLower.includes('organik') || pLower.includes('molekül') || pLower.includes('reaksiyon') || pLower.includes('bağ')) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <defs>
+    <radialGradient id="chemBg" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="50%" stop-color="#022c22"/>
+      <stop offset="100%" stop-color="#01120e"/>
+    </radialGradient>
+    <filter id="chemGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#chemBg)"/>
+  <circle cx="${centerX}" cy="${centerY - 30}" r="170" fill="none" stroke="rgba(16, 185, 129, 0.15)" stroke-width="2" stroke-dasharray="8 8"/>
+  <circle cx="${centerX}" cy="${centerY - 30}" r="120" fill="rgba(6, 182, 212, 0.08)" stroke="rgba(6, 182, 212, 0.25)" stroke-width="1.5"/>
+  <polygon points="${centerX},${centerY - 130} ${centerX + 86},${centerY - 80} ${centerX + 86},${centerY + 20} ${centerX},${centerY + 70} ${centerX - 86},${centerY + 20} ${centerX - 86},${centerY - 80}" 
+           fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="4" filter="url(#chemGlow)"/>
+  <circle cx="${centerX}" cy="${centerY - 30}" r="50" fill="none" stroke="#34d399" stroke-width="3" stroke-dasharray="10 8" filter="url(#chemGlow)"/>
+  <circle cx="${centerX}" cy="${centerY - 130}" r="14" fill="#06b6d4" filter="url(#chemGlow)"/>
+  <circle cx="${centerX + 86}" cy="${centerY - 80}" r="14" fill="#10b981" filter="url(#chemGlow)"/>
+  <circle cx="${centerX + 86}" cy="${centerY + 20}" r="14" fill="#06b6d4" filter="url(#chemGlow)"/>
+  <circle cx="${centerX}" cy="${centerY + 70}" r="14" fill="#10b981" filter="url(#chemGlow)"/>
+  <circle cx="${centerX - 86}" cy="${centerY + 20}" r="14" fill="#06b6d4" filter="url(#chemGlow)"/>
+  <circle cx="${centerX - 86}" cy="${centerY - 80}" r="14" fill="#10b981" filter="url(#chemGlow)"/>
+  <line x1="${centerX}" y1="${centerY - 130}" x2="${centerX}" y2="${centerY - 190}" stroke="#38bdf8" stroke-width="4" filter="url(#chemGlow)"/>
+  <circle cx="${centerX}" cy="${centerY - 190}" r="16" fill="#f97316" filter="url(#chemGlow)"/>
+  <text x="${centerX}" y="${centerY - 184}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">OH</text>
+  <rect x="${centerX - 150}" y="${height - 90}" width="300" height="42" rx="21" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="1.5"/>
+  <text x="${centerX}" y="${height - 63}" font-family="system-ui, sans-serif" font-weight="bold" font-size="14" fill="#34d399" text-anchor="middle">
+    AYT KİMYA • ORGANİK ŞEMA &amp; BAĞLAR
+  </text>
+</svg>`
+  }
+
+  // 4. Türkçe / Bionic Reader / Paragraf Hızı
   if (pLower.includes('türkçe') || pLower.includes('paragraf') || pLower.includes('okuma') || pLower.includes('kitap') || pLower.includes('bionic')) {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
   <defs>
@@ -168,7 +207,7 @@ function getProceduralSvg(
 </svg>`
   }
 
-  // 4. Varsayılan / Maskot Zeki Tilki & DersoLab Laboratuvarı
+  // 5. Varsayılan / Maskot Zeki Tilki & DersoLab Laboratuvarı
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
   <defs>
     <radialGradient id="defBg" cx="50%" cy="50%" r="65%">
@@ -234,7 +273,7 @@ export async function generateSocialImage(
     height = 675
   }
 
-  // 1. Try Gemini 3.8 Flash to generate custom, intricate SVG
+  // 1. Try Gemini Models to generate custom, intricate SVG
   if (apiKey) {
     try {
       const styleInstruction = STYLE_PROMPTS[stylePreset] || STYLE_PROMPTS.cyber_lab
@@ -251,30 +290,37 @@ Requirements:
 - Include visual concepts matching the topic (e.g. geometric angles, optical prisms, wave formulas, neural paths, DNA spirals, or student desk elements).
 - Do not include markdown code block ticks, no \`\`\`xml or \`\`\`svg, and no preamble text. Output must begin directly with <svg.`
 
-      // 1. Try Gemini 4 Argon first, then fallback to Gemini 2.5 Flash
-      let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-4-argon:generateContent?key=${apiKey}`
-      let response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: systemInstruction }] }],
-        }),
-        signal: AbortSignal.timeout(5000),
-      })
+      // Model hiyerarşisi: gemini-3.6-flash ve 3.5-flash öncelikli
+      const imageModels = [
+        'gemini-3.6-flash',
+        'gemini-3.5-flash',
+        'gemini-flash-lite-latest',
+        'gemini-3.8-flash',
+        'gemini-4-argon',
+      ]
+      let response: Response | null = null
 
-      if (!response.ok) {
-        url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`
-        response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: systemInstruction }] }],
-          }),
-          signal: AbortSignal.timeout(4000),
-        })
+      for (const m of imageModels) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: systemInstruction }] }],
+            }),
+            signal: AbortSignal.timeout(8000),
+          })
+          if (res.ok) {
+            response = res
+            break
+          }
+        } catch (mErr) {
+          console.warn(`[ImageGenerator] ${m} denemesi başarısız, sonrakine geçiliyor:`, mErr)
+        }
       }
 
-      if (response.ok) {
+      if (response && response.ok) {
         const data = await response.json()
         let svgCode = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || ''
 
