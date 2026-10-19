@@ -337,23 +337,35 @@ export function VisualCanvasEngine({
     ctx.lineTo(width - 80, 150)
     ctx.stroke()
 
-    let cursorY = 230
+    // 6. İÇERİK ALANI (Akıllı ve Dinamik Boyutlandırma Motoru)
+    let cursorY = 175
+    const hasImage = Boolean(loadedImage)
+    const hasPoints = Boolean(isCarousel && currentSlide?.bodyPoints && currentSlide.bodyPoints.length > 0)
+    const hasOptions = Boolean(singlePost?.options && singlePost.options.length > 0)
 
-    // YÜKLENEN FOTOĞRAF VARSA ÇİZ
+    // YÜKLENEN / ÜRETİLEN GÖRSEL VARSA ÇİZ
     if (loadedImage) {
       const imgBoxW = width - 160
-      const imgBoxH = isStory ? 550 : 380
+      // Eğer slayt içinde maddeler veya şıklar varsa görsel yüksekliğini dengeli tutuyoruz (275px)
+      // Böylece alt metinler, maddeler ve footer birbirine ASLA basmaz
+      const imgBoxH = isStory ? 520 : (hasPoints || hasOptions ? 275 : 350)
 
       ctx.save()
-      roundRect(ctx, 80, cursorY, imgBoxW, imgBoxH, 24)
+      roundRect(ctx, 80, cursorY, imgBoxW, imgBoxH, 22)
       ctx.clip()
 
-      // Orantılı kaplama (object-cover)
-      const hRatio = imgBoxW / loadedImage.width
-      const vRatio = imgBoxH / loadedImage.height
-      const ratio = Math.max(hRatio, vRatio)
+      // Akıllı ölçekleme: 1:1 diyagramlar veya kare şemalar için contain, dikey/yatay fotoğraflar için cover
+      const isSquareOrDiagram = Math.abs(loadedImage.width - loadedImage.height) < 120
+      const ratio = isSquareOrDiagram
+        ? Math.min(imgBoxW / loadedImage.width, (imgBoxH - 16) / loadedImage.height)
+        : Math.max(imgBoxW / loadedImage.width, imgBoxH / loadedImage.height)
+
       const centerShiftX = (imgBoxW - loadedImage.width * ratio) / 2
       const centerShiftY = (imgBoxH - loadedImage.height * ratio) / 2
+
+      // Görsel arka planı için koyu nötr taban
+      ctx.fillStyle = '#05070c'
+      ctx.fillRect(80, cursorY, imgBoxW, imgBoxH)
 
       ctx.drawImage(
         loadedImage,
@@ -368,50 +380,74 @@ export function VisualCanvasEngine({
       )
       ctx.restore()
 
-      // Çerçeve
+      // Görsel dış çerçevesi ve neon vurgusu
       ctx.strokeStyle = theme.accentColor
-      ctx.lineWidth = 2
-      roundRect(ctx, 80, cursorY, imgBoxW, imgBoxH, 24)
+      ctx.lineWidth = 1.5
+      roundRect(ctx, 80, cursorY, imgBoxW, imgBoxH, 22)
       ctx.stroke()
 
-      cursorY += imgBoxH + 40
+      cursorY += imgBoxH + 20
     }
 
-    // ROZET (BADGE)
+    // ROZET & VURGU ETİKETİ SATIRI
     const badgeText = currentSlide?.badge || singlePost?.badge || storyData?.badge || 'DERSOLAB • TAKTİK'
-    ctx.font = 'bold 22px Inter, system-ui, sans-serif'
-    const badgeWidth = ctx.measureText(badgeText).width + 36
-    const badgeHeight = 44
+    const highlightTag = currentSlide?.highlightTag || (!isStory ? singlePost?.keyTakeaway : '')
+    const badgeY = cursorY
+    const badgeH = 38
 
+    // Sol Rozet: Kategori / Konu
+    ctx.font = 'bold 20px Inter, system-ui, sans-serif'
+    const badgeW = ctx.measureText(badgeText).width + 32
     ctx.fillStyle = theme.badgeBg
-    roundRect(ctx, 80, cursorY, badgeWidth, badgeHeight, 12)
+    roundRect(ctx, 80, badgeY, badgeW, badgeH, 10)
     ctx.fill()
     ctx.strokeStyle = theme.accentColor
     ctx.lineWidth = 1.5
     ctx.stroke()
-
     ctx.fillStyle = theme.badgeText
-    ctx.fillText(badgeText, 98, cursorY + 30)
+    ctx.fillText(badgeText, 96, badgeY + 25)
 
-    cursorY += 85
+    // Sağ Vurgu Rozeti (KAYDETMELİK, +NET, vb. - Varsa Aynı Hizada Sağa Yerleştir)
+    if (highlightTag && !isStory && highlightTag.length <= 25) {
+      ctx.font = '900 18px Inter, system-ui, sans-serif'
+      const tagW = ctx.measureText(highlightTag).width + 32
+      const tagX = width - 80 - tagW
 
-    // VURUCU BAŞLIK
-    const headline =
-      currentSlide?.headline || singlePost?.headline || storyData?.headline || 'Sınavda Başarıyı Getiren Strateji'
-    ctx.font = '900 54px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    cursorY = wrapText(ctx, headline, 80, cursorY, width - 160, 68)
+      ctx.fillStyle = theme.tagBg
+      roundRect(ctx, tagX, badgeY, tagW, badgeH, 10)
+      ctx.fill()
 
-    // ALT BAŞLIK
-    cursorY += 20
-    const subhead = currentSlide?.subhead || singlePost?.questionOrSummary || storyData?.subhead || ''
-    if (subhead) {
-      ctx.font = '500 28px Inter, system-ui, sans-serif'
-      ctx.fillStyle = 'rgba(226, 232, 240, 0.85)'
-      cursorY = wrapText(ctx, subhead, 80, cursorY, width - 160, 42)
+      ctx.fillStyle = theme.tagText
+      ctx.fillText(highlightTag, tagX + 16, badgeY + 25)
     }
 
-    cursorY += 40
+    cursorY += badgeH + 16
+
+    // VURUCU BAŞLIK (Resim varsa daha kompakt, resim yoksa daha büyük ve havalı)
+    const headline =
+      currentSlide?.headline || singlePost?.headline || storyData?.headline || 'Sınavda Başarıyı Getiren Strateji'
+    const headlineFontSize = hasImage ? 42 : 50
+    const headlineLineHeight = hasImage ? 52 : 62
+    ctx.font = `900 ${headlineFontSize}px Inter, system-ui, sans-serif`
+    ctx.fillStyle = '#ffffff'
+    cursorY = wrapText(ctx, headline, 80, cursorY, width - 160, headlineLineHeight, 2)
+
+    // ALT BAŞLIK (varsa)
+    const subhead = currentSlide?.subhead || singlePost?.questionOrSummary || storyData?.subhead || ''
+    if (subhead) {
+      cursorY += 8
+      const subheadFontSize = hasImage ? 23 : 26
+      const subheadLineHeight = hasImage ? 32 : 36
+      ctx.font = `500 ${subheadFontSize}px Inter, system-ui, sans-serif`
+      ctx.fillStyle = 'rgba(226, 232, 240, 0.85)'
+      cursorY = wrapText(ctx, subhead, 80, cursorY, width - 160, subheadLineHeight, 2)
+    }
+
+    cursorY += 18
+
+    // Güvenli İçerik Alt Sınırı (Footer çizgisinin 20px yukarısı)
+    const safeContentBottom = height - 130
+    const availableSpace = safeContentBottom - cursorY
 
     // STORY ÇIKARTMASI (STORY MODUNDA İSE)
     if (isStory && storyData) {
@@ -430,95 +466,136 @@ export function VisualCanvasEngine({
         cursorY = drawStorySticker(ctx, storyData, cursorY, width, theme)
       }
     } else if (isCarousel && currentSlide?.bodyPoints && currentSlide.bodyPoints.length > 0) {
-      // CAROUSEL MADDELERİ
-      currentSlide.bodyPoints.forEach((point, idx) => {
-        const cardY = cursorY
-        const cardHeight = 105
+      // CAROUSEL MADDELERİ (DİNAMİK ADAPTİF YÜKSEKLİK VE SIFIR ÇAKIŞMA)
+      const points = currentSlide.bodyPoints
+      const count = points.length
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)'
-        roundRect(ctx, 80, cardY, width - 160, cardHeight, 20)
+      const gap = count > 3 ? 10 : 14
+      const totalGaps = (count - 1) * gap
+      const rawCardH = Math.floor((availableSpace - totalGaps) / count)
+
+      // Görsel varken max 78px, görsel yokken max 98px; minimum 56px
+      const maxCardH = hasImage ? (count > 3 ? 66 : 78) : (count > 3 ? 84 : 98)
+      const cardHeight = Math.min(maxCardH, Math.max(56, rawCardH))
+      const isCompact = cardHeight < 72
+
+      points.forEach((point, idx) => {
+        const cardY = cursorY
+        const radius = isCompact ? 14 : 18
+
+        // Kart Arka Planı
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.035)'
+        roundRect(ctx, 80, cardY, width - 160, cardHeight, radius)
         ctx.fill()
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
         ctx.lineWidth = 1
         ctx.stroke()
 
+        // Sıra Numarası Rozeti (Daire)
+        const circleR = isCompact ? 18 : 22
+        const circleX = 80 + 16 + circleR
+        const circleY = cardY + cardHeight / 2
+
         ctx.fillStyle = theme.accentColor
         ctx.beginPath()
-        ctx.arc(130, cardY + cardHeight / 2, 22, 0, Math.PI * 2)
+        ctx.arc(circleX, circleY, circleR, 0, Math.PI * 2)
         ctx.fill()
 
-        ctx.font = 'bold 22px Inter, system-ui, sans-serif'
+        ctx.font = `bold ${isCompact ? 17 : 20}px Inter, system-ui, sans-serif`
         ctx.fillStyle = '#0f172a'
         ctx.textAlign = 'center'
-        ctx.fillText(String(idx + 1), 130, cardY + cardHeight / 2 + 8)
+        ctx.fillText(String(idx + 1), circleX, circleY + (isCompact ? 6 : 7))
         ctx.textAlign = 'left'
 
-        ctx.font = '600 25px Inter, system-ui, sans-serif'
-        ctx.fillStyle = '#f8fafc'
-        wrapText(ctx, point, 180, cardY + 45, width - 290, 34, 2)
+        // Madde Metni
+        const textX = circleX + circleR + 16
+        const textW = width - 80 - textX - 16
+        const textFontSize = isCompact ? 21 : 24
+        const textLineH = isCompact ? 28 : 32
 
-        cursorY += cardHeight + 18
+        ctx.font = `600 ${textFontSize}px Inter, system-ui, sans-serif`
+        ctx.fillStyle = '#f8fafc'
+        wrapText(
+          ctx,
+          point,
+          textX,
+          cardY + (cardHeight - textLineH) / 2 + (isCompact ? 20 : 22),
+          textW,
+          textLineH,
+          isCompact ? 1 : 2
+        )
+
+        cursorY += cardHeight + gap
       })
     } else if (singlePost?.options && singlePost.options.length > 0) {
-      // ÇOKTAN SEÇMELİ POST
-      singlePost.options.forEach((opt) => {
+      // ÇOKTAN SEÇMELİ POST (DİNAMİK ADAPTİF ŞIKLAR)
+      const opts = singlePost.options
+      const count = opts.length
+      const gap = 12
+      const totalGaps = (count - 1) * gap
+      const rawCardH = Math.floor((availableSpace - totalGaps) / count)
+      const cardHeight = Math.min(hasImage ? 68 : 82, Math.max(50, rawCardH))
+      const isCompact = cardHeight < 64
+
+      opts.forEach((opt) => {
         const cardY = cursorY
-        const cardHeight = 82
 
         ctx.fillStyle = opt.isCorrect ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255, 255, 255, 0.03)'
-        roundRect(ctx, 80, cardY, width - 160, cardHeight, 16)
+        roundRect(ctx, 80, cardY, width - 160, cardHeight, 14)
         ctx.fill()
         ctx.strokeStyle = opt.isCorrect ? '#22c55e' : 'rgba(255, 255, 255, 0.08)'
         ctx.lineWidth = 1.5
         ctx.stroke()
 
+        const boxSize = isCompact ? 36 : 46
+        const boxY = cardY + (cardHeight - boxSize) / 2
         ctx.fillStyle = opt.isCorrect ? '#22c55e' : 'rgba(255, 255, 255, 0.1)'
-        roundRect(ctx, 95, cardY + 16, 50, 50, 12)
+        roundRect(ctx, 95, boxY, boxSize, boxSize, 10)
         ctx.fill()
 
-        ctx.font = 'bold 24px Inter, system-ui, sans-serif'
+        ctx.font = `bold ${isCompact ? 19 : 23}px Inter, system-ui, sans-serif`
         ctx.fillStyle = opt.isCorrect ? '#052e16' : '#ffffff'
         ctx.textAlign = 'center'
-        ctx.fillText(opt.key, 120, cardY + 49)
+        ctx.fillText(opt.key, 95 + boxSize / 2, boxY + boxSize * 0.72)
         ctx.textAlign = 'left'
 
-        ctx.font = '500 24px Inter, system-ui, sans-serif'
+        ctx.font = `500 ${isCompact ? 20 : 23}px Inter, system-ui, sans-serif`
         ctx.fillStyle = '#f8fafc'
-        wrapText(ctx, opt.text, 170, cardY + 49, width - 280, 30, 1)
+        wrapText(ctx, opt.text, 100 + boxSize + 16, cardY + cardHeight * 0.62, width - 260 - boxSize, 28, 1)
 
-        cursorY += cardHeight + 14
+        cursorY += cardHeight + gap
       })
-    }
+    } else if (!isStory && singlePost?.keyTakeaway && (!singlePost.options || singlePost.options.length === 0)) {
+      // Tekil Post Özet Notu / Püf Nokta Kartı
+      const cardW = width - 160
+      const boxY = cursorY + 10
+      ctx.fillStyle = 'rgba(249, 115, 22, 0.08)'
+      roundRect(ctx, 80, boxY, cardW, 115, 18)
+      ctx.fill()
+      ctx.strokeStyle = theme.accentColor
+      ctx.lineWidth = 1.5
+      ctx.stroke()
 
-    // ALT VURGU ETİKETİ (Story harici)
-    if (!isStory) {
-      const tagText = currentSlide?.highlightTag || singlePost?.keyTakeaway || 'LİNK BİYODA'
-      if (tagText) {
-        ctx.font = '900 20px Inter, system-ui, sans-serif'
-        const tagW = ctx.measureText(tagText).width + 36
-        const tagH = 44
-        const tagY = height - 190
+      ctx.font = 'bold 20px Inter, system-ui, sans-serif'
+      ctx.fillStyle = theme.accentColor
+      ctx.fillText('💡 PÜF NOKTA & DERSOLAB NOTU', 105, boxY + 40)
 
-        ctx.fillStyle = theme.tagBg
-        roundRect(ctx, 80, tagY, tagW, tagH, 12)
-        ctx.fill()
-
-        ctx.fillStyle = theme.tagText
-        ctx.fillText(tagText, 98, tagY + 29)
-      }
+      ctx.font = '500 23px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#f8fafc'
+      wrapText(ctx, singlePost.keyTakeaway, 105, boxY + 76, cardW - 50, 30, 2)
     }
 
     // 7. ALT FOOTER
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
     ctx.lineWidth = 1.5
     ctx.beginPath()
-    ctx.moveTo(80, height - 125)
-    ctx.lineTo(width - 80, height - 125)
+    ctx.moveTo(80, height - 110)
+    ctx.lineTo(width - 80, height - 110)
     ctx.stroke()
 
     ctx.font = '600 20px Inter, system-ui, sans-serif'
     ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
-    ctx.fillText('@dersolabegitim  •  🛡️ ÖSYM KAZANIM ONAYLI', 80, height - 75)
+    ctx.fillText('@dersolabegitim  •  🛡️ ÖSYM KAZANIM ONAYLI', 80, height - 62)
 
     const footerRightText = isStory
       ? 'Yanıt Gönder 💬'
@@ -528,7 +605,7 @@ export function VisualCanvasEngine({
     ctx.font = 'bold 22px Inter, system-ui, sans-serif'
     ctx.fillStyle = theme.accentColor
     ctx.textAlign = 'right'
-    ctx.fillText(footerRightText, width - 80, height - 75)
+    ctx.fillText(footerRightText, width - 80, height - 62)
   }, [
     currentSlide,
     singlePost,
