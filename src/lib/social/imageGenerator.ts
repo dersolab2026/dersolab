@@ -207,17 +207,18 @@ function getProceduralSvg(
 </svg>`
   }
 
-  // 5. Varsayılan / Maskot Zeki Tilki & DersoLab Laboratuvarı
+  // 5. Varsayılan / Maskot Zeki Tilki & DersoLab Laboratuvarı (Resmi Maskot İkonu)
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
   <defs>
     <radialGradient id="defBg" cx="50%" cy="50%" r="65%">
       <stop offset="0%" stop-color="#0f172a"/>
       <stop offset="100%" stop-color="#030712"/>
     </radialGradient>
-    <linearGradient id="foxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fb923c"/>
-      <stop offset="100%" stop-color="#ea580c"/>
-    </linearGradient>
+    <radialGradient id="foxHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.35"/>
+      <stop offset="70%" stop-color="#ea580c" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#030712" stop-opacity="0"/>
+    </radialGradient>
     <filter id="orangeGlow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="8" result="blur"/>
       <feMerge>
@@ -227,32 +228,34 @@ function getProceduralSvg(
     </filter>
   </defs>
   <rect width="${width}" height="${height}" fill="url(#defBg)"/>
-  <!-- Laboratuvar Işımaları -->
-  <circle cx="${centerX}" cy="${centerY - 30}" r="140" fill="rgba(249, 115, 22, 0.12)" filter="url(#orangeGlow)"/>
-  <!-- Stilize Tilki Kafası Geometrisi -->
-  <polygon points="${centerX},${centerY - 120} ${centerX - 110},${centerY - 10} ${centerX},${centerY + 60} ${centerX + 110},${centerY - 10}" 
-           fill="url(#foxGrad)" filter="url(#orangeGlow)"/>
-  <!-- Sol Kulak -->
-  <polygon points="${centerX - 110},${centerY - 10} ${centerX - 90},${centerY - 140} ${centerX - 30},${centerY - 60}" fill="#ea580c"/>
-  <polygon points="${centerX - 95},${centerY - 25} ${centerX - 85},${centerY - 115} ${centerX - 45},${centerY - 60}" fill="#fed7aa"/>
-  <!-- Sağ Kulak -->
-  <polygon points="${centerX + 110},${centerY - 10} ${centerX + 90},${centerY - 140} ${centerX + 30},${centerY - 60}" fill="#ea580c"/>
-  <polygon points="${centerX + 95},${centerY - 25} ${centerX + 85},${centerY - 115} ${centerX + 45},${centerY - 60}" fill="#fed7aa"/>
-  <!-- Beyaz Yanaklar -->
-  <polygon points="${centerX},${centerY + 60} ${centerX - 65},${centerY + 10} ${centerX},${centerY - 10}" fill="#ffffff"/>
-  <polygon points="${centerX},${centerY + 60} ${centerX + 65},${centerY + 10} ${centerX},${centerY - 10}" fill="#ffffff"/>
-  <!-- Burun -->
-  <polygon points="${centerX - 15},${centerY + 45} ${centerX + 15},${centerY + 45} ${centerX},${centerY + 62}" fill="#0f172a"/>
-  <!-- Gözler / Zeki Bakış -->
-  <polygon points="${centerX - 45},${centerY - 15} ${centerX - 20},${centerY - 22} ${centerX - 28},${centerY - 8}" fill="#0f172a"/>
-  <polygon points="${centerX + 45},${centerY - 15} ${centerX + 20},${centerY - 22} ${centerX + 28},${centerY - 8}" fill="#0f172a"/>
-  <!-- Alt Rozet -->
-  <rect x="${centerX - 140}" y="${height - 90}" width="280" height="42" rx="21" fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" stroke-width="1.5"/>
-  <text x="${centerX}" y="${height - 63}" font-family="system-ui, sans-serif" font-weight="bold" font-size="15" fill="#fb923c" text-anchor="middle">
-    DERSOLAB • AI LAB ASİSTANI
+  <!-- Laboratuvar Siber Dairesel Hologram Alanı -->
+  <circle cx="${centerX}" cy="${centerY - 30}" r="170" fill="url(#foxHalo)"/>
+  <circle cx="${centerX}" cy="${centerY - 30}" r="145" fill="none" stroke="#f97316" stroke-width="2" stroke-dasharray="12 8" opacity="0.6" filter="url(#orangeGlow)"/>
+  <circle cx="${centerX}" cy="${centerY - 30}" r="125" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.4"/>
+  
+  <!-- Resmi DersoLab Maskot İkonu -->
+  <image href="/fox-mascot-icon.png" x="${centerX - 110}" y="${centerY - 140}" width="220" height="220" preserveAspectRatio="xMidYMid meet" filter="url(#orangeGlow)"/>
+
+  <!-- Alt Rozet & Marka -->
+  <rect x="${centerX - 150}" y="${height - 90}" width="300" height="42" rx="21" fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" stroke-width="1.5"/>
+  <text x="${centerX}" y="${height - 63}" font-family="system-ui, sans-serif" font-weight="bold" font-size="14" fill="#fb923c" text-anchor="middle">
+    DERSOLAB • RESMİ LAB ASİSTANI
   </text>
 </svg>`
 }
+
+/**
+ * DersoLab Resmi Marka & Maskot Görsel Arşivi
+ */
+export const DERSOLAB_BRAND_ASSETS = {
+  mascotCyberFox: '/mascot-student.jpg', // Ultra HD siber tilki (öğrenci)
+  mascotPixelFox: '/fox-mascot.png', // Tam boy piksel sanat tilki
+  mascotIconFox: '/fox-mascot-icon.png', // Kare şeffaf piksel tilki ikonu
+  mascotHeadFox: '/fox-head.png', // Navbar tilki başlığı ikonu
+  mascotOwlInstructor: '/mascot-instructor.jpg', // Siber bilge baykuş (eğitmen)
+  logoModern: '/dersolab-modern-logo.png', // Modern logo banner
+  logoLab: '/dersolab-lab-logo.png', // Siber lab logosu
+} as const
 
 /**
  * Main AI Image Generation function
@@ -262,6 +265,30 @@ export async function generateSocialImage(
 ): Promise<GenerateImageResponse> {
   const { prompt, stylePreset = 'cyber_lab', aspectRatio = '1:1', subject } = req
   const apiKey = process.env.GEMINI_API_KEY
+
+  // 0. Resmi Maskot veya Marka Varlığı İsteniyorsa doğrudan yüksek çözünürlüklü marka görselini kullan
+  const isExplicitMascot =
+    stylePreset === 'mascot_fox' ||
+    /(?:maskot|tilki|fox|logo|marka|asistan)/i.test(prompt + ' ' + (subject || ''))
+
+  if (isExplicitMascot) {
+    const isOwl = /(?:baykuş|owl|eğitmen|hoca|mentör)/i.test(prompt + ' ' + (subject || ''))
+    const isPixel = /(?:piksel|pixel|retro|arcade)/i.test(prompt + ' ' + (subject || ''))
+    const isLogo = /(?:logo|banner|amblem)/i.test(prompt + ' ' + (subject || ''))
+
+    let chosenAsset: string = DERSOLAB_BRAND_ASSETS.mascotCyberFox
+    if (isOwl) chosenAsset = DERSOLAB_BRAND_ASSETS.mascotOwlInstructor
+    else if (isPixel) chosenAsset = DERSOLAB_BRAND_ASSETS.mascotPixelFox
+    else if (isLogo) chosenAsset = DERSOLAB_BRAND_ASSETS.logoModern
+
+    return {
+      success: true,
+      imageUrl: chosenAsset,
+      prompt,
+      stylePreset,
+      aspectRatio,
+    }
+  }
 
   let width = 1080
   let height = 1080

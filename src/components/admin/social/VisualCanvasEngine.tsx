@@ -123,11 +123,13 @@ export function VisualCanvasEngine({
   const [copied, setCopied] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null)
+  const [loadedLogo, setLoadedLogo] = useState<HTMLImageElement | null>(null)
   const [loadedOrtaokulImg, setLoadedOrtaokulImg] = useState<HTMLImageElement | null>(null)
   const [loadedLiseImg, setLoadedLiseImg] = useState<HTMLImageElement | null>(null)
 
-  // AI Görsel Üretici Durumları
+  // AI Görsel Üretici & Marka Modalı Durumları
   const [isAiModalOpen, setIsAiModalOpen] = useState(false)
+  const [isBrandModalOpen, setIsBrandModalOpen] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
   const [aiStylePreset, setAiStylePreset] = useState<ImageStylePreset>('cyber_lab')
   const [isGeneratingImage, setIsGeneratingImage] = useState(false)
@@ -224,6 +226,14 @@ export function VisualCanvasEngine({
     img.src = liseImgUrl
   }, [liseImgUrl])
 
+  // DersoLab Resmi Logo / Tilki Başlığı Yükle
+  useEffect(() => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => setLoadedLogo(img)
+    img.src = '/fox-head.png'
+  }, [])
+
   // Canvas çizim fonksiyonu
   const renderCanvas = useCallback(() => {
     const canvas = canvasRef.current
@@ -284,15 +294,25 @@ export function VisualCanvasEngine({
     ctx.stroke()
 
     // 5. ÜST HEADER: DersoLab Logo ve Sayfa Sayacı
+    let logoStartX = 80
+    if (loadedLogo) {
+      // Resmi DersoLab Tilki Başlığı Logo İkonu
+      ctx.drawImage(loadedLogo, 80, 76, 44, 44)
+      logoStartX = 136
+    }
+
     ctx.font = 'bold 38px Inter, system-ui, sans-serif'
     ctx.fillStyle = '#ffffff'
-    ctx.fillText('Derso', 80, 115)
+    ctx.fillText('Derso', logoStartX, 114)
 
-    const logoGrad = ctx.createLinearGradient(190, 0, 270, 0)
+    const dersoW = ctx.measureText('Derso').width
+    const labX = logoStartX + dersoW + 4
+
+    const logoGrad = ctx.createLinearGradient(labX, 0, labX + 80, 0)
     logoGrad.addColorStop(0, theme.accentColor)
     logoGrad.addColorStop(1, theme.secondaryAccent)
     ctx.fillStyle = logoGrad
-    ctx.fillText('Lab', 195, 115)
+    ctx.fillText('Lab', labX, 114)
 
     if (isStory) {
       ctx.font = 'bold 22px Inter, system-ui, sans-serif'
@@ -518,6 +538,7 @@ export function VisualCanvasEngine({
     totalSlides,
     isCarousel,
     loadedImage,
+    loadedLogo,
     loadedOrtaokulImg,
     loadedLiseImg,
   ])
@@ -1169,6 +1190,16 @@ export function VisualCanvasEngine({
             <span>AI Görsel</span>
           </button>
 
+          {/* Resmi Maskot & Logo Arşivi Butonu */}
+          <button
+            onClick={() => setIsBrandModalOpen(true)}
+            className="flex items-center gap-1.5 bg-gradient-to-r from-orange-500/20 to-amber-500/20 hover:from-orange-500/30 hover:to-amber-500/30 border border-orange-500/40 text-orange-300 rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(249,115,22,0.2)]"
+            title="DersoLab resmi maskot (siber tilki, bilge baykuş) ve logo arşivinden görsel seç"
+          >
+            <span className="text-xs">🦊</span>
+            <span>Maskot / Logo</span>
+          </button>
+
           {/* Görsel Kaldır Butonu (Varsa) */}
           {Boolean(effectiveImageUrl) && (
             <button
@@ -1372,6 +1403,139 @@ export function VisualCanvasEngine({
                     <span>Görseli Üret &amp; Slayta Ekle</span>
                   </>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RESMİ MASCOT & MARKA MODALI */}
+      {isBrandModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#0b0f19] border border-orange-500/30 shadow-[0_20px_70px_rgba(249,115,22,0.3)] p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400">
+                  <span className="text-base">🦊</span>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">DersoLab Resmi Maskot &amp; Logo Arşivi</h3>
+                  <p className="text-[11px] text-slate-400">
+                    Orijinal yüksek çözünürlüklü marka ve karakter varlıklarını tek tıkla slayta yerleştirin
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsBrandModalOpen(false)}
+                className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Varlık Kartları Izgarası */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                {
+                  id: 'mascot-student',
+                  title: 'Siber Tilki (Öğrenci Maskotu)',
+                  subtitle: 'Ultra HD siber neon tilki karakteri. AYT/TYT taktikleri için ideal.',
+                  url: '/mascot-student.jpg',
+                  tag: 'Önerilen • Ultra HD',
+                  tagColor: 'border-orange-500/40 bg-orange-500/10 text-orange-300',
+                },
+                {
+                  id: 'fox-mascot',
+                  title: 'Piksel Tilki (Tam Boy)',
+                  subtitle: 'DersoLab resmi tam boy piksel sanat maskotu.',
+                  url: '/fox-mascot.png',
+                  tag: 'Piksel Sanatı',
+                  tagColor: 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300',
+                },
+                {
+                  id: 'fox-mascot-icon',
+                  title: 'Piksel Tilki İkonu (Şeffaf)',
+                  subtitle: 'Kare şeffaf arka planlı sevimli piksel tilki ikonu.',
+                  url: '/fox-mascot-icon.png',
+                  tag: 'Şeffaf İkon',
+                  tagColor: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300',
+                },
+                {
+                  id: 'fox-head',
+                  title: 'Derso Tilki Kafası (Logo)',
+                  subtitle: 'Navbar ve marka başlığı için kullanılan resmi logo rozeti.',
+                  url: '/fox-head.png',
+                  tag: 'Marka Rozeti',
+                  tagColor: 'border-purple-500/40 bg-purple-500/10 text-purple-300',
+                },
+                {
+                  id: 'mascot-instructor',
+                  title: 'Siber Bilge Baykuş (Eğitmen)',
+                  subtitle: 'Gözlüklü siber baykuş, öğretmen ve rehberlik mentörü.',
+                  url: '/mascot-instructor.jpg',
+                  tag: 'Mentör & Eğitmen',
+                  tagColor: 'border-blue-500/40 bg-blue-500/10 text-blue-300',
+                },
+                {
+                  id: 'dersolab-modern-logo',
+                  title: 'DersoLab Modern Logo Banner',
+                  subtitle: 'Modern tipografi ve gradyanlı yatay marka logosu.',
+                  url: '/dersolab-modern-logo.png',
+                  tag: 'Logo Banner',
+                  tagColor: 'border-pink-500/40 bg-pink-500/10 text-pink-300',
+                },
+                {
+                  id: 'dersolab-lab-logo',
+                  title: 'DersoLab Laboratuvar Logosu',
+                  subtitle: 'Siber neon laboratuvar marka amblemi.',
+                  url: '/dersolab-lab-logo.png',
+                  tag: 'Lab Amblem',
+                  tagColor: 'border-amber-500/40 bg-amber-500/10 text-amber-300',
+                },
+              ].map((asset) => (
+                <div
+                  key={asset.id}
+                  onClick={() => {
+                    onImageUpload?.(asset.url)
+                    if (isCarousel && onSlideUpdate && currentSlide) {
+                      onSlideUpdate(activeSlideIndex, {
+                        ...currentSlide,
+                        uploadedImageUrl: asset.url,
+                      })
+                    }
+                    setIsBrandModalOpen(false)
+                    toast.success(`${asset.title} slayta yerleştirildi!`)
+                  }}
+                  className="group relative flex flex-col p-3 rounded-2xl bg-white/5 hover:bg-orange-500/10 border border-white/10 hover:border-orange-500/40 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <div className="relative w-full h-32 rounded-xl overflow-hidden bg-black/50 border border-white/10 flex items-center justify-center p-2 mb-2.5">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={asset.url}
+                      alt={asset.title}
+                      className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold border backdrop-blur-md ${asset.tagColor}`}>
+                      {asset.tag}
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-white group-hover:text-orange-400 transition-colors">
+                    {asset.title}
+                  </h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2">
+                    {asset.subtitle}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-2 flex items-center justify-end border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setIsBrandModalOpen(false)}
+                className="px-4 py-2 rounded-xl border border-white/10 text-xs font-semibold text-slate-300 hover:bg-white/5"
+              >
+                Kapat
               </button>
             </div>
           </div>

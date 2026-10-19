@@ -289,10 +289,22 @@ Yanıtını kesinlikle şu JSON şemasına uygun döndür:
       try {
         const visualSubject = request.subject || parsed.topicLabel || parsed.title
         const visualPrompt = `${parsed.title}: ${parsed.topicLabel || 'Bilimsel infografik ve kavram şeması'}`
+        
+        // Genel sınav stratejisi, taktik, rehberlik veya motivasyon konularında DersoLab resmi maskotunu kullan
+        const isMascotTopic =
+          /(?:strateji|taktik|hata|tavsiye|rehberlik|motivasyon|öğrenci|deneme|net|dersolab|yks|lgs)/i.test(
+            visualSubject + ' ' + visualPrompt
+          ) &&
+          !/(?:optik|fizik|kırılma|ışık|türev|integral|matematik|geometri|kimya|organik|molekül|bionic|okuma)/i.test(
+            visualSubject + ' ' + visualPrompt
+          )
+
+        const chosenPreset: ImageStylePreset = isMascotTopic ? 'mascot_fox' : 'cyber_lab'
+
         const img = await generateSocialImage({
           prompt: visualPrompt,
           subject: visualSubject,
-          stylePreset: 'cyber_lab',
+          stylePreset: chosenPreset,
           aspectRatio: request.type === 'story' ? '9:16' : '1:1',
         })
         if (img?.imageUrl) {
@@ -478,6 +490,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
           ],
           highlightTag: 'KAYDETMELİK',
           footerNote: 'DersoLab Sınav Laboratuvarı • @dersolabegitim',
+          uploadedImageUrl: '/mascot-student.jpg',
           themeVariant: 'lab_dark',
         },
         {
@@ -523,6 +536,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
           themeVariant: 'purple_matrix',
         },
       ],
+      uploadedImageUrl: '/mascot-student.jpg',
       createdAt: new Date().toISOString(),
     }
   }
