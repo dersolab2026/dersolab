@@ -25,6 +25,7 @@ import {
   MessageSquare,
   CheckCircle2,
   ArrowRight,
+  ArrowLeft,
   Wand2,
   Loader2,
   ShieldCheck,
@@ -40,6 +41,7 @@ import type {
   StoryStickerType,
 } from '@/types/social'
 import { buildDefaultComments, buildDefaultHookMatrix, runPedagogicalAudit } from '@/lib/social/agent'
+import { downloadAllPostMedia } from '@/lib/social/canvasRenderer'
 import { VisualCanvasEngine } from './VisualCanvasEngine'
 import { InstagramMockup } from './InstagramMockup'
 import { toast } from 'sonner'
@@ -68,6 +70,7 @@ export function PostEditorDrawer({
   onDeletePost,
 }: PostEditorDrawerProps) {
   const [activeTab, setActiveTab] = useState<'caption' | 'slides' | 'visuals' | 'hooks' | 'comments' | 'pedagogy' | 'publish'>('caption')
+  const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor')
   const [isAuditing, setIsAuditing] = useState(false)
   const [previewMode, setPreviewMode] = useState<'canvas' | 'phone'>('canvas')
   const [activeSlideIndex, setActiveSlideIndex] = useState(0)
@@ -83,6 +86,7 @@ export function PostEditorDrawer({
   const [visualStylePreset, setVisualStylePreset] = useState<ImageStylePreset>('cyber_lab')
   const [isGeneratingVisual, setIsGeneratingVisual] = useState(false)
   const [isBatchGeneratingVisuals, setIsBatchGeneratingVisuals] = useState(false)
+  const [isExportingMedia, setIsExportingMedia] = useState(false)
 
   if (!isOpen || !post) return null
 
@@ -533,56 +537,43 @@ export function PostEditorDrawer({
     }
   }
 
-  // Görsel İndirme Fonksiyonu
-  function triggerDownload(urlOrData: string, filename: string) {
-    const link = document.createElement('a')
-    link.href = urlOrData
-    link.download = filename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-
-  function handleDownloadAllMedia() {
-    let downloadedCount = 0
-
-    if (isCarousel && post?.carouselSlides) {
-      post.carouselSlides.forEach((s, idx) => {
-        const src = s.uploadedImageUrl
-        if (src) {
-          triggerDownload(src, `dersolab_slayt_${idx + 1}.png`)
-          downloadedCount++
-        }
+  // Görselleri 1080p Tam Tasarım Olarak Dışa Aktar ve İndir
+  async function handleDownloadAllMedia() {
+    if (!post) return
+    setIsExportingMedia(true)
+    try {
+      const count = await downloadAllPostMedia(post, (current, total) => {
+        toast.info(`Görseller hazırlanıyor (${current}/${total})...`)
       })
-    } else if (post?.uploadedImageUrl) {
-      triggerDownload(post.uploadedImageUrl, `dersolab_gonderi.png`)
-      downloadedCount++
-    } else if (isStory && post?.storyData?.uploadedImageUrl) {
-      triggerDownload(post.storyData.uploadedImageUrl, `dersolab_story.png`)
-      downloadedCount++
-    }
-
-    if (downloadedCount > 0) {
-      toast.success(`${downloadedCount} adet görsel indirildi!`)
-    } else {
-      toast.info('İndirilecek kayıtlı görsel bulunamadı. Şablon üzerinden AI görseli üretebilirsiniz.')
+      if (count > 0) {
+        toast.success(`🎉 ${count} adet yüksek çözünürlüklü görsel başarıyla indirildi!`)
+      } else {
+        toast.info('İndirilecek görsel içeriği bulunamadı.')
+      }
+    } catch (err) {
+      console.error('İndirme hatası:', err)
+      toast.error('Görseller indirilirken bir hata oluştu.')
+    } finally {
+      setIsExportingMedia(false)
     }
   }
 
   // 1 Tıkla Paketi İndir + Metni Kopyala + Instagram'ı Aç
-  function handleOneClickShare() {
+  async function handleOneClickShare() {
+    if (!post) return
     // 1. Metni kopyala
-    const fullText = `${post!.caption}\n\n${(post!.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
-    navigator.clipboard.writeText(fullText)
+    const fullText = `${post.caption}\n\n${(post.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
+    await navigator.clipboard.writeText(fullText)
 
-    // 2. Görselleri indir
-    handleDownloadAllMedia()
+    // 2. Görselleri hazırla ve indir
+    toast.info('Paylaşım paketi hazırlanıyor...')
+    await handleDownloadAllMedia()
 
     // 3. Instagram'ı aç
     window.open('https://www.instagram.com/', '_blank')
 
     // 4. Durumu güncelle
-    if (post!.status !== 'published') {
+    if (post.status !== 'published') {
       handleStatusChange('approved')
     }
 
@@ -603,7 +594,7 @@ export function PostEditorDrawer({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-3 md:p-6 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
       {/* Gizli dosya seçici */}
       <input
         ref={fileInputRef}
@@ -613,12 +604,12 @@ export function PostEditorDrawer({
         className="hidden"
       />
 
-      <div className="relative w-full max-w-6xl h-[92vh] rounded-3xl bg-[#0d0f15] border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col">
+      <div className="relative w-full h-full sm:h-[92vh] max-w-6xl sm:rounded-3xl rounded-none bg-[#0d0f15] border-0 sm:border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col">
         {/* Üst Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.02]">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between px-3.5 sm:px-6 py-3 sm:py-4 border-b border-white/10 bg-white/[0.02] shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <div
-              className={`w-10 h-10 rounded-2xl flex items-center justify-center border ${
+              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center border shrink-0 ${
                 isCarousel
                   ? 'bg-orange-500/20 border-orange-500/30 text-orange-400'
                   : isStory
@@ -629,20 +620,20 @@ export function PostEditorDrawer({
               }`}
             >
               {isCarousel ? (
-                <Layers className="w-5 h-5" />
+                <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
               ) : isStory ? (
-                <Smartphone className="w-5 h-5" />
+                <Smartphone className="w-4 h-4 sm:w-5 sm:h-5" />
               ) : isReels ? (
-                <Film className="w-5 h-5" />
+                <Film className="w-4 h-4 sm:w-5 sm:h-5" />
               ) : (
-                <HelpCircle className="w-5 h-5" />
+                <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               )}
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-white max-w-md truncate">{post.title}</h2>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-sm sm:text-base font-bold text-white max-w-[130px] sm:max-w-md truncate">{post.title}</h2>
                 <span
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                  className={`px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wider shrink-0 ${
                     post.status === 'published'
                       ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                       : post.status === 'approved'
@@ -655,21 +646,14 @@ export function PostEditorDrawer({
                   {getStatusLabel(post.status)}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                {post.topicLabel} • {post.targetAudience} •{' '}
-                {isCarousel
-                  ? 'Kaydırmalı Carousel'
-                  : isStory
-                    ? 'Instagram Story'
-                    : isReels
-                      ? 'Reels'
-                      : 'Günün Sorusu / Post'}
+              <p className="text-[11px] sm:text-xs text-slate-400 truncate">
+                {post.topicLabel} • {post.targetAudience}
               </p>
             </div>
           </div>
 
           {/* Sağ Aksiyonlar */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/15 to-cyan-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)]">
               <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
               <span>Etkileşim Skoru: %{post.virality?.score || 96}</span>
@@ -684,19 +668,47 @@ export function PostEditorDrawer({
             </button>
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
+        {/* Mobil Görünüm Değiştirici: [Düzenle] vs [Önizleme & İndir] */}
+        <div className="lg:hidden flex items-center bg-[#07090e] border-b border-white/10 p-1.5 gap-1.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setMobileView('editor')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+              mobileView === 'editor'
+                ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/25'
+                : 'bg-white/5 text-slate-400 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>İçerik Düzenle</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileView('preview')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+              mobileView === 'preview'
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 shadow-md shadow-cyan-500/25 font-black'
+                : 'bg-white/5 text-slate-400 hover:text-white'
+            }`}
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Canlı Önizleme & İndir</span>
+          </button>
+        </div>
+
         {/* Ana İçerik Grid */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
           {/* SOL PANEL (7 Kolon) */}
-          <div className="lg:col-span-7 flex flex-col border-r border-white/10 overflow-hidden bg-black/20">
+          <div className={`lg:col-span-7 flex flex-col border-r border-white/10 overflow-hidden bg-black/20 ${mobileView === 'preview' ? 'hidden lg:flex' : 'flex flex-1'}`}>
             {/* Sekme Seçici */}
-            <div className="flex items-center gap-1 px-6 pt-4 pb-2 border-b border-white/5 overflow-x-auto">
+            <div className="flex items-center gap-1.5 px-3 sm:px-6 pt-3 sm:pt-4 pb-2 border-b border-white/5 overflow-x-auto scrollbar-none touch-pan-x shrink-0">
               <button
                 onClick={() => setActiveTab('caption')}
                 className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
@@ -705,7 +717,6 @@ export function PostEditorDrawer({
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <span>Açıklama</span>
               </button>
               <button
                 onClick={() => setActiveTab('slides')}
@@ -2245,10 +2256,15 @@ export function PostEditorDrawer({
 
                     <button
                       onClick={handleOneClickShare}
-                      className="w-full flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-sm shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.01] active:scale-95"
+                      disabled={isExportingMedia}
+                      className="w-full flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-sm shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50"
                     >
-                      <Sparkles className="w-4 h-4 fill-slate-950" />
-                      <span>1 Tıkla Paylaşım Paketini Başlat</span>
+                      {isExportingMedia ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                      ) : (
+                        <Sparkles className="w-4 h-4 fill-slate-950" />
+                      )}
+                      <span>{isExportingMedia ? 'Görseller Çiziliyor & İndiriliyor...' : '1 Tıkla Paylaşım Paketini Başlat'}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
 
@@ -2267,10 +2283,15 @@ export function PostEditorDrawer({
 
                       <button
                         onClick={handleDownloadAllMedia}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-colors"
+                        disabled={isExportingMedia}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-colors disabled:opacity-50"
                       >
-                        <Download className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Görselleri İndir</span>
+                        {isExportingMedia ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+                        ) : (
+                          <Download className="w-3.5 h-3.5 text-emerald-400" />
+                        )}
+                        <span>{isExportingMedia ? 'İndiriliyor...' : 'Görselleri İndir'}</span>
                       </button>
 
                       <a
@@ -2317,9 +2338,9 @@ export function PostEditorDrawer({
           </div>
 
           {/* SAĞ PANEL: Canlı Önizleme (5 Kolon) */}
-          <div className="lg:col-span-5 flex flex-col overflow-hidden bg-black/40">
+          <div className={`lg:col-span-5 flex flex-col overflow-hidden bg-black/40 ${mobileView === 'editor' ? 'hidden lg:flex' : 'flex flex-1'}`}>
             {/* Önizleme Modu Değiştirici */}
-            <div className="flex items-center justify-between px-6 py-3 border-b border-white/5">
+            <div className="flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 border-b border-white/5 shrink-0">
               <span className="text-xs font-semibold text-slate-400">Canlı Önizleme</span>
               <div className="flex items-center gap-1 p-0.5 rounded-xl bg-white/5 border border-white/10">
                 <button
@@ -2386,7 +2407,11 @@ export function PostEditorDrawer({
                   slides={post.carouselSlides}
                   singlePost={post.singlePostData}
                   storyData={post.storyData}
+                  reelsStoryboard={post.reelsStoryboard}
                   isStory={post.type === 'story'}
+                  isReels={post.type === 'reels'}
+                  postTitle={post.title}
+                  postCaption={post.caption}
                   customImageUrl={post.uploadedImageUrl}
                   activeSlideIndex={activeSlideIndex}
                   onSlideChange={setActiveSlideIndex}
@@ -2402,6 +2427,58 @@ export function PostEditorDrawer({
               )}
             </div>
           </div>
+        </div>
+
+        {/* Mobil Sabit Alt Aksiyon Barı */}
+        <div className="lg:hidden p-2.5 sm:p-3 border-t border-white/10 bg-[#07090e] flex items-center gap-2 shrink-0">
+          {mobileView === 'editor' ? (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  const fullText = `${post.caption}\n\n${(post.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
+                  navigator.clipboard.writeText(fullText)
+                  toast.success('Açıklama ve etiketler kopyalandı!')
+                }}
+                className="flex-1 py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95"
+              >
+                <Copy className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Metni Kopyala</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileView('preview')}
+                className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/20 transition-all active:scale-95"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Önizleme & İndir</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setMobileView('editor')}
+                className="py-2.5 px-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Düzenle</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadAllMedia}
+                disabled={isExportingMedia}
+                className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50"
+              >
+                {isExportingMedia ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-950" />
+                ) : (
+                  <Download className="w-3.5 h-3.5 text-slate-950" />
+                )}
+                <span>{isExportingMedia ? 'İndiriliyor...' : 'Görselleri İndir (PNG)'}</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

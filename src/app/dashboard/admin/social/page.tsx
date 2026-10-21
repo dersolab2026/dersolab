@@ -491,10 +491,10 @@ export default function SocialStudioPage() {
           </div>
 
           {/* Hızlı Aksiyon Butonları */}
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full lg:w-auto shrink-0">
             <button
               onClick={handleOpenNewPost}
-              className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs shadow-[0_0_25px_rgba(249,115,22,0.4)] transition-all hover:scale-105 active:scale-95"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs shadow-[0_0_25px_rgba(249,115,22,0.4)] transition-all hover:scale-105 active:scale-95"
             >
               <Plus className="w-4 h-4" />
               <span>Yeni Gönderi Oluştur</span>
@@ -503,7 +503,7 @@ export default function SocialStudioPage() {
               href="https://www.instagram.com/dersolabegitim/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-all hover:scale-105 active:scale-95"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-all hover:scale-105 active:scale-95"
             >
               <InstagramIcon className="w-4 h-4 text-pink-400" />
               <span>@dersolabegitim</span>
@@ -681,7 +681,7 @@ export default function SocialStudioPage() {
             </div>
 
             {/* Format Seçici */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-black/40 border border-white/10 shrink-0">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-black/40 border border-white/10 overflow-x-auto w-full sm:w-auto scrollbar-none shrink-0">
               {[
                 { id: 'carousel', label: 'Carousel (1:1)' },
                 { id: 'reels', label: 'Reels / TikTok' },
@@ -692,7 +692,7 @@ export default function SocialStudioPage() {
                   key={f.id}
                   type="button"
                   onClick={() => setQuickFormat(f.id as any)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                     quickFormat === f.id
                       ? 'bg-orange-500 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white'
@@ -717,7 +717,7 @@ export default function SocialStudioPage() {
             <button
               type="submit"
               disabled={isQuickGenerating || !quickPrompt.trim()}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs shadow-md transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shrink-0"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs shadow-md transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shrink-0"
             >
               {isQuickGenerating ? (
                 <>
@@ -766,11 +766,11 @@ export default function SocialStudioPage() {
         </div>
 
         {/* Durum Filtresi & Arama */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full md:w-auto">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-orange-500"
+            className="w-full sm:w-auto bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-orange-500"
           >
             <option value="all" className="bg-neutral-900">Tüm Durumlar</option>
             <option value="draft" className="bg-neutral-900">Taslak (Hazırlanan)</option>
@@ -778,7 +778,7 @@ export default function SocialStudioPage() {
             <option value="published" className="bg-neutral-900">Yayınlandı</option>
           </select>
 
-          <div className="relative w-48 sm:w-64">
+          <div className="relative w-full sm:w-64">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="text"

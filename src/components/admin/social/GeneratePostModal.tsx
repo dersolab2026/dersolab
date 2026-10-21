@@ -187,70 +187,70 @@ export function GeneratePostModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl rounded-3xl bg-[#0f1117] border border-white/10 shadow-[0_25px_70px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full h-full sm:h-auto max-w-2xl sm:rounded-3xl rounded-none bg-[#0f1117] border-0 sm:border border-white/10 shadow-[0_25px_70px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-none sm:max-h-[90vh]">
         {/* Üst Başlık Barı */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/10 bg-white/[0.02]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400">
-              <Sparkles className="w-5 h-5" />
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-5 border-b border-white/10 bg-white/[0.02] shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400 shrink-0">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2 truncate">
                 <span>DersoLab İçerik Üretici</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-orange-500/20 text-orange-300 border border-orange-500/30 shrink-0">
                   AI Destekli
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">DersoLab öğrencileri için Instagram ve TikTok gönderilerini saniyeler içinde hazırlayın</p>
+              <p className="text-[11px] sm:text-xs text-slate-400 truncate">Instagram ve TikTok içeriklerinizi saniyeler içinde hazırlayın</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Modu (Tekil vs Günün 3'lü Paketi vs 7 Günlük) */}
-        <div className="px-6 pt-5">
+        <div className="px-3 sm:px-6 pt-3 sm:pt-5 shrink-0">
           <div className="grid grid-cols-3 p-1 rounded-2xl bg-white/[0.03] border border-white/10 gap-1">
             <button
               type="button"
               onClick={() => setMode('single')}
-              className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 sm:py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
                 mode === 'single'
                   ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Tekil İçerik</span>
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span>Tekil</span>
             </button>
             <button
               type="button"
               onClick={() => setMode('auto_pilot')}
-              className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 sm:py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
                 mode === 'auto_pilot'
                   ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.3)]'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Zap className="w-3.5 h-3.5 text-amber-300" />
-              <span>⚡ Günün 3'lü Paketi</span>
+              <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300" />
+              <span className="truncate">⚡ 3'lü Paket</span>
             </button>
             <button
               type="button"
               onClick={() => setMode('weekly')}
-              className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 sm:py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
                 mode === 'weekly'
                   ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.3)]'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>7 Günlük Takvim</span>
+              <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span className="truncate">7 Günlük</span>
             </button>
           </div>
         </div>
