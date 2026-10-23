@@ -1,7 +1,11 @@
 import crypto from 'crypto'
 
 function getSigningSecret(): string {
-  return process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.CRON_SECRET || 'dersolab-calendar-oauth-secret'
+  const secret = process.env.OAUTH_SIGNING_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.CRON_SECRET
+  if (!secret) {
+    throw new Error('OAuth state imzalama anahtarı (OAUTH_SIGNING_SECRET veya SUPABASE_SERVICE_ROLE_KEY) yapılandırılmamış.')
+  }
+  return secret
 }
 
 /**

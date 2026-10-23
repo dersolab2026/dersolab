@@ -21,23 +21,19 @@ import type {
 
 export async function POST(request: NextRequest) {
   try {
-    const isDev = process.env.NODE_ENV === 'development'
-
-    // Auth kontrolü
+    // Auth kontrolü: Yalnızca sistem yöneticileri (admin) içerik üretebilir
     const supabase = await createClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
 
-    if (!user && !isDev) {
+    if (!user) {
       return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 })
     }
 
-    if (user) {
-      const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
-      if (userRow?.role !== 'admin' && !isDev) {
-        return NextResponse.json({ error: 'Bu işlem yalnızca sistem yöneticilerine açıktır.' }, { status: 403 })
-      }
+    const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+    if (userRow?.role !== 'admin') {
+      return NextResponse.json({ error: 'Bu işlem yalnızca sistem yöneticilerine açıktır.' }, { status: 403 })
     }
 
     const body = await request.json()
