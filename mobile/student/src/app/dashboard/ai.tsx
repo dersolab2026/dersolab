@@ -342,7 +342,7 @@ export default function AiScreen() {
           </Text>
         </View>
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
