@@ -1,5 +1,4 @@
-'use client'
-
+import Link from 'next/link'
 import { Video } from 'lucide-react'
 import { CancelBookingButton } from '@/components/booking/CancelBookingButton'
 import { LessonMaterials } from '@/components/booking/LessonMaterials'
@@ -44,15 +43,22 @@ export function BookingListItem({ booking, materials }: BookingListItemProps) {
 
         {booking.status === 'scheduled' && (
           <>
+            <Link
+              href={`/canli-ders/${booking.id}`}
+              className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] active:scale-95"
+            >
+              <Video className="h-4 w-4 fill-current" />
+              Canlı Derse Katıl
+            </Link>
             {booking.meetLink && (
               <a
                 href={booking.meetLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${PIXEL_BUTTON_SECONDARY} gap-2 px-3 py-1.5 text-sm`}
+                className={`${PIXEL_BUTTON_SECONDARY} px-2.5 py-1.5 text-xs text-slate-400`}
+                title="Google Meet ile Aç"
               >
-                <Video className="h-4 w-4" />
-                Derse Katıl
+                Meet
               </a>
             )}
             <CancelBookingButton bookingId={booking.id} startTime={booking.startTime} />
