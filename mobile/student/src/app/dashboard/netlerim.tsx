@@ -52,7 +52,7 @@ export default function NetlerimScreen() {
       if (!session) return;
 
       const { data, error } = await supabase
-        .from('exam_results')
+        .from('student_exam_results')
         .select('*')
         .eq('student_id', session.user.id)
         .order('exam_date', { ascending: false });
@@ -107,14 +107,13 @@ export default function NetlerimScreen() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Oturum bulunamadı');
 
-      const { error } = await supabase.from('exam_results').insert({
+      const { error } = await supabase.from('student_exam_results').insert({
         student_id: session.user.id,
         exam_name: examName.trim(),
         exam_type: examType,
         exam_date: new Date().toISOString().slice(0, 10),
         correct_count: c,
         wrong_count: w,
-        sections: [],
       });
 
       if (error) {

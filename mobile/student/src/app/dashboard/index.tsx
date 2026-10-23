@@ -15,6 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { supabase } from '@/lib/supabase';
 
 type Booking = {
@@ -439,13 +440,31 @@ export default function DashboardHome() {
               : 'Ders kredisi yükleyerek birebir canlı derslere hemen başla.'}
           </Text>
 
-          <TouchableOpacity
-            style={styles.findInstructorFullBtn}
-            onPress={() => router.push('/dashboard/instructors' as any)}
-          >
-            <Ionicons name="search" size={18} color="#030712" style={{ marginRight: 8 }} />
-            <Text style={styles.findInstructorFullBtnText}>Eğitmen Bul & Ders Ayarla</Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <TouchableOpacity
+              style={[styles.findInstructorFullBtn, { flex: 1.6 }]}
+              onPress={() => router.push('/dashboard/instructors' as any)}
+            >
+              <Ionicons name="search" size={16} color="#030712" style={{ marginRight: 6 }} />
+              <Text style={styles.findInstructorFullBtnText}>Eğitmen Bul</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.findInstructorFullBtn,
+                {
+                  flex: 1.2,
+                  backgroundColor: 'rgba(0, 229, 255, 0.15)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(0, 229, 255, 0.4)',
+                },
+              ]}
+              onPress={() => WebBrowser.openBrowserAsync('https://dersolab.com/dashboard/student/packages')}
+            >
+              <Ionicons name="card-outline" size={16} color="#00e5ff" style={{ marginRight: 6 }} />
+              <Text style={[styles.findInstructorFullBtnText, { color: '#00e5ff' }]}>Kredi Al</Text>
+            </TouchableOpacity>
+          </View>
         </LinearGradient>
 
         {loading ? (

@@ -18,6 +18,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { supabase } from '@/lib/supabase';
 
 const { width } = Dimensions.get('window');
@@ -381,6 +382,13 @@ export default function ParentDashboardHome() {
                 <Text style={styles.metricValue}>
                   {selectedStudent?.creditBalance ?? 0} <Text style={styles.metricSub}>Ders</Text>
                 </Text>
+                <TouchableOpacity
+                  onPress={() => WebBrowser.openBrowserAsync('https://dersolab.com/dashboard/parent/paketler')}
+                  style={{ marginTop: 6, backgroundColor: 'rgba(249, 115, 22, 0.18)', paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, alignSelf: 'flex-start', borderWidth: 1, borderColor: 'rgba(249, 115, 22, 0.3)' }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={{ color: '#f97316', fontSize: 10, fontWeight: '800' }}>+ Kredi Satın Al</Text>
+                </TouchableOpacity>
               </View>
 
               {/* Bu Ayki Dersler */}

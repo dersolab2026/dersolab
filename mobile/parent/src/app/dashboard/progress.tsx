@@ -95,14 +95,29 @@ export default function ParentProgressScreen() {
 
   const loadDetails = async (studentId: string) => {
     try {
-      // 1. Denemeler
       const { data: examData } = await supabase
-        .from('exam_results')
+        .from('student_exam_results')
         .select('*')
         .eq('student_id', studentId)
-        .order('date', { ascending: false });
+        .order('exam_date', { ascending: false });
 
-      setExams(examData ?? []);
+      const formattedExams: ExamResult[] = (examData ?? []).map((e: any) => {
+        const penalty = e.exam_type === 'lgs' ? 3 : 4;
+        const net = Math.max(0, e.correct_count - (e.wrong_count / penalty));
+        return {
+          id: e.id,
+          exam_title: e.exam_name || 'Deneme Sınavı',
+          exam_type: e.exam_type || 'tyt',
+          total_net: Number(net.toFixed(2)),
+          date: e.exam_date || e.created_at,
+          details: {
+            'Doğru': e.correct_count || 0,
+            'Yanlış': e.wrong_count || 0,
+          },
+        };
+      });
+
+      setExams(formattedExams);
 
       // 2. Ödevler
       const { data: hwData } = await supabase

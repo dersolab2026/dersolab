@@ -25,18 +25,35 @@ export default function LoginScreen() {
     setLoading(true);
     setErrorMsg('');
     
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    
-    setLoading(false);
-    
+
     if (error) {
+      setLoading(false);
       setErrorMsg(error.message);
-    } else {
-      router.replace('/dashboard');
+      return;
     }
+
+    if (signInData.user) {
+      const { data: userRow } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', signInData.user.id)
+        .single();
+
+      if (userRow?.role && userRow.role !== 'student' && userRow.role !== 'admin') {
+        await supabase.auth.signOut();
+        setLoading(false);
+        const roleName = userRow.role === 'instructor' ? 'Eğitmen' : 'Veli';
+        setErrorMsg(`Bu uygulama sadece Öğrenciler içindir. Giriş yaptığınız hesap bir ${roleName} hesabıdır.`);
+        return;
+      }
+    }
+
+    setLoading(false);
+    router.replace('/dashboard');
   };
 
   const handleGoogleLogin = async () => {

@@ -19,6 +19,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { supabase } from '@/lib/supabase';
 
 const { width } = Dimensions.get('window');
@@ -206,9 +207,17 @@ export default function InstructorsScreen() {
 
     if (creditBalance < 1) {
       Alert.alert(
-        'Yetersiz Kredi',
-        'Canlı ders randevusu oluşturabilmek için en az 1 ders krediniz olmalıdır. Kredi yüklemek için web sitemizi ziyaret edebilirsiniz.',
-        [{ text: 'Tamam' }]
+        'Yetersiz Ders Kredisi ⚠️',
+        'Canlı ders randevusu oluşturabilmek için en az 1 ders krediniz olmalıdır. Hemen kredi paketi satın alıp dersinizi ayırtabilirsiniz.',
+        [
+          { text: 'Vazgeç', style: 'cancel' },
+          {
+            text: 'Kredi Satın Al ⚡',
+            onPress: () => {
+              WebBrowser.openBrowserAsync('https://dersolab.com/dashboard/student/packages');
+            },
+          },
+        ]
       );
       return;
     }

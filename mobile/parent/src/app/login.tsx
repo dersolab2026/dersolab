@@ -52,7 +52,21 @@ export default function ParentLoginScreen() {
         return;
       }
 
-      if (data.session) {
+      if (data.session && data.user) {
+        const { data: userRow } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        if (userRow?.role && userRow.role !== 'parent' && userRow.role !== 'admin') {
+          await supabase.auth.signOut();
+          setLoading(false);
+          const roleName = userRow.role === 'student' ? 'Öğrenci' : 'Eğitmen';
+          setErrorMsg(`Bu uygulama sadece Veliler içindir. Giriş yaptığınız hesap bir ${roleName} hesabıdır.`);
+          return;
+        }
+
         router.replace('/dashboard');
       }
     } catch (err: any) {
