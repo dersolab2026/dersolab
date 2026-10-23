@@ -30,11 +30,13 @@ export default function DashboardLayout() {
     color: string;
   }[] = [
     { id: 'home', label: 'Ana Sayfa', path: '/dashboard', icon: 'home-outline', activeIcon: 'home', color: '#00e5ff' },
+    { id: 'instructors', label: 'Eğitmen Bul', path: '/dashboard/instructors', icon: 'search-outline', activeIcon: 'search', color: '#38bdf8' },
+    { id: 'lessons', label: 'Derslerim', path: '/dashboard/lessons', icon: 'videocam-outline', activeIcon: 'videocam', color: '#6366f1' },
     { id: 'lab', label: 'L.A.B.', path: '/dashboard/lab', icon: 'flask-outline', activeIcon: 'flask', color: '#a855f7' },
-    { id: 'homework', label: 'Ödevlerim', path: '/dashboard/homework', icon: 'school-outline', activeIcon: 'school', color: '#38bdf8' },
+    { id: 'ai', label: 'AI Soru', path: '/dashboard/ai', icon: 'hardware-chip-outline', activeIcon: 'hardware-chip', color: '#ec4899' },
+    { id: 'homework', label: 'Ödevlerim', path: '/dashboard/homework', icon: 'school-outline', activeIcon: 'school', color: '#06b6d4' },
     { id: 'netlerim', label: 'Netlerim', path: '/dashboard/netlerim', icon: 'trending-up-outline', activeIcon: 'trending-up', color: '#10b981' },
     { id: 'diary', label: 'Günlük', path: '/dashboard/diary', icon: 'calendar-outline', activeIcon: 'calendar', color: '#f59e0b' },
-    { id: 'ai', label: 'AI Soru', path: '/dashboard/ai', icon: 'hardware-chip-outline', activeIcon: 'hardware-chip', color: '#ec4899' },
     { id: 'profile', label: 'Profil', path: '/dashboard/profile', icon: 'person-outline', activeIcon: 'person', color: '#94a3b8' },
   ];
 

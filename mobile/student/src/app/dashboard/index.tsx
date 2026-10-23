@@ -441,7 +441,7 @@ export default function DashboardHome() {
 
           <TouchableOpacity
             style={styles.findInstructorFullBtn}
-            onPress={() => router.push('/explore')}
+            onPress={() => router.push('/dashboard/instructors' as any)}
           >
             <Ionicons name="search" size={18} color="#030712" style={{ marginRight: 8 }} />
             <Text style={styles.findInstructorFullBtnText}>Eğitmen Bul & Ders Ayarla</Text>
@@ -455,12 +455,17 @@ export default function DashboardHome() {
             {/* Yaklaşan Canlı Dersler */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Yaklaşan Canlı Derslerin</Text>
-                {upcoming.length > 0 ? (
-                  <View style={styles.countBadge}>
-                    <Text style={styles.countBadgeText}>{upcoming.length}</Text>
-                  </View>
-                ) : null}
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={styles.sectionTitle}>Yaklaşan Canlı Derslerin</Text>
+                  {upcoming.length > 0 ? (
+                    <View style={styles.countBadge}>
+                      <Text style={styles.countBadgeText}>{upcoming.length}</Text>
+                    </View>
+                  ) : null}
+                </View>
+                <TouchableOpacity onPress={() => router.push('/dashboard/lessons' as any)}>
+                  <Text style={{ color: '#00e5ff', fontSize: 13, fontWeight: '700' }}>Tüm Derslerim →</Text>
+                </TouchableOpacity>
               </View>
 
               {upcoming.length === 0 ? (
