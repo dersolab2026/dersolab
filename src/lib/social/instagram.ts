@@ -12,6 +12,7 @@ export interface InstagramPublishResult {
   postId?: string
   permalink?: string
   mode: 'api' | 'manual_fallback'
+  action: 'story' | 'post'
   message: string
 }
 
@@ -43,13 +44,17 @@ export async function publishToInstagram({
   isStory?: boolean
 }): Promise<InstagramPublishResult> {
   const { isConfigured, token, accountId } = getInstagramConfig()
+  const actionType: 'story' | 'post' = isStory ? 'story' : 'post'
 
   if (!isConfigured) {
     return {
       success: true,
       mode: 'manual_fallback',
-      message:
-        'Instagram API kimlik bilgileri (INSTAGRAM_ACCESS_TOKEN & INSTAGRAM_BUSINESS_ACCOUNT_ID) henüz .env ortamına eklenmediği için gönderi "Manuel Paylaşım Modu"nda hazırlandı. Metin ve görselleri panodan kopyalayıp Instagram uygulamasında veya Creator Studio üzerinden hemen paylaşabilirsiniz.',
+      action: actionType,
+      permalink: isStory ? 'https://www.instagram.com/stories/create/' : 'https://www.instagram.com/',
+      message: isStory
+        ? 'Instagram Story (9:16 Hikaye) başarıyla hazırlandı. Dikey görsel cihazınıza aktarıldı, metin panoya kopyalandı ve Instagram Story açıldı.'
+        : 'Instagram Gönderisi başarıyla hazırlandı. Görseller cihazınıza indirildi, açıklama panoya kopyalandı ve Instagram açıldı.',
     }
   }
 
@@ -90,7 +95,9 @@ export async function publishToInstagram({
       return {
         success: true,
         postId: publishData.id,
+        permalink: 'https://www.instagram.com/dersolabegitim',
         mode: 'api',
+        action: actionType,
         message: 'Story başarıyla Instagram hesabınızda yayınlandı!',
       }
     }
@@ -131,7 +138,9 @@ export async function publishToInstagram({
       return {
         success: true,
         postId: publishData.id,
+        permalink: 'https://www.instagram.com/dersolabegitim',
         mode: 'api',
+        action: actionType,
         message: 'Reels başarıyla Instagram hesabınızda yayınlandı!',
       }
     }
@@ -196,7 +205,9 @@ export async function publishToInstagram({
       return {
         success: true,
         postId: publishData.id,
+        permalink: 'https://www.instagram.com/dersolabegitim',
         mode: 'api',
+        action: actionType,
         message: 'Carousel gönderisi başarıyla Instagram hesabınızda yayınlandı!',
       }
     }
@@ -235,7 +246,9 @@ export async function publishToInstagram({
       return {
         success: true,
         postId: publishData.id,
+        permalink: 'https://www.instagram.com/dersolabegitim',
         mode: 'api',
+        action: actionType,
         message: 'Gönderi başarıyla Instagram hesabınızda yayınlandı!',
       }
     }
@@ -246,6 +259,8 @@ export async function publishToInstagram({
     return {
       success: false,
       mode: 'api',
+      action: actionType,
+      permalink: isStory ? 'https://www.instagram.com/stories/create/' : 'https://www.instagram.com/',
       message: error?.message || 'Instagram API çağrısı sırasında bir hata oluştu.',
     }
   }

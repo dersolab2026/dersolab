@@ -38,15 +38,27 @@ export default async function AdminOverviewPage() {
           <CardHeader><CardTitle className="text-sm font-normal text-muted-foreground">Bu Ay Ciro</CardTitle></CardHeader>
           <CardContent><p className="text-2xl font-semibold">{stats.revenueThisMonth.toLocaleString('tr-TR')} ₺</p></CardContent>
         </Card>
-        <Card className="border-orange-500/30 bg-orange-500/[0.05]">
+        <Card className="border-pink-500/30 bg-gradient-to-br from-pink-500/[0.07] via-purple-500/[0.04] to-cyan-500/[0.07] relative overflow-hidden">
+          <div className="absolute top-2 right-2 flex items-center gap-1">
+            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30">
+              ⚡ Tek Tuşla Çift Yayın
+            </span>
+          </div>
           <CardHeader>
-            <CardTitle className="text-sm font-semibold text-orange-400">✨ Sosyal Medya Ajanı</CardTitle>
+            <CardTitle className="text-sm font-semibold text-pink-300 flex items-center gap-1.5">
+              <span>✨ Sosyal Medya Stüdyosu</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1.5">
-            <p className="text-xs text-muted-foreground">Instagram için AI içerik üretimi, şablon tasarımı ve onay merkezi</p>
-            <Link href="/social" className="inline-block text-xs font-bold text-orange-400 hover:underline pt-1">
-              Stüdyoyu Aç →
-            </Link>
+            <p className="text-xs text-muted-foreground">
+              Instagram & TikTok için tek tuşla Story ve Gönderi yayını, AI senaryo ve görsel üretimi.
+            </p>
+            <div className="flex items-center gap-2 pt-1">
+              <Link href="/social" className="inline-flex items-center gap-1.5 text-xs font-bold text-pink-400 hover:text-pink-300 hover:underline">
+                <span>Stüdyoyu Aç (Tek Tuşla Paylaş)</span>
+                <span>→</span>
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>

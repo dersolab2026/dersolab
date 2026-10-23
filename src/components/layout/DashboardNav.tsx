@@ -38,11 +38,11 @@ interface DashboardNavProps {
   notifications: NotificationItem[]
 }
 
-const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
+const NAV_ITEMS: Record<string, { href: string; label: string; badge?: string }[]> = {
   student: [
     { href: '/dashboard/student/bookings', label: 'Derslerim' },
     { href: '/lab', label: 'L.A.B.' },
-    { href: '/social', label: 'Sosyal Medya Ajanı' },
+    { href: '/social', label: 'Sosyal Medya Ajanı', badge: 'AI' },
     { href: '/dashboard/student/gunluk', label: 'Günlük' },
     { href: '/dashboard/student/netlerim', label: 'Netlerim' },
     { href: '/dashboard/student/kocluk-formu', label: 'Koçluk Formu' },
@@ -65,7 +65,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
     { href: '/dashboard/instructor', label: 'Derslerim' },
     { href: '/dashboard/instructor/ogrencilerim', label: 'Öğrencilerim' },
     { href: '/lab', label: 'L.A.B.' },
-    { href: '/social', label: 'Sosyal Medya' },
+    { href: '/social', label: 'Sosyal Medya', badge: 'Insta & TikTok' },
     { href: '/dashboard/instructor/homework', label: 'Ödevler' },
     { href: '/dashboard/instructor/availability', label: 'Ajanda' },
     { href: '/dashboard/instructor/profile', label: 'Profilim' },
@@ -75,7 +75,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string }[]> = {
   ],
   admin: [
     { href: '/dashboard/admin', label: 'Genel Bakış' },
-    { href: '/social', label: 'Sosyal Medya' },
+    { href: '/social', label: 'Sosyal Medya', badge: 'Insta & TikTok' },
     { href: '/lab', label: 'L.A.B.' },
     { href: '/dashboard/admin/users', label: 'Kullanıcılar' },
     { href: '/dashboard/admin/instructors', label: 'Eğitmen Onayları' },
@@ -185,9 +185,14 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
                 {i === dividerIndex && <div className="my-2 border-t border-white/10" />}
                 <Link
                   href={item.href}
-                  className={isActive ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE}
+                  className={`${isActive ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE} flex items-center justify-between gap-1.5`}
                 >
-                  {item.label}
+                  <span className="truncate">{item.label}</span>
+                  {item.badge && (
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-teal-400/20 text-pink-300 border border-pink-500/30 shrink-0">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               </div>
             )
@@ -228,9 +233,14 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
                   {i === dividerIndex && <div className="my-2 border-t border-white/10" />}
                   <Link
                     href={item.href}
-                    className={isActive ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE}
+                    className={`${isActive ? getActiveLinkClass(role) : SIDEBAR_LINK_INACTIVE} flex items-center justify-between gap-1.5`}
                   >
-                    {item.label}
+                    <span className="truncate">{item.label}</span>
+                    {item.badge && (
+                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-teal-400/20 text-pink-300 border border-pink-500/30 shrink-0">
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 </div>
               )

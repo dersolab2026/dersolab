@@ -652,19 +652,19 @@ export function VisualCanvasEngine({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 {
-                  id: 'mascot-student',
-                  title: 'Siber Tilki (Öğrenci Maskotu)',
-                  subtitle: 'Ultra HD siber neon tilki karakteri. AYT/TYT taktikleri için ideal.',
-                  url: '/mascot-student.jpg',
-                  tag: 'Önerilen • Ultra HD',
-                  tagColor: 'border-orange-500/40 bg-orange-500/10 text-orange-300',
+                  id: 'fox-mascot-520',
+                  title: '🦊 Zeki Tilki (Resmi DersoLab Maskotu)',
+                  subtitle: 'Yüksek çözünürlüklü şeffaf sevimli piksel maskotumuz.',
+                  url: '/fox-mascot-520.png',
+                  tag: '⭐ Resmi Maskot',
+                  tagColor: 'border-orange-500/40 bg-orange-500/15 text-orange-300',
                 },
                 {
                   id: 'fox-mascot',
                   title: 'Piksel Tilki (Tam Boy)',
-                  subtitle: 'DersoLab resmi tam boy piksel sanat maskotu.',
+                  subtitle: 'DersoLab tam boy sevimli piksel sanat maskotu.',
                   url: '/fox-mascot.png',
-                  tag: 'Piksel Sanatı',
+                  tag: 'Orijinal Maskot',
                   tagColor: 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300',
                 },
                 {

@@ -1,103 +1,139 @@
 import type { GenerateImageRequest, GenerateImageResponse, ImageStylePreset } from '@/types/social'
+import fs from 'fs'
+import path from 'path'
 
 /**
- * DersoLab AI Visual & Image Generator Engine
- * 
- * Generates custom, high-impact SVG illustrations and visual compositions
- * for Instagram Carousels, Stories, Reels, and X (Twitter) Threads.
+ * DersoLab Resmi Marka & Maskot Görsel Arşivi
+ * Not: Yalnızca DersoLab'ın sevimli resmi piksel tilkisi ve resmi logoları kullanılır.
  */
+export const DERSOLAB_BRAND_ASSETS = {
+  mascotFox: '/fox-mascot.png', // Tam boy sevimli DersoLab piksel maskotu
+  mascotPixelFox: '/fox-mascot-520.png', // Yüksek çözünürlüklü şeffaf piksel sanat tilki
+  mascotIconFox: '/fox-mascot-icon.png', // Kare şeffaf piksel tilki ikonu
+  mascotHeadFox: '/fox-head.png', // Navbar tilki başlığı ikonu
+  logoModern: '/dersolab-modern-logo.png', // Modern logo banner
+  logoLab: '/dersolab-lab-logo.png', // Siber lab logosu
+} as const
 
-const STYLE_PROMPTS: Record<ImageStylePreset, string> = {
-  cyber_lab:
-    'DersoLab futuristic cyber-laboratory style. Dark #080c14 background with glowing neon orange (#f97316), cyan (#06b6d4) and emerald (#10b981) highlights, glowing particles, holographic grid, 3D depth, sleek modern UI aesthetics.',
-  scientific_diagram:
-    'Precise technical scientific and mathematical blueprint diagram. Clean coordinate axes, labeled curves, vectors, geometric angles, optical rays or molecular bonds, glowing neon accents on dark blueprint background.',
-  minimal_vector:
-    'Modern flat editorial vector illustration. Bold geometric shapes, clean negative space, vibrant harmonious colors, minimalist high-impact graphic design.',
-  realistic_study:
-    'Cinematic modern study atmosphere. Aesthetic desk setup, open notebook with diagrams, stopwatch, warm ambient lighting with subtle orange neon desk lamp, hyper-focused exam preparation vibe.',
-  mascot_fox:
-    'Friendly, smart orange DersoLab mascot fox with science goggles in a high-tech modern educational laboratory, holding a glowing hologram tablet or pointing at a formula.',
+// Sunucu tarafında base64 piksel tilki önbelleği
+let cachedFoxBase64: string | null = null
+function getFoxMascotBase64(): string {
+  if (cachedFoxBase64 !== null) return cachedFoxBase64
+  try {
+    const filePath = path.join(process.cwd(), 'public', 'fox-mascot-520.png')
+    if (fs.existsSync(filePath)) {
+      const buffer = fs.readFileSync(filePath)
+      cachedFoxBase64 = `data:image/png;base64,${buffer.toString('base64')}`
+      return cachedFoxBase64
+    }
+  } catch {
+    // fallback
+  }
+  cachedFoxBase64 = ''
+  return cachedFoxBase64
 }
 
-// Procedural fallback SVG templates for instant, offline visual generation
-function getProceduralSvg(
-  prompt: string,
-  style: ImageStylePreset,
-  width: number,
-  height: number,
-  subject?: string
-): string {
-  const centerX = width / 2
-  const centerY = height / 2
+/**
+ * DersoLab Orijinal Vektör Piksel Tilkisi (public/tasarim/tilki.svg'den derlenmiştir)
+ * Harici dosya bağımlılığı olmadan her ortamda %100 net ve keskin piksel sanatı üretir.
+ */
+function renderDersoLabPixelFoxVector(x: number, y: number, scale = 12): string {
+  return `<g transform="translate(${x}, ${y}) scale(${scale})" shape-rendering="crispEdges">
+    <rect x="3" y="0" width="2" height="1" fill="#1F1F1F"/>
+    <rect x="13" y="0" width="2" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="1" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="3" y="1" width="2" height="1" fill="#E56B0D"/>
+    <rect x="5" y="1" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="12" y="1" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="13" y="2" width="2" height="1" fill="#E56B0D"/>
+    <rect x="15" y="1" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="2" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="3" y="2" width="1" height="1" fill="#E56B0D"/>
+    <rect x="4" y="2" width="1" height="1" fill="#EDECEC"/>
+    <rect x="5" y="2" width="1" height="1" fill="#E56B0D"/>
+    <rect x="6" y="2" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="11" y="2" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="12" y="2" width="1" height="1" fill="#E56B0D"/>
+    <rect x="13" y="2" width="1" height="1" fill="#EDECEC"/>
+    <rect x="14" y="2" width="1" height="1" fill="#E56B0D"/>
+    <rect x="15" y="2" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="1" y="3" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="3" width="5" height="1" fill="#E56B0D"/>
+    <rect x="7" y="3" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="10" y="3" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="11" y="3" width="5" height="1" fill="#E56B0D"/>
+    <rect x="16" y="3" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="1" y="4" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="4" width="6" height="1" fill="#E56B0D"/>
+    <rect x="8" y="4" width="2" height="1" fill="#1F1F1F"/>
+    <rect x="10" y="4" width="6" height="1" fill="#E56B0D"/>
+    <rect x="16" y="4" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="1" y="5" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="5" width="14" height="1" fill="#E56B0D"/>
+    <rect x="16" y="5" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="1" y="6" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="6" width="14" height="1" fill="#E56B0D"/>
+    <rect x="16" y="6" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="1" y="7" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="7" width="2" height="1" fill="#E56B0D"/>
+    <rect x="4" y="7" width="1" height="1" fill="#EDECEC"/>
+    <rect x="5" y="7" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="6" y="7" width="6" height="1" fill="#E56B0D"/>
+    <rect x="12" y="7" width="1" height="1" fill="#EDECEC"/>
+    <rect x="13" y="7" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="14" y="7" width="2" height="1" fill="#E56B0D"/>
+    <rect x="16" y="7" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="1" y="8" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="8" width="2" height="1" fill="#E56B0D"/>
+    <rect x="4" y="8" width="2" height="1" fill="#1F1F1F"/>
+    <rect x="6" y="8" width="6" height="1" fill="#E56B0D"/>
+    <rect x="12" y="8" width="2" height="1" fill="#1F1F1F"/>
+    <rect x="14" y="8" width="2" height="1" fill="#E56B0D"/>
+    <rect x="16" y="8" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="1" y="9" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="9" width="14" height="1" fill="#E56B0D"/>
+    <rect x="16" y="9" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="1" y="10" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="10" width="1" height="1" fill="#C7591B"/>
+    <rect x="3" y="10" width="12" height="1" fill="#E56B0D"/>
+    <rect x="15" y="10" width="1" height="1" fill="#C7591B"/>
+    <rect x="16" y="10" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="1" y="11" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="11" width="5" height="1" fill="#EDECEC"/>
+    <rect x="7" y="11" width="4" height="1" fill="#E56B0D"/>
+    <rect x="11" y="11" width="5" height="1" fill="#EDECEC"/>
+    <rect x="16" y="11" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="12" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="3" y="12" width="5" height="1" fill="#EDECEC"/>
+    <rect x="8" y="12" width="2" height="1" fill="#1F1F1F"/>
+    <rect x="10" y="12" width="5" height="1" fill="#EDECEC"/>
+    <rect x="15" y="12" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="2" y="13" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="3" y="13" width="12" height="1" fill="#EDECEC"/>
+    <rect x="15" y="13" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="3" y="14" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="4" y="14" width="10" height="1" fill="#EDECEC"/>
+    <rect x="14" y="14" width="1" height="1" fill="#1F1F1F"/>
+    <rect x="5" y="15" width="8" height="1" fill="#1F1F1F"/>
+  </g>`
+}
 
-  const pLower = (prompt + ' ' + (subject || '')).toLowerCase()
+/**
+ * 1A. Bilimsel Şema: Turlama & Zaman Akış Diyagramı (Blueprint Stili)
+ */
+function getScientificBlueprintTurlamaSvg(width: number, height: number, headline = 'TURLAMA TAKTİĞİ'): string {
+  const cx = width / 2
+  const cy = height / 2 - 20
+  const is916 = height > width
 
-  // 1. TYT / AYT Fizik & Optik
-  if (pLower.includes('optik') || pLower.includes('fizik') || pLower.includes('ışık') || pLower.includes('kırılma')) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
   <defs>
-    <radialGradient id="bgGlow" cx="50%" cy="50%" r="60%">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#020617"/>
+    <radialGradient id="bpBg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#03254c"/>
+      <stop offset="60%" stop-color="#02152d"/>
+      <stop offset="100%" stop-color="#010c1c"/>
     </radialGradient>
-    <linearGradient id="beamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="50%" stop-color="#38bdf8"/>
-      <stop offset="100%" stop-color="#f97316"/>
-    </linearGradient>
-    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="${width}" height="${height}" fill="url(#bgGlow)"/>
-  <!-- Holografik Grid Çizgileri -->
-  <g stroke="rgba(56, 189, 248, 0.08)" stroke-width="1.5">
-    <line x1="0" y1="${centerY - 150}" x2="${width}" y2="${centerY - 150}"/>
-    <line x1="0" y1="${centerY}" x2="${width}" y2="${centerY}"/>
-    <line x1="0" y1="${centerY + 150}" x2="${width}" y2="${centerY + 150}"/>
-    <line x1="${centerX - 150}" y1="0" x2="${centerX - 150}" y2="${height}"/>
-    <line x1="${centerX}" y1="0" x2="${centerX}" y2="${height}"/>
-    <line x1="${centerX + 150}" y1="0" x2="${centerX + 150}" y2="${height}"/>
-  </g>
-  <!-- Prizma Üçgeni -->
-  <polygon points="${centerX},${centerY - 140} ${centerX - 160},${centerY + 130} ${centerX + 160},${centerY + 130}" 
-           fill="rgba(56, 189, 248, 0.12)" stroke="#38bdf8" stroke-width="3" filter="url(#neonGlow)"/>
-  <!-- Gelen Işık Işını -->
-  <line x1="${centerX - 350}" y1="${centerY + 180}" x2="${centerX - 50}" y2="${centerY - 20}" 
-        stroke="#ffffff" stroke-width="5" filter="url(#neonGlow)"/>
-  <!-- Kırılan Renk Tayfı -->
-  <line x1="${centerX - 50}" y1="${centerY - 20}" x2="${centerX + 350}" y2="${centerY - 100}" stroke="#ef4444" stroke-width="4" filter="url(#neonGlow)"/>
-  <line x1="${centerX - 50}" y1="${centerY - 20}" x2="${centerX + 350}" y2="${centerY - 50}" stroke="#f97316" stroke-width="4" filter="url(#neonGlow)"/>
-  <line x1="${centerX - 50}" y1="${centerY - 20}" x2="${centerX + 350}" y2="${centerY}" stroke="#eab308" stroke-width="4" filter="url(#neonGlow)"/>
-  <line x1="${centerX - 50}" y1="${centerY - 20}" x2="${centerX + 350}" y2="${centerY + 50}" stroke="#10b981" stroke-width="4" filter="url(#neonGlow)"/>
-  <line x1="${centerX - 50}" y1="${centerY - 20}" x2="${centerX + 350}" y2="${centerY + 100}" stroke="#06b6d4" stroke-width="4" filter="url(#neonGlow)"/>
-  <!-- Rozet -->
-  <rect x="${centerX - 120}" y="${height - 90}" width="240" height="42" rx="21" fill="rgba(14, 165, 233, 0.2)" stroke="#38bdf8" stroke-width="1.5"/>
-  <text x="${centerX}" y="${height - 63}" font-family="system-ui, sans-serif" font-weight="bold" font-size="15" fill="#38bdf8" text-anchor="middle">
-    TYT FİZİK • OPTİK &amp; KIRILMA
-  </text>
-</svg>`
-  }
-
-  // 2. Matematik / Türev / Geometri
-  if (pLower.includes('matematik') || pLower.includes('türev') || pLower.includes('geometri') || pLower.includes('fonksiyon')) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-  <defs>
-    <radialGradient id="mathBg" cx="50%" cy="50%" r="60%">
-      <stop offset="0%" stop-color="#111827"/>
-      <stop offset="100%" stop-color="#030712"/>
-    </radialGradient>
-    <linearGradient id="curveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#06b6d4"/>
-      <stop offset="50%" stop-color="#f97316"/>
-      <stop offset="100%" stop-color="#e11d48"/>
-    </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+    <filter id="bpGlow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="6" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
@@ -105,157 +141,563 @@ function getProceduralSvg(
       </feMerge>
     </filter>
   </defs>
-  <rect width="${width}" height="${height}" fill="url(#mathBg)"/>
-  <!-- Koordinat Ekseni -->
-  <line x1="80" y1="${centerY + 60}" x2="${width - 80}" y2="${centerY + 60}" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-  <line x1="${centerX - 60}" y1="80" x2="${centerX - 60}" y2="${height - 80}" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-  <!-- Fonksiyon Eğrisi f(x) -->
-  <path d="M 120 ${centerY + 180} Q ${centerX - 100} ${centerY - 220} ${centerX + 80} ${centerY + 60} T ${width - 120} ${centerY - 160}" 
-        fill="none" stroke="url(#curveGrad)" stroke-width="6" stroke-linecap="round" filter="url(#glow)"/>
-  <!-- Teğet Doğrusu (Türev) -->
-  <line x1="${centerX - 180}" y1="${centerY + 160}" x2="${centerX + 180}" y2="${centerY - 80}" 
-        stroke="#22c55e" stroke-width="3" stroke-dasharray="8,6" filter="url(#glow)"/>
-  <!-- Değme Noktası -->
-  <circle cx="${centerX}" cy="${centerY + 40}" r="9" fill="#f97316" stroke="#ffffff" stroke-width="3" filter="url(#glow)"/>
-  <!-- Formül Etiketi -->
-  <rect x="${centerX - 140}" y="${height - 90}" width="280" height="42" rx="21" fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" stroke-width="1.5"/>
-  <text x="${centerX}" y="${height - 63}" font-family="system-ui, sans-serif" font-weight="bold" font-size="15" fill="#f97316" text-anchor="middle">
-    AYT MATEMATİK • f'(x) TEĞET EĞİMİ
-  </text>
-</svg>`
-  }
+  <rect width="${width}" height="${height}" fill="url(#bpBg)"/>
 
-  // 3. Kimya & Organik Kimya & Moleküler Yapılar
-  if (pLower.includes('kimya') || pLower.includes('organik') || pLower.includes('molekül') || pLower.includes('reaksiyon') || pLower.includes('bağ')) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-  <defs>
-    <radialGradient id="chemBg" cx="50%" cy="50%" r="65%">
-      <stop offset="0%" stop-color="#064e3b"/>
-      <stop offset="50%" stop-color="#022c22"/>
-      <stop offset="100%" stop-color="#01120e"/>
-    </radialGradient>
-    <filter id="chemGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="${width}" height="${height}" fill="url(#chemBg)"/>
-  <circle cx="${centerX}" cy="${centerY - 30}" r="170" fill="none" stroke="rgba(16, 185, 129, 0.15)" stroke-width="2" stroke-dasharray="8 8"/>
-  <circle cx="${centerX}" cy="${centerY - 30}" r="120" fill="rgba(6, 182, 212, 0.08)" stroke="rgba(6, 182, 212, 0.25)" stroke-width="1.5"/>
-  <polygon points="${centerX},${centerY - 130} ${centerX + 86},${centerY - 80} ${centerX + 86},${centerY + 20} ${centerX},${centerY + 70} ${centerX - 86},${centerY + 20} ${centerX - 86},${centerY - 80}" 
-           fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="4" filter="url(#chemGlow)"/>
-  <circle cx="${centerX}" cy="${centerY - 30}" r="50" fill="none" stroke="#34d399" stroke-width="3" stroke-dasharray="10 8" filter="url(#chemGlow)"/>
-  <circle cx="${centerX}" cy="${centerY - 130}" r="14" fill="#06b6d4" filter="url(#chemGlow)"/>
-  <circle cx="${centerX + 86}" cy="${centerY - 80}" r="14" fill="#10b981" filter="url(#chemGlow)"/>
-  <circle cx="${centerX + 86}" cy="${centerY + 20}" r="14" fill="#06b6d4" filter="url(#chemGlow)"/>
-  <circle cx="${centerX}" cy="${centerY + 70}" r="14" fill="#10b981" filter="url(#chemGlow)"/>
-  <circle cx="${centerX - 86}" cy="${centerY + 20}" r="14" fill="#06b6d4" filter="url(#chemGlow)"/>
-  <circle cx="${centerX - 86}" cy="${centerY - 80}" r="14" fill="#10b981" filter="url(#chemGlow)"/>
-  <line x1="${centerX}" y1="${centerY - 130}" x2="${centerX}" y2="${centerY - 190}" stroke="#38bdf8" stroke-width="4" filter="url(#chemGlow)"/>
-  <circle cx="${centerX}" cy="${centerY - 190}" r="16" fill="#f97316" filter="url(#chemGlow)"/>
-  <text x="${centerX}" y="${centerY - 184}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">OH</text>
-  <rect x="${centerX - 150}" y="${height - 90}" width="300" height="42" rx="21" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="1.5"/>
-  <text x="${centerX}" y="${height - 63}" font-family="system-ui, sans-serif" font-weight="bold" font-size="14" fill="#34d399" text-anchor="middle">
-    AYT KİMYA • ORGANİK ŞEMA &amp; BAĞLAR
-  </text>
-</svg>`
-  }
-
-  // 4. Türkçe / Bionic Reader / Paragraf Hızı
-  if (pLower.includes('türkçe') || pLower.includes('paragraf') || pLower.includes('okuma') || pLower.includes('kitap') || pLower.includes('bionic')) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-  <defs>
-    <radialGradient id="readBg" cx="50%" cy="50%" r="60%">
-      <stop offset="0%" stop-color="#180e29"/>
-      <stop offset="100%" stop-color="#0a0512"/>
-    </radialGradient>
-    <linearGradient id="bookGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#c084fc"/>
-      <stop offset="100%" stop-color="#a855f7"/>
-    </linearGradient>
-    <filter id="purpGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="${width}" height="${height}" fill="url(#readBg)"/>
-  <!-- Hızlı Okuma Göz / Fokus Sembolü -->
-  <circle cx="${centerX}" cy="${centerY - 40}" r="110" fill="rgba(168, 85, 247, 0.15)" stroke="#a855f7" stroke-width="3" filter="url(#purpGlow)"/>
-  <circle cx="${centerX}" cy="${centerY - 40}" r="65" fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" stroke-width="2.5"/>
-  <circle cx="${centerX}" cy="${centerY - 40}" r="26" fill="#ffffff" filter="url(#purpGlow)"/>
-  <!-- Hız Çizgileri -->
-  <line x1="${centerX - 180}" y1="${centerY - 40}" x2="${centerX - 130}" y2="${centerY - 40}" stroke="#a855f7" stroke-width="4" stroke-linecap="round"/>
-  <line x1="${centerX + 130}" y1="${centerY - 40}" x2="${centerX + 180}" y2="${centerY - 40}" stroke="#a855f7" stroke-width="4" stroke-linecap="round"/>
-  <line x1="${centerX - 160}" y1="${centerY - 80}" x2="${centerX - 120}" y2="${centerY - 70}" stroke="rgba(168,85,247,0.6)" stroke-width="3" stroke-linecap="round"/>
-  <line x1="${centerX + 120}" y1="${centerY - 70}" x2="${centerX + 160}" y2="${centerY - 80}" stroke="rgba(168,85,247,0.6)" stroke-width="3" stroke-linecap="round"/>
-  <!-- Biyonik Metin Çizgileri -->
-  <g fill="rgba(255,255,255,0.7)" font-family="monospace" font-size="18" text-anchor="middle">
-    <text x="${centerX}" y="${centerY + 110}">PARAGRAF • HIZ • ODAKLANMA</text>
-    <text x="${centerX}" y="${centerY + 140}" fill="#f97316" font-size="14">+12 DAKİKA TASARRUF</text>
+  <!-- Blueprint Teknik Izgara -->
+  <g stroke="rgba(56, 189, 248, 0.15)" stroke-width="1.2">
+    ${Array.from({ length: 9 }).map((_, i) => `<line x1="0" y1="${i * (height / 8)}" x2="${width}" y2="${i * (height / 8)}"/>`).join('')}
+    ${Array.from({ length: 7 }).map((_, i) => `<line x1="${i * (width / 6)}" y1="0" x2="${i * (width / 6)}" y2="${height}"/>`).join('')}
   </g>
-  <!-- Rozet -->
-  <rect x="${centerX - 140}" y="${height - 90}" width="280" height="42" rx="21" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="1.5"/>
-  <text x="${centerX}" y="${height - 63}" font-family="system-ui, sans-serif" font-weight="bold" font-size="15" fill="#c084fc" text-anchor="middle">
-    DERSOLAB • BIONIC READER
+
+  <!-- Üst Başlık -->
+  <rect x="${cx - 240}" y="${cy - 300}" width="480" height="42" rx="10" fill="rgba(14, 165, 233, 0.18)" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="${cx}" y="${cy - 273}" font-family="monospace, sans-serif" font-weight="900" font-size="14" fill="#38bdf8" text-anchor="middle" letter-spacing="1">
+    📐 BİLİMSEL ŞEMA • TURLAMA KARAR AĞACI
   </text>
-</svg>`
-  }
 
-  // 5. Varsayılan / Maskot Zeki Tilki & DersoLab Laboratuvarı (Resmi Maskot İkonu)
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-  <defs>
-    <radialGradient id="defBg" cx="50%" cy="50%" r="65%">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#030712"/>
-    </radialGradient>
-    <radialGradient id="foxHalo" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#f97316" stop-opacity="0.35"/>
-      <stop offset="70%" stop-color="#ea580c" stop-opacity="0.1"/>
-      <stop offset="100%" stop-color="#030712" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="orangeGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="${width}" height="${height}" fill="url(#defBg)"/>
-  <!-- Laboratuvar Siber Dairesel Hologram Alanı -->
-  <circle cx="${centerX}" cy="${centerY - 30}" r="170" fill="url(#foxHalo)"/>
-  <circle cx="${centerX}" cy="${centerY - 30}" r="145" fill="none" stroke="#f97316" stroke-width="2" stroke-dasharray="12 8" opacity="0.6" filter="url(#orangeGlow)"/>
-  <circle cx="${centerX}" cy="${centerY - 30}" r="125" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.4"/>
-  
-  <!-- Resmi DersoLab Maskot İkonu -->
-  <image href="/fox-mascot-icon.png" x="${centerX - 110}" y="${centerY - 140}" width="220" height="220" preserveAspectRatio="xMidYMid meet" filter="url(#orangeGlow)"/>
+  <!-- Karar Ağacı / Diyagram Kutusı: Giriş -->
+  <rect x="${cx - 150}" y="${cy - 210}" width="300" height="58" rx="12" fill="rgba(15, 23, 42, 0.85)" stroke="#38bdf8" stroke-width="2.5" filter="url(#bpGlow)"/>
+  <text x="${cx}" y="${cy - 175}" font-family="system-ui, sans-serif" font-weight="800" font-size="15" fill="#ffffff" text-anchor="middle">
+    SORUYLA İLK KARŞILAŞMA (0-30 sn)
+  </text>
 
-  <!-- Alt Rozet & Marka -->
-  <rect x="${centerX - 150}" y="${height - 90}" width="300" height="42" rx="21" fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" stroke-width="1.5"/>
-  <text x="${centerX}" y="${height - 63}" font-family="system-ui, sans-serif" font-weight="bold" font-size="14" fill="#fb923c" text-anchor="middle">
-    DERSOLAB • RESMİ LAB ASİSTANI
+  <!-- Oklar -->
+  <line x1="${cx}" y1="${cy - 152}" x2="${cx - 180}" y2="${cy - 80}" stroke="#22c55e" stroke-width="3" stroke-dasharray="6 4" filter="url(#bpGlow)"/>
+  <line x1="${cx}" y1="${cy - 152}" x2="${cx + 180}" y2="${cy - 80}" stroke="#f97316" stroke-width="3" stroke-dasharray="6 4" filter="url(#bpGlow)"/>
+
+  <!-- Sol Kol: EVET (Hemen Çöz) -->
+  <rect x="${cx - 320}" y="${cy - 80}" width="260" height="110" rx="16" fill="rgba(34, 197, 94, 0.15)" stroke="#22c55e" stroke-width="2.5" filter="url(#bpGlow)"/>
+  <text x="${cx - 190}" y="${cy - 48}" font-family="system-ui, sans-serif" font-weight="900" font-size="15" fill="#4ade80" text-anchor="middle">
+    ✅ ÇÖZÜM YOLU AÇIK
+  </text>
+  <text x="${cx - 190}" y="${cy - 24}" font-family="system-ui, sans-serif" font-weight="600" font-size="12" fill="#dcfce7" text-anchor="middle">
+    30-60 saniyede bitir.
+  </text>
+  <text x="${cx - 190}" y="${cy}" font-family="system-ui, sans-serif" font-weight="900" font-size="13" fill="#22c55e" text-anchor="middle">
+    🎯 +1 NET CEPTE!
+  </text>
+
+  <!-- Sağ Kol: HAYIR (Takılma, Geç) -->
+  <rect x="${cx + 60}" y="${cy - 80}" width="260" height="110" rx="16" fill="rgba(249, 115, 22, 0.15)" stroke="#f97316" stroke-width="2.5" filter="url(#bpGlow)"/>
+  <text x="${cx + 190}" y="${cy - 48}" font-family="system-ui, sans-serif" font-weight="900" font-size="15" fill="#fb923c" text-anchor="middle">
+    ⚠️ 60 SN GEÇTİ, ÇIKMADI
+  </text>
+  <text x="${cx + 190}" y="${cy - 24}" font-family="system-ui, sans-serif" font-weight="600" font-size="12" fill="#ffedd5" text-anchor="middle">
+    İnatlaşma! Yanına [•] koy.
+  </text>
+  <text x="${cx + 190}" y="${cy}" font-family="system-ui, sans-serif" font-weight="900" font-size="13" fill="#f97316" text-anchor="middle">
+    🔄 2. TURDA AVLA!
+  </text>
+
+  <!-- Netice Metriği -->
+  <rect x="${cx - 180}" y="${cy + 80}" width="360" height="60" rx="16" fill="rgba(6, 182, 212, 0.15)" stroke="#06b6d4" stroke-width="2" filter="url(#bpGlow)"/>
+  <text x="${cx}" y="${cy + 116}" font-family="system-ui, sans-serif" font-weight="900" font-size="16" fill="#38bdf8" text-anchor="middle">
+    ⚡ KAZANÇ: +15 NET &amp; +20 DK SÜRE
+  </text>
+
+  <!-- Alt Rozet -->
+  <rect x="${cx - 190}" y="${height - (is916 ? 120 : 80)}" width="380" height="46" rx="23" fill="rgba(14, 165, 233, 0.15)" stroke="#38bdf8" stroke-width="1.8"/>
+  <text x="${cx}" y="${height - (is916 ? 91 : 51)}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#bae6fd" text-anchor="middle" letter-spacing="1">
+    DERSOLAB • ${headline.toUpperCase().slice(0, 36)}
   </text>
 </svg>`
 }
 
 /**
- * DersoLab Resmi Marka & Maskot Görsel Arşivi
+ * 1B. Cyber Lab: Turlama ve Sınav Telemetrisi (Neon Kokpit Stili)
  */
-export const DERSOLAB_BRAND_ASSETS = {
-  mascotCyberFox: '/mascot-student.jpg', // Ultra HD siber tilki (öğrenci)
-  mascotPixelFox: '/fox-mascot.png', // Tam boy piksel sanat tilki
-  mascotIconFox: '/fox-mascot-icon.png', // Kare şeffaf piksel tilki ikonu
-  mascotHeadFox: '/fox-head.png', // Navbar tilki başlığı ikonu
-  mascotOwlInstructor: '/mascot-instructor.jpg', // Siber bilge baykuş (eğitmen)
-  logoModern: '/dersolab-modern-logo.png', // Modern logo banner
-  logoLab: '/dersolab-lab-logo.png', // Siber lab logosu
-} as const
+function getCyberLabTurlamaSvg(width: number, height: number, headline = 'TURLAMA TAKTİĞİ'): string {
+  const cx = width / 2
+  const cy = height / 2 - 20
+  const is916 = height > width
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <defs>
+    <radialGradient id="cyberTurlama" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#2e1065"/>
+      <stop offset="45%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </radialGradient>
+    <filter id="cTimerGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#cyberTurlama)"/>
+
+  <!-- Holografik Dairesel Zaman Halkası -->
+  <circle cx="${cx}" cy="${cy}" r="170" fill="none" stroke="#f97316" stroke-width="2.5" stroke-dasharray="14 8" opacity="0.7" filter="url(#cTimerGlow)"/>
+  <circle cx="${cx}" cy="${cy}" r="140" fill="rgba(15, 23, 42, 0.85)" stroke="#38bdf8" stroke-width="3" filter="url(#cTimerGlow)"/>
+  
+  <!-- İbre -->
+  <line x1="${cx}" y1="${cy}" x2="${cx + 80}" y2="${cy - 75}" stroke="#ffffff" stroke-width="5" stroke-linecap="round" filter="url(#cTimerGlow)"/>
+  <circle cx="${cx}" cy="${cy}" r="12" fill="#f97316" stroke="#ffffff" stroke-width="3"/>
+
+  <!-- Dijital Sayaç -->
+  <text x="${cx}" y="${cy - 35}" font-family="system-ui, monospace" font-weight="900" font-size="36" fill="#ffffff" text-anchor="middle" filter="url(#cTimerGlow)">
+    01:00
+  </text>
+  <text x="${cx}" y="${cy + 40}" font-family="system-ui, sans-serif" font-weight="bold" font-size="14" fill="#38bdf8" text-anchor="middle" letter-spacing="2">
+    1 SORUYA MAX 1 DAKİKA
+  </text>
+  <text x="${cx}" y="${cy + 68}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#22c55e" text-anchor="middle">
+    🎯 +15 NET ARTIŞI
+  </text>
+
+  <!-- Tur 1 Kartı -->
+  <g transform="translate(${cx - 320}, ${cy - 230})">
+    <rect width="210" height="74" rx="16" fill="rgba(34, 197, 94, 0.15)" stroke="#22c55e" stroke-width="2" filter="url(#cTimerGlow)"/>
+    <text x="16" y="30" font-family="system-ui, sans-serif" font-weight="900" font-size="13" fill="#4ade80">⚡ 1. TUR: HIZLI AV</text>
+    <text x="16" y="52" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#dcfce7">Çözebildiğin soruları al, geç!</text>
+  </g>
+
+  <!-- Tur 2 Kartı -->
+  <g transform="translate(${cx + 110}, ${cy - 230})">
+    <rect width="210" height="74" rx="16" fill="rgba(249, 115, 22, 0.15)" stroke="#f97316" stroke-width="2" filter="url(#cTimerGlow)"/>
+    <text x="16" y="30" font-family="system-ui, sans-serif" font-weight="900" font-size="13" fill="#fb923c">🎯 2. TUR: DERİN ÇÖZÜM</text>
+    <text x="16" y="52" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#ffedd5">İşaretli sorulara geri dön!</text>
+  </g>
+
+  <!-- Alt Rozet -->
+  <rect x="${cx - 190}" y="${height - (is916 ? 120 : 80)}" width="380" height="46" rx="23" fill="rgba(249, 115, 22, 0.15)" stroke="#f97316" stroke-width="1.8"/>
+  <text x="${cx}" y="${height - (is916 ? 91 : 51)}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#fed7aa" text-anchor="middle" letter-spacing="1">
+    DERSOLAB • ${headline.toUpperCase().slice(0, 36)}
+  </text>
+</svg>`
+}
+
+/**
+ * 1C. Vektör Sanatı: Minimalist Düz Grafik Stili
+ */
+function getMinimalVectorTurlamaSvg(width: number, height: number, headline = 'TURLAMA TAKTİĞİ'): string {
+  const cx = width / 2
+  const cy = height / 2 - 20
+  const is916 = height > width
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <defs>
+    <linearGradient id="minVecBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#minVecBg)"/>
+
+  <!-- Başlık Şeridi -->
+  <rect x="${cx - 200}" y="${cy - 250}" width="400" height="44" rx="22" fill="#1e293b"/>
+  <text x="${cx}" y="${cy - 222}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#38bdf8" text-anchor="middle" letter-spacing="1">
+    🎨 VEKTÖR SANATI • 3 ADIMDA NET KATLA
+  </text>
+
+  <!-- 3 Adım Kartları (Minimal Düz Renk Blokları) -->
+  <!-- Adım 1 -->
+  <g transform="translate(${cx - 190}, ${cy - 160})">
+    <rect width="380" height="74" rx="18" fill="#166534" stroke="#22c55e" stroke-width="2"/>
+    <text x="30" y="32" font-family="system-ui, sans-serif" font-weight="900" font-size="16" fill="#4ade80">ADIM 1 • HIZLI AVLA</text>
+    <text x="30" y="54" font-family="system-ui, sans-serif" font-weight="600" font-size="12" fill="#ffffff">İlk 30 saniyede çözülebilen soruları bitir.</text>
+  </g>
+
+  <!-- Adım 2 -->
+  <g transform="translate(${cx - 190}, ${cy - 65})">
+    <rect width="380" height="74" rx="18" fill="#9a3412" stroke="#f97316" stroke-width="2"/>
+    <text x="30" y="32" font-family="system-ui, sans-serif" font-weight="900" font-size="16" fill="#fb923c">ADIM 2 • İŞARETLE VE GEÇ</text>
+    <text x="30" y="54" font-family="system-ui, sans-serif" font-weight="600" font-size="12" fill="#ffffff">Bir soruyla inatlaşma, 60 saniyede geç.</text>
+  </g>
+
+  <!-- Adım 3 -->
+  <g transform="translate(${cx - 190}, ${cy + 30})">
+    <rect width="380" height="74" rx="18" fill="#581c87" stroke="#a855f7" stroke-width="2"/>
+    <text x="30" y="32" font-family="system-ui, sans-serif" font-weight="900" font-size="16" fill="#c084fc">ADIM 3 • 2. TURDA CEBE KOY</text>
+    <text x="30" y="54" font-family="system-ui, sans-serif" font-weight="600" font-size="12" fill="#ffffff">Artan vakitte işaretlediğin soruları avla.</text>
+  </g>
+
+  <!-- Net Skoru -->
+  <rect x="${cx - 140}" y="${cy + 130}" width="280" height="42" rx="21" fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" stroke-width="1.8"/>
+  <text x="${cx}" y="${cy + 157}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#fb923c" text-anchor="middle">
+    🔥 ORTALAMA +15 İLA +20 NET!
+  </text>
+
+  <!-- Alt Rozet -->
+  <rect x="${cx - 190}" y="${height - (is916 ? 120 : 80)}" width="380" height="46" rx="23" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="${cx}" y="${height - (is916 ? 91 : 51)}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">
+    DERSOLAB • ${headline.toUpperCase().slice(0, 36)}
+  </text>
+</svg>`
+}
+
+/**
+ * 1D. Çalışma Masası / Odası: Gerçekçi Masa & Kronometre Stili
+ */
+function getRealisticStudyTurlamaSvg(width: number, height: number, headline = 'TURLAMA TAKTİĞİ'): string {
+  const cx = width / 2
+  const cy = height / 2 - 20
+  const is916 = height > width
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <defs>
+    <radialGradient id="deskLampGlow" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#451a03" stop-opacity="0.7"/>
+      <stop offset="50%" stop-color="#1c1917" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#0c0a09"/>
+    </radialGradient>
+    <filter id="deskGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#deskLampGlow)"/>
+
+  <!-- Sıcak Masa Lambası Işık Konisi -->
+  <polygon points="${cx - 60},0 ${cx + 60},0 ${cx + 320},${height - 100} ${cx - 320},${height - 100}" fill="rgba(251, 146, 60, 0.07)"/>
+
+  <!-- Çalışma Masası Kitapçığı & Notu -->
+  <rect x="${cx - 210}" y="${cy - 180}" width="420" height="260" rx="14" fill="#1c1917" stroke="#44403c" stroke-width="2.5" filter="url(#deskGlow)"/>
+  
+  <!-- Kitapçık Sayfa Çizgileri -->
+  <line x1="${cx}" y1="${cy - 170}" x2="${cx}" y2="${cy + 70}" stroke="#44403c" stroke-width="2" stroke-dasharray="4 4"/>
+  
+  <!-- Sol Sayfa: Soru & Süre -->
+  <text x="${cx - 190}" y="${cy - 135}" font-family="system-ui, sans-serif" font-weight="900" font-size="13" fill="#ea580c">📌 DENEME KİTAPÇIĞI</text>
+  <text x="${cx - 190}" y="${cy - 105}" font-family="system-ui, sans-serif" font-weight="700" font-size="12" fill="#d6d3d1">Soru 1: Çözüldü (40 sn) ✅</text>
+  <text x="${cx - 190}" y="${cy - 80}" font-family="system-ui, sans-serif" font-weight="700" font-size="12" fill="#d6d3d1">Soru 2: Çözüldü (50 sn) ✅</text>
+  <text x="${cx - 190}" y="${cy - 55}" font-family="system-ui, sans-serif" font-weight="900" font-size="12" fill="#f97316">Soru 3: [•] 2. TURA (GEÇİLDİ!)</text>
+  <text x="${cx - 190}" y="${cy - 30}" font-family="system-ui, sans-serif" font-weight="700" font-size="12" fill="#d6d3d1">Soru 4: Çözüldü (35 sn) ✅</text>
+
+  <!-- Sağ Sayfa: Masa Kronometresi -->
+  <circle cx="${cx + 105}" cy="${cy - 50}" r="65" fill="#0c0a09" stroke="#f97316" stroke-width="3" filter="url(#deskGlow)"/>
+  <text x="${cx + 105}" y="${cy - 48}" font-family="system-ui, monospace" font-weight="900" font-size="20" fill="#ffffff" text-anchor="middle">01:15</text>
+  <text x="${cx + 105}" y="${cy - 25}" font-family="system-ui, sans-serif" font-weight="bold" font-size="10" fill="#f97316" text-anchor="middle">KRONOMETRE</text>
+
+  <!-- Masa Not Kağıdı -->
+  <rect x="${cx - 180}" y="${cy + 100}" width="360" height="50" rx="10" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+  <text x="${cx}" y="${cy + 132}" font-family="system-ui, sans-serif" font-weight="900" font-size="13" fill="#854d0e" text-anchor="middle">
+    💡 "Bir soruya inatlaşma, süreni ve netini ikiye katla!"
+  </text>
+
+  <!-- Alt Rozet -->
+  <rect x="${cx - 190}" y="${height - (is916 ? 120 : 80)}" width="380" height="46" rx="23" fill="#292524" stroke="#ea580c" stroke-width="1.8"/>
+  <text x="${cx}" y="${height - (is916 ? 91 : 51)}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#fdba74" text-anchor="middle">
+    DERSOLAB • ${headline.toUpperCase().slice(0, 36)}
+  </text>
+</svg>`
+}
+
+/**
+ * 2. DersoLab Resmi Sevimli Maskot Stüdyosu (Zeki Tilki)
+ */
+function getOfficialMascotStudioSvg(
+  width: number,
+  height: number,
+  headline = 'DERSOLAB AKILLI ASİSTAN'
+): string {
+  const cx = width / 2
+  const cy = height / 2 - 30
+  const is916 = height > width
+
+  const base64Png = getFoxMascotBase64()
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <defs>
+    <radialGradient id="mascotHalo" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#ea580c" stop-opacity="0.3"/>
+      <stop offset="40%" stop-color="#431407" stop-opacity="0.4"/>
+      <stop offset="85%" stop-color="#07090e" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </radialGradient>
+    <filter id="mascotGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="${width}" height="${height}" fill="url(#mascotHalo)"/>
+
+  <!-- Holografik Portallar -->
+  <circle cx="${cx}" cy="${cy}" r="210" fill="none" stroke="#f97316" stroke-width="2" stroke-dasharray="16 10" opacity="0.6" filter="url(#mascotGlow)"/>
+  <circle cx="${cx}" cy="${cy}" r="175" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="8 8" opacity="0.8" filter="url(#mascotGlow)"/>
+  <circle cx="${cx}" cy="${cy}" r="145" fill="rgba(249, 115, 22, 0.08)"/>
+
+  <!-- Parçacıklar & İpuçları -->
+  <circle cx="${cx - 160}" cy="${cy - 120}" r="5" fill="#38bdf8" filter="url(#mascotGlow)"/>
+  <circle cx="${cx + 170}" cy="${cy - 80}" r="6" fill="#f97316" filter="url(#mascotGlow)"/>
+  <circle cx="${cx - 140}" cy="${cy + 130}" r="4" fill="#22c55e" filter="url(#mascotGlow)"/>
+  <circle cx="${cx + 150}" cy="${cy + 120}" r="5" fill="#fbbf24" filter="url(#mascotGlow)"/>
+
+  <!-- Resmi DersoLab Piksel Tilkisi (Tam Boy veya Vektör) -->
+  ${
+    base64Png
+      ? `<image href="${base64Png}" x="${cx - 150}" y="${cy - 160}" width="300" height="300" preserveAspectRatio="xMidYMid meet" filter="url(#mascotGlow)"/>`
+      : renderDersoLabPixelFoxVector(cx - 108, cy - 100, 12)
+  }
+
+  <!-- Üst Rozet -->
+  <rect x="${cx - 150}" y="${cy - 240}" width="300" height="42" rx="21" fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" stroke-width="1.8" filter="url(#mascotGlow)"/>
+  <text x="${cx}" y="${cy - 213}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#fb923c" text-anchor="middle" letter-spacing="1">
+    🦊 ZEKİ TİLKİ • RESMİ MASKOT
+  </text>
+
+  <!-- Alt Başlık Kartı -->
+  <rect x="${cx - 200}" y="${height - (is916 ? 130 : 90)}" width="400" height="50" rx="25" fill="rgba(15, 23, 42, 0.85)" stroke="#38bdf8" stroke-width="1.8"/>
+  <text x="${cx}" y="${height - (is916 ? 99 : 59)}" font-family="system-ui, sans-serif" font-weight="bold" font-size="14" fill="#ffffff" text-anchor="middle">
+    DERSOLAB • ${headline.toUpperCase().slice(0, 36)}
+  </text>
+</svg>`
+}
+
+/**
+ * 3. TYT / AYT Fizik & Optik & Dalgalar
+ */
+function getOpticsAndPhysicsSvg(width: number, height: number): string {
+  const cx = width / 2
+  const cy = height / 2 - 20
+  const is916 = height > width
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <defs>
+    <radialGradient id="physBg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <filter id="physGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#physBg)"/>
+  <!-- Prizma Üçgeni -->
+  <polygon points="${cx},${cy - 140} ${cx - 160},${cy + 130} ${cx + 160},${cy + 130}" 
+           fill="rgba(56, 189, 248, 0.12)" stroke="#38bdf8" stroke-width="3" filter="url(#physGlow)"/>
+  <!-- Gelen Beyaz Işık Işını -->
+  <line x1="${cx - 350}" y1="${cy + 180}" x2="${cx - 50}" y2="${cy - 20}" stroke="#ffffff" stroke-width="5" filter="url(#physGlow)"/>
+  <!-- Kırılan Renk Tayfı -->
+  <line x1="${cx - 50}" y1="${cy - 20}" x2="${cx + 350}" y2="${cy - 100}" stroke="#ef4444" stroke-width="4" filter="url(#physGlow)"/>
+  <line x1="${cx - 50}" y1="${cy - 20}" x2="${cx + 350}" y2="${cy - 50}" stroke="#f97316" stroke-width="4" filter="url(#physGlow)"/>
+  <line x1="${cx - 50}" y1="${cy - 20}" x2="${cx + 350}" y2="${cy}" stroke="#eab308" stroke-width="4" filter="url(#physGlow)"/>
+  <line x1="${cx - 50}" y1="${cy - 20}" x2="${cx + 350}" y2="${cy + 50}" stroke="#10b981" stroke-width="4" filter="url(#physGlow)"/>
+  <line x1="${cx - 50}" y1="${cy - 20}" x2="${cx + 350}" y2="${cy + 100}" stroke="#06b6d4" stroke-width="4" filter="url(#physGlow)"/>
+
+  <rect x="${cx - 150}" y="${height - (is916 ? 120 : 80)}" width="300" height="42" rx="21" fill="rgba(14, 165, 233, 0.2)" stroke="#38bdf8" stroke-width="1.8"/>
+  <text x="${cx}" y="${height - (is916 ? 93 : 53)}" font-family="system-ui, sans-serif" font-weight="bold" font-size="14" fill="#38bdf8" text-anchor="middle">
+    TYT FİZİK • OPTİK &amp; KIRILMA
+  </text>
+</svg>`
+}
+
+/**
+ * 4. Matematik & Türev & Geometri
+ */
+function getMathAndCalculusSvg(width: number, height: number): string {
+  const cx = width / 2
+  const cy = height / 2 - 20
+  const is916 = height > width
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <defs>
+    <radialGradient id="mBg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </radialGradient>
+    <linearGradient id="mGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="50%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <filter id="mGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#mBg)"/>
+  <line x1="80" y1="${cy + 60}" x2="${width - 80}" y2="${cy + 60}" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <line x1="${cx - 60}" y1="80" x2="${cx - 60}" y2="${height - 80}" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <path d="M 120 ${cy + 180} Q ${cx - 100} ${cy - 220} ${cx + 80} ${cy + 60} T ${width - 120} ${cy - 160}" 
+        fill="none" stroke="url(#mGrad)" stroke-width="6" stroke-linecap="round" filter="url(#mGlow)"/>
+  <line x1="${cx - 180}" y1="${cy + 160}" x2="${cx + 180}" y2="${cy - 80}" stroke="#22c55e" stroke-width="3" stroke-dasharray="8,6" filter="url(#mGlow)"/>
+  <circle cx="${cx}" cy="${cy + 40}" r="9" fill="#f97316" stroke="#ffffff" stroke-width="3" filter="url(#mGlow)"/>
+
+  <rect x="${cx - 150}" y="${height - (is916 ? 120 : 80)}" width="300" height="42" rx="21" fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" stroke-width="1.8"/>
+  <text x="${cx}" y="${height - (is916 ? 93 : 53)}" font-family="system-ui, sans-serif" font-weight="bold" font-size="14" fill="#f97316" text-anchor="middle">
+    AYT MATEMATİK • f'(x) TEĞET EĞİMİ
+  </text>
+</svg>`
+}
+
+/**
+ * 5. Kimya & Organik Kimya
+ */
+function getChemistrySvg(width: number, height: number): string {
+  const cx = width / 2
+  const cy = height / 2 - 20
+  const is916 = height > width
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <defs>
+    <radialGradient id="chBg" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="100%" stop-color="#01120e"/>
+    </radialGradient>
+    <filter id="chGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#chBg)"/>
+  <polygon points="${cx},${cy - 130} ${cx + 86},${cy - 80} ${cx + 86},${cy + 20} ${cx},${cy + 70} ${cx - 86},${cy + 20} ${cx - 86},${cy - 80}" 
+           fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="4" filter="url(#chGlow)"/>
+  <circle cx="${cx}" cy="${cy - 30}" r="50" fill="none" stroke="#34d399" stroke-width="3" stroke-dasharray="10 8" filter="url(#chGlow)"/>
+  <circle cx="${cx}" cy="${cy - 130}" r="14" fill="#06b6d4" filter="url(#chGlow)"/>
+  <circle cx="${cx + 86}" cy="${cy - 80}" r="14" fill="#10b981" filter="url(#chGlow)"/>
+  <circle cx="${cx + 86}" cy="${cy + 20}" r="14" fill="#06b6d4" filter="url(#chGlow)"/>
+  <circle cx="${cx}" cy="${cy + 70}" r="14" fill="#10b981" filter="url(#chGlow)"/>
+  <circle cx="${cx - 86}" cy="${cy + 20}" r="14" fill="#06b6d4" filter="url(#chGlow)"/>
+  <circle cx="${cx - 86}" cy="${cy - 80}" r="14" fill="#10b981" filter="url(#chGlow)"/>
+  <line x1="${cx}" y1="${cy - 130}" x2="${cx}" y2="${cy - 190}" stroke="#38bdf8" stroke-width="4" filter="url(#chGlow)"/>
+  <circle cx="${cx}" cy="${cy - 190}" r="16" fill="#f97316" filter="url(#chGlow)"/>
+  <text x="${cx}" y="${cy - 184}" font-family="system-ui, sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">OH</text>
+
+  <rect x="${cx - 150}" y="${height - (is916 ? 120 : 80)}" width="300" height="42" rx="21" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="1.8"/>
+  <text x="${cx}" y="${height - (is916 ? 93 : 53)}" font-family="system-ui, sans-serif" font-weight="bold" font-size="14" fill="#34d399" text-anchor="middle">
+    AYT KİMYA • ORGANİK ŞEMA &amp; BAĞLAR
+  </text>
+</svg>`
+}
+
+/**
+ * 6. Genel Cyber Lab & Sınav Telemetrisi (Yedek & Cyber Lab Stili)
+ */
+function getCyberLabTelemetrySvg(
+  width: number,
+  height: number,
+  headline = 'DERSOLAB SİBER LABORATUVARI'
+): string {
+  const cx = width / 2
+  const cy = height / 2 - 20
+  const is916 = height > width
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <defs>
+    <radialGradient id="cyberBg" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#082f49"/>
+      <stop offset="60%" stop-color="#0c1322"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </radialGradient>
+    <filter id="cLabGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="${width}" height="${height}" fill="url(#cyberBg)"/>
+  
+  <!-- Hologram Radar Halkaları -->
+  <circle cx="${cx}" cy="${cy}" r="180" fill="none" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="8 6" opacity="0.4"/>
+  <circle cx="${cx}" cy="${cy}" r="130" fill="rgba(14, 165, 233, 0.05)" stroke="#38bdf8" stroke-width="2.5" filter="url(#cLabGlow)"/>
+  <circle cx="${cx}" cy="${cy}" r="75" fill="none" stroke="#f97316" stroke-width="3" filter="url(#cLabGlow)"/>
+
+  <!-- Radar Tarama Çizgisi -->
+  <line x1="${cx}" y1="${cy}" x2="${cx + 120}" y2="${cy - 50}" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" filter="url(#cLabGlow)"/>
+  <circle cx="${cx + 120}" cy="${cy - 50}" r="6" fill="#ffffff" filter="url(#cLabGlow)"/>
+
+  <!-- Telemetri Verileri -->
+  <text x="${cx}" y="${cy - 5}" font-family="system-ui, monospace" font-weight="900" font-size="28" fill="#ffffff" text-anchor="middle" filter="url(#cLabGlow)">
+    %98.4
+  </text>
+  <text x="${cx}" y="${cy + 25}" font-family="system-ui, monospace" font-weight="bold" font-size="12" fill="#38bdf8" text-anchor="middle">
+    ODAK &amp; VERİM SKORU
+  </text>
+
+  <rect x="${cx - 160}" y="${height - (is916 ? 120 : 80)}" width="320" height="42" rx="21" fill="rgba(14, 165, 233, 0.2)" stroke="#38bdf8" stroke-width="1.8"/>
+  <text x="${cx}" y="${height - (is916 ? 93 : 53)}" font-family="system-ui, sans-serif" font-weight="bold" font-size="13" fill="#bae6fd" text-anchor="middle">
+    DERSOLAB • ${headline.toUpperCase().slice(0, 32)}
+  </text>
+</svg>`
+}
+
+/**
+ * Ana Prosedürel Görsel Üretim Motoru
+ * Her stil ve her konu için özel, farklı ve sıfır hata ile çalışan SVG üretir.
+ */
+function getProceduralSvg(
+  prompt: string,
+  style: ImageStylePreset,
+  width: number,
+  height: number,
+  subject?: string
+): string {
+  const pLower = (prompt + ' ' + (subject || '')).toLowerCase()
+
+  // 1. Zeki Tilki Maskot Stili veya Maskot İsteği
+  if (
+    style === 'mascot_fox' ||
+    /(?:maskot|tilki|fox|zeki|karakter|derso)/i.test(pLower)
+  ) {
+    return getOfficialMascotStudioSvg(width, height, prompt || subject || 'Zeki Tilki')
+  }
+
+  // 2. Turlama Taktiği, Deneme Çözümü, Zaman Yönetimi, Sınav Stratejisi
+  if (
+    /(?:turlama|takılma|deneme|zaman|süre|soru|net|strateji|sınav|hız|hedef)/i.test(pLower)
+  ) {
+    if (style === 'scientific_diagram') {
+      return getScientificBlueprintTurlamaSvg(width, height, prompt || subject || 'Turlama Taktiği')
+    }
+    if (style === 'minimal_vector') {
+      return getMinimalVectorTurlamaSvg(width, height, prompt || subject || 'Turlama Taktiği')
+    }
+    if (style === 'realistic_study') {
+      return getRealisticStudyTurlamaSvg(width, height, prompt || subject || 'Turlama Taktiği')
+    }
+    return getCyberLabTurlamaSvg(width, height, prompt || subject || 'Turlama Taktiği')
+  }
+
+  // 3. Fizik / Optik
+  if (/(?:optik|fizik|ışık|kırılma|mercek|dalga|kuvvet)/i.test(pLower)) {
+    return getOpticsAndPhysicsSvg(width, height)
+  }
+
+  // 4. Matematik / Türev / Fonksiyon
+  if (/(?:matematik|türev|integral|fonksiyon|geometri|parabol|trigonometri)/i.test(pLower)) {
+    return getMathAndCalculusSvg(width, height)
+  }
+
+  // 5. Kimya
+  if (/(?:kimya|organik|molekül|bağ|asit|baz|periyodik)/i.test(pLower)) {
+    return getChemistrySvg(width, height)
+  }
+
+  // 6. Seçilen Stile Göre Özelleştirilmiş Çıktı
+  if (style === 'scientific_diagram') {
+    return getScientificBlueprintTurlamaSvg(width, height, prompt || subject || 'Bilimsel Şema')
+  }
+  if (style === 'minimal_vector') {
+    return getMinimalVectorTurlamaSvg(width, height, prompt || subject || 'Vektör Sanatı')
+  }
+  if (style === 'realistic_study') {
+    return getRealisticStudyTurlamaSvg(width, height, prompt || subject || 'Çalışma Masası')
+  }
+
+  return getCyberLabTelemetrySvg(width, height, prompt || subject || 'DersoLab Studio')
+}
 
 /**
  * Main AI Image Generation function
@@ -264,31 +706,6 @@ export async function generateSocialImage(
   req: GenerateImageRequest
 ): Promise<GenerateImageResponse> {
   const { prompt, stylePreset = 'cyber_lab', aspectRatio = '1:1', subject } = req
-  const apiKey = process.env.GEMINI_API_KEY
-
-  // 0. Resmi Maskot veya Marka Varlığı İsteniyorsa doğrudan yüksek çözünürlüklü marka görselini kullan
-  const isExplicitMascot =
-    stylePreset === 'mascot_fox' ||
-    /(?:maskot|tilki|fox|logo|marka|asistan)/i.test(prompt + ' ' + (subject || ''))
-
-  if (isExplicitMascot) {
-    const isOwl = /(?:baykuş|owl|eğitmen|hoca|mentör)/i.test(prompt + ' ' + (subject || ''))
-    const isPixel = /(?:piksel|pixel|retro|arcade)/i.test(prompt + ' ' + (subject || ''))
-    const isLogo = /(?:logo|banner|amblem)/i.test(prompt + ' ' + (subject || ''))
-
-    let chosenAsset: string = DERSOLAB_BRAND_ASSETS.mascotCyberFox
-    if (isOwl) chosenAsset = DERSOLAB_BRAND_ASSETS.mascotOwlInstructor
-    else if (isPixel) chosenAsset = DERSOLAB_BRAND_ASSETS.mascotPixelFox
-    else if (isLogo) chosenAsset = DERSOLAB_BRAND_ASSETS.logoModern
-
-    return {
-      success: true,
-      imageUrl: chosenAsset,
-      prompt,
-      stylePreset,
-      aspectRatio,
-    }
-  }
 
   let width = 1080
   let height = 1080
@@ -300,85 +717,20 @@ export async function generateSocialImage(
     height = 675
   }
 
-  // 1. Try Gemini Models to generate custom, intricate SVG
-  if (apiKey) {
-    try {
-      const styleInstruction = STYLE_PROMPTS[stylePreset] || STYLE_PROMPTS.cyber_lab
-      const systemInstruction = `You are DersoLab's world-class vector graphic artist and UI illustration generator.
-Generate a breathtaking, standalone, modern SVG illustration for an educational social media post.
-User Prompt / Topic: "${prompt}"
-Related Subject: "${subject || 'YKS / LGS Sınav Hazırlığı'}"
-Visual Style: ${styleInstruction}
-
-Requirements:
-- Output ONLY valid, standalone <svg ...> ... </svg> code.
-- ViewBox must be "0 0 ${width} ${height}", width="${width}", height="${height}".
-- Use beautiful gradients (<linearGradient>, <radialGradient>), neon glows (<filter id="glow"> with <feGaussianBlur>), and clean vector geometries.
-- Include visual concepts matching the topic (e.g. geometric angles, optical prisms, wave formulas, neural paths, DNA spirals, or student desk elements).
-- Do not include markdown code block ticks, no \`\`\`xml or \`\`\`svg, and no preamble text. Output must begin directly with <svg.`
-
-      // Model hiyerarşisi: gemini-3.6-flash ve 3.5-flash öncelikli
-      const imageModels = [
-        'gemini-3.6-flash',
-        'gemini-3.5-flash',
-        'gemini-flash-lite-latest',
-        'gemini-3.8-flash',
-        'gemini-4-argon',
-      ]
-      let response: Response | null = null
-
-      for (const m of imageModels) {
-        try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: systemInstruction }] }],
-            }),
-            signal: AbortSignal.timeout(8000),
-          })
-          if (res.ok) {
-            response = res
-            break
-          }
-        } catch (mErr) {
-          console.warn(`[ImageGenerator] ${m} denemesi başarısız, sonrakine geçiliyor:`, mErr)
-        }
-      }
-
-      if (response && response.ok) {
-        const data = await response.json()
-        let svgCode = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || ''
-
-        // Strip any markdown code fences if present
-        if (svgCode.startsWith('```')) {
-          svgCode = svgCode.replace(/^```(svg|xml)?\n?/, '').replace(/\n?```$/, '').trim()
-        }
-
-        if (svgCode.includes('<svg') && svgCode.includes('</svg>')) {
-          const startIdx = svgCode.indexOf('<svg')
-          const endIdx = svgCode.lastIndexOf('</svg>') + 6
-          const cleanSvg = svgCode.slice(startIdx, endIdx)
-
-          const base64Svg = Buffer.from(cleanSvg, 'utf-8').toString('base64')
-          const dataUrl = `data:image/svg+xml;base64,${base64Svg}`
-
-          return {
-            success: true,
-            imageUrl: dataUrl,
-            prompt,
-            stylePreset,
-            aspectRatio,
-          }
-        }
-      }
-    } catch (err) {
-      console.warn('Gemini SVG generation error, falling back to procedural engine:', err)
+  // 1. Zeki Tilki stili seçildiyse doğrudan DersoLab resmi piksel maskot stüdyosunu oluştur
+  if (stylePreset === 'mascot_fox') {
+    const mascotSvg = getOfficialMascotStudioSvg(width, height, prompt || subject || 'Zeki Tilki')
+    const base64 = Buffer.from(mascotSvg, 'utf-8').toString('base64')
+    return {
+      success: true,
+      imageUrl: `data:image/svg+xml;base64,${base64}`,
+      prompt,
+      stylePreset,
+      aspectRatio,
     }
   }
 
-  // 2. High-Fidelity Procedural Vector Engine fallback
+  // 2. Yüksek Çözünürlüklü Vektör Motoru ile Konuya ve Stile Özel Görsel Üret
   const proceduralSvg = getProceduralSvg(prompt, stylePreset, width, height, subject)
   const base64 = Buffer.from(proceduralSvg, 'utf-8').toString('base64')
   const dataUrl = `data:image/svg+xml;base64,${base64}`

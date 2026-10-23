@@ -490,7 +490,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
           ],
           highlightTag: 'KAYDETMELİK',
           footerNote: 'DersoLab Sınav Laboratuvarı • @dersolabegitim',
-          uploadedImageUrl: '/mascot-student.jpg',
+          uploadedImageUrl: '/fox-mascot.png',
           themeVariant: 'lab_dark',
         },
         {
@@ -536,7 +536,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
           themeVariant: 'purple_matrix',
         },
       ],
-      uploadedImageUrl: '/mascot-student.jpg',
+      uploadedImageUrl: '/fox-mascot.png',
       createdAt: new Date().toISOString(),
     }
   }

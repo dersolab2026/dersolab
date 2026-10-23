@@ -41,9 +41,10 @@ import type {
   StoryStickerType,
 } from '@/types/social'
 import { buildDefaultComments, buildDefaultHookMatrix, runPedagogicalAudit } from '@/lib/social/agent'
-import { downloadAllPostMedia } from '@/lib/social/canvasRenderer'
+import { downloadAllPostMedia, generateAllPostMediaFiles, triggerDownload } from '@/lib/social/canvasRenderer'
 import { VisualCanvasEngine } from './VisualCanvasEngine'
 import { InstagramMockup } from './InstagramMockup'
+import { PublishSuccessModal, type PublishResultData, InstagramIcon, TikTokIcon } from './PublishSuccessModal'
 import { toast } from 'sonner'
 
 function XPlatformIcon({ className = 'w-4 h-4' }: { className?: string }) {
@@ -76,6 +77,14 @@ export function PostEditorDrawer({
   const [activeSlideIndex, setActiveSlideIndex] = useState(0)
   const [copiedCaption, setCopiedCaption] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isPublishingBoth, setIsPublishingBoth] = useState(false)
+  const [publishTargetPlatforms, setPublishTargetPlatforms] = useState<{ instagram: boolean; tiktok: boolean }>({
+    instagram: true,
+    tiktok: true,
+  })
+  const [publishSuccessData, setPublishSuccessData] = useState<PublishResultData | null>(null)
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [publishedMediaCount, setPublishedMediaCount] = useState(1)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const ortaokulFileRef = useRef<HTMLInputElement | null>(null)
   const liseFileRef = useRef<HTMLInputElement | null>(null)
@@ -512,6 +521,8 @@ export function PostEditorDrawer({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          postId: post!.id,
+          platform: 'instagram',
           caption: `${post!.caption}\n\n${(post!.hashtags || []).join(' ')}`,
           isReels: post!.type === 'reels',
           isStory: post!.type === 'story',
@@ -524,10 +535,10 @@ export function PostEditorDrawer({
         throw new Error(data.message || 'Instagram yayını başarısız oldu.')
       }
 
-      if (data.mode === 'manual_fallback') {
-        toast.info(data.message, { duration: 6000 })
+      if (data.instagram?.mode === 'manual_fallback' || data.mode === 'manual_fallback') {
+        toast.info(data.instagram?.message || data.message, { duration: 6000 })
       } else {
-        toast.success(data.message)
+        toast.success(data.instagram?.message || data.message)
         handleStatusChange('published')
       }
     } catch (err: any) {
@@ -558,27 +569,133 @@ export function PostEditorDrawer({
     }
   }
 
-  // 1 Tıkla Paketi İndir + Metni Kopyala + Instagram'ı Aç
-  async function handleOneClickShare() {
+  // Tek Tuşla Hem Instagram Hem TikTok'ta Paylaşım (Story ise Story, Gönderi ise Gönderi)
+  async function handleOneClickDualPublish(overridePlatform?: 'both' | 'instagram' | 'tiktok') {
     if (!post) return
-    // 1. Metni kopyala
-    const fullText = `${post.caption}\n\n${(post.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
-    await navigator.clipboard.writeText(fullText)
 
-    // 2. Görselleri hazırla ve indir
-    toast.info('Paylaşım paketi hazırlanıyor...')
-    await handleDownloadAllMedia()
-
-    // 3. Instagram'ı aç
-    window.open('https://www.instagram.com/', '_blank')
-
-    // 4. Durumu güncelle
-    if (post.status !== 'published') {
-      handleStatusChange('approved')
+    let selectedPlatform: 'both' | 'instagram' | 'tiktok' = overridePlatform || 'both'
+    if (!overridePlatform) {
+      if (publishTargetPlatforms.instagram && publishTargetPlatforms.tiktok) {
+        selectedPlatform = 'both'
+      } else if (publishTargetPlatforms.instagram) {
+        selectedPlatform = 'instagram'
+      } else if (publishTargetPlatforms.tiktok) {
+        selectedPlatform = 'tiktok'
+      }
     }
 
-    toast.success('🎉 Paylaşım paketi hazır! Görseller indirildi, açıklama kopyalandı ve Instagram açıldı.')
+    setIsPublishingBoth(true)
+    const isPostStory = post.type === 'story'
+    toast.info(
+      isPostStory
+        ? '⚡ Instagram Story & TikTok Story hazırlanıyor...'
+        : '⚡ Instagram & TikTok gönderisi hazırlanıyor...'
+    )
+
+    try {
+      // 1. Açıklama metni ve etiketleri panoya kopyala
+      const fullText = `${post.caption}\n\n${(post.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
+      try {
+        await navigator.clipboard.writeText(fullText)
+      } catch (clipErr) {
+        console.warn('Clipboard write warning:', clipErr)
+      }
+
+      // 2. Yüksek çözünürlüklü görselleri üret
+      let mediaFiles: { filename: string; dataUrl: string }[] = []
+      try {
+        mediaFiles = await generateAllPostMediaFiles(post, (curr, tot) => {
+          toast.info(`Görseller çiziliyor (${curr}/${tot})...`)
+        })
+      } catch (renderErr) {
+        console.warn('Media render warning:', renderErr)
+      }
+
+      setPublishedMediaCount(mediaFiles.length || 1)
+
+      // 3. Görselleri cihaz için arka arkaya indir
+      if (mediaFiles.length > 0) {
+        for (let idx = 0; idx < mediaFiles.length; idx++) {
+          const item = mediaFiles[idx]
+          triggerDownload(item.dataUrl, item.filename)
+          if (idx < mediaFiles.length - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 350))
+          }
+        }
+      }
+
+      // 4. Eğer mobil cihaz ve Web Share destekleniyorsa dosya paylaşımı dene
+      if (typeof navigator !== 'undefined' && 'canShare' in navigator && mediaFiles.length > 0) {
+        try {
+          const fileBlobs: File[] = []
+          for (const f of mediaFiles.slice(0, 3)) {
+            const res = await fetch(f.dataUrl)
+            const blob = await res.blob()
+            fileBlobs.push(new File([blob], f.filename, { type: 'image/png' }))
+          }
+          if (navigator.canShare({ files: fileBlobs })) {
+            navigator.share({
+              title: post.title,
+              text: fullText,
+              files: fileBlobs,
+            }).catch(() => {})
+          }
+        } catch {}
+      }
+
+      // 5. Sunucu API çağrısı yap (Instagram + TikTok)
+      const res = await fetch('/api/admin/social/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postId: post.id,
+          platform: selectedPlatform,
+          contentType: post.type,
+          isStory: isPostStory,
+          isReels: post.type === 'reels',
+          caption: fullText,
+          title: post.title,
+          imageUrls: post.uploadedImageUrl ? [post.uploadedImageUrl] : undefined,
+        }),
+      })
+
+      const resultData = await res.json()
+
+      // 6. Platform sekmelerini aç
+      if (selectedPlatform === 'both' || selectedPlatform === 'instagram') {
+        const igTarget = resultData.instagram?.permalink ||
+          (isPostStory ? 'https://www.instagram.com/stories/create/' : 'https://www.instagram.com/')
+        window.open(igTarget, '_blank')
+      }
+
+      if (selectedPlatform === 'both' || selectedPlatform === 'tiktok') {
+        const ttTarget = resultData.tiktok?.shareUrl ||
+          (isPostStory ? 'https://www.tiktok.com/upload' : 'https://www.tiktok.com/creator-center/upload')
+        window.open(ttTarget, '_blank')
+      }
+
+      // 7. Gönderi durumunu Yayınlandı yap
+      handleStatusChange('published')
+
+      // 8. Kutlama / Onay modalını aç
+      setPublishSuccessData(resultData)
+      setIsSuccessModalOpen(true)
+
+      toast.success(
+        isPostStory
+          ? '🎉 Instagram Story ve TikTok Story başarıyla hazırlandı!'
+          : '🎉 Instagram ve TikTok gönderisi başarıyla hazırlandı!'
+      )
+    } catch (err: any) {
+      console.error('Dual publish error:', err)
+      toast.error(err?.message || 'Paylaşım sırasında bir hata oluştu.')
+    } finally {
+      setIsPublishingBoth(false)
+    }
   }
+
+  // Geriye dönük uyumluluk
+  const handleOneClickShare = () => handleOneClickDualPublish('both')
 
   function getStatusLabel(status: PostStatus) {
     switch (status) {
@@ -654,6 +771,28 @@ export function PostEditorDrawer({
 
           {/* Sağ Aksiyonlar */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* ⚡ Tek Tuşla Paylaş Butonu (Header) */}
+            <button
+              onClick={() => handleOneClickDualPublish()}
+              disabled={isPublishingBoth}
+              className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-orange-500 via-pink-500 to-cyan-500 hover:from-orange-600 hover:to-cyan-600 text-white font-black text-xs shadow-[0_0_20px_rgba(249,115,22,0.4)] transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+              title="Instagram ve TikTok'a tek tuşla gönder"
+            >
+              {isPublishingBoth ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Zap className="w-3.5 h-3.5 fill-white" />
+              )}
+              <span className="hidden md:inline">
+                {isStory ? '⚡ Tek Tuşla Hikaye At' : '⚡ Tek Tuşla Gönderi Paylaş'}
+              </span>
+              <span className="md:hidden">⚡ Paylaş</span>
+              <div className="flex items-center gap-1 opacity-90 pl-0.5">
+                <InstagramIcon className="w-3.5 h-3.5" />
+                <TikTokIcon className="w-3.5 h-3.5" />
+              </div>
+            </button>
+
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/15 to-cyan-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)]">
               <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
               <span>Etkileşim Skoru: %{post.virality?.score || 96}</span>
@@ -1887,17 +2026,19 @@ export function PostEditorDrawer({
                     isCarousel && post.carouselSlides
                       ? post.carouselSlides[selectedVisualSlideIndex]?.uploadedImageUrl
                       : (post.storyData?.uploadedImageUrl || post.uploadedImageUrl)
-                  ) && (
+                  ) && (() => {
+                    const currentRawImg = isCarousel && post.carouselSlides
+                      ? post.carouselSlides[selectedVisualSlideIndex]?.uploadedImageUrl
+                      : (post.storyData?.uploadedImageUrl || post.uploadedImageUrl)
+                    const displayImg = currentRawImg === '/mascot-student.jpg' ? '/fox-mascot-520.png' : currentRawImg
+
+                    return (
                     <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <img
-                          src={
-                            isCarousel && post.carouselSlides
-                              ? post.carouselSlides[selectedVisualSlideIndex]?.uploadedImageUrl
-                              : (post.storyData?.uploadedImageUrl || post.uploadedImageUrl)
-                          }
+                          src={displayImg}
                           alt="Görsel"
-                          className="w-16 h-16 rounded-xl object-cover border border-white/10"
+                          className="w-16 h-16 rounded-xl object-contain bg-black/40 border border-white/10"
                         />
                         <div>
                           <span className="text-xs font-bold text-white block">
@@ -1938,7 +2079,8 @@ export function PostEditorDrawer({
                         Kaldır
                       </button>
                     </div>
-                  )}
+                    )
+                  })()}
 
                   {/* Prompt Girişi */}
                   <div className="space-y-1.5">
@@ -1962,6 +2104,7 @@ export function PostEditorDrawer({
                     <div className="flex items-center gap-1.5 flex-wrap pt-1">
                       {(isStory
                         ? [
+                            '⏱️ Turlama Taktiği & Zaman Yönetimi (9:16)',
                             '📐 TYT Fizik Optik & Kırılma (9:16)',
                             '⚡ Parabol Teğet Eğrisi & Kökler',
                             '🧬 Mitoz & Mayoz Evreleri Şeması',
@@ -1969,6 +2112,7 @@ export function PostEditorDrawer({
                             '🦊 Zeki Tilki Soru Çözüyor (9:16)',
                           ]
                         : [
+                            '⏱️ Sınav Stratejisi & Turlama',
                             '📐 Optik & Işık Kırılması',
                             '⚡ Türev & Teğet Eğimi',
                             '📖 Biyonik Hızlı Okuma',
@@ -1994,10 +2138,10 @@ export function PostEditorDrawer({
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {[
                         { id: 'cyber_lab', label: '🔮 Cyber Lab', desc: 'Neon & Koyu Lab' },
-                        { id: 'scientific_diagram', label: '📐 Bilimsel Şema', desc: 'Optik, Formül, Eğri' },
+                        { id: 'scientific_diagram', label: '📐 Bilimsel Şema', desc: 'Optik, Formül, Akış' },
                         { id: 'minimal_vector', label: '🎨 Vektör Sanatı', desc: 'Modern & Düz' },
-                        { id: 'realistic_study', label: '📸 Çalışma Odası', desc: 'Masa, Kitap, Odak' },
-                        { id: 'mascot_fox', label: '🦊 Zeki Tilki', desc: 'DersoLab Maskotu' },
+                        { id: 'realistic_study', label: '📸 Çalışma Masası', desc: 'Kronometre, Odak' },
+                        { id: 'mascot_fox', label: '🦊 Zeki Tilki', desc: 'Resmi Piksel Maskotumuz' },
                       ].map((st) => (
                         <button
                           key={st.id}
@@ -2218,64 +2362,160 @@ export function PostEditorDrawer({
                     </div>
                   </div>
 
-                  {/* 1 Tıkla Paylaşım Paketi (Tavsiye Edilen & %100 Garantili) */}
-                  <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/30 space-y-4 shadow-lg">
-                    <div className="flex items-center justify-between">
+                  {/* ⚡ TEK TUŞLA ÇİFT PLATFORM PAYLAŞIMI (INSTAGRAM & TIKTOK) */}
+                  <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-orange-500/15 via-[#131622] to-cyan-500/15 border border-orange-500/40 space-y-5 shadow-[0_10px_40px_rgba(249,115,22,0.15)] relative overflow-hidden">
+                    {/* Arka plan ışıkları */}
+                    <div className="absolute -top-12 -right-12 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+
+                    <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
-                          <Zap className="w-5 h-5" />
+                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-orange-500 via-pink-500 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+                          <Zap className="w-6 h-6 fill-white" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-bold text-white">1 Tıkla Hazırla & Paylaş</h4>
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold">
-                              Önerilen & Kesin Çözüm
+                            <h4 className="text-base font-black text-white">Tek Tuşla Çift Platform Paylaşımı</h4>
+                            <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500/20 to-cyan-500/20 border border-orange-500/30 text-orange-300 text-[10px] font-black uppercase">
+                              Instagram & TikTok
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-300">
-                            Görseller bilgisayarınıza indirilir, açıklama panoya kopyalanır ve Instagram açılır.
+                          <p className="text-xs text-slate-300 mt-0.5">
+                            {isStory
+                              ? '9:16 dikey formatında hem Instagram Story hem TikTok Story olarak paylaşır.'
+                              : 'Görseller ve açıklamayla hem Instagram akışına hem TikTok galerisine gönderi paylaşır.'}
                           </p>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-2 text-xs text-slate-300">
-                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                        <span>Slayt / kapak görselleri anında tam çözünürlükte indirilir</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                        <span>Metin + etiketler (hashtag'ler) otomatik kopyalanır</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                        <span>Instagram tek tıkla açılır; görseli sürükleyip Ctrl+V ile metni yapıştırıp paylaşabilirsiniz</span>
+                      {/* Format Rozeti */}
+                      <div className="self-start sm:self-auto px-3 py-1.5 rounded-xl bg-black/60 border border-white/10 text-xs font-bold text-slate-200 flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${isStory ? 'bg-purple-400' : 'bg-emerald-400'} animate-pulse`} />
+                        <span>{isStory ? 'Otomatik Tespit: Story (9:16)' : 'Otomatik Tespit: Gönderi (Post)'}</span>
                       </div>
                     </div>
 
+                    {/* Platform Seçicileri */}
+                    <div className="relative z-10 grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPublishTargetPlatforms((prev) => ({
+                            ...prev,
+                            instagram: !prev.instagram,
+                          }))
+                        }
+                        className={`p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all ${
+                          publishTargetPlatforms.instagram
+                            ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 border-pink-500/50 shadow-md shadow-pink-500/10'
+                            : 'bg-white/5 border-white/10 opacity-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white">
+                            <InstagramIcon className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-white">Instagram</div>
+                            <div className="text-[10px] text-pink-300">
+                              {isStory ? 'Story (Hikaye)' : 'Akış Gönderisi'}
+                            </div>
+                          </div>
+                        </div>
+                        <div className={`w-5 h-5 rounded-lg border flex items-center justify-center ${
+                          publishTargetPlatforms.instagram ? 'bg-pink-500 border-pink-400 text-white' : 'border-white/20'
+                        }`}>
+                          {publishTargetPlatforms.instagram && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPublishTargetPlatforms((prev) => ({
+                            ...prev,
+                            tiktok: !prev.tiktok,
+                          }))
+                        }
+                        className={`p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all ${
+                          publishTargetPlatforms.tiktok
+                            ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border-cyan-500/50 shadow-md shadow-cyan-500/10'
+                            : 'bg-white/5 border-white/10 opacity-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-rose-500 flex items-center justify-center text-white">
+                            <TikTokIcon className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-white">TikTok</div>
+                            <div className="text-[10px] text-cyan-300">
+                              {isStory ? 'TikTok Story' : 'TikTok Gönderisi'}
+                            </div>
+                          </div>
+                        </div>
+                        <div className={`w-5 h-5 rounded-lg border flex items-center justify-center ${
+                          publishTargetPlatforms.tiktok ? 'bg-cyan-500 border-cyan-400 text-white' : 'border-white/20'
+                        }`}>
+                          {publishTargetPlatforms.tiktok && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Akıllı Otomasyon Bilgi Kutusu */}
+                    <div className="relative z-10 p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2 text-xs text-slate-300">
+                      <div className="flex items-center gap-2 text-orange-400 font-semibold">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                        <span>
+                          {isStory
+                            ? '9:16 dikey hikaye tasarımı otomatik çizilir ve indirilir'
+                            : 'Görseller / carousel slaytları 1080p tam kalitede indirilir'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-pink-400 font-semibold">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                        <span>Açıklama metni, hashtag\'ler ve sınav etiketleri panoya kopyalanır</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-cyan-400 font-semibold">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                        <span>
+                          {isStory
+                            ? 'Instagram ve TikTok Story yükleme panelleri eşzamanlı açılır'
+                            : 'Instagram ve TikTok Creator Center yükleme panelleri eşzamanlı açılır'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* ⚡ DEV BUTON: TEK TUŞLA HEM INSTA HEM TIKTOK PAYLAŞ */}
                     <button
-                      onClick={handleOneClickShare}
-                      disabled={isExportingMedia}
-                      className="w-full flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-sm shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50"
+                      onClick={() => handleOneClickDualPublish()}
+                      disabled={isPublishingBoth || (!publishTargetPlatforms.instagram && !publishTargetPlatforms.tiktok)}
+                      className="relative z-10 w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl bg-gradient-to-r from-orange-500 via-pink-500 to-cyan-500 hover:from-orange-600 hover:to-cyan-600 text-white font-black text-sm sm:text-base shadow-[0_0_35px_rgba(249,115,22,0.5)] transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50 cursor-pointer"
                     >
-                      {isExportingMedia ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                      {isPublishingBoth ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
-                        <Sparkles className="w-4 h-4 fill-slate-950" />
+                        <Zap className="w-5 h-5 fill-white" />
                       )}
-                      <span>{isExportingMedia ? 'Görseller Çiziliyor & İndiriliyor...' : '1 Tıkla Paylaşım Paketini Başlat'}</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <span>
+                        {isPublishingBoth
+                          ? 'İçerik Hazırlanıyor & İletiliyor...'
+                          : isStory
+                            ? '⚡ Tek Tuşla Hikaye Olarak Paylaş (Instagram Story + TikTok Story)'
+                            : '⚡ Tek Tuşla Gönderi Olarak Paylaş (Instagram Post + TikTok Post)'}
+                      </span>
+                      <ArrowRight className="w-5 h-5" />
                     </button>
 
-                    <div className="flex items-center gap-2 pt-1">
+                    {/* Hızlı Butonlar */}
+                    <div className="relative z-10 flex flex-wrap items-center gap-2 pt-1">
                       <button
                         onClick={() => {
                           const fullText = `${post.caption}\n\n${(post.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
                           navigator.clipboard.writeText(fullText)
                           toast.success('Açıklama ve hashtag\'ler panoya kopyalandı!')
                         }}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-colors"
+                        className="flex-1 min-w-[140px] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-colors"
                       >
                         <Copy className="w-3.5 h-3.5 text-cyan-400" />
                         <span>Sadece Metni Kopyala</span>
@@ -2284,7 +2524,7 @@ export function PostEditorDrawer({
                       <button
                         onClick={handleDownloadAllMedia}
                         disabled={isExportingMedia}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-colors disabled:opacity-50"
+                        className="flex-1 min-w-[140px] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold transition-colors disabled:opacity-50"
                       >
                         {isExportingMedia ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
@@ -2295,40 +2535,64 @@ export function PostEditorDrawer({
                       </button>
 
                       <a
-                        href="https://www.instagram.com/"
+                        href={isStory ? 'https://www.instagram.com/stories/create/' : 'https://www.instagram.com/'}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold transition-colors"
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-pink-300 hover:text-white text-xs font-semibold transition-colors"
                       >
-                        <ExternalLink className="w-3.5 h-3.5" />
+                        <InstagramIcon className="w-3.5 h-3.5" />
                         <span>Instagram Web</span>
+                        <ExternalLink className="w-3 h-3 text-slate-400" />
+                      </a>
+
+                      <a
+                        href={isStory ? 'https://www.tiktok.com/upload' : 'https://www.tiktok.com/creator-center/upload'}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-300 hover:text-white text-xs font-semibold transition-colors"
+                      >
+                        <TikTokIcon className="w-3.5 h-3.5" />
+                        <span>TikTok Studio</span>
+                        <ExternalLink className="w-3 h-3 text-slate-400" />
                       </a>
                     </div>
                   </div>
 
-                  {/* Meta Graph API ile Doğrudan Gönderim */}
-                  <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-500 to-indigo-600 flex items-center justify-center text-white">
-                        <Send className="w-4 h-4" />
+                  {/* API Durumu ve Doğrudan Entegrasyon Bilgisi */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                      <div className="flex items-center gap-2 text-pink-400 font-bold text-xs">
+                        <InstagramIcon className="w-4 h-4" />
+                        <span>Meta Graph API Entegrasyonu</span>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-white">Meta Graph API ile Doğrudan Gönderim</h4>
-                        <p className="text-[10px] text-slate-400">
-                          Hesabınıza bağlı resmi Facebook / Instagram Business API üzerinden otomatik paylaşım
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-white/5 text-[11px] text-slate-400">
-                      <span>API doğrudan gönderim için sunucuda Instagram Business hesabı ve internete açık görsel URL'si gerekir.</span>
+                      <p className="text-[11px] text-slate-400">
+                        Resmi Instagram Graph API ile doğrudan sunucudan yayınlama. (Story veya Feed gönderisi).
+                      </p>
                       <button
                         onClick={handlePublishToInstagram}
                         disabled={isPublishing}
-                        className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/40 text-pink-300 text-xs font-bold transition-all disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/40 text-pink-300 text-xs font-bold transition-all disabled:opacity-50"
                       >
                         <Send className="w-3.5 h-3.5" />
-                        <span>{isPublishing ? 'İletiliyor...' : 'Doğrudan Gönder'}</span>
+                        <span>{isPublishing ? 'İletiliyor...' : 'Yalnızca Instagram\'a Gönder'}</span>
+                      </button>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                      <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs">
+                        <TikTokIcon className="w-4 h-4" />
+                        <span>TikTok Content Posting API v2</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400">
+                        Resmi TikTok for Developers API ile dikey video veya fotoğraf albümü paylaşımı.
+                      </p>
+                      <button
+                        onClick={() => handleOneClickDualPublish('tiktok')}
+                        disabled={isPublishingBoth}
+                        className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-bold transition-all disabled:opacity-50"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>{isPublishingBoth ? 'İletiliyor...' : 'Yalnızca TikTok\'a Gönder'}</span>
                       </button>
                     </div>
                   </div>
@@ -2466,21 +2730,30 @@ export function PostEditorDrawer({
               </button>
               <button
                 type="button"
-                onClick={handleDownloadAllMedia}
-                disabled={isExportingMedia}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50"
+                onClick={() => handleOneClickDualPublish()}
+                disabled={isPublishingBoth}
+                className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-orange-500 via-pink-500 to-cyan-500 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/20 transition-all active:scale-95 disabled:opacity-50"
               >
-                {isExportingMedia ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-950" />
+                {isPublishingBoth ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
-                  <Download className="w-3.5 h-3.5 text-slate-950" />
+                  <Zap className="w-3.5 h-3.5 fill-white" />
                 )}
-                <span>{isExportingMedia ? 'İndiriliyor...' : 'Görselleri İndir (PNG)'}</span>
+                <span>{isStory ? '⚡ Story At' : '⚡ Gönderi Paylaş'}</span>
               </button>
             </>
           )}
         </div>
       </div>
+
+      {/* Çift Platform Paylaşım Onay Modalı */}
+      <PublishSuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        post={post}
+        publishResult={publishSuccessData}
+        downloadCount={publishedMediaCount}
+      />
     </div>
   )
 }

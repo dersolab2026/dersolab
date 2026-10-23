@@ -668,11 +668,14 @@ export async function renderSlideToCanvas(
   const loadedLogo =
     preloadedImages?.logo !== undefined ? preloadedImages.logo : await loadImageSafely('/fox-head.png')
 
-  const effectiveImageUrl = isCarousel
+  const rawImageUrl = isCarousel
     ? currentSlide?.uploadedImageUrl || (activeSlideIndex === 0 ? customImageUrl : undefined)
     : isReels
       ? reelsStoryboard?.uploadedImageUrl || customImageUrl
       : singlePost?.uploadedImageUrl || storyData?.uploadedImageUrl || customImageUrl
+
+  // Eski /mascot-student.jpg önbelleğini resmi DersoLab maskotu ile otomatik değiştir
+  const effectiveImageUrl = rawImageUrl === '/mascot-student.jpg' ? '/fox-mascot-520.png' : rawImageUrl
 
   const loadedImage =
     preloadedImages?.mainImage !== undefined ? preloadedImages.mainImage : await loadImageSafely(effectiveImageUrl)
@@ -1131,15 +1134,15 @@ export function triggerDownload(urlOrData: string, filename: string) {
 
 /**
  * Gönderinin TÜM görsellerini (Carousel slaytları, Story, Post veya Reels)
- * 1080p yüksek çözünürlüklü PNG formatında sırayla oluşturur ve indirir.
+ * 1080p yüksek çözünürlüklü PNG formatında sırayla oluşturur ve Data URL listesi döner.
  */
-export async function downloadAllPostMedia(
+export async function generateAllPostMediaFiles(
   post: SocialPostItem,
   onProgress?: (current: number, total: number) => void
-): Promise<number> {
-  if (!post) return 0
+): Promise<{ filename: string; dataUrl: string }[]> {
+  if (!post) return []
 
-  let exportedFiles: { filename: string; dataUrl: string }[] = []
+  const exportedFiles: { filename: string; dataUrl: string }[] = []
 
   if (post.type === 'carousel' && post.carouselSlides && post.carouselSlides.length > 0) {
     const slides = post.carouselSlides
@@ -1188,7 +1191,6 @@ export async function downloadAllPostMedia(
       filename: `dersolab_reels_kapak.png`,
       dataUrl,
     })
-    // Eğer otonom üretilen bağımsız bir SVG/vektör çizimi de varsa ek dosya olarak da sun
     if (post.uploadedImageUrl && post.uploadedImageUrl.startsWith('data:')) {
       exportedFiles.push({
         filename: `dersolab_reels_vektor_cizim.png`,
@@ -1218,16 +1220,28 @@ export async function downloadAllPostMedia(
     }
   }
 
-  if (exportedFiles.length === 0) return 0
+  return exportedFiles
+}
+
+/**
+ * Gönderinin TÜM görsellerini (Carousel slaytları, Story, Post veya Reels)
+ * 1080p yüksek çözünürlüklü PNG formatında sırayla oluşturur ve indirir.
+ */
+export async function downloadAllPostMedia(
+  post: SocialPostItem,
+  onProgress?: (current: number, total: number) => void
+): Promise<number> {
+  const files = await generateAllPostMediaFiles(post, onProgress)
+  if (files.length === 0) return 0
 
   // İndirmeleri tarayıcının engellememesi için 350ms arayla tetikle
-  for (let idx = 0; idx < exportedFiles.length; idx++) {
-    const item = exportedFiles[idx]
+  for (let idx = 0; idx < files.length; idx++) {
+    const item = files[idx]
     triggerDownload(item.dataUrl, item.filename)
-    if (idx < exportedFiles.length - 1) {
+    if (idx < files.length - 1) {
       await new Promise((resolve) => setTimeout(resolve, 350))
     }
   }
 
-  return exportedFiles.length
+  return files.length
 }
