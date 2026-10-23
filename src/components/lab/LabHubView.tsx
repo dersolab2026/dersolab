@@ -450,15 +450,15 @@ export function LabHubView() {
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
               <div className="text-left">
                 <span className="text-xs text-slate-400 block font-medium">İçerik</span>
-                <span className="text-sm font-bold text-white">20+ Sanal Simülatör</span>
+                <span className="text-sm font-bold text-white">35+ Sanal Simülatör</span>
               </div>
             </div>
 
             <div className="px-4 py-2 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-md flex items-center gap-2.5">
               <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
               <div className="text-left">
-                <span className="text-xs text-slate-400 block font-medium">Kademeler</span>
-                <span className="text-sm font-bold text-white">5 - 12. Sınıf</span>
+                <span className="text-xs text-slate-400 block font-medium">Oyunlaştırma</span>
+                <span className="text-sm font-bold text-white">Görev & XP Sistemi</span>
               </div>
             </div>
 
@@ -466,7 +466,7 @@ export function LabHubView() {
               <div className="w-2.5 h-2.5 rounded-full bg-violet-400" />
               <div className="text-left">
                 <span className="text-xs text-slate-400 block font-medium">Müfredat</span>
-                <span className="text-sm font-bold text-white">Maarif & MEB</span>
+                <span className="text-sm font-bold text-white">Maarif & ÖSYM</span>
               </div>
             </div>
           </div>

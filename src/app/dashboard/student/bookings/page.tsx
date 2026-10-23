@@ -4,6 +4,7 @@ import { getBookingsForViewer } from '@/lib/bookings/get-student-bookings'
 import { getLessonMaterialsForBookings } from '@/lib/lessons/get-lesson-materials'
 import { BookingListItem } from '@/components/booking/BookingListItem'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
+import { ExamCountdownHero } from '@/components/student/ExamCountdownHero'
 
 export default async function StudentBookingsPage() {
   const supabase = await createClient()
@@ -17,7 +18,9 @@ export default async function StudentBookingsPage() {
   const materialsByBooking = await getLessonMaterialsForBookings(bookings.map((b) => b.id))
 
   return (
-    <DashboardPageShell title="Derslerim" description="Planlanan ve geçmiş derslerin.">
+    <DashboardPageShell title="Derslerim & Çalışma Alanım" description="Sınav hedefine kalan süre, planlanan ve geçmiş derslerin.">
+      {/* Sınav Geri Sayımı & Hızlı Başlatıcı */}
+      <ExamCountdownHero />
       <div className="space-y-3">
         <h2 className="font-bold text-slate-200">Yaklaşan Dersler</h2>
         {upcoming.length === 0 ? (

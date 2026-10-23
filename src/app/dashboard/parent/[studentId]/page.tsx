@@ -5,6 +5,7 @@ import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { kisaTarihSaat } from '@/lib/format/datetime'
 import { EXAM_TYPE_LABELS } from '@/lib/exams/scoring'
 import { PIXEL_CARD } from '@/lib/theme'
+import { StudentWeeklyReportCard } from '@/components/guardian/StudentWeeklyReportCard'
 
 const BOOKING_LABELS: Record<string, string> = {
   scheduled: 'Planlandı',
@@ -52,15 +53,35 @@ export default async function ParentStudentDetailPage({
   const yaklasan = veri.bookings.filter((b) => b.status === 'scheduled')
   const gecmis = veri.bookings.filter((b) => b.status !== 'scheduled').slice(0, 10)
   const bekleyenOdev = veri.homework.filter((h) => h.status !== 'completed')
+  const completedBookings = veri.bookings.filter((b) => b.status === 'completed')
+  const submittedHomework = veri.homework.filter((h) => h.status === 'completed' || h.status === 'submitted')
+
+  const latestExam = veri.examResults[0]
+    ? {
+        examType: veri.examResults[0].examType,
+        totalNet: veri.examResults[0].net,
+        date: veri.examResults[0].examDate,
+      }
+    : undefined
 
   return (
     <DashboardPageShell
       title={veri.studentName}
       description={`${veri.studentEmail} · ${veri.creditBalance} ders kredisi`}
     >
-      <Link href="/dashboard/parent" className="text-sm font-bold text-slate-400 hover:underline">
-        &larr; Öğrencilerim
+      <Link href="/dashboard/parent" className="text-sm font-bold text-slate-400 hover:underline inline-block mb-2">
+        &larr; Öğrencilerim Listesine Dön
       </Link>
+
+      {/* Haftalık Karne & Veli İlerleme Kartı */}
+      <StudentWeeklyReportCard
+        studentName={veri.studentName}
+        creditBalance={veri.creditBalance}
+        completedBookingsCount={completedBookings.length}
+        pendingHomeworkCount={bekleyenOdev.length}
+        submittedHomeworkCount={submittedHomework.length}
+        latestExam={latestExam}
+      />
 
       <Bolum baslik="Yaklaşan Dersler" bos="Planlanmış ders yok.">
         {yaklasan.length > 0 ? (
