@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Image, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -66,6 +67,84 @@ export default function AiScreen() {
       }
     } catch (e) {
       setErrorMsg('Fotoğraf seçilirken bir hata oluştu.');
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('İzin Gerekli', 'Kamera ile soru çekmek için kamera erişimine izin vermelisiniz.');
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        quality: 0.8,
+        base64: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0];
+        if (asset.base64) {
+          const mimeType = asset.mimeType || 'image/jpeg';
+          const b64Str = `data:${mimeType};base64,${asset.base64}`;
+          setImageUri(b64Str);
+        } else {
+          setImageUri(asset.uri);
+        }
+        setErrorMsg('');
+      }
+    } catch (e) {
+      setErrorMsg('Kamera ile fotoğraf çekilirken bir hata oluştu.');
+    }
+  };
+
+  const handleGenerateSimilar = async () => {
+    if (!solution && !question) return;
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const prompt = `Lütfen şu sorunun temel mantığını, kavramlarını ve çözüm yöntemini kullanarak yeni, orijinal ve benzer bir soru üret ve adım adım ayrıntılı çözümünü ver:\n\nOrijinal Soru: ${question}\n\nKonu: ${subject}`;
+      const res = await fetch('https://dersolab.com/api/ai/solve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
+        },
+        body: JSON.stringify({
+          question: prompt,
+          subject: subject,
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Benzer soru üretilemedi.');
+      setSolution(data.solution);
+      setQuestion(`[Yeni Nesil Benzer Soru - ${subject}]`);
+      setImageUri(null);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Benzer soru üretilirken hata oluştu.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveQuestion = async () => {
+    try {
+      const savedRaw = await AsyncStorage.getItem('dersolab_saved_questions');
+      const list = savedRaw ? JSON.parse(savedRaw) : [];
+      const newItem = {
+        id: Date.now().toString(),
+        subject,
+        question: question || 'Görsel Soru',
+        solution,
+        date: new Date().toLocaleDateString('tr-TR'),
+      };
+      list.unshift(newItem);
+      await AsyncStorage.setItem('dersolab_saved_questions', JSON.stringify(list));
+      Alert.alert('Harika!', 'Soru ve detaylı çözümü arşivinize kaydedildi.');
+    } catch (e) {
+      Alert.alert('Hata', 'Soru kaydedilirken bir hata oluştu.');
     }
   };
 
@@ -163,9 +242,13 @@ export default function AiScreen() {
             <View style={styles.labelRow}>
               <Text style={styles.label}>Sorun</Text>
               <View style={styles.actionsRow}>
+                <TouchableOpacity onPress={takePhoto} style={styles.actionBtn}>
+                  <Ionicons name="camera" size={16} color="#38bdf8" />
+                  <Text style={[styles.actionText, { color: '#38bdf8' }]}>Kamera</Text>
+                </TouchableOpacity>
                 <TouchableOpacity onPress={pickImage} style={styles.actionBtn}>
-                  <Ionicons name="camera" size={16} color="#cbd5e1" />
-                  <Text style={styles.actionText}>Fotoğraf</Text>
+                  <Ionicons name="image-outline" size={16} color="#cbd5e1" />
+                  <Text style={styles.actionText}>Galeri</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={loadExample} style={styles.actionBtn}>
                   <Text style={[styles.actionText, { color: '#f59e0b', textDecorationLine: 'underline' }]}>Örnek</Text>
@@ -238,11 +321,16 @@ export default function AiScreen() {
             <Text style={styles.solutionText}>{solution}</Text>
             
             <View style={styles.solutionActions}>
+              <TouchableOpacity style={[styles.secondaryBtn, { backgroundColor: 'rgba(56, 189, 248, 0.15)', borderColor: 'rgba(56, 189, 248, 0.4)' }]} onPress={handleGenerateSimilar}>
+                <Ionicons name="sparkles" size={14} color="#38bdf8" style={{ marginRight: 4 }} />
+                <Text style={[styles.secondaryBtnText, { color: '#38bdf8' }]}>Benzer Soru Üret</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.secondaryBtn, { backgroundColor: 'rgba(245, 158, 11, 0.15)', borderColor: 'rgba(245, 158, 11, 0.4)' }]} onPress={handleSaveQuestion}>
+                <Ionicons name="star" size={14} color="#f59e0b" style={{ marginRight: 4 }} />
+                <Text style={[styles.secondaryBtnText, { color: '#f59e0b' }]}>Deftere Kaydet</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={styles.secondaryBtn} onPress={() => {setSolution(''); setQuestion(''); setImageUri(null);}}>
                 <Text style={styles.secondaryBtnText}>Yeni Soru</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.secondaryBtn} onPress={() => alert('Eğitmene Danış yakında eklenecek.')}>
-                <Text style={styles.secondaryBtnText}>Eğitmene Danış</Text>
               </TouchableOpacity>
             </View>
           </View>

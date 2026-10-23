@@ -367,22 +367,25 @@ export default function InstructorDashboardHome() {
                     </View>
                   </View>
 
-                  {b.meetLink ? (
-                    <TouchableOpacity
-                      style={styles.meetBtn}
-                      onPress={() => Linking.openURL(b.meetLink!)}
+                  <TouchableOpacity
+                    style={styles.meetBtn}
+                    onPress={() => {
+                      const url = b.meetLink || `https://dersolab.com/canli-ders/${b.id}`;
+                      Linking.openURL(url);
+                    }}
+                  >
+                    <LinearGradient
+                      colors={b.meetLink ? ['#6366f1', '#4f46e5'] : ['#06b6d4', '#0284c7']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.meetBtnInner}
                     >
-                      <LinearGradient
-                        colors={['#6366f1', '#4f46e5']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.meetBtnInner}
-                      >
-                        <Ionicons name="videocam-outline" size={16} color="#ffffff" />
-                        <Text style={styles.meetBtnText}>Google Meet ile Derse Katıl</Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  ) : null}
+                      <Ionicons name="videocam-outline" size={16} color="#ffffff" />
+                      <Text style={styles.meetBtnText}>
+                        {b.meetLink ? 'Google Meet ile Derse Katıl' : 'DersoLab Canlı Sınıfını Başlat'}
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
                 </View>
               ))}
             </View>

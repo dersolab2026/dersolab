@@ -446,15 +446,18 @@ export default function ParentDashboardHome() {
                     </View>
                   </View>
 
-                  {nextBooking.meetLink ? (
-                    <TouchableOpacity
-                      style={styles.meetBtn}
-                      onPress={() => Linking.openURL(nextBooking.meetLink!)}
-                    >
-                      <Ionicons name="link-outline" size={16} color="#ffffff" />
-                      <Text style={styles.meetBtnText}>Canlı Ders Linkine Git</Text>
-                    </TouchableOpacity>
-                  ) : null}
+                  <TouchableOpacity
+                    style={styles.meetBtn}
+                    onPress={() => {
+                      const url = nextBooking.meetLink || `https://dersolab.com/canli-ders/${nextBooking.id}`;
+                      Linking.openURL(url);
+                    }}
+                  >
+                    <Ionicons name="videocam-outline" size={16} color="#ffffff" style={{ marginRight: 6 }} />
+                    <Text style={styles.meetBtnText}>
+                      {nextBooking.meetLink ? 'Google Meet ile Derse Katıl' : 'Canlı Ders Odasını Aç (DersoLab)'}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               ) : (
                 <View style={styles.noLessonCard}>
@@ -462,6 +465,40 @@ export default function ParentDashboardHome() {
                   <Text style={styles.noLessonText}>Yakın zamanda planlanmış bir canlı ders yok.</Text>
                 </View>
               )}
+            </View>
+
+            {/* Haftalık Gelişim Raporu Paylaşım Kartı */}
+            <View style={styles.section}>
+              <View style={styles.reportCard}>
+                <View style={styles.reportLeft}>
+                  <View style={styles.reportIconBox}>
+                    <Ionicons name="document-text-outline" size={20} color="#22c55e" />
+                  </View>
+                  <View>
+                    <Text style={styles.reportTitle}>Haftalık Gelişim Raporu</Text>
+                    <Text style={styles.reportSub}>Öğrencinin ders, katılım ve ödev özeti</Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  style={styles.whatsappBtn}
+                  onPress={() => {
+                    const currentSt = students.find((s) => s.id === selectedStudentId);
+                    const text = encodeURIComponent(
+                      `*DersoLab Veli Bilgilendirme Raporu*\n` +
+                      `👤 Öğrenci: ${currentSt?.name || 'Öğrenci'}\n` +
+                      `⚡ Kalan Ders Kredisi: ${currentSt?.creditBalance || 0}\n` +
+                      `📚 Bu Ayki Dersler: ${monthLessonsCount}\n` +
+                      `🎯 Ders Katılım Oranı: %${attendanceRate ?? 100}\n` +
+                      `📝 Bekleyen Ödev: ${pendingHomeworkCount}\n` +
+                      `🌐 DersoLab: https://dersolab.com`
+                    );
+                    Linking.openURL(`https://api.whatsapp.com/send?text=${text}`);
+                  }}
+                >
+                  <Ionicons name="logo-whatsapp" size={16} color="#ffffff" style={{ marginRight: 6 }} />
+                  <Text style={styles.whatsappBtnText}>WhatsApp İle Gönder</Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* Hızlı Kısayollar */}
@@ -996,6 +1033,51 @@ const styles = StyleSheet.create({
   modalSubmitBtnText: {
     color: '#ffffff',
     fontSize: 15,
+    fontWeight: '700',
+  },
+  reportCard: {
+    backgroundColor: '#18181b',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(34, 197, 94, 0.25)',
+    gap: 12,
+  },
+  reportLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  reportIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  reportTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  reportSub: {
+    fontSize: 12,
+    color: '#a1a1aa',
+    marginTop: 2,
+  },
+  whatsappBtn: {
+    backgroundColor: '#16a34a',
+    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  whatsappBtnText: {
+    color: '#ffffff',
+    fontSize: 13,
     fontWeight: '700',
   },
 });

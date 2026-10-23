@@ -41,6 +41,28 @@ export default function DashboardHome() {
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [completedSessions, setCompletedSessions] = useState<number>(0);
 
+  // Exam Countdown State
+  const [selectedExam, setSelectedExam] = useState<'YKS' | 'LGS'>('YKS');
+  const [examCountdown, setExamCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const targetDate = selectedExam === 'YKS'
+        ? new Date('2026-06-20T10:15:00+03:00').getTime()
+        : new Date('2026-06-14T09:30:00+03:00').getTime();
+      const diff = Math.max(0, targetDate - Date.now());
+      setExamCountdown({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    };
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [selectedExam]);
+
   useEffect(() => {
     loadDashboardData();
   }, []);
@@ -266,6 +288,55 @@ export default function DashboardHome() {
           </TouchableOpacity>
         </View>
 
+        {/* Canlı Sınav Geri Sayım Kartı */}
+        <LinearGradient colors={['#1e1b4b', '#0f172a']} style={styles.countdownCard}>
+          <View style={styles.countdownHeader}>
+            <View style={styles.countdownTitleRow}>
+              <Ionicons name="hourglass-outline" size={18} color="#a5b4fc" style={{ marginRight: 6 }} />
+              <Text style={styles.countdownTitle}>Sınav Geri Sayımı</Text>
+            </View>
+            <View style={styles.examToggleRow}>
+              <TouchableOpacity
+                onPress={() => setSelectedExam('YKS')}
+                style={[styles.examToggleBtn, selectedExam === 'YKS' && styles.examToggleBtnActive]}
+              >
+                <Text style={[styles.examToggleText, selectedExam === 'YKS' && styles.examToggleTextActive]}>YKS 2026</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setSelectedExam('LGS')}
+                style={[styles.examToggleBtn, selectedExam === 'LGS' && styles.examToggleBtnActive]}
+              >
+                <Text style={[styles.examToggleText, selectedExam === 'LGS' && styles.examToggleTextActive]}>LGS 2026</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.timerDigitsRow}>
+            <View style={styles.timerDigitBox}>
+              <Text style={styles.timerDigitNum}>{examCountdown.days}</Text>
+              <Text style={styles.timerDigitLabel}>GÜN</Text>
+            </View>
+            <Text style={styles.timerColon}>:</Text>
+            <View style={styles.timerDigitBox}>
+              <Text style={styles.timerDigitNum}>{String(examCountdown.hours).padStart(2, '0')}</Text>
+              <Text style={styles.timerDigitLabel}>SAAT</Text>
+            </View>
+            <Text style={styles.timerColon}>:</Text>
+            <View style={styles.timerDigitBox}>
+              <Text style={styles.timerDigitNum}>{String(examCountdown.minutes).padStart(2, '0')}</Text>
+              <Text style={styles.timerDigitLabel}>DAKİKA</Text>
+            </View>
+            <Text style={styles.timerColon}>:</Text>
+            <View style={styles.timerDigitBox}>
+              <Text style={[styles.timerDigitNum, { color: '#f59e0b' }]}>{String(examCountdown.seconds).padStart(2, '0')}</Text>
+              <Text style={styles.timerDigitLabel}>SANİYE</Text>
+            </View>
+          </View>
+          <Text style={styles.countdownSub}>
+            {selectedExam === 'YKS' ? '20-21 Haziran 2026 • Üniversite hedefin seni bekliyor!' : '14 Haziran 2026 • Hayalindeki lise için hazır ol!'}
+          </Text>
+        </LinearGradient>
+
         {/* Ferah Pomodoro Odak Masası */}
         <View style={styles.pomodoroCard}>
           <View style={styles.pomoHeader}>
@@ -410,22 +481,19 @@ export default function DashboardHome() {
                       📅 {formatDate(b.start_time)} • Eğitmen: {b.instructor_name}
                     </Text>
 
-                    {b.meet_link ? (
-                      <TouchableOpacity
-                        style={styles.joinButton}
-                        activeOpacity={0.8}
-                        onPress={() => openMeetLink(b.meet_link)}
-                      >
-                        <Ionicons name="videocam" size={20} color="#030712" style={{ marginRight: 8 }} />
-                        <Text style={styles.joinButtonText}>Canlı Derse Katıl (Google Meet)</Text>
-                      </TouchableOpacity>
-                    ) : (
-                      <View style={[styles.joinButton, { backgroundColor: '#1e293b' }]}>
-                        <Text style={[styles.joinButtonText, { color: '#64748b' }]}>
-                          Meet Linki Bekleniyor...
-                        </Text>
-                      </View>
-                    )}
+                    <TouchableOpacity
+                      style={styles.joinButton}
+                      activeOpacity={0.8}
+                      onPress={() => {
+                        const targetUrl = b.meet_link || `https://dersolab.com/canli-ders/${b.id}`;
+                        openMeetLink(targetUrl);
+                      }}
+                    >
+                      <Ionicons name="videocam" size={20} color="#030712" style={{ marginRight: 8 }} />
+                      <Text style={styles.joinButtonText}>
+                        {b.meet_link ? 'Canlı Derse Katıl (Google Meet)' : 'Canlı Sınıfa Katıl (DersoLab)'}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 ))
               )}
@@ -798,5 +866,98 @@ const styles = StyleSheet.create({
     color: '#030712',
     fontSize: 14,
     fontWeight: '900',
+  },
+  countdownCard: {
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+    shadowColor: '#4f46e5',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  countdownHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  countdownTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  countdownTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#ffffff',
+  },
+  examToggleRow: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    borderRadius: 10,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  examToggleBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+  examToggleBtnActive: {
+    backgroundColor: '#6366f1',
+  },
+  examToggleText: {
+    color: '#94a3b8',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  examToggleTextActive: {
+    color: '#ffffff',
+  },
+  timerDigitsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  timerDigitBox: {
+    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    minWidth: 58,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  timerDigitNum: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#38bdf8',
+    fontVariant: ['tabular-nums'],
+  },
+  timerDigitLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#64748b',
+    marginTop: 2,
+    letterSpacing: 0.5,
+  },
+  timerColon: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#64748b',
+    marginBottom: 12,
+  },
+  countdownSub: {
+    fontSize: 12,
+    color: '#94a3b8',
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });
