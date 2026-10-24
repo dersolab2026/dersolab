@@ -130,6 +130,125 @@ export function roundRect(
 }
 
 /**
+ * Metni verilen genişliğe göre satırlara ayırır (çizmeden önce satır sayısını bilmek ve ortalamak için)
+ */
+export function getWrappedLines(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  maxLines: number = 5
+): string[] {
+  if (!text) return []
+  const words = text.trim().split(/\s+/)
+  const lines: string[] = []
+  let currentLine = ''
+
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i]
+    const testLine = currentLine ? `${currentLine} ${word}` : word
+    if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+      lines.push(currentLine)
+      currentLine = word
+      if (lines.length >= maxLines - 1) {
+        const remaining = words.slice(i).join(' ')
+        let truncated = remaining
+        while (truncated.length > 1 && ctx.measureText(`${truncated}...`).width > maxWidth) {
+          truncated = truncated.slice(0, -1).trim()
+        }
+        lines.push(remaining === truncated ? truncated : `${truncated}...`)
+        return lines
+      }
+    } else {
+      currentLine = testLine
+    }
+  }
+  if (currentLine) {
+    lines.push(currentLine)
+  }
+  return lines.slice(0, maxLines)
+}
+
+/**
+ * Tek satırlık metni verilen genişliğe sığacak şekilde fontu küçülterek (ve gerekirse ... ekleyerek) çizer
+ */
+function drawFittedSingleLine(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  initialFontSize: number,
+  minFontSize: number = 14,
+  fontWeight: string = '600',
+  align: CanvasTextAlign = 'left'
+) {
+  if (!text) return
+  ctx.save()
+  ctx.textAlign = align
+  let fontSize = initialFontSize
+  ctx.font = `${fontWeight} ${fontSize}px Inter, system-ui, sans-serif`
+  while (fontSize > minFontSize && ctx.measureText(text).width > maxWidth) {
+    fontSize -= 1
+    ctx.font = `${fontWeight} ${fontSize}px Inter, system-ui, sans-serif`
+  }
+  let finalStr = text
+  if (ctx.measureText(finalStr).width > maxWidth) {
+    while (finalStr.length > 1 && ctx.measureText(`${finalStr}...`).width > maxWidth) {
+      finalStr = finalStr.slice(0, -1).trim()
+    }
+    finalStr = `${finalStr}...`
+  }
+  ctx.fillText(finalStr, x, y)
+  ctx.restore()
+}
+
+/**
+ * Buton içine metni taşmadan (1 veya 2 satır olarak ortalayarak ve clip uygulayarak) çizer
+ */
+function drawPollButtonText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  btnX: number,
+  btnY: number,
+  btnW: number,
+  btnH: number,
+  radius: number = 18
+) {
+  ctx.save()
+  roundRect(ctx, btnX, btnY, btnW, btnH, radius)
+  ctx.clip()
+
+  const innerW = btnW - 28
+  const centerX = btnX + btnW / 2
+  ctx.fillStyle = '#ffffff'
+  ctx.textAlign = 'center'
+
+  // Önce tek satırda 21px -> 17px arası sığıyor mu kontrol et
+  let singleSize = 21
+  ctx.font = `bold ${singleSize}px Inter, system-ui, sans-serif`
+  while (singleSize > 17 && ctx.measureText(text).width > innerW) {
+    singleSize -= 1
+    ctx.font = `bold ${singleSize}px Inter, system-ui, sans-serif`
+  }
+
+  if (ctx.measureText(text).width <= innerW) {
+    ctx.fillText(text, centerX, btnY + btnH / 2 + singleSize * 0.35)
+  } else {
+    // 2 satıra bölerek buton içinde dikey + yatay ortala
+    ctx.font = 'bold 16px Inter, system-ui, sans-serif'
+    const lines = getWrappedLines(ctx, text, innerW, 2)
+    const lineH = 20
+    const totalH = lines.length * lineH
+    const startY = btnY + (btnH - totalH) / 2 + 15
+    lines.forEach((ln, i) => {
+      ctx.fillText(ln, centerX, startY + i * lineH)
+    })
+  }
+
+  ctx.restore()
+}
+
+/**
  * Metni verilen genişliğe göre satırlara bölerek çizer
  */
 export function wrapText(
@@ -142,29 +261,12 @@ export function wrapText(
   maxLines: number = 5
 ): number {
   if (!text) return y
-  const words = text.split(' ')
-  let line = ''
-  let lineCount = 0
-
-  for (let n = 0; n < words.length; n++) {
-    const testLine = line + words[n] + ' '
-    const metrics = ctx.measureText(testLine)
-    const testWidth = metrics.width
-    if (testWidth > maxWidth && n > 0) {
-      ctx.fillText(line.trim(), x, y)
-      line = words[n] + ' '
-      y += lineHeight
-      lineCount++
-      if (lineCount >= maxLines) {
-        ctx.fillText(line.trim() + '...', x, y)
-        return y + lineHeight
-      }
-    } else {
-      line = testLine
-    }
+  const lines = getWrappedLines(ctx, text, maxWidth, maxLines)
+  for (const ln of lines) {
+    ctx.fillText(ln, x, y)
+    y += lineHeight
   }
-  ctx.fillText(line.trim(), x, y)
-  return y + lineHeight
+  return y
 }
 
 /**
@@ -204,41 +306,46 @@ function drawStorySticker(
 
   if (stickerType === 'quiz') {
     const options = story.stickerOptions || ['A Seçeneği', 'B Seçeneği', 'C Seçeneği', 'D Seçeneği']
-    const cardH = 140 + options.length * 75
+    const cardH = 145 + options.length * 74
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+    ctx.save()
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'
+    ctx.shadowBlur = 26
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
     roundRect(ctx, 80, cursorY, cardW, cardH, 28)
     ctx.fill()
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-    ctx.shadowBlur = 30
+    ctx.restore()
 
-    ctx.font = 'bold 28px Inter, system-ui, sans-serif'
+    ctx.font = 'bold 26px Inter, system-ui, sans-serif'
     ctx.fillStyle = '#0f172a'
-    wrapText(ctx, story.stickerQuestion || 'Sence doğru cevap hangisi?', 115, cursorY + 60, cardW - 70, 36, 2)
+    wrapText(ctx, story.stickerQuestion || 'Sence doğru cevap hangisi?', 115, cursorY + 56, cardW - 70, 34, 2)
 
-    let optY = cursorY + 120
+    let optY = cursorY + 122
     options.forEach((opt, idx) => {
-      ctx.fillStyle = idx === 0 ? 'rgba(59, 130, 246, 0.12)' : 'rgba(241, 245, 249, 0.9)'
-      roundRect(ctx, 115, optY, cardW - 70, 60, 16)
+      const rowX = 115
+      const rowW = cardW - 70
+      const rowH = 60
+
+      ctx.fillStyle = idx === 0 ? 'rgba(59, 130, 246, 0.12)' : 'rgba(241, 245, 249, 0.92)'
+      roundRect(ctx, rowX, optY, rowW, rowH, 16)
       ctx.fill()
-      ctx.strokeStyle = idx === 0 ? '#3b82f6' : 'rgba(203, 213, 225, 0.8)'
+      ctx.strokeStyle = idx === 0 ? '#3b82f6' : 'rgba(203, 213, 225, 0.85)'
       ctx.lineWidth = 1.5
       ctx.stroke()
 
       ctx.fillStyle = idx === 0 ? '#3b82f6' : '#94a3b8'
       ctx.beginPath()
-      ctx.arc(148, optY + 30, 16, 0, Math.PI * 2)
+      ctx.arc(rowX + 33, optY + 30, 16, 0, Math.PI * 2)
       ctx.fill()
 
-      ctx.font = 'bold 18px Inter, system-ui, sans-serif'
+      ctx.font = 'bold 17px Inter, system-ui, sans-serif'
       ctx.fillStyle = '#ffffff'
       ctx.textAlign = 'center'
-      ctx.fillText(['A', 'B', 'C', 'D'][idx] || String(idx + 1), 148, optY + 36)
+      ctx.fillText(['A', 'B', 'C', 'D'][idx] || String(idx + 1), rowX + 33, optY + 36)
       ctx.textAlign = 'left'
 
-      ctx.font = '600 22px Inter, system-ui, sans-serif'
       ctx.fillStyle = '#1e293b'
-      ctx.fillText(opt, 180, optY + 37)
+      drawFittedSingleLine(ctx, opt, rowX + 64, optY + 37, rowW - 82, 21, 14, '600', 'left')
 
       optY += 72
     })
@@ -247,35 +354,46 @@ function drawStorySticker(
   }
 
   if (stickerType === 'poll') {
-    const cardH = 210
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+    const cardH = 200
+    ctx.save()
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'
+    ctx.shadowBlur = 24
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
     roundRect(ctx, 80, cursorY, cardW, cardH, 28)
     ctx.fill()
+    ctx.restore()
 
-    ctx.font = 'bold 28px Inter, system-ui, sans-serif'
     ctx.fillStyle = '#0f172a'
-    ctx.textAlign = 'center'
-    ctx.fillText(story.stickerQuestion || 'Bu taktiği denemende deneyecek misin?', width / 2, cursorY + 65)
-    ctx.textAlign = 'left'
+    drawFittedSingleLine(
+      ctx,
+      story.stickerQuestion || 'Bu taktiği denemende deneyecek misin?',
+      width / 2,
+      cursorY + 58,
+      cardW - 56,
+      25,
+      16,
+      'bold',
+      'center'
+    )
 
     const optLeft = (story.stickerOptions && story.stickerOptions[0]) || 'Evet! 🔥'
     const optRight = (story.stickerOptions && story.stickerOptions[1]) || 'Henüz Değil 🤔'
 
-    const btnW = (cardW - 80) / 2
+    const btnW = (cardW - 72) / 2
+    const leftX = 106
+    const rightX = 106 + btnW + 20
+    const btnY = cursorY + 96
+    const btnH = 74
+
     ctx.fillStyle = '#10b981'
-    roundRect(ctx, 110, cursorY + 105, btnW, 70, 20)
+    roundRect(ctx, leftX, btnY, btnW, btnH, 20)
     ctx.fill()
-    ctx.font = 'bold 24px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.textAlign = 'center'
-    ctx.fillText(optLeft, 110 + btnW / 2, cursorY + 148)
+    drawPollButtonText(ctx, optLeft, leftX, btnY, btnW, btnH, 20)
 
     ctx.fillStyle = '#64748b'
-    roundRect(ctx, 110 + btnW + 20, cursorY + 105, btnW, 70, 20)
+    roundRect(ctx, rightX, btnY, btnW, btnH, 20)
     ctx.fill()
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(optRight, 110 + btnW + 20 + btnW / 2, cursorY + 148)
-    ctx.textAlign = 'left'
+    drawPollButtonText(ctx, optRight, rightX, btnY, btnW, btnH, 20)
 
     return cursorY + cardH + 30
   }
@@ -289,13 +407,158 @@ function drawStorySticker(
   ctx.lineWidth = 2
   ctx.stroke()
 
-  ctx.font = 'bold 26px Inter, system-ui, sans-serif'
   ctx.fillStyle = '#0284c7'
-  ctx.textAlign = 'center'
-  ctx.fillText(`🔗 ${story.stickerLinkText || 'dersolab.com'} ↗`, width / 2, cursorY + 102)
-  ctx.textAlign = 'left'
+  drawFittedSingleLine(ctx, `🔗 ${story.stickerLinkText || 'dersolab.com'} ↗`, width / 2, cursorY + 100, 400, 25, 16, 'bold', 'center')
 
   return cursorY + cardH + 60
+}
+
+/**
+ * Tek bir kitap kartını (Ortaokul veya Lise) kusursuz hizalama ve taşma korumasıyla çizer
+ */
+function drawSingleBookCard(
+  ctx: CanvasRenderingContext2D,
+  book: NonNullable<StoryData['dualBookData']>['ortaokul'],
+  cardY: number,
+  cardW: number,
+  cardH: number,
+  level: 'ortaokul' | 'lise',
+  loadedImg?: HTMLImageElement | null
+) {
+  const isOrtaokul = level === 'ortaokul'
+  const cardX = 80
+  const pad = 26
+
+  const cardBg = isOrtaokul ? 'rgba(6, 182, 212, 0.08)' : 'rgba(249, 115, 22, 0.08)'
+  const cardBorder = isOrtaokul ? 'rgba(6, 182, 212, 0.45)' : 'rgba(249, 115, 22, 0.5)'
+  const imgBorder = isOrtaokul ? 'rgba(6, 182, 212, 0.65)' : 'rgba(249, 115, 22, 0.65)'
+  const pillBg = isOrtaokul ? '#0891b2' : '#ea580c'
+  const authorColor = isOrtaokul ? '#38bdf8' : '#fb923c'
+  const boxBg = isOrtaokul ? 'rgba(6, 182, 212, 0.12)' : 'rgba(249, 115, 22, 0.12)'
+  const boxBorder = isOrtaokul ? 'rgba(6, 182, 212, 0.28)' : 'rgba(249, 115, 22, 0.28)'
+  const defaultTag = isOrtaokul ? '📘 ORTAOKUL & LGS' : '📕 LİSE & YKS'
+
+  ctx.save()
+  // Dış kart çerçevesi ve taşma kilidi
+  roundRect(ctx, cardX, cardY, cardW, cardH, 26)
+  ctx.fillStyle = cardBg
+  ctx.fill()
+  ctx.strokeStyle = cardBorder
+  ctx.lineWidth = 2
+  ctx.stroke()
+  ctx.clip()
+
+  const imgX = cardX + pad
+  const imgY = cardY + pad
+  const imgW = 212
+  const imgH = cardH - pad * 2
+
+  if (loadedImg) {
+    ctx.save()
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.65)'
+    ctx.shadowBlur = 22
+    ctx.shadowOffsetX = 6
+    ctx.shadowOffsetY = 8
+    roundRect(ctx, imgX, imgY, imgW, imgH, 16)
+    ctx.clip()
+
+    const r = Math.max(imgW / loadedImg.width, imgH / loadedImg.height)
+    const sw = imgW / r
+    const sh = imgH / r
+    const sx = (loadedImg.width - sw) / 2
+    const sy = (loadedImg.height - sh) / 2
+    ctx.drawImage(loadedImg, sx, sy, sw, sh, imgX, imgY, imgW, imgH)
+    ctx.restore()
+
+    ctx.strokeStyle = imgBorder
+    ctx.lineWidth = 2
+    roundRect(ctx, imgX, imgY, imgW, imgH, 16)
+    ctx.stroke()
+  }
+
+  const rightX = loadedImg ? imgX + imgW + 26 : cardX + pad
+  const rightW = cardX + cardW - pad - rightX
+
+  // 1. Üst Seviye Etiketi (Dinamik genişlikli pill)
+  const rawTag = book.highlightTag || defaultTag
+  const tagText = rawTag.startsWith('📘') || rawTag.startsWith('📕') ? rawTag : `${isOrtaokul ? '📘' : '📕'} ${rawTag}`
+  ctx.font = '800 14px Inter, system-ui, sans-serif'
+  const pillW = Math.min(rightW, Math.max(180, ctx.measureText(tagText).width + 28))
+  const pillH = 32
+  const pillY = cardY + pad
+
+  ctx.fillStyle = pillBg
+  roundRect(ctx, rightX, pillY, pillW, pillH, 10)
+  ctx.fill()
+  ctx.fillStyle = '#ffffff'
+  drawFittedSingleLine(ctx, tagText, rightX + 14, pillY + 21, pillW - 24, 14, 11, '800', 'left')
+
+  // 2. Kitap Adı (1 veya 2 satır dinamik yükseklik — Yazar satırıyla asla çakışmaz)
+  ctx.font = 'bold 31px Inter, system-ui, sans-serif'
+  let titleLines = getWrappedLines(ctx, book.title, rightW, 2)
+  let titleFontSize = 31
+  let titleLineH = 36
+  if (titleLines.length > 1) {
+    titleFontSize = 27
+    titleLineH = 32
+    ctx.font = `bold ${titleFontSize}px Inter, system-ui, sans-serif`
+    titleLines = getWrappedLines(ctx, book.title, rightW, 2)
+  }
+
+  ctx.fillStyle = '#ffffff'
+  const titleFirstBaseline = pillY + pillH + (titleLines.length > 1 ? 30 : 34)
+  titleLines.forEach((ln, idx) => {
+    ctx.fillText(ln, rightX, titleFirstBaseline + idx * titleLineH)
+  })
+  const afterTitleY = titleFirstBaseline + (titleLines.length - 1) * titleLineH
+
+  // 3. Yazar ve Tür Satırları (Başlığın bittiği yere göre dinamik konumlanır)
+  const authorY = afterTitleY + 28
+  ctx.fillStyle = authorColor
+  drawFittedSingleLine(ctx, `Yazar: ${book.author}`, rightX, authorY, rightW, 20, 14, '600', 'left')
+
+  const genreY = authorY + 25
+  if (book.genre) {
+    ctx.fillStyle = '#94a3b8'
+    drawFittedSingleLine(ctx, `Tür: ${book.genre}`, rightX, genreY, rightW, 17, 13, '500', 'left')
+  }
+
+  // 4. Ayırıcı Çizgi ve Açıklama (whyRead) Kutusu — Sağdan ve alttan tam 26px içeride biter
+  const boxBottom = cardY + cardH - pad
+  const boxY = Math.max(genreY + 16, cardY + 228)
+  const boxH = Math.max(84, boxBottom - boxY)
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(rightX, boxY - 8)
+  ctx.lineTo(rightX + rightW, boxY - 8)
+  ctx.stroke()
+
+  ctx.fillStyle = boxBg
+  roundRect(ctx, rightX, boxY, rightW, boxH, 14)
+  ctx.fill()
+  ctx.strokeStyle = boxBorder
+  ctx.lineWidth = 1
+  ctx.stroke()
+
+  const whyText =
+    book.whyRead ||
+    (isOrtaokul
+      ? 'LGS yeni nesil paragraf sorularında hız ve dikkat süresini geliştirir.'
+      : 'TYT derin anlama ve AYT edebiyat tahlil gücü kazandırır.')
+
+  ctx.font = '600 17px Inter, system-ui, sans-serif'
+  ctx.fillStyle = '#e2e8f0'
+  const whyLines = getWrappedLines(ctx, whyText, rightW - 32, 3)
+  const whyLineH = 23
+  const totalWhyH = whyLines.length * whyLineH
+  const whyStartY = boxY + (boxH - totalWhyH) / 2 + 17
+  whyLines.forEach((ln, idx) => {
+    ctx.fillText(ln, rightX + 16, whyStartY + idx * whyLineH)
+  })
+
+  ctx.restore()
 }
 
 /**
@@ -311,245 +574,15 @@ function drawDualBookStoryCards(
 ): number {
   const { ortaokul, lise } = story.dualBookData!
   const cardW = width - 160
-  const cardH = 370
+  const cardH = 374
 
   // 1. ORTAOKUL & LGS KARTI
   const card1Y = cursorY
-  ctx.save()
-  ctx.fillStyle = 'rgba(6, 182, 212, 0.08)'
-  roundRect(ctx, 80, card1Y, cardW, cardH, 26)
-  ctx.fill()
-  ctx.strokeStyle = 'rgba(6, 182, 212, 0.45)'
-  ctx.lineWidth = 2
-  ctx.stroke()
-
-  if (loadedOrtaokulImg) {
-    const imgX = 110
-    const imgY = card1Y + 25
-    const imgW = 215
-    const imgH = 320
-
-    ctx.save()
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)'
-    ctx.shadowBlur = 25
-    ctx.shadowOffsetX = 8
-    ctx.shadowOffsetY = 10
-    roundRect(ctx, imgX, imgY, imgW, imgH, 16)
-    ctx.clip()
-
-    const r = Math.max(imgW / loadedOrtaokulImg.width, imgH / loadedOrtaokulImg.height)
-    const sw = imgW / r
-    const sh = imgH / r
-    const sx = (loadedOrtaokulImg.width - sw) / 2
-    const sy = (loadedOrtaokulImg.height - sh) / 2
-    ctx.drawImage(loadedOrtaokulImg, sx, sy, sw, sh, imgX, imgY, imgW, imgH)
-    ctx.restore()
-
-    ctx.strokeStyle = 'rgba(6, 182, 212, 0.6)'
-    ctx.lineWidth = 2
-    roundRect(ctx, imgX, imgY, imgW, imgH, 16)
-    ctx.stroke()
-
-    const rightX = 355
-    const rightW = cardW - 275
-
-    ctx.fillStyle = '#0891b2'
-    roundRect(ctx, rightX, card1Y + 28, 290, 34, 10)
-    ctx.fill()
-    ctx.font = '900 15px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText('📘 ' + (ortaokul.highlightTag || 'ORTAOKUL & LGS (10-14 YAŞ)'), rightX + 14, card1Y + 51)
-
-    ctx.font = 'bold 36px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    wrapText(ctx, ortaokul.title, rightX, card1Y + 110, rightW, 40, 2)
-
-    ctx.font = '600 21px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#38bdf8'
-    ctx.fillText(`Yazar: ${ortaokul.author}`, rightX, card1Y + 168)
-
-    if (ortaokul.genre) {
-      ctx.font = '500 18px Inter, system-ui, sans-serif'
-      ctx.fillStyle = '#94a3b8'
-      ctx.fillText(`Tür: ${ortaokul.genre}`, rightX, card1Y + 198)
-    }
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.moveTo(rightX, card1Y + 218)
-    ctx.lineTo(rightX + rightW, card1Y + 218)
-    ctx.stroke()
-
-    ctx.fillStyle = 'rgba(6, 182, 212, 0.12)'
-    roundRect(ctx, rightX, card1Y + 236, rightW, 82, 14)
-    ctx.fill()
-    ctx.strokeStyle = 'rgba(6, 182, 212, 0.25)'
-    ctx.lineWidth = 1
-    ctx.stroke()
-
-    ctx.font = '600 18px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#e2e8f0'
-    wrapText(
-      ctx,
-      ortaokul.whyRead || 'LGS yeni nesil paragraf sorularında hız ve dikkat süresini geliştirir ⚡',
-      rightX + 16,
-      card1Y + 268,
-      rightW - 32,
-      25,
-      2
-    )
-  } else {
-    ctx.fillStyle = '#0891b2'
-    roundRect(ctx, 110, card1Y + 26, 320, 36, 10)
-    ctx.fill()
-    ctx.font = '900 16px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText('📘 ' + (ortaokul.highlightTag || 'ORTAOKUL & LGS (10-14 YAŞ)'), 125, card1Y + 50)
-
-    ctx.font = 'bold 36px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(ortaokul.title, 110, card1Y + 105)
-
-    ctx.font = '600 21px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#38bdf8'
-    ctx.fillText(`Yazar: ${ortaokul.author}${ortaokul.genre ? ` • ${ortaokul.genre}` : ''}`, 110, card1Y + 142)
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.moveTo(110, card1Y + 165)
-    ctx.lineTo(110 + cardW - 60, card1Y + 165)
-    ctx.stroke()
-
-    ctx.font = 'bold 18px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#94a3b8'
-    ctx.fillText('🎯 LGS Paragraf & Odaklanma Katkısı:', 110, card1Y + 198)
-
-    ctx.font = '500 22px Inter, system-ui, sans-serif'
-    ctx.fillStyle = 'rgba(241, 245, 249, 0.95)'
-    wrapText(ctx, ortaokul.whyRead || 'Kitap kapağı için görsel ekleyebilirsiniz.', 110, card1Y + 234, cardW - 60, 32, 3)
-  }
-  ctx.restore()
+  drawSingleBookCard(ctx, ortaokul, card1Y, cardW, cardH, 'ortaokul', loadedOrtaokulImg)
 
   // 2. LİSE & YKS KARTI
-  const card2Y = card1Y + cardH + 28
-  ctx.save()
-  ctx.fillStyle = 'rgba(249, 115, 22, 0.08)'
-  roundRect(ctx, 80, card2Y, cardW, cardH, 26)
-  ctx.fill()
-  ctx.strokeStyle = 'rgba(249, 115, 22, 0.5)'
-  ctx.lineWidth = 2
-  ctx.stroke()
-
-  if (loadedLiseImg) {
-    const imgX = 110
-    const imgY = card2Y + 25
-    const imgW = 215
-    const imgH = 320
-
-    ctx.save()
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)'
-    ctx.shadowBlur = 25
-    ctx.shadowOffsetX = 8
-    ctx.shadowOffsetY = 10
-    roundRect(ctx, imgX, imgY, imgW, imgH, 16)
-    ctx.clip()
-
-    const r = Math.max(imgW / loadedLiseImg.width, imgH / loadedLiseImg.height)
-    const sw = imgW / r
-    const sh = imgH / r
-    const sx = (loadedLiseImg.width - sw) / 2
-    const sy = (loadedLiseImg.height - sh) / 2
-    ctx.drawImage(loadedLiseImg, sx, sy, sw, sh, imgX, imgY, imgW, imgH)
-    ctx.restore()
-
-    ctx.strokeStyle = 'rgba(249, 115, 22, 0.6)'
-    ctx.lineWidth = 2
-    roundRect(ctx, imgX, imgY, imgW, imgH, 16)
-    ctx.stroke()
-
-    const rightX = 355
-    const rightW = cardW - 275
-
-    ctx.fillStyle = '#ea580c'
-    roundRect(ctx, rightX, card2Y + 28, 270, 34, 10)
-    ctx.fill()
-    ctx.font = '900 15px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText('📕 ' + (lise.highlightTag || 'LİSE & YKS (14-18 YAŞ)'), rightX + 14, card2Y + 51)
-
-    ctx.font = 'bold 36px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    wrapText(ctx, lise.title, rightX, card2Y + 110, rightW, 40, 2)
-
-    ctx.font = '600 21px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#fb923c'
-    ctx.fillText(`Yazar: ${lise.author}`, rightX, card2Y + 168)
-
-    if (lise.genre) {
-      ctx.font = '500 18px Inter, system-ui, sans-serif'
-      ctx.fillStyle = '#94a3b8'
-      ctx.fillText(`Tür: ${lise.genre}`, rightX, card2Y + 198)
-    }
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.moveTo(rightX, card2Y + 218)
-    ctx.lineTo(rightX + rightW, card2Y + 218)
-    ctx.stroke()
-
-    ctx.fillStyle = 'rgba(249, 115, 22, 0.12)'
-    roundRect(ctx, rightX, card2Y + 236, rightW, 82, 14)
-    ctx.fill()
-    ctx.strokeStyle = 'rgba(249, 115, 22, 0.25)'
-    ctx.lineWidth = 1
-    ctx.stroke()
-
-    ctx.font = '600 18px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#e2e8f0'
-    wrapText(
-      ctx,
-      lise.whyRead || 'TYT derin anlama ve AYT edebiyat tahlil gücü kazandırır ✨',
-      rightX + 16,
-      card2Y + 268,
-      rightW - 32,
-      25,
-      2
-    )
-  } else {
-    ctx.fillStyle = '#ea580c'
-    roundRect(ctx, 110, card2Y + 26, 290, 36, 10)
-    ctx.fill()
-    ctx.font = '900 16px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText('📕 ' + (lise.highlightTag || 'LİSE & YKS (14-18 YAŞ)'), 125, card2Y + 50)
-
-    ctx.font = 'bold 36px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(lise.title, 110, card2Y + 105)
-
-    ctx.font = '600 21px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#fb923c'
-    ctx.fillText(`Yazar: ${lise.author}${lise.genre ? ` • ${lise.genre}` : ''}`, 110, card2Y + 142)
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.moveTo(110, card2Y + 165)
-    ctx.lineTo(110 + cardW - 60, card2Y + 165)
-    ctx.stroke()
-
-    ctx.font = 'bold 18px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#94a3b8'
-    ctx.fillText('🎯 YKS Derin Anlama & Analiz Katkısı:', 110, card2Y + 198)
-
-    ctx.font = '500 22px Inter, system-ui, sans-serif'
-    ctx.fillStyle = 'rgba(241, 245, 249, 0.95)'
-    wrapText(ctx, lise.whyRead || 'Kitap kapağı için görsel ekleyebilirsiniz.', 110, card2Y + 234, cardW - 60, 32, 3)
-  }
-  ctx.restore()
+  const card2Y = card1Y + cardH + 26
+  drawSingleBookCard(ctx, lise, card2Y, cardW, cardH, 'lise', loadedLiseImg)
 
   // 3. ÇIKARTMA (YALNIZCA KULLANICI SEÇTİYSE ÇİZİLİR - ZORUNLU ANKET/QUIZ YOK)
   if (!story.stickerType || story.stickerType === 'none') {
@@ -557,39 +590,50 @@ function drawDualBookStoryCards(
   }
 
   if (story.stickerType === 'quiz' || story.stickerType === 'link') {
-    return drawStorySticker(ctx, story, card2Y + cardH + 28, width)
+    return drawStorySticker(ctx, story, card2Y + cardH + 26, width)
   }
 
-  const pollY = card2Y + cardH + 28
-  const pollH = 175
+  const pollY = card2Y + cardH + 26
+  const pollH = 172
 
+  ctx.save()
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)'
+  ctx.shadowBlur = 20
   ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
   roundRect(ctx, 80, pollY, cardW, pollH, 26)
   ctx.fill()
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)'
-  ctx.shadowBlur = 20
+  ctx.restore()
 
-  ctx.font = 'bold 24px Inter, system-ui, sans-serif'
   ctx.fillStyle = '#0f172a'
-  ctx.textAlign = 'center'
-  ctx.fillText(story.stickerQuestion || 'Bu hafta hangisini okuyacaksın? 📚', width / 2, pollY + 44)
+  drawFittedSingleLine(
+    ctx,
+    story.stickerQuestion || 'Bu hafta hangisini okuyacaksın? 📚',
+    width / 2,
+    pollY + 46,
+    cardW - 56,
+    23,
+    15,
+    'bold',
+    'center'
+  )
 
-  const btnW = (cardW - 60) / 2
+  const btnW = (cardW - 68) / 2
+  const leftBtnX = 104
+  const rightBtnX = 104 + btnW + 20
+  const btnY = pollY + 72
+  const btnH = 74
+
   ctx.fillStyle = '#0284c7'
-  roundRect(ctx, 100, pollY + 74, btnW, 68, 18)
+  roundRect(ctx, leftBtnX, btnY, btnW, btnH, 18)
   ctx.fill()
-  ctx.font = 'bold 20px Inter, system-ui, sans-serif'
-  ctx.fillStyle = '#ffffff'
   const opt1 = (story.stickerOptions && story.stickerOptions[0]) || `📘 ${ortaokul.title}`
-  ctx.fillText(opt1, 100 + btnW / 2, pollY + 115)
+  drawPollButtonText(ctx, opt1, leftBtnX, btnY, btnW, btnH, 18)
 
   ctx.fillStyle = '#ea580c'
-  roundRect(ctx, 100 + btnW + 20, pollY + 74, btnW, 68, 18)
+  roundRect(ctx, rightBtnX, btnY, btnW, btnH, 18)
   ctx.fill()
-  ctx.fillStyle = '#ffffff'
   const opt2 = (story.stickerOptions && story.stickerOptions[1]) || `📕 ${lise.title}`
-  ctx.fillText(opt2, 100 + btnW + 20 + btnW / 2, pollY + 115)
-  ctx.textAlign = 'left'
+  drawPollButtonText(ctx, opt2, rightBtnX, btnY, btnW, btnH, 18)
 
   return pollY + pollH + 30
 }
@@ -827,8 +871,9 @@ export async function renderSlideToCanvas(
   const badgeY = cursorY
   const badgeH = 38
 
-  ctx.font = 'bold 20px Inter, system-ui, sans-serif'
-  const badgeW = ctx.measureText(badgeText).width + 32
+  ctx.font = 'bold 19px Inter, system-ui, sans-serif'
+  const maxBadgeW = highlightTag && !isStory && !isReels ? width - 380 : width - 160
+  const badgeW = Math.min(maxBadgeW, ctx.measureText(badgeText).width + 32)
   ctx.fillStyle = theme.badgeBg
   roundRect(ctx, 80, badgeY, badgeW, badgeH, 10)
   ctx.fill()
@@ -836,7 +881,7 @@ export async function renderSlideToCanvas(
   ctx.lineWidth = 1.5
   ctx.stroke()
   ctx.fillStyle = theme.badgeText
-  ctx.fillText(badgeText, 96, badgeY + 25)
+  drawFittedSingleLine(ctx, badgeText, 96, badgeY + 25, badgeW - 32, 19, 13, 'bold', 'left')
 
   if (highlightTag && !isStory && !isReels && highlightTag.length <= 25) {
     ctx.font = '900 18px Inter, system-ui, sans-serif'
@@ -981,30 +1026,32 @@ export async function renderSlideToCanvas(
       wrapText(ctx, `🚀 ${reelsStoryboard.callToAction}`, 105, cursorY + 44, cardW - 50, 26, 1)
     }
   } else if (isCarousel && currentSlide?.bodyPoints && currentSlide.bodyPoints.length > 0) {
-    // CAROUSEL MADDELERİ
+    // CAROUSEL MADDELERİ (Kutu içinde dikey + yatay tam ortalama)
     const points = currentSlide.bodyPoints
     const count = points.length
 
     const gap = count > 3 ? 10 : 14
     const totalGaps = (count - 1) * gap
     const rawCardH = Math.floor((availableSpace - totalGaps) / count)
-    const maxCardH = hasImage ? (count > 3 ? 66 : 78) : count > 3 ? 84 : 98
-    const cardHeight = Math.min(maxCardH, Math.max(56, rawCardH))
+    const maxCardH = hasImage ? (count > 3 ? 68 : 80) : count > 3 ? 88 : 104
+    const cardHeight = Math.min(maxCardH, Math.max(58, rawCardH))
     const isCompact = cardHeight < 72
 
     points.forEach((point, idx) => {
       const cardY = cursorY
       const radius = isCompact ? 14 : 18
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.035)'
+      ctx.save()
       roundRect(ctx, 80, cardY, width - 160, cardHeight, radius)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.035)'
       ctx.fill()
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
       ctx.lineWidth = 1
       ctx.stroke()
+      ctx.clip()
 
       const circleR = isCompact ? 18 : 22
-      const circleX = 80 + 16 + circleR
+      const circleX = 80 + 18 + circleR
       const circleY = cardY + cardHeight / 2
 
       ctx.fillStyle = theme.accentColor
@@ -1018,60 +1065,71 @@ export async function renderSlideToCanvas(
       ctx.fillText(String(idx + 1), circleX, circleY + (isCompact ? 6 : 7))
       ctx.textAlign = 'left'
 
-      const textX = circleX + circleR + 16
-      const textW = width - 80 - textX - 16
-      const textFontSize = isCompact ? 21 : 24
-      const textLineH = isCompact ? 28 : 32
+      const textX = circleX + circleR + 18
+      const textW = width - 80 - textX - 20
+      const textFontSize = isCompact ? 20 : 23
+      const textLineH = isCompact ? 25 : 29
 
       ctx.font = `600 ${textFontSize}px Inter, system-ui, sans-serif`
       ctx.fillStyle = '#f8fafc'
-      wrapText(
-        ctx,
-        point,
-        textX,
-        cardY + (cardHeight - textLineH) / 2 + (isCompact ? 20 : 22),
-        textW,
-        textLineH,
-        isCompact ? 1 : 2
-      )
+      const lines = getWrappedLines(ctx, point, textW, isCompact ? 2 : 2)
+      const totalH = lines.length * textLineH
+      const startY = cardY + (cardHeight - totalH) / 2 + textFontSize * 0.82
+      lines.forEach((ln, lIdx) => {
+        ctx.fillText(ln, textX, startY + lIdx * textLineH)
+      })
+      ctx.restore()
 
       cursorY += cardHeight + gap
     })
   } else if (singlePost?.options && singlePost.options.length > 0) {
-    // ÇOKTAN SEÇMELİ POST
+    // ÇOKTAN SEÇMELİ POST (1 veya 2 satır şık metni kutu içinde dikey ortalanır)
     const opts = singlePost.options
     const count = opts.length
     const gap = 12
     const totalGaps = (count - 1) * gap
     const rawCardH = Math.floor((availableSpace - totalGaps) / count)
-    const cardHeight = Math.min(hasImage ? 68 : 82, Math.max(50, rawCardH))
-    const isCompact = cardHeight < 64
+    const cardHeight = Math.min(hasImage ? 72 : 86, Math.max(54, rawCardH))
+    const isCompact = cardHeight < 66
 
     opts.forEach((opt) => {
       const cardY = cursorY
 
-      ctx.fillStyle = opt.isCorrect ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255, 255, 255, 0.03)'
+      ctx.save()
       roundRect(ctx, 80, cardY, width - 160, cardHeight, 14)
+      ctx.fillStyle = opt.isCorrect ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255, 255, 255, 0.03)'
       ctx.fill()
       ctx.strokeStyle = opt.isCorrect ? '#22c55e' : 'rgba(255, 255, 255, 0.08)'
       ctx.lineWidth = 1.5
       ctx.stroke()
+      ctx.clip()
 
-      const boxSize = isCompact ? 36 : 46
+      const boxSize = isCompact ? 38 : 46
       const boxY = cardY + (cardHeight - boxSize) / 2
       ctx.fillStyle = opt.isCorrect ? '#22c55e' : 'rgba(255, 255, 255, 0.1)'
-      roundRect(ctx, 95, boxY, boxSize, boxSize, 10)
+      roundRect(ctx, 98, boxY, boxSize, boxSize, 10)
       ctx.fill()
 
-      ctx.font = `bold ${isCompact ? 19 : 23}px Inter, system-ui, sans-serif`
+      ctx.font = `bold ${isCompact ? 19 : 22}px Inter, system-ui, sans-serif`
       ctx.fillStyle = opt.isCorrect ? '#052e16' : '#ffffff'
       ctx.textAlign = 'center'
-      ctx.fillText(opt.key, 95 + boxSize / 2, boxY + boxSize * 0.72)
+      ctx.fillText(opt.key, 98 + boxSize / 2, boxY + boxSize * 0.7)
       ctx.textAlign = 'left'
 
-      ctx.font = `500 ${isCompact ? 20 : 23}px Inter, system-ui, sans-serif`
+      const optTextX = 98 + boxSize + 18
+      const optTextW = width - 80 - optTextX - 20
+      const optFontSize = isCompact ? 19 : 21
+      const optLineH = isCompact ? 23 : 26
+
+      ctx.font = `500 ${optFontSize}px Inter, system-ui, sans-serif`
       ctx.fillStyle = '#f8fafc'
-      wrapText(ctx, opt.text, 100 + boxSize + 16, cardY + cardHeight * 0.62, width - 260 - boxSize, 28, 1)
+      const optLines = getWrappedLines(ctx, opt.text, optTextW, 2)
+      const totalOptH = optLines.length * optLineH
+      const optStartY = cardY + (cardHeight - totalOptH) / 2 + optFontSize * 0.82
+      optLines.forEach((ln, lIdx) => {
+        ctx.fillText(ln, optTextX, optStartY + lIdx * optLineH)
+      })
+      ctx.restore()
 
       cursorY += cardHeight + gap
     })

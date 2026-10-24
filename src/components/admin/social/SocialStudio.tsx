@@ -49,6 +49,8 @@ import {
   toTurkishTitleCase,
   buildBookCoverSvgDataUrl,
   CURATED_BOOK_PAIRS,
+  isFakeOrInvalidBook,
+  pickCuratedBookPair,
 } from '@/lib/social/agent'
 import {
   getSocialPostsFromDb,
@@ -218,45 +220,52 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
 ]
 
 function sanitizePostList(rawList: SocialPostItem[]): SocialPostItem[] {
-  return rawList.map((post: SocialPostItem) => {
-    const cleanTitle = toTurkishTitleCase(post.title || '')
-    const cleanTopicLabel = toTurkishTitleCase(post.topicLabel || '')
-    const nextStoryData = post.storyData
-      ? {
-          ...post.storyData,
-          // Eski demo_story_3 kaydında dayatılan anket varsa çıkartmasız ('none') yap
-          stickerType:
-            post.id === 'demo_story_3' && post.storyData.stickerType === 'poll'
-              ? ('none' as StoryStickerType)
-              : post.storyData.stickerType || ('none' as StoryStickerType),
-          dualBookData: post.storyData.dualBookData
-            ? {
-                ortaokul: {
-                  ...post.storyData.dualBookData.ortaokul,
-                  imageUrl:
-                    post.storyData.dualBookData.ortaokul.imageUrl ||
-                    buildBookCoverSvgDataUrl(
-                      post.storyData.dualBookData.ortaokul.title,
-                      post.storyData.dualBookData.ortaokul.author,
-                      post.storyData.dualBookData.ortaokul.genre,
-                      'ortaokul'
-                    ),
-                },
-                lise: {
-                  ...post.storyData.dualBookData.lise,
-                  imageUrl:
-                    post.storyData.dualBookData.lise.imageUrl ||
-                    buildBookCoverSvgDataUrl(
-                      post.storyData.dualBookData.lise.title,
-                      post.storyData.dualBookData.lise.author,
-                      post.storyData.dualBookData.lise.genre,
-                      'lise'
-                    ),
-                },
-              }
-            : undefined,
+  return rawList.map((post: SocialPostItem, postIdx: number) => {
+    let cleanTitle = toTurkishTitleCase(post.title || '')
+    let cleanTopicLabel = toTurkishTitleCase(post.topicLabel || '')
+
+    let nextStoryData = post.storyData ? { ...post.storyData } : undefined
+
+    if (nextStoryData) {
+      // Eski demo_story_3 kaydında dayatılan anket varsa çıkartmasız ('none') yap
+      nextStoryData.stickerType =
+        post.id === 'demo_story_3' && nextStoryData.stickerType === 'poll'
+          ? ('none' as StoryStickerType)
+          : nextStoryData.stickerType || ('none' as StoryStickerType)
+
+      if (nextStoryData.dualBookData) {
+        const rawOrt = nextStoryData.dualBookData.ortaokul
+        const rawLis = nextStoryData.dualBookData.lise
+        const hasFakeBook = isFakeOrInvalidBook(rawOrt) || isFakeOrInvalidBook(rawLis)
+        const fallbackPair = pickCuratedBookPair('', postIdx + 1)
+
+        const safeOrt = hasFakeBook ? fallbackPair.ortaokul : rawOrt
+        const safeLis = hasFakeBook ? fallbackPair.lise : rawLis
+
+        if (hasFakeBook) {
+          cleanTitle = `Haftalık Kitap Önerisi: ${safeOrt.title} & ${safeLis.title}`
+          cleanTopicLabel = 'Pazar Kitap Kulübü • 9:16 Story'
+          nextStoryData.badge = 'PAZAR KİTAP KULÜBÜ 📚'
+          nextStoryData.headline = 'Haftanın Kitap Önerileri'
+          nextStoryData.subhead = 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik'
+          nextStoryData.stickerQuestion = 'Bu hafta hangisini okuyacaksın? 📚'
         }
-      : undefined
+
+        nextStoryData.dualBookData = {
+          ortaokul: {
+            ...safeOrt,
+            highlightTag: 'ORTAOKUL & LGS',
+            imageUrl: buildBookCoverSvgDataUrl(safeOrt.title, safeOrt.author, safeOrt.genre, 'ortaokul'),
+          },
+          lise: {
+            ...safeLis,
+            highlightTag: 'LİSE & YKS',
+            imageUrl: buildBookCoverSvgDataUrl(safeLis.title, safeLis.author, safeLis.genre, 'lise'),
+          },
+        }
+        nextStoryData.stickerOptions = [`📘 ${safeOrt.title}`, `📕 ${safeLis.title}`]
+      }
+    }
 
     return {
       ...post,
@@ -560,21 +569,26 @@ export default function SocialStudio() {
     if (isRegenerating || isGenerating) return
     setIsRegenerating(true)
 
-    // Kullanıcının girdiği prompt'u aynen koru; eğer kutu boşsa mevcut gönderinin prompt'unu kutuya yerleştir
-    const preservedPrompt =
-      genSubject.trim() ||
-      activePost.sourcePrompt?.trim() ||
-      activePost.topicLabel.split('•').pop()?.trim() ||
-      activePost.title.replace(/^(Story:|Reels:|1 Soru 1 Net:)\s*/i, '').trim()
+    // Kullanıcının girdiği prompt'u aynen koru; eğer kutu boşsa mevcut gönderinin konusunu kullan
+    const userEnteredPrompt = genSubject.trim()
+    const activeIsBook =
+      activePost.topic === 'book_recommendation' || Boolean(activePost.storyData?.dualBookData)
 
-    if (!genSubject.trim() && preservedPrompt) {
+    const preservedPrompt =
+      userEnteredPrompt ||
+      (activeIsBook
+        ? 'Haftalık Kitap Önerisi'
+        : activePost.sourcePrompt?.trim() ||
+          activePost.topicLabel.split('•')[0]?.trim() ||
+          activePost.title.replace(/^(Story:|Reels:|1 Soru 1 Net:)\s*/i, '').trim())
+
+    if (!userEnteredPrompt && preservedPrompt) {
       setGenSubject(preservedPrompt)
     }
 
-    const isBookPost =
-      activePost.topic === 'book_recommendation' ||
-      Boolean(activePost.storyData?.dualBookData) ||
-      /kitap|roman|okuma/i.test(preservedPrompt)
+    const isBookPost = userEnteredPrompt
+      ? /kitap|roman|okuma/i.test(userEnteredPrompt)
+      : activeIsBook || /kitap|roman|okuma/i.test(preservedPrompt)
 
     const currentSticker: StoryStickerType =
       activePost.type === 'story' ? activePost.storyData?.stickerType || genStorySticker || 'none' : 'none'
@@ -1007,10 +1021,7 @@ export default function SocialStudio() {
           subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
           stickerType: storyStickerType,
           stickerQuestion: 'Bu hafta hangisini okuyacaksın? 📚',
-          stickerOptions: [
-            `Ortaokul: ${chosen.ortaokul.title} 📘`,
-            `Lise: ${chosen.lise.title} 📕`,
-          ],
+          stickerOptions: [`📘 ${chosen.ortaokul.title}`, `📕 ${chosen.lise.title}`],
           stickerLinkText: 'Kitap Listesi & İpuçları',
           stickerLinkUrl: 'https://dersolab.com/lab',
           themeVariant: (['purple_matrix', 'lab_dark', 'cyan_cyber', 'neon_orange'] as SlideThemeVariant[])[

@@ -189,15 +189,41 @@ export function buildBookCoverSvgDataUrl(
   const accentSoft = isOrtaokul ? 'rgba(56,189,248,0.22)' : 'rgba(251,146,60,0.22)'
   const badgeLabel = isOrtaokul ? 'LGS & ORTAOKUL SEÇKİSİ' : 'YKS & LİSE KLASİĞİ'
 
-  // Başlığı 2 satıra böl
-  const words = cleanTitle.split(/\s+/)
-  let line1 = cleanTitle
-  let line2 = ''
-  if (cleanTitle.length > 14 && words.length >= 2) {
-    const mid = Math.ceil(words.length / 2)
-    line1 = words.slice(0, mid).join(' ')
-    line2 = words.slice(mid).join(' ')
+  // Başlığı kelimelere göre en fazla 3 dengeli satıra böl (taşmayı tamamen önler)
+  const words = cleanTitle.split(/\s+/).filter(Boolean)
+  const lines: string[] = []
+  let current = ''
+  for (const w of words) {
+    const candidate = current ? `${current} ${w}` : w
+    if (candidate.length > 15 && current) {
+      lines.push(current)
+      current = w
+    } else {
+      current = candidate
+    }
   }
+  if (current) lines.push(current)
+  const safeLines = lines.slice(0, 3)
+  if (lines.length > 3) {
+    safeLines[2] = `${safeLines[2].slice(0, 13)}...`
+  }
+
+  const maxLineLen = Math.max(...safeLines.map((l) => l.length), 1)
+  const titleFontSize = maxLineLen > 17 ? 22 : maxLineLen > 13 ? 27 : 33
+  const lineStep = titleFontSize + 9
+  const startY = safeLines.length === 3 ? 372 : safeLines.length === 2 ? 390 : 412
+
+  const cleanAuthor = (author || '').trim()
+  const authorFontSize = cleanAuthor.length > 22 ? 17 : cleanAuthor.length > 16 ? 19 : 22
+  const cleanGenre = (genre || '').trim()
+  const genreFontSize = cleanGenre.length > 24 ? 14 : 16
+
+  const titleSvgNodes = safeLines
+    .map(
+      (ln, idx) =>
+        `<text x="215" y="${startY + idx * lineStep}" text-anchor="middle" fill="#ffffff" font-family="Inter, system-ui, sans-serif" font-size="${titleFontSize}" font-weight="900">${esc(ln)}</text>`
+    )
+    .join('\n    ')
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 640" width="430" height="640">
     <defs>
@@ -216,16 +242,15 @@ export function buildBookCoverSvgDataUrl(
     <rect x="30" y="30" width="370" height="580" rx="12" fill="none" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1"/>
     <rect x="0" y="0" width="16" height="640" fill="#ffffff" fill-opacity="0.08"/>
     <rect x="55" y="54" width="320" height="36" rx="18" fill="${accentSoft}" stroke="${accent}" stroke-opacity="0.5"/>
-    <text x="215" y="78" text-anchor="middle" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="800" letter-spacing="1.5">${esc(badgeLabel)}</text>
-    <circle cx="215" cy="240" r="86" fill="${accentSoft}" stroke="${accent}" stroke-width="2" stroke-dasharray="6 6"/>
-    <circle cx="215" cy="240" r="58" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5"/>
-    <path d="M175 255 Q215 225 255 255 L255 215 Q215 185 175 215 Z" fill="${accent}" fill-opacity="0.85"/>
-    <path d="M215 198 L215 262" stroke="${bg1}" stroke-width="3"/>
-    <text x="215" y="${line2 ? '395' : '415'}" text-anchor="middle" fill="#ffffff" font-family="Inter, system-ui, sans-serif" font-size="${line1.length > 15 ? '30' : '36'}" font-weight="900">${esc(line1)}</text>
-    ${line2 ? `<text x="215" y="438" text-anchor="middle" fill="#ffffff" font-family="Inter, system-ui, sans-serif" font-size="${line2.length > 15 ? '30' : '36'}" font-weight="900">${esc(line2)}</text>` : ''}
-    <line x1="115" y1="468" x2="315" y2="468" stroke="${accent}" stroke-opacity="0.5" stroke-width="2"/>
-    <text x="215" y="506" text-anchor="middle" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700">${esc(author)}</text>
-    <text x="215" y="544" text-anchor="middle" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="500">${esc(genre)}</text>
+    <text x="215" y="78" text-anchor="middle" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="800" letter-spacing="1.2">${esc(badgeLabel)}</text>
+    <circle cx="215" cy="230" r="82" fill="${accentSoft}" stroke="${accent}" stroke-width="2" stroke-dasharray="6 6"/>
+    <circle cx="215" cy="230" r="54" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5"/>
+    <path d="M175 245 Q215 215 255 245 L255 205 Q215 175 175 205 Z" fill="${accent}" fill-opacity="0.85"/>
+    <path d="M215 188 L215 252" stroke="${bg1}" stroke-width="3"/>
+    ${titleSvgNodes}
+    <line x1="115" y1="472" x2="315" y2="472" stroke="${accent}" stroke-opacity="0.5" stroke-width="2"/>
+    <text x="215" y="508" text-anchor="middle" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="${authorFontSize}" font-weight="700">${esc(cleanAuthor)}</text>
+    <text x="215" y="544" text-anchor="middle" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="${genreFontSize}" font-weight="500">${esc(cleanGenre)}</text>
     <text x="215" y="592" text-anchor="middle" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" letter-spacing="2">DERSOLAB KÜTÜPHANESİ</text>
   </svg>`
 
@@ -237,8 +262,8 @@ export const CURATED_BOOK_PAIRS = [
     ortaokul: {
       title: 'Momo',
       author: 'Michael Ende',
-      genre: 'Felsefi Masal & Zaman Macerası',
-      whyRead: 'LGS yeni nesil sorularda zaman algısı ve dikkat süresini geliştirir.',
+      genre: 'Felsefi Masal & Zaman',
+      whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
       imageUrl: '/books/momo.jpg',
     },
@@ -363,7 +388,60 @@ export const CURATED_BOOK_PAIRS = [
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
     },
   },
+  {
+    ortaokul: {
+      title: 'Seksen Günde Devriâlem',
+      author: 'Jules Verne',
+      genre: 'Macera & Keşif Klasiği',
+      whyRead: 'Zamanla yarış kurgusu sayesinde okuma temposunu ve dikkat odaklanmasını güçlendirir.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+    },
+    lise: {
+      title: 'Hayvan Çiftliği',
+      author: 'George Orwell',
+      genre: 'Alegorik & Politik Roman',
+      whyRead: 'Dolaylı anlatım, ironi ve ÖSYM paragraf sorularındaki örtük anlamı yakalama becerisi katar.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+    },
+  },
+  {
+    ortaokul: {
+      title: 'Beyaz Gemi',
+      author: 'Cengiz Aytmatov',
+      genre: 'Modern Klasik & İmgelem',
+      whyRead: 'Zengin betimlemeleri ve destansı anlatımıyla Türkçe söz varlığını ve yorum gücünü besler.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+    },
+    lise: {
+      title: 'Dokuzuncu Hariciye Koğuşu',
+      author: 'Peyami Safa',
+      genre: 'Psikolojik Roman Klasiği',
+      whyRead: 'AYT Edebiyat için temel eserlerden biri olup iç çözümleme ve derin paragraf analizi kazandırır.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+    },
+  },
 ]
+
+export function isFakeOrInvalidBook(book?: { title?: string; author?: string } | null): boolean {
+  if (!book || !book.title || !book.author) return true
+  const combined = `${book.title} ${book.author}`.toLocaleLowerCase('tr-TR')
+  // Yapay zekanın uydurduğu ders kitabı / kurum adı / sahte yazar kalıplarını yakala
+  return /dersolab|ösym|osym|lgs|yks|tyt|ayt|kazanım|paragraf|tersine mühendislik|pedagoji|ölçme|komisyon|strateji|taktik|soru bankası|fasikül|anonim|yazar adı|edebi kitabın adı/i.test(
+    combined
+  )
+}
+
+export function pickCuratedBookPair(excludeSummary: string = '', variationSeed: number = 1) {
+  const excludeLower = (excludeSummary || '').toLocaleLowerCase('tr-TR')
+  const availablePairs = CURATED_BOOK_PAIRS.filter(
+    (pair) =>
+      !excludeLower.includes(pair.ortaokul.title.toLocaleLowerCase('tr-TR')) &&
+      !excludeLower.includes(pair.lise.title.toLocaleLowerCase('tr-TR'))
+  )
+  const pool = availablePairs.length > 0 ? availablePairs : CURATED_BOOK_PAIRS
+  const idx = Math.abs(variationSeed - 1) % pool.length
+  return pool[idx]
+}
 
 const VARIATION_ANGLES = [
   '1. AÇI (TUZAKLAR & YANILGILAR): Öğrencilerin bu konuda en sık düştüğü çeldiriciler, kavram yanılgıları ve sınav tuzakları.',
@@ -393,15 +471,26 @@ export async function generateSocialPost(request: GeneratePostRequest): Promise<
       /kitap|roman|okuma kulübü|pazar hikayesi|kitap öneri/i.test(topicFocus)
     const chosenSticker = request.storyStickerType || 'none'
     const seedNum = Math.max(1, request.variationSeed || 1)
-    const selectedAngle = VARIATION_ANGLES[(seedNum - 1) % VARIATION_ANGLES.length]
+    const selectedAngle = isBookTopic
+      ? `GERÇEK DÜNYA VE TÜRK EDEBİYATI KLASİKLERİ SEÇKİSİ (Alternatif #${seedNum}): Kesinlikle uydurma/sahte kitap veya kurum adı ("DersoLab", "ÖSYM", "LGS Paragraf" vb.) YAZMA! Sadece gerçek, dünyaca ünlü basılmış edebi roman/hikaye eserlerini ve gerçek yazarlarını öner.`
+      : VARIATION_ANGLES[(seedNum - 1) % VARIATION_ANGLES.length]
+    const curatedBookPair = isBookTopic ? pickCuratedBookPair(request.excludeSummary, seedNum) : null
 
     const userPrompt = `
 Lütfen aşağıdaki parametrelere göre yüksek etkileşimli ve öğretici 1 adet Instagram içeriği üret:
 - İçerik Formatı: ${request.type} (${request.type === 'carousel' ? 'Kaydırmalı Carousel' : request.type === 'reels' ? 'Reels / Video Senaryosu' : request.type === 'story' ? 'Instagram Story' : 'Tekli Görsel / Bilgi Gönderisi'})
-- İÇERİK KONUSU VEYA TALİMAT: "${topicFocus}"
+- İÇERİK KONUSU VEYA TALİMAT: "${isBookTopic ? 'Ortaokul (LGS) ve Lise (YKS) Öğrencileri İçin Haftalık Gerçek Edebi Kitap Önerisi' : topicFocus}"
 - Hedef Kitle: ${request.targetGrade || 'YKS (TYT/AYT)'}
 - Anlatım Tonu: ${request.tone || 'energetic'}
 - İSTENEN ANLATIM AÇISI / YAKLAŞIM: ${selectedAngle}
+${
+  curatedBookPair
+    ? `- BU ALTERNATİFTE ÖNERİLECEK GERÇEK KİTAP ÇİFTİ:
+  * Ortaokul (LGS): "${curatedBookPair.ortaokul.title}" — Yazar: ${curatedBookPair.ortaokul.author} (${curatedBookPair.ortaokul.genre})
+  * Lise (YKS): "${curatedBookPair.lise.title}" — Yazar: ${curatedBookPair.lise.author} (${curatedBookPair.lise.genre})
+  (Lütfen dualBookData içinde BİREBİR bu gerçek kitap adlarını ve gerçek yazarlarını kullan!)`
+    : ''
+}
 ${request.customPrompt && request.customPrompt !== topicFocus ? `- Ek Not / Talimat: ${request.customPrompt}` : ''}
 ${
   request.excludeSummary
@@ -410,7 +499,11 @@ ${
 }
 
 ÖNEMLİ KURALLAR:
-1. ŞABLONSUZ & ÖZGÜR: Asla basmakalıp hazır şablon cümleleri yazma. İçerik KESİNLİKLE "${topicFocus}" konusunun gerçek ders içeriği, kuralları, formülleri, soru çözme mantığı veya püf noktaları üzerine odaklanmalıdır!
+1. ${
+      isBookTopic
+        ? 'GERÇEK EDEBİ ESER ZORUNLULUĞU: Asla "LGS Paragraf Mantığı" veya "Yazar: DersoLab Ekibi" gibi sahte/uydurma kitaplar üretme! Sadece gerçek edebi roman/öykü klasiklerini ve gerçek yazarlarını kullan.'
+        : `ŞABLONSUZ & ÖZGÜR: Asla basmakalıp hazır şablon cümleleri yazma. İçerik KESİNLİKLE "${topicFocus}" konusunun gerçek ders içeriği, kuralları, formülleri, soru çözme mantığı veya püf noktaları üzerine odaklanmalıdır!`
+    }
 2. 4 SABİT TEMA: Her slayt ve görsel için 'themeVariant' değerini SADECE şu 4 temadan biri olarak belirle:
    - "lab_dark" (DersoLab Koyu)
    - "neon_orange" (Neon Turuncu)
@@ -592,7 +685,7 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       badge: slide.badge ? slide.badge.toLocaleUpperCase('tr-TR') : undefined,
     }))
 
-    // Story kitap önerisi ise dualBookData kapak görsellerini hazırla
+    // Story kitap önerisi ise dualBookData kapak görsellerini hazırla ve sahte kitapları %100 engelle
     let normalizedStoryData = parsed.storyData
       ? {
           ...parsed.storyData,
@@ -602,23 +695,45 @@ Yanıtını kesinlikle şu JSON formatında döndür:
         }
       : undefined
 
-    if (normalizedStoryData?.dualBookData?.ortaokul && normalizedStoryData?.dualBookData?.lise) {
-      const ort = normalizedStoryData.dualBookData.ortaokul
-      const lis = normalizedStoryData.dualBookData.lise
+    if (!isBookTopic && normalizedStoryData?.dualBookData) {
+      delete normalizedStoryData.dualBookData
+    }
+
+    if (isBookTopic && normalizedStoryData) {
+      const safePair = curatedBookPair || pickCuratedBookPair(request.excludeSummary, seedNum)
+      const rawOrt = normalizedStoryData.dualBookData?.ortaokul
+      const rawLis = normalizedStoryData.dualBookData?.lise
+      const excludeLower = (request.excludeSummary || '').toLocaleLowerCase('tr-TR')
+
+      const useCuratedOrt =
+        !rawOrt ||
+        isFakeOrInvalidBook(rawOrt) ||
+        (excludeLower && excludeLower.includes(rawOrt.title.toLocaleLowerCase('tr-TR')))
+      const useCuratedLis =
+        !rawLis ||
+        isFakeOrInvalidBook(rawLis) ||
+        (excludeLower && excludeLower.includes(rawLis.title.toLocaleLowerCase('tr-TR')))
+
+      const finalOrt = useCuratedOrt ? safePair.ortaokul : rawOrt
+      const finalLis = useCuratedLis ? safePair.lise : rawLis
+
+      normalizedStoryData.badge = 'PAZAR KİTAP KULÜBÜ 📚'
+      normalizedStoryData.headline = 'Haftanın Kitap Önerileri'
+      normalizedStoryData.subhead = 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik'
+      normalizedStoryData.stickerQuestion = 'Bu hafta hangisini okuyacaksın? 📚'
       normalizedStoryData.dualBookData = {
         ortaokul: {
-          ...ort,
-          imageUrl: ort.imageUrl || buildBookCoverSvgDataUrl(ort.title, ort.author, ort.genre, 'ortaokul'),
+          ...finalOrt,
+          highlightTag: 'ORTAOKUL & LGS',
+          imageUrl: buildBookCoverSvgDataUrl(finalOrt.title, finalOrt.author, finalOrt.genre, 'ortaokul'),
         },
         lise: {
-          ...lis,
-          imageUrl: lis.imageUrl || buildBookCoverSvgDataUrl(lis.title, lis.author, lis.genre, 'lise'),
+          ...finalLis,
+          highlightTag: 'LİSE & YKS',
+          imageUrl: buildBookCoverSvgDataUrl(finalLis.title, finalLis.author, finalLis.genre, 'lise'),
         },
       }
-      normalizedStoryData.stickerOptions = [
-        `Ortaokul: ${ort.title} 📘`,
-        `Lise: ${lis.title} 📕`,
-      ]
+      normalizedStoryData.stickerOptions = [`📘 ${finalOrt.title}`, `📕 ${finalLis.title}`]
     }
 
     const postItem: SocialPostItem = {
