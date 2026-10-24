@@ -30,19 +30,17 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Korumalı İçerikler: Kayıt olmayan / giriş yapmayan kullanıcıların erişemeyeceği platform rotaları
+  // Not: /demo-ders, /instructors, /kocluk ve /lab vitrin/dönüşüm sayfalarıdır; ziyaretçilere ve SEO'ya açıktır.
   const isProtectedContent =
-    pathname.startsWith('/lab') ||
     pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/instructors') ||
-    pathname.startsWith('/demo-ders') ||
-    pathname.startsWith('/kocluk') ||
-    pathname.startsWith('/tasarim') ||
+    pathname.startsWith('/social') ||
+    pathname.startsWith('/canli-ders') ||
     pathname.startsWith('/hesap-turu') ||
     pathname.startsWith('/terms/accept')
 
   if (!user && isProtectedContent) {
     const fullPath = pathname + request.nextUrl.search
-    const redirectUrl = new URL('/register', request.url)
+    const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('redirect', fullPath)
     const redirectResponse = NextResponse.redirect(redirectUrl)
     response.cookies.getAll().forEach((cookie) => {

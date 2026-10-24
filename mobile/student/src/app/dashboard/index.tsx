@@ -49,8 +49,8 @@ export default function DashboardHome() {
   useEffect(() => {
     const updateCountdown = () => {
       const targetDate = selectedExam === 'YKS'
-        ? new Date('2026-06-20T10:15:00+03:00').getTime()
-        : new Date('2026-06-14T09:30:00+03:00').getTime();
+        ? new Date('2027-06-19T10:15:00+03:00').getTime()
+        : new Date('2027-06-06T09:30:00+03:00').getTime();
       const diff = Math.max(0, targetDate - Date.now());
       setExamCountdown({
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
@@ -301,13 +301,13 @@ export default function DashboardHome() {
                 onPress={() => setSelectedExam('YKS')}
                 style={[styles.examToggleBtn, selectedExam === 'YKS' && styles.examToggleBtnActive]}
               >
-                <Text style={[styles.examToggleText, selectedExam === 'YKS' && styles.examToggleTextActive]}>YKS 2026</Text>
+                <Text style={[styles.examToggleText, selectedExam === 'YKS' && styles.examToggleTextActive]}>YKS 2027</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setSelectedExam('LGS')}
                 style={[styles.examToggleBtn, selectedExam === 'LGS' && styles.examToggleBtnActive]}
               >
-                <Text style={[styles.examToggleText, selectedExam === 'LGS' && styles.examToggleTextActive]}>LGS 2026</Text>
+                <Text style={[styles.examToggleText, selectedExam === 'LGS' && styles.examToggleTextActive]}>LGS 2027</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -334,7 +334,7 @@ export default function DashboardHome() {
             </View>
           </View>
           <Text style={styles.countdownSub}>
-            {selectedExam === 'YKS' ? '20-21 Haziran 2026 • Üniversite hedefin seni bekliyor!' : '14 Haziran 2026 • Hayalindeki lise için hazır ol!'}
+            {selectedExam === 'YKS' ? '19-20 Haziran 2027 • Üniversite hedefin seni bekliyor!' : '6 Haziran 2027 • Hayalindeki lise için hazır ol!'}
           </Text>
         </LinearGradient>
 

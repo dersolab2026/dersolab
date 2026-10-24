@@ -38,9 +38,10 @@ import type {
 } from '@/types/social'
 import { SocialPhoneMockup } from './SocialPhoneMockup'
 import { downloadAllPostMedia } from '@/lib/social/canvasRenderer'
+import { toTurkishTitleCase } from '@/lib/social/agent'
 import { toast } from 'sonner'
 
-const STORAGE_KEY = 'dersolab_social_posts_v6'
+const STORAGE_KEY = 'dersolab_social_posts_v7'
 
 const INITIAL_DEMO_POSTS: SocialPostItem[] = [
   {
@@ -218,15 +219,45 @@ export default function SocialStudio() {
   const [isCopied, setIsCopied] = useState<boolean>(false)
   const [isDraftsOpen, setIsDraftsOpen] = useState<boolean>(false)
 
-  // Yerel Depolamadan Yükleme
+  // Yerel Depolamadan Yükleme ve Veri Temizleme (Sanitize)
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY)
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('dersolab_social_posts_v6')
       if (saved) {
         const parsed = JSON.parse(saved)
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setPosts(parsed)
-          setActivePostId(parsed[0].id)
+          const sanitized: SocialPostItem[] = parsed.map((post: SocialPostItem) => {
+            const cleanTitle = toTurkishTitleCase(post.title || '')
+            const cleanTopicLabel = toTurkishTitleCase(post.topicLabel || '')
+            return {
+              ...post,
+              title: cleanTitle,
+              topicLabel: cleanTopicLabel,
+              // Carousel kapak veya çoklu madde içeren slaytlardaki hatalı maskot görselini temizle
+              carouselSlides: post.carouselSlides?.map((slide) => {
+                const hasDensePoints = slide.bodyPoints && slide.bodyPoints.length > 0
+                const isMascot =
+                  slide.uploadedImageUrl &&
+                  (/(?:fox-mascot|fox-head|mascot-icon|zeki|maskot)/i.test(slide.uploadedImageUrl) ||
+                    (slide.uploadedImageUrl.startsWith('data:image/svg') &&
+                      slide.uploadedImageUrl.includes('mascotHalo')))
+                return {
+                  ...slide,
+                  headline: toTurkishTitleCase(slide.headline || ''),
+                  badge: slide.badge ? slide.badge.toLocaleUpperCase('tr-TR') : undefined,
+                  uploadedImageUrl: hasDensePoints && isMascot ? undefined : slide.uploadedImageUrl,
+                }
+              }),
+              caption: post.caption ? post.caption.replace(/\uFFFD/g, '') : '',
+            }
+          })
+          setPosts(sanitized)
+          setActivePostId(sanitized[0].id)
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized))
+          } catch {
+            // ignore
+          }
         }
       }
     } catch {
@@ -260,7 +291,7 @@ export default function SocialStudio() {
     topic?: ContentTopic
   }) {
     const typeToUse = customOptions?.type || genType
-    const subjectToUse = (customOptions?.subject ?? genSubject).trim()
+    const subjectToUse = toTurkishTitleCase((customOptions?.subject ?? genSubject).trim())
     const gradeToUse = customOptions?.targetGrade || genGrade
     const topicToUse = customOptions?.topic || 'custom'
 
@@ -320,9 +351,10 @@ export default function SocialStudio() {
     grade: string,
     topic: ContentTopic
   ): SocialPostItem {
-    const title = subject.trim() || 'ÖSYM Net Artırma Stratejisi'
+    const title = toTurkishTitleCase(subject.trim() || 'ÖSYM Net Artırma Stratejisi')
     const id = `post_${Date.now()}`
 
+    const isDeneme = /deneme|taktik|strateji|süre|zaman|turlama|hata/i.test(title)
     const isMath = /matematik|geometri|trigo|türev|integral|denklem|fonksiyon|limit|polinom|üslü|köklü|olasılık/i.test(title)
     const isPhysics = /fizik|kuvvet|hareket|newton|elektrik|manyetizma|dalga|optik|termodinamik/i.test(title)
     const isChemistry = /kimya|organik|mol|asit|baz|tepkime|periyodik|bağlar|gazlar/i.test(title)
@@ -343,7 +375,21 @@ export default function SocialStudio() {
       'Denemelerde benzer soru pratikleriyle süreni kısalt.',
     ]
 
-    if (isMath) {
+    if (isDeneme) {
+      badge = `${grade.toUpperCase()} • STRATEJİ`
+      s2Headline = `${title}: Turlama Tekniği & Süre Kontrolü`
+      s2Points = [
+        '1. Turda yalnızca doğrudan çözüm yolunu bildiğin soruları tamamla.',
+        '60 saniye içinde çıkmayan sorularla inatlaşma, yanına işaret koyup geç.',
+        'Zor sorulara takılıp testin sonundaki kolay soruları kaçırma riskini sıfırla.',
+      ]
+      s3Headline = 'Deneme Analizi & Hata Defteri Metodu'
+      s3Points = [
+        'Deneme bitiminde boş ve yanlış soruları analiz defterine kaydet.',
+        'Hatanın bilgi eksikliği mi yoksa dikkat hatası mı olduğunu tespit et.',
+        'Hatalı soru kalıplarını 3 gün sonra DersoLab modülleriyle tekrar sına.',
+      ]
+    } else if (isMath) {
       badge = `${grade.toUpperCase()} • MATEMATİK`
       s2Headline = `${title}: Temel Formül & Çözüm Yolu`
       s2Points = [
@@ -430,13 +476,21 @@ export default function SocialStudio() {
           {
             slideNumber: 1,
             badge,
-            headline: `${title}: En Çok Karıştırılan Noktalar`,
-            subhead: 'ÖSYM’nin en çok yokladığı kritik kavramlar ve püf noktalar',
-            bodyPoints: [
-              `${title} konusunda soru çözerken yapılan en yaygın hatalar`,
-              'Temel mantığı kavramadan ezbere soru çözmekten kaçın',
-              'Kaydır, adım adım doğru stratejiyi öğren 👉',
-            ],
+            headline: isDeneme
+              ? `${title}: En Sık Yapılan 3 Hata`
+              : `${title}: En Çok Karıştırılan Noktalar`,
+            subhead: 'ÖSYM sınavlarında öğrencilerin en çok net kaybettiği kritik tuzaklar ve püf noktalar',
+            bodyPoints: isDeneme
+              ? [
+                  'Sorunun temel mantığını kavramadan kuralları ezberleyip geçmek',
+                  'Soru kökündeki sınırlayıcı koşulları ve öncülleri dikkatsizce okumak',
+                  'Kaydır; netlerini artıracak 3 adımlı sınav stratejisini keşfet 👉',
+                ]
+              : [
+                  `${title} konusunda soru çözerken yapılan en yaygın hatalar`,
+                  'Temel mantığı kavramadan ezbere soru çözmekten kaçın',
+                  'Kaydır, adım adım doğru stratejiyi öğren 👉',
+                ],
             highlightTag: 'KAYDETMELİK',
             footerNote: 'DersoLab Sınav Laboratuvarı • @dersolabegitim',
             themeVariant: 'lab_dark',
@@ -916,6 +970,7 @@ export default function SocialStudio() {
                   type="text"
                   value={activePost.title}
                   onChange={(e) => handleUpdateActivePost({ ...activePost, title: e.target.value })}
+                  onBlur={() => handleUpdateActivePost({ ...activePost, title: toTurkishTitleCase(activePost.title) })}
                   className="w-full px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-hidden focus:border-orange-500"
                 />
               </div>
@@ -926,6 +981,7 @@ export default function SocialStudio() {
                   type="text"
                   value={activePost.topicLabel}
                   onChange={(e) => handleUpdateActivePost({ ...activePost, topicLabel: e.target.value })}
+                  onBlur={() => handleUpdateActivePost({ ...activePost, topicLabel: toTurkishTitleCase(activePost.topicLabel) })}
                   className="w-full px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-hidden focus:border-orange-500"
                 />
               </div>
@@ -987,6 +1043,11 @@ export default function SocialStudio() {
                             updatedSlides[activeSlideIndex] = { ...currentSlide, badge: e.target.value }
                             handleUpdateActivePost({ ...activePost, carouselSlides: updatedSlides })
                           }}
+                          onBlur={() => {
+                            const updatedSlides = [...(activePost.carouselSlides || [])]
+                            updatedSlides[activeSlideIndex] = { ...currentSlide, badge: (currentSlide.badge || '').toLocaleUpperCase('tr-TR') }
+                            handleUpdateActivePost({ ...activePost, carouselSlides: updatedSlides })
+                          }}
                           className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-hidden focus:border-orange-500"
                         />
                       </div>
@@ -998,6 +1059,11 @@ export default function SocialStudio() {
                           onChange={(e) => {
                             const updatedSlides = [...(activePost.carouselSlides || [])]
                             updatedSlides[activeSlideIndex] = { ...currentSlide, highlightTag: e.target.value }
+                            handleUpdateActivePost({ ...activePost, carouselSlides: updatedSlides })
+                          }}
+                          onBlur={() => {
+                            const updatedSlides = [...(activePost.carouselSlides || [])]
+                            updatedSlides[activeSlideIndex] = { ...currentSlide, highlightTag: (currentSlide.highlightTag || '').toLocaleUpperCase('tr-TR') }
                             handleUpdateActivePost({ ...activePost, carouselSlides: updatedSlides })
                           }}
                           placeholder="Örn: +3 NET, KAYDETMELİK"
@@ -1014,6 +1080,11 @@ export default function SocialStudio() {
                         onChange={(e) => {
                           const updatedSlides = [...(activePost.carouselSlides || [])]
                           updatedSlides[activeSlideIndex] = { ...currentSlide, headline: e.target.value }
+                          handleUpdateActivePost({ ...activePost, carouselSlides: updatedSlides })
+                        }}
+                        onBlur={() => {
+                          const updatedSlides = [...(activePost.carouselSlides || [])]
+                          updatedSlides[activeSlideIndex] = { ...currentSlide, headline: toTurkishTitleCase(currentSlide.headline) }
                           handleUpdateActivePost({ ...activePost, carouselSlides: updatedSlides })
                         }}
                         className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-hidden focus:border-orange-500 font-semibold"
@@ -1385,11 +1456,33 @@ export default function SocialStudio() {
               ))}
             </div>
 
-            <div className="pt-3 border-t border-white/10 flex justify-end">
+            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm('Tüm kayıtlı taslakları sıfırlayıp fabrika ayarlarına dönmek istediğinize emin misiniz?')) {
+                    try {
+                      localStorage.removeItem(STORAGE_KEY)
+                      localStorage.removeItem('dersolab_social_posts_v6')
+                    } catch {
+                      // ignore
+                    }
+                    setPosts(INITIAL_DEMO_POSTS)
+                    setActivePostId(INITIAL_DEMO_POSTS[0].id)
+                    setActiveSlideIndex(0)
+                    setIsDraftsOpen(false)
+                    toast.success('Sosyal medya stüdyosu varsayılan şablonlara sıfırlandı.')
+                  }
+                }}
+                className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-xs font-semibold text-red-400 border border-red-500/20 transition-colors"
+              >
+                Varsayılana Sıfırla
+              </button>
+
               <button
                 type="button"
                 onClick={() => setIsDraftsOpen(false)}
-                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white"
+                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition-colors"
               >
                 Kapat
               </button>

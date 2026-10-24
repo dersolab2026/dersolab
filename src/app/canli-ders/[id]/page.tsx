@@ -45,7 +45,7 @@ export default async function LiveClassroomPage({ params }: LivePageProps) {
   // Rezervasyonu çek
   const { data: booking } = await admin
     .from('bookings')
-    .select('id, student_id, instructor_id, start_time, end_time, status, topic_note')
+    .select('id, student_id, instructor_id, start_time, end_time, status, topic_note, meet_link')
     .eq('id', bookingId)
     .maybeSingle()
 
@@ -84,6 +84,7 @@ export default async function LiveClassroomPage({ params }: LivePageProps) {
       startTime={booking.start_time}
       endTime={booking.end_time}
       topicNote={booking.topic_note}
+      meetLink={booking.meet_link}
     />
   )
 }

@@ -4,12 +4,21 @@ import { GoogleGenAI } from '@google/genai'
 
 // Rate limiting için basit in-memory store (production'da Redis kullanılır)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+let lastRateLimitCleanup = Date.now()
 
 const DAILY_LIMIT_STUDENT = 500 // Kayıtlı öğrenciler için sınırsız kullanım (güvenlik tavanı)
 
 function getRateLimit(key: string, limit: number): { allowed: boolean; remaining: number } {
   const now = Date.now()
   const dayMs = 24 * 60 * 60 * 1000
+
+  if (now - lastRateLimitCleanup > 60 * 60 * 1000 && rateLimitMap.size > 200) {
+    for (const [k, v] of rateLimitMap.entries()) {
+      if (v.resetAt < now) rateLimitMap.delete(k)
+    }
+    lastRateLimitCleanup = now
+  }
+
   const entry = rateLimitMap.get(key)
 
   if (!entry || entry.resetAt < now) {
@@ -161,11 +170,11 @@ export async function POST(request: NextRequest) {
     }
 
     const solveModels = [
-      'gemini-3.6-flash',
-      'gemini-3.5-flash',
-      'gemini-flash-lite-latest',
       'gemini-3.8-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite',
       'gemini-4-argon',
+      'gemini-flash-lite-latest',
     ]
     let response: any = null
     let lastError: any = null

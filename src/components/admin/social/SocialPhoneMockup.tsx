@@ -22,6 +22,13 @@ interface SocialPhoneMockupProps {
   onSlideChange: (index: number) => void
 }
 
+function truncateCaptionSafely(text: string, maxLength: number): string {
+  if (!text) return ''
+  const chars = Array.from(text)
+  if (chars.length <= maxLength) return text
+  return chars.slice(0, maxLength).join('') + '...'
+}
+
 export function SocialPhoneMockup({
   post,
   activeSlideIndex,
@@ -259,9 +266,9 @@ export function SocialPhoneMockup({
                 <span className="whitespace-pre-line">
                   {isCaptionExpanded
                     ? post.caption
-                    : post.caption.slice(0, 110) + (post.caption.length > 110 ? '...' : '')}
+                    : truncateCaptionSafely(post.caption, 110)}
                 </span>
-                {post.caption.length > 110 && (
+                {Array.from(post.caption || '').length > 110 && (
                   <button
                     type="button"
                     onClick={() => setIsCaptionExpanded(!isCaptionExpanded)}

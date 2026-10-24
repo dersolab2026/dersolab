@@ -40,9 +40,19 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 const RATE_LIMIT_WINDOW = 60 * 1000 // 1 dakika
 const MAX_MUTATION_REQUESTS_PER_MINUTE = 60 // IP başına dakikada 60 mutasyon isteği
 const MAX_TOTAL_REQUESTS_PER_MINUTE = 240 // IP başına dakikada 240 toplam istek (Agresif bot/scraping kalkanı)
+let lastCleanup = Date.now()
 
 function checkRateLimit(key: string, maxRequests: number): boolean {
   const now = Date.now()
+
+  // Bellek sızıntısını önlemek için dakikada bir süresi dolmuş kayıtları temizle
+  if (now - lastCleanup > RATE_LIMIT_WINDOW && rateLimitMap.size > 500) {
+    for (const [k, v] of rateLimitMap.entries()) {
+      if (now > v.resetTime) rateLimitMap.delete(k)
+    }
+    lastCleanup = now
+  }
+
   const record = rateLimitMap.get(key)
   
   if (!record || now > record.resetTime) {

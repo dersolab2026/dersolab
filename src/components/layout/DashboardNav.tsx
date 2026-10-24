@@ -40,6 +40,7 @@ interface DashboardNavProps {
 
 const NAV_ITEMS: Record<string, { href: string; label: string; badge?: string }[]> = {
   student: [
+    { href: '/dashboard/student', label: 'Genel Bakış' },
     { href: '/dashboard/student/bookings', label: 'Derslerim' },
     { href: '/lab', label: 'L.A.B. Deneyleri', badge: '3D' },
     { href: '/dashboard/student/odaklanma', label: 'Odaklanma & Pomodoro', badge: 'Yeni' },

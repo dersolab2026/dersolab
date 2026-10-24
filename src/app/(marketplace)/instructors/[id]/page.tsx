@@ -1,4 +1,5 @@
-import { notFound, redirect } from 'next/navigation'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { createClient } from '@/lib/supabase/server'
 import { GUIDANCE_SUBJECT } from '@/lib/constants'
@@ -26,11 +27,11 @@ export default async function InstructorDetailPage({ params, searchParams }: Ins
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
   const education = await getInstructorEducation(instructor.userId)
 
   const initials = instructor.name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
+  const redirectPath = `/instructors/${instructor.userId}${tur ? `?tur=${tur}` : ''}`
 
   return (
     <div className="min-h-[calc(100vh-57px)] md:min-h-screen w-full relative">
@@ -63,7 +64,30 @@ export default async function InstructorDetailPage({ params, searchParams }: Ins
         </div>
 
         <div className="bg-white/[0.02] rounded-2xl p-6 sm:p-8 border border-white/5 backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-          {instructor.isCalendarConnected ? (
+          {!user ? (
+            <div className="space-y-4 text-center py-2">
+              <h2 className="text-lg font-black text-white">
+                {instructor.name} ile Ders veya Koçluk Planla
+              </h2>
+              <p className="text-sm font-semibold text-slate-400 max-w-md mx-auto">
+                Müsait saatleri görmek ve hemen bire bir seans oluşturmak için ücretsiz hesabına giriş yap veya kayıt ol.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+                <Link
+                  href={`/register?redirect=${encodeURIComponent(redirectPath)}`}
+                  className="inline-flex items-center justify-center bg-[#DD7B3A] text-white font-bold rounded-full px-6 py-2.5 text-sm hover:bg-[#DD7B3A]/90 transition-all shadow-[0_0_15px_rgba(221,123,58,0.3)]"
+                >
+                  Ücretsiz Kayıt Ol →
+                </Link>
+                <Link
+                  href={`/login?redirect=${encodeURIComponent(redirectPath)}`}
+                  className="inline-flex items-center justify-center bg-white/5 border border-white/10 text-slate-200 font-bold rounded-full px-6 py-2.5 text-sm hover:bg-white/10 transition-all"
+                >
+                  Giriş Yap
+                </Link>
+              </div>
+            </div>
+          ) : instructor.isCalendarConnected ? (
             <InstructorBookingSection
               instructorId={instructor.userId}
               studentId={user.id}

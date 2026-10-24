@@ -6,6 +6,7 @@ import type {
   SlideThemeVariant,
   SocialPostItem,
 } from '@/types/social'
+import { toTurkishTitleCase } from './agent'
 
 export interface RenderSlideOptions {
   isStory?: boolean
@@ -741,12 +742,22 @@ export async function renderSlideToCanvas(
 
   // 6. İÇERİK ALANI
   let cursorY = 175
-  const hasImage = Boolean(loadedImage)
+  const isMascotAsset = Boolean(
+    effectiveImageUrl &&
+      (/(?:fox-mascot|fox-head|mascot-icon|zeki|maskot)/i.test(effectiveImageUrl) ||
+        (effectiveImageUrl.startsWith('data:image/svg') && effectiveImageUrl.includes('mascotHalo')))
+  )
   const hasPoints = Boolean(isCarousel && currentSlide?.bodyPoints && currentSlide.bodyPoints.length > 0)
   const hasOptions = Boolean(singlePost?.options && singlePost.options.length > 0)
+  // Carousel kapak veya içerik slaytlarında maddeler (bodyPoints) varken görsel kutusu maddeleri ve başlığı ezeceğinden görsel çizilmez.
+  // Yalnızca maddesiz slaytlarda (tam sayfa diyagram/infografik slaytı) veya single/story post ise görsel çizilir.
+  const hasImage =
+    Boolean(loadedImage) &&
+    !isMascotAsset &&
+    (!isCarousel || !hasPoints || !currentSlide?.bodyPoints || currentSlide.bodyPoints.length <= 1)
 
   // YÜKLENEN / ÜRETİLEN GÖRSEL VARSA ÇİZ
-  if (loadedImage) {
+  if (hasImage && loadedImage) {
     const imgBoxW = width - 160
     const imgBoxH = isStory ? 520 : isReels ? 420 : hasPoints || hasOptions ? 275 : 350
 
@@ -787,14 +798,16 @@ export async function renderSlideToCanvas(
   }
 
   // ROZET & VURGU ETİKETİ
-  const badgeText =
+  const rawBadge =
     currentSlide?.badge ||
     singlePost?.badge ||
     storyData?.badge ||
     (isReels ? 'REELS • 9:16 VİDEO' : 'DERSOLAB • TAKTİK')
+  const badgeText = rawBadge.toLocaleUpperCase('tr-TR')
 
-  const highlightTag =
+  const rawTag =
     currentSlide?.highlightTag || (!isStory && !isReels ? singlePost?.keyTakeaway : '') || ''
+  const highlightTag = rawTag.length <= 25 ? rawTag.toLocaleUpperCase('tr-TR') : ''
 
   const badgeY = cursorY
   const badgeH = 38
@@ -826,12 +839,13 @@ export async function renderSlideToCanvas(
   cursorY += badgeH + 20
 
   // BAŞLIK
-  const headline =
+  const rawHeadline =
     currentSlide?.headline ||
     singlePost?.headline ||
     storyData?.headline ||
     postTitle ||
     'Sınavda Başarıyı Getiren Strateji'
+  const headline = toTurkishTitleCase(rawHeadline)
 
   const headlineFontSize = hasImage ? (isStory || isReels ? 46 : 42) : isStory || isReels ? 56 : 50
   const headlineLineHeight = hasImage ? (isStory || isReels ? 58 : 52) : isStory || isReels ? 68 : 62

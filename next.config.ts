@@ -11,9 +11,9 @@ const CSP = [
   `img-src 'self' data: blob: ${SUPABASE_ORIGIN} https://img.youtube.com https://*.googleusercontent.com https://lh3.googleusercontent.com https://meet.jit.si https://8x8.vc`,
   `media-src 'self' ${SUPABASE_ORIGIN} blob:`,
   "font-src 'self' data:",
-  `connect-src 'self' ${SUPABASE_ORIGIN} https://meet.jit.si https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc${isDev ? ' ws://localhost:* wss://localhost:*' : ''}`,
-  "frame-src https://www.youtube.com https://player.vimeo.com https://meet.jit.si https://8x8.vc",
-  "frame-ancestors 'none'",
+  `connect-src 'self' ${SUPABASE_ORIGIN} wss://nkqifjcyudvwfaehgtgp.supabase.co https://meet.jit.si https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc${isDev ? ' ws://localhost:* wss://localhost:*' : ''}`,
+  "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://meet.jit.si https://8x8.vc",
+  "frame-ancestors 'self'",
   "form-action 'self'",
   "base-uri 'self'",
   "object-src 'none'",
@@ -32,10 +32,6 @@ const nextConfig: NextConfig = {
       // 1 haftalik ucretsiz kocluk urun karariyla kaldirildi
       // (20260824213000_remove_free_coaching_and_referral.sql), sayfasi da
       // birlikte gitti. Eski baglantilar Hos Geldin Paketine dusuyor.
-      //
-      // Burada, app/ agacinda redirect() yapan bir page.tsx olarak degil:
-      // o yol gecici (307) yonlendirme uretiyordu ve kalici olarak
-      // kaldirilmis bir adres icin dogru sinyal kalici (308) olan.
       { source: '/ucretsiz-kocluk', destination: '/demo-ders', permanent: true },
     ];
   },
@@ -44,7 +40,7 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(self "https://meet.jit.si" "https://8x8.vc"), microphone=(self "https://meet.jit.si" "https://8x8.vc"), display-capture=(self "https://meet.jit.si" "https://8x8.vc"), geolocation=()' },

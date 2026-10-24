@@ -1,6 +1,4 @@
 import type { GenerateImageRequest, GenerateImageResponse, ImageStylePreset } from '@/types/social'
-import fs from 'fs'
-import path from 'path'
 
 /**
  * DersoLab Resmi Marka & Maskot Görsel Arşivi
@@ -14,24 +12,6 @@ export const DERSOLAB_BRAND_ASSETS = {
   logoModern: '/dersolab-modern-logo.png', // Modern logo banner
   logoLab: '/dersolab-lab-logo.png', // Siber lab logosu
 } as const
-
-// Sunucu tarafında base64 piksel tilki önbelleği
-let cachedFoxBase64: string | null = null
-function getFoxMascotBase64(): string {
-  if (cachedFoxBase64 !== null) return cachedFoxBase64
-  try {
-    const filePath = path.join(process.cwd(), 'public', 'fox-mascot-520.png')
-    if (fs.existsSync(filePath)) {
-      const buffer = fs.readFileSync(filePath)
-      cachedFoxBase64 = `data:image/png;base64,${buffer.toString('base64')}`
-      return cachedFoxBase64
-    }
-  } catch {
-    // fallback
-  }
-  cachedFoxBase64 = ''
-  return cachedFoxBase64
-}
 
 /**
  * DersoLab Orijinal Vektör Piksel Tilkisi (public/tasarim/tilki.svg'den derlenmiştir)
@@ -400,8 +380,6 @@ function getOfficialMascotStudioSvg(
   const cy = height / 2 - 30
   const is916 = height > width
 
-  const base64Png = getFoxMascotBase64()
-
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
   <defs>
     <radialGradient id="mascotHalo" cx="50%" cy="45%" r="65%">
@@ -432,12 +410,8 @@ function getOfficialMascotStudioSvg(
   <circle cx="${cx - 140}" cy="${cy + 130}" r="4" fill="#22c55e" filter="url(#mascotGlow)"/>
   <circle cx="${cx + 150}" cy="${cy + 120}" r="5" fill="#fbbf24" filter="url(#mascotGlow)"/>
 
-  <!-- Resmi DersoLab Piksel Tilkisi (Tam Boy veya Vektör) -->
-  ${
-    base64Png
-      ? `<image href="${base64Png}" x="${cx - 150}" y="${cy - 160}" width="300" height="300" preserveAspectRatio="xMidYMid meet" filter="url(#mascotGlow)"/>`
-      : renderDersoLabPixelFoxVector(cx - 108, cy - 100, 12)
-  }
+  <!-- Resmi DersoLab Piksel Tilkisi (Vektör Sanatı) -->
+  ${renderDersoLabPixelFoxVector(cx - 108, cy - 100, 12)}
 
   <!-- Üst Rozet -->
   <rect x="${cx - 150}" y="${cy - 240}" width="300" height="42" rx="21" fill="rgba(249, 115, 22, 0.2)" stroke="#f97316" stroke-width="1.8" filter="url(#mascotGlow)"/>
@@ -646,17 +620,17 @@ function getProceduralSvg(
 ): string {
   const pLower = (prompt + ' ' + (subject || '')).toLowerCase()
 
-  // 1. Zeki Tilki Maskot Stili veya Maskot İsteği
+  // 1. Yalnızca stil açıkça 'mascot_fox' ise veya kullanıcı açıkça maskot/tilki talep etmişse maskot stili kullan
   if (
     style === 'mascot_fox' ||
-    /(?:maskot|tilki|fox|zeki|karakter|derso)/i.test(pLower)
+    /\b(?:maskot|tilki|fox\s*mascot)\b/i.test(pLower)
   ) {
     return getOfficialMascotStudioSvg(width, height, prompt || subject || 'Zeki Tilki')
   }
 
   // 2. Turlama Taktiği, Deneme Çözümü, Zaman Yönetimi, Sınav Stratejisi
   if (
-    /(?:turlama|takılma|deneme|zaman|süre|soru|net|strateji|sınav|hız|hedef)/i.test(pLower)
+    /(?:turlama|takılma|deneme|zaman|süre|soru|net|strateji|sınav|hız|hedef|taktik)/i.test(pLower)
   ) {
     if (style === 'scientific_diagram') {
       return getScientificBlueprintTurlamaSvg(width, height, prompt || subject || 'Turlama Taktiği')

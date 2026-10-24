@@ -22,11 +22,61 @@ import type {
 } from '@/types/social'
 import { generateSocialImage } from './imageGenerator'
 
+const ACRONYM_MAP: Record<string, string> = {
+  ösym: 'ÖSYM',
+  yks: 'YKS',
+  tyt: 'TYT',
+  ayt: 'AYT',
+  lgs: 'LGS',
+  meb: 'MEB',
+  pdf: 'PDF',
+  ai: 'AI',
+  dersolab: 'DersoLab',
+  lab: 'L.A.B.',
+  cta: 'CTA',
+}
+
+/**
+ * Türkçe kurallarına uygun Başlık Düzeni (Title Case) formatlayıcı
+ * Türkçe'deki i -> İ ve ı -> I dönüşümlerini doğru yapar, ÖSYM/YKS/TYT/AYT/LGS kısaltmalarını korur.
+ */
+export function toTurkishTitleCase(str: string): string {
+  if (!str) return ''
+  const lowercaseWords = new Set(['ve', 'veya', 'ile', 'de', 'da', 'ki', 'için', 'mi', 'mı', 'mu', 'mü'])
+
+  const formatSingleToken = (token: string, isFirst: boolean): string => {
+    const lower = token.toLocaleLowerCase('tr-TR')
+    if (ACRONYM_MAP[lower]) return ACRONYM_MAP[lower]
+    if (!isFirst && lowercaseWords.has(lower)) return lower
+    return token.charAt(0).toLocaleUpperCase('tr-TR') + token.slice(1).toLocaleLowerCase('tr-TR')
+  }
+
+  return str
+    .trim()
+    .split(/\s+/)
+    .map((rawWord, index) => {
+      const match = rawWord.match(/^([^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]*)(.*?)([^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]*)$/)
+      if (!match) return rawWord
+
+      const [, prefix, coreWord, suffix] = match
+      if (!coreWord) return rawWord
+
+      // "TYT/AYT" gibi slash içeren terimleri de ayrı ayrı formatla
+      if (coreWord.includes('/')) {
+        const parts = coreWord.split('/').map((p, pIdx) => formatSingleToken(p, index === 0 && pIdx === 0))
+        return prefix + parts.join('/') + suffix
+      }
+
+      const formatted = formatSingleToken(coreWord, index === 0)
+      return prefix + formatted + suffix
+    })
+    .join(' ')
+}
+
 const SYSTEM_INSTRUCTION = `Sen DersoLab'ın Baş Sosyal Medya İçerik ve Büyüme Uzmanısın (Instagram Growth Lead & Creative Educator).
 
 DERSOLAB HAKKINDA:
 - DersoLab, YKS (TYT / AYT) ve LGS öğrencilerine yönelik yeni nesil bir dijital eğitim, sınav koçluğu ve soru çözüm platformudur.
-- Maskot: Zeki, dinamik ve sevimli Tilki (Fox).
 - Marka Renkleri & Havası: Koyu uzay siyahı, siber camgöbeği (cyan) ve enerjik neon turuncu (orange).
 - Instagram Hesabı: @dersolabegitim
 
@@ -35,9 +85,18 @@ HEDEF KİTLE VE İÇERİK DİLİ:
 - Dil samimi, motive edici, gençlerin ilgisini çeken, sınav terminolojisine ve ders müfredatına hakim (ÖSYM soru tipleri, kazanım mantığı, net artırma, formül ve kavram püf noktaları).
 - Asla yapay, kuru veya kopyala-yapıştır şablon gibi yazma!
 
+TÜRKÇE İMLA VE BAŞLIK KURALLARI (ÇOK ÖNEMLİ):
+- Tüm başlıklar (title, headline, slide başlıkları) kusursuz Türkçe Başlık Düzeninde (Title Case) olmalıdır. ASLA küçük harfle başlamamalıdır.
+- Cümle başları, özel isimler, kısaltmalar (ÖSYM, YKS, TYT, AYT, LGS) doğru büyük harfle yazılmalıdır.
+- "de/da", "ki" bağlaçlarının yazımına ve Türkçe dilbilgisine harfiyen uyulmalıdır.
+- Anlatım akıcı, somut, didaktik ve doğrudan konunun özünü veren zengin içerik olmalıdır; yuvarlak ve boş laflardan kaçınılmalıdır.
+
 ÖZGÜR VE KONUYA ÖZEL İÇERİK ÜRETİMİ (ŞABLONSUZ & YARATICI):
-- KESİNLİKLE kalıplaşmış şablonlara veya yapay baskılara takılıp kalma (örn: her postta sürekli aynı Türkçe paragraf hızı taktiği, hep aynı "Paragrafta süre yetiştiremeyenlerin 3 hatası", gereksiz araç reklamı veya alakasız kitap kulübü ZORLAMA)!
-- Kullanıcı giriş kutusuna ne yazdıysa (Örn: "Trigonometri", "Organik Kimya", "Newton'un Hareket Yasaları", "Hücre Bölünmesi", "Milli Edebiyat", "Paragrafta Hız", "LGS Yeni Nesil Geometri", "Sınav Kaygısı" vb.), içerik %100 O DERS VE KONUNUN GERÇEK KAZANIMI, FORMÜLÜ, MANTIĞI VE PÜF NOKTASI üzerine kurulmalıdır.
+- KESİNLİKLE kalıplaşmış şablonlara veya yapay baskılara takılıp kalma!
+- Kullanıcı giriş kutusuna ne yazdıysa (Örn: "Trigonometri", "Organik Kimya", "Newton'un Hareket Yasaları", "Hücre Bölünmesi", "Milli Edebiyat", "Paragrafta Hız", "Deneme Çözme Taktikleri", "Turlama Yöntemi" vb.), içerik %100 O DERS VE KONUNUN GERÇEK KAZANIMI, FORMÜLÜ, MANTIĞI VE PÜF NOKTASI üzerine kurulmalıdır.
+
+GÖRSEL VE DİYAGRAM İLKESİ:
+- Genel sınav stratejisi veya ders konularında gereksiz yere maskot görseli dayatma! Görseller konuyla tam örtüşen bilimsel şema, karar ağacı, kronometre/süre HUD veya formül infografiği niteliğinde düşünülmelidir.
 
 4 SABİT DERSOLAB TEMASI:
 Slaytlarda ve görsel verilerinde SADECE şu 4 tema varyantını kullan:
@@ -55,11 +114,12 @@ Slaytlarda ve görsel verilerinde SADECE şu 4 tema varyantını kullan:
 ÇIKTI FORMATI:
 Sadece ve sadece istenilen JSON formatında yanıt ver. Markdown blokları (\`\`\`json ... \`\`\`) içine alarak ver.`
 
-// Model Hiyerarşisi:
-// 1. gemini-3.8-flash: Güncel, ultra kararlı ve yüksek kaliteli üretim modeli
-// 2. gemini-flash-lite-latest: Düşük gecikmeli hafif model
+// Model Hiyerarşisi: Hızlı, kararlı ve yüksek kaliteli modeller
 const MODEL_CASCADE = [
   'gemini-3.8-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite',
+  'gemini-4-argon',
   'gemini-flash-lite-latest',
 ]
 
@@ -75,7 +135,7 @@ async function callGenAIModel(
   let lastError: any = null
   for (const model of MODEL_CASCADE) {
     try {
-      return await ai.models.generateContent({
+      const callPromise = ai.models.generateContent({
         model,
         config: {
           systemInstruction: params.systemInstruction,
@@ -84,6 +144,13 @@ async function callGenAIModel(
         },
         contents: params.contents,
       })
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`Timeout: ${model} 12s aşıldı`)), 12000)
+      )
+
+      const result = (await Promise.race([callPromise, timeoutPromise])) as any
+      return result
     } catch (err: any) {
       lastError = err
       console.warn(`[${model}] API uyarısı, sonraki modele geçiliyor:`, err?.message || err)
@@ -261,21 +328,42 @@ Yanıtını kesinlikle şu JSON formatında döndür:
     const cleanJson = extractJsonFromText(rawText)
     const parsed = JSON.parse(cleanJson)
 
+    const rawTitle = parsed.title || 'DersoLab Sosyal Medya İçeriği'
+    const formattedTitle = toTurkishTitleCase(rawTitle)
+
+    const formattedSlides = parsed.carouselSlides?.map((slide: any) => ({
+      ...slide,
+      headline: toTurkishTitleCase(slide.headline || ''),
+      badge: slide.badge ? slide.badge.toLocaleUpperCase('tr-TR') : undefined,
+    }))
+
     const postItem: SocialPostItem = {
       id: `post_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-      title: parsed.title || 'DersoLab Sosyal Medya İçeriği',
+      title: formattedTitle,
       type: request.type,
       topic: request.topic,
-      topicLabel: parsed.topicLabel || 'Eğitim & Sınav',
+      topicLabel: toTurkishTitleCase(parsed.topicLabel || 'Eğitim ve Sınav'),
       status: 'draft',
       caption: parsed.caption || '',
       hashtags: parsed.hashtags || ['#dersolab', '#yks2026'],
       targetAudience: parsed.targetAudience || request.targetGrade || 'YKS Adayları',
       platform: request.platform || (request.type === 'x_thread' ? 'x' : 'instagram'),
       persona: request.persona || 'derso_friendly',
-      carouselSlides: parsed.carouselSlides,
-      singlePostData: parsed.singlePostData,
-      storyData: parsed.storyData,
+      carouselSlides: formattedSlides,
+      singlePostData: parsed.singlePostData
+        ? {
+            ...parsed.singlePostData,
+            headline: toTurkishTitleCase(parsed.singlePostData.headline || ''),
+            badge: parsed.singlePostData.badge?.toLocaleUpperCase('tr-TR'),
+          }
+        : undefined,
+      storyData: parsed.storyData
+        ? {
+            ...parsed.storyData,
+            headline: toTurkishTitleCase(parsed.storyData.headline || ''),
+            badge: parsed.storyData.badge?.toLocaleUpperCase('tr-TR'),
+          }
+        : undefined,
       reelsStoryboard: parsed.reelsStoryboard,
       xThreadData: parsed.xThreadData,
       uploadedImageUrl: request.imageBase64,
@@ -288,16 +376,9 @@ Yanıtını kesinlikle şu JSON formatında döndür:
         const visualSubject = request.subject || parsed.topicLabel || parsed.title
         const visualPrompt = `${parsed.title}: ${parsed.topicLabel || 'Bilimsel infografik ve kavram şeması'}`
         
-        // Genel sınav stratejisi, taktik, rehberlik veya motivasyon konularında DersoLab resmi maskotunu kullan
-        const isMascotTopic =
-          /(?:strateji|taktik|hata|tavsiye|rehberlik|motivasyon|öğrenci|deneme|net|dersolab|yks|lgs)/i.test(
-            visualSubject + ' ' + visualPrompt
-          ) &&
-          !/(?:optik|fizik|kırılma|ışık|türev|integral|matematik|geometri|kimya|organik|molekül|bionic|okuma)/i.test(
-            visualSubject + ' ' + visualPrompt
-          )
-
-        const chosenPreset: ImageStylePreset = isMascotTopic ? 'mascot_fox' : 'cyber_lab'
+        // Yalnızca kullanıcı veya içerik açıkça maskot/tilki talep etmişse maskot stili kullan
+        const isExplicitMascot = /(?:maskot|tilki|fox|karakter)/i.test(visualSubject + ' ' + visualPrompt)
+        const chosenPreset: ImageStylePreset = isExplicitMascot ? 'mascot_fox' : 'cyber_lab'
 
         const img = await generateSocialImage({
           prompt: visualPrompt,
@@ -307,7 +388,14 @@ Yanıtını kesinlikle şu JSON formatında döndür:
         })
         if (img?.imageUrl) {
           postItem.uploadedImageUrl = img.imageUrl
-          if (postItem.carouselSlides && postItem.carouselSlides.length > 0) {
+          // Carousel slaytlarında maddeler (bodyPoints) varsa görsel kutusu metinleri sıkıştırmasın.
+          // Yalnızca slaytta madde yoksa (saf görsel/diyagram slaytı) slayta görsel bağla.
+          if (
+            !isExplicitMascot &&
+            postItem.carouselSlides &&
+            postItem.carouselSlides.length > 0 &&
+            (!postItem.carouselSlides[0].bodyPoints || postItem.carouselSlides[0].bodyPoints.length === 0)
+          ) {
             postItem.carouselSlides[0].uploadedImageUrl = img.imageUrl
             postItem.carouselSlides[0].aiImagePrompt = visualPrompt
           }
@@ -460,47 +548,63 @@ function extractJsonFromText(text: string): string {
 function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem {
   const now = Date.now()
   const custom = (request.customPrompt || request.subTopic || request.subject || '').trim()
-  const focus = custom || (request.topic === 'book_recommendation' ? 'Haftalık Kitap Önerisi' : 'Sınav Başarı Taktikleri')
+  const rawFocus = custom || (request.topic === 'book_recommendation' ? 'Haftalık Kitap Önerisi' : 'Sınav Başarı Taktikleri')
+  const focus = toTurkishTitleCase(rawFocus)
   const displayTitle = focus.length > 55 ? `${focus.slice(0, 52)}...` : focus
-  const badgeText = (request.subject || request.subTopic || (request.targetGrade === 'LGS' ? 'LGS 2026' : 'AYT & TYT')).toUpperCase()
+  const badgeText = (request.subject || request.subTopic || (request.targetGrade === 'LGS' ? 'LGS 2026' : 'AYT & TYT')).toLocaleUpperCase('tr-TR')
+
+  const isDenemeOrTaktik = /(?:deneme|taktik|strateji|süre|zaman|turlama|hata)/i.test(rawFocus)
 
   if (request.type === 'carousel') {
     return {
       id: `post_${now}_car`,
-      title: `${displayTitle} • En Kritik 4 Kural & Püf Nokta`,
+      title: `${displayTitle} • En Kritik 4 Kural & Püf Noktası`,
       type: 'carousel',
       topic: request.topic,
       topicLabel: request.subject || focus,
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `${focus} konusunda sınavda en çok puan kaybettiren hatalar ve net kazandıran pratik çözümler! 🎯\n\nBu taktikleri denemelerinde uygula, soru kaçırma!\n\n💡 DersoLab L.A.B. araçlarıyla eksiklerini kapatmak için profildeki linke tıkla!\n\n#yks2026 #dersolab #ykstayfa #${focus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}`,
+      caption: `${focus} konusunda sınavda en çok puan kaybettiren hatalar ve net kazandıran pratik çözümler! 🎯\n\nBu stratejileri denemelerinde test et, gereksiz net kaybının önüne geç!\n\n💡 DersoLab sınav analiz araçlarıyla eksiklerini kapatmak için profildeki linke tıkla!\n\n#yks2026 #dersolab #ykstayfa #${focus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}`,
       hashtags: ['#yks2026', '#dersolab', '#ykstayfa', '#sinavtaktikleri'],
       carouselSlides: [
         {
           slideNumber: 1,
-          badge: badgeText,
-          headline: `${displayTitle}: En Sık Yapılan Hatalar`,
-          subhead: 'Öğrencilerin en çok puan kaybettiği kritik tuzaklar ve püf noktalar',
-          bodyPoints: [
-            'Temel kavram ve kural mantığını ezberle geçiştirmek',
-            'Soru kökü ve öncüllerdeki kritik detayları atlamak',
-            'Kaydır, netlerini artıracak 3 adımlı stratejiyi öğren 👉',
-          ],
+          badge: `${badgeText} • STRATEJİ`,
+          headline: isDenemeOrTaktik
+            ? `${displayTitle}: En Sık Yapılan 3 Hata`
+            : `${displayTitle}: En Çok Karıştırılan Noktalar`,
+          subhead: 'Öğrencilerin sınavda en çok puan kaybettiği kritik tuzaklar ve çözüm yolları',
+          bodyPoints: isDenemeOrTaktik
+            ? [
+                'Sorunun temel mantığını kavramadan kuralları ezberleyip geçmek',
+                'Soru kökündeki sınırlayıcı koşulları ve öncülleri dikkatsizce okumak',
+                'Kaydır; netlerini artıracak 3 adımlı sınav stratejisini keşfet 👉',
+              ]
+            : [
+                'Konunun temel kavram ve mantığını yüzeysel ezberle geçiştirmek',
+                'ÖSYM soru kalıplarındaki çeldirici kelime oyunlarını fark edememek',
+                'Kaydır; net kazandıran adımları sırayla incele 👉',
+              ],
           highlightTag: 'KAYDETMELİK',
           footerNote: 'DersoLab Sınav Laboratuvarı • @dersolabegitim',
-          uploadedImageUrl: '/fox-mascot.png',
           themeVariant: 'lab_dark',
         },
         {
           slideNumber: 2,
           badge: '1. ALTIN KURAL',
-          headline: 'Soru Kökünü ve Anahtar Kavramları İyi Tara',
+          headline: isDenemeOrTaktik ? 'Turlama Tekniğini Disiplinle Uygula' : 'Soru Kökünü ve Öncülleri İyi Tara',
           subhead: `${focus} sorularında ÖSYM tuzaklarına düşmemek için önlem al!`,
-          bodyPoints: [
-            'Soru kökündeki sınırlayıcı koşulları mutlaka belirle.',
-            'Temel formül ve kuralları soru üzerinde adım adım uygula.',
-            'Şıkları elerken en net ve kesin verilerden başla.',
-          ],
+          bodyPoints: isDenemeOrTaktik
+            ? [
+                '1. Turda yalnızca doğrudan çözüm yolunu gördüğün soruları çöz.',
+                '60 saniye içinde çıkmayan sorularla inatlaşma, yanına işaret koyup geç.',
+                'Zor sorulara takılıp sınavın kolay sorularını kaçırma riskini sıfırla.',
+              ]
+            : [
+                'Soru kökündeki "kesinlikle", "olamaz" gibi sınırlayıcı koşulları işaretle.',
+                'Temel formül ve kuralları soru üzerinde adım adım uygula.',
+                'Şıkları elerken en net ve kesin verilerden başla.',
+              ],
           highlightTag: '+ NET',
           footerNote: 'DersoLab Taktikleri',
           themeVariant: 'neon_orange',
@@ -508,14 +612,20 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
         {
           slideNumber: 3,
           badge: '2. ALTIN KURAL',
-          headline: 'Mantığı Özümse ve Çeldiricileri Ayıkla',
-          subhead: 'Ezberleme, konunun altında yatan mantığı kavra',
-          bodyPoints: [
-            'Hangi soru tipinde hangi çözüm yolunun çalışacağını bil.',
-            'Denemelerdeki hatalarını analiz et ve not al.',
-            'DersoLab L.A.B. modülleriyle benzer soru pratikleri yap.',
-          ],
-          highlightTag: 'PÜF NOKTA',
+          headline: isDenemeOrTaktik ? 'Hata Defteri Tut ve Deneme Analizi Yap' : 'Mantığı Özümse ve Çeldiricileri Ayıkla',
+          subhead: 'Ezberleme; konunun altında yatan soru çözüm mantığını kavra',
+          bodyPoints: isDenemeOrTaktik
+            ? [
+                'Deneme biter bitmez yanlış ve boş bıraktığın soruların konusunu yaz.',
+                'İşlem hatası mı, bilgi eksikliği mi yoksa dikkatsizlik mi olduğunu tespit et.',
+                'Hatalı olduğun soru tiplerini 3 gün sonra tekrar çözerek kalıcılığı pekiştir.',
+              ]
+            : [
+                'Hangi soru tipinde hangi formülün çalışacağını soru öncesinde kestir.',
+                'Çeldiricileri doğrudan elemek için soru verilerini grafikle eşleştir.',
+                'DersoLab soru çözüm modülleriyle benzer soru pratikleri yap.',
+              ],
+          highlightTag: 'PÜF NOKTASI',
           footerNote: 'DersoLab L.A.B.',
           themeVariant: 'cyan_cyber',
         },
@@ -523,18 +633,17 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
           slideNumber: 4,
           badge: 'ÖZET & HAREKETE GEÇ',
           headline: 'Bu Stratejiyi Hemen Denemende Test Et!',
-          subhead: 'Unutmamak için bu postu kaydet ve çalışma arkadaşına gönder.',
+          subhead: 'Unutmamak için bu gönderiyi kaydet ve arkadaşına gönder.',
           bodyPoints: [
-            '💾 Kaydetmeyi unutma!',
-            '🦊 DersoLab L.A.B. araçlarını ücretsiz test et',
-            '🔗 Biyodaki linkten hemen başla',
+            '💾 Kaydetmeyi ve denemeye girmeden önce göz gezdirmeyi unutma!',
+            '🦊 DersoLab soru çözüm araçlarıyla zayıf konularını güçlendir.',
+            '🔗 Profildeki linke tıklayarak deneme pratiklerine hemen başla.',
           ],
-          highlightTag: 'LİNK BİYODA',
+          highlightTag: 'KAYDET',
           footerNote: '@dersolabegitim',
           themeVariant: 'purple_matrix',
         },
       ],
-      uploadedImageUrl: '/fox-mascot.png',
       createdAt: new Date().toISOString(),
     }
   }
@@ -542,7 +651,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
   if (request.type === 'reels') {
     return {
       id: `post_${now}_reel`,
-      title: `Reels: 30 Saniyede ${displayTitle} Hilesi`,
+      title: `Reels: 30 Saniyede ${displayTitle} Taktiği`,
       type: 'reels',
       topic: request.topic,
       topicLabel: `Reels • ${focus}`,
@@ -555,13 +664,13 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
         visualDirection: 'Ön planda dinamik anlatıcı, arkada DersoLab L.A.B. soru çözüm ekranı. Kritik noktalar parlak yeşil ve turuncu ile vurgulanır.',
         spokenScript: `${focus} konusunda ÖSYM'nin her yıl yokladığı en kritik nokta burada gizli! Soruyu çözerken yapılan en büyük hata öncülleri aceleyle okumak. Şifre çok basit: Temel kuralı doğrudan uygula ve çeldiricileri adım adım ele. DersoLab L.A.B.'a gir, benzer soruları anında çöz. Profildeki linkten ücretsiz dene!`,
         onScreenText: [
-          `🚨 ${displayTitle.toUpperCase()}`,
+          `🚨 ${displayTitle.toLocaleUpperCase('tr-TR')}`,
           '❌ Hata: Ezbere çözmek',
           '✅ Çözüm: Kuralı adım adım uygula',
           'Link Biyoda 🦊',
         ],
-        musicAudioVibe: 'Enerjik TikTok/Instagram trend hip-hop veya synthwave beat',
-        callToAction: `DersoLab L.A.B. modüllerini hemen profildeki linkten ücretsiz dene, ${focus} netlerini katla!`,
+        musicAudioVibe: 'Enerjik TikTok/Instagram trend beat',
+        callToAction: `DersoLab soru çözüm araçlarını hemen profildeki linkten ücretsiz dene, ${focus} netlerini katla!`,
       },
       createdAt: new Date().toISOString(),
     }

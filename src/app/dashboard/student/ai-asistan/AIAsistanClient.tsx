@@ -19,6 +19,12 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import {
+  getMyAiQuestions,
+  saveAiQuestion,
+  toggleAiQuestionFavorite,
+  deleteAiQuestion,
+} from '@/actions/ai-questions'
 
 const SUBJECTS = [
   'TYT Matematik',
@@ -96,7 +102,7 @@ export function AIAsistanClient() {
   const solutionRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Yerel hafızadan geçmişi yükle
+  // Yerel hafızadan ve buluttan (Supabase) geçmişi yükle
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
@@ -106,30 +112,77 @@ export function AIAsistanClient() {
     } catch {
       // LocalStorage hatasını yut
     }
+
+    getMyAiQuestions().then((remoteItems) => {
+      if (remoteItems && remoteItems.length > 0) {
+        setHistory((prev) => {
+          const mergedMap = new Map<string, SavedSolution>()
+          for (const item of remoteItems) {
+            mergedMap.set(item.question, item)
+          }
+          for (const item of prev) {
+            if (!mergedMap.has(item.question)) {
+              mergedMap.set(item.question, item)
+            }
+          }
+          const merged = Array.from(mergedMap.values())
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .slice(0, 50)
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
+          } catch {}
+          return merged
+        })
+      }
+    })
   }, [])
 
-  // Geçmişi kaydet
+  // Geçmişi kaydet (hem yerel önbellek hem Supabase bulut)
   const saveToHistory = (newEntry: SavedSolution) => {
     setHistory((prev) => {
       const filtered = prev.filter((item) => item.question !== newEntry.question)
-      const updated = [newEntry, ...filtered].slice(0, 30) // Son 30 soru
+      const updated = [newEntry, ...filtered].slice(0, 50)
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
       } catch {}
       return updated
+    })
+
+    saveAiQuestion({
+      subject: newEntry.subject,
+      question: newEntry.question,
+      solution: newEntry.solution,
+    }).then((res) => {
+      if (res.success && res.id) {
+        setHistory((prev) => {
+          const updated = prev.map((item) =>
+            item.id === newEntry.id ? { ...item, id: res.id! } : item
+          )
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+          } catch {}
+          return updated
+        })
+      }
     })
   }
 
   const toggleFavorite = (id: string) => {
+    let nextState = false
     setHistory((prev) => {
-      const updated = prev.map((item) =>
-        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
-      )
+      const updated = prev.map((item) => {
+        if (item.id === id) {
+          nextState = !item.isFavorite
+          return { ...item, isFavorite: nextState }
+        }
+        return item
+      })
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
       } catch {}
       return updated
     })
+    toggleAiQuestionFavorite(id, nextState)
   }
 
   const deleteFromHistory = (id: string) => {
@@ -141,6 +194,7 @@ export function AIAsistanClient() {
       toast.success('Soru defterinden silindi.')
       return updated
     })
+    deleteAiQuestion(id)
   }
 
   function loadExample() {

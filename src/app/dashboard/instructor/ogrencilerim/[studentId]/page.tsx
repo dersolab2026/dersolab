@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getStudentInsight } from '@/lib/students/get-student-insight'
 import { getMyTargets } from '@/lib/students/get-my-targets'
 import { getIntake } from '@/lib/coaching/get-intake'
+import { getStudentAiQuestions } from '@/actions/ai-questions'
 import { StudentIntakeSummary } from '@/components/instructor/StudentIntakeSummary'
 import { RiskSignalList } from '@/components/instructor/RiskSignalList'
 import { riskSinyalleri } from '@/lib/coaching/risk-signals'
@@ -36,8 +37,11 @@ export default async function StudentInsightPage({
   const veri = await getStudentInsight(studentId)
   if (!veri) notFound()
 
-  const [targets, intake] = await Promise.all([getMyTargets(studentId), getIntake(studentId)])
-
+  const [targets, intake, aiQuestions] = await Promise.all([
+    getMyTargets(studentId),
+    getIntake(studentId),
+    getStudentAiQuestions(studentId),
+  ])
 
   // Sinyaller sunucuda hesaplaniyor; bugun de sunucudan.
   const bugun = new Date().toISOString().slice(0, 10)
@@ -148,6 +152,30 @@ export default async function StudentInsightPage({
         logs={veri.studyLogs}
         dersToplamlari={veri.dersToplamlari}
       />
+
+      {aiQuestions.length > 0 && (
+        <div className={`${PIXEL_CARD} p-5 space-y-3`}>
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-slate-200">AI Soru Defteri (Takıldığı Sorular)</h3>
+            <span className="text-xs font-bold text-slate-400">{aiQuestions.length} kayıt</span>
+          </div>
+          <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+            {aiQuestions.map((q) => (
+              <div key={q.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="px-2 py-0.5 rounded-md bg-orange-500/15 border border-orange-500/30 text-orange-300 text-[11px] font-bold">
+                    {q.subject}
+                  </span>
+                  <span className="text-[11px] text-slate-400">
+                    {new Date(q.timestamp).toLocaleDateString('tr-TR')}
+                  </span>
+                </div>
+                <p className="text-xs font-semibold text-slate-200 line-clamp-2">{q.question}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </DashboardPageShell>
   )
 }

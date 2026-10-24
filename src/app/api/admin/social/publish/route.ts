@@ -4,6 +4,20 @@ import { getInstagramConfig, publishToInstagram } from '@/lib/social/instagram'
 import { getTikTokConfig, publishToTikTok } from '@/lib/social/tiktok'
 
 export async function GET() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 })
+  }
+
+  const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+  if (userRow?.role !== 'admin') {
+    return NextResponse.json({ error: 'Bu işlem yalnızca sistem yöneticilerine açıktır.' }, { status: 403 })
+  }
+
   const igConfig = getInstagramConfig()
   const ttConfig = getTikTokConfig()
 
