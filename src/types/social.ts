@@ -193,6 +193,7 @@ export interface SocialPostItem {
   publishedAt?: string | null
   createdAt: string
   notes?: string
+  sourcePrompt?: string
 }
 
 export interface GeneratePostRequest {

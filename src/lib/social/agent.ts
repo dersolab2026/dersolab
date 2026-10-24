@@ -13,6 +13,7 @@ import type {
   ReelsStoryboard,
   SimulatedComment,
   SinglePostData,
+  SlideThemeVariant,
   SocialPlatform,
   SocialPostItem,
   ViralityAnalysis,
@@ -364,6 +365,15 @@ export const CURATED_BOOK_PAIRS = [
   },
 ]
 
+const VARIATION_ANGLES = [
+  '1. AÇI (TUZAKLAR & YANILGILAR): Öğrencilerin bu konuda en sık düştüğü çeldiriciler, kavram yanılgıları ve sınav tuzakları.',
+  '2. AÇI (PRATİK KESTİRME & HIZ): Soruları yarı sürede çözdüren pratik metot, kodlama ve zaman kazandıran şifreler.',
+  '3. AÇI (ÖSYM SORU RÖNTGENİ): Son yıllarda sınavda çıkan soru tiplerinin analizi ve soru kökündeki anahtar kelimeler.',
+  '4. AÇI (TEMEL FORMÜL & KAVRAM HARİTASI): Ezber bozan mantıksal ispat, neden-sonuç ilişkisi ve adım adım çözüm şeması.',
+  '5. AÇI (DENEME STRATEJİSİ & +NET REHBERİ): Denemelerde bu konudan soru kaçırmamak için uygulanacak kontrol listesi.',
+  '6. AÇI (KARŞILAŞTIRMALI ÖZET & İSTİSNALAR): En çok karıştırılan iki kavramın karşılaştırması ve sınavda çıkan istisnalar.',
+]
+
 /**
  * Tekil Instagram Gönderisi Üretir
  */
@@ -382,6 +392,8 @@ export async function generateSocialPost(request: GeneratePostRequest): Promise<
       request.topic === 'book_recommendation' ||
       /kitap|roman|okuma kulübü|pazar hikayesi|kitap öneri/i.test(topicFocus)
     const chosenSticker = request.storyStickerType || 'none'
+    const seedNum = Math.max(1, request.variationSeed || 1)
+    const selectedAngle = VARIATION_ANGLES[(seedNum - 1) % VARIATION_ANGLES.length]
 
     const userPrompt = `
 Lütfen aşağıdaki parametrelere göre yüksek etkileşimli ve öğretici 1 adet Instagram içeriği üret:
@@ -389,10 +401,11 @@ Lütfen aşağıdaki parametrelere göre yüksek etkileşimli ve öğretici 1 ad
 - İÇERİK KONUSU VEYA TALİMAT: "${topicFocus}"
 - Hedef Kitle: ${request.targetGrade || 'YKS (TYT/AYT)'}
 - Anlatım Tonu: ${request.tone || 'energetic'}
+- İSTENEN ANLATIM AÇISI / YAKLAŞIM: ${selectedAngle}
 ${request.customPrompt && request.customPrompt !== topicFocus ? `- Ek Not / Talimat: ${request.customPrompt}` : ''}
 ${
   request.excludeSummary
-    ? `\n⚠️ ÇOK ÖNEMLİ - YENİDEN ÜRETİM / FARKLI ALTERNATİF TALEBİ:\nKullanıcı bir önceki içeriği beğenmedi ve "Yeniden Dene" butonuna bastı! Daha önce gösterilen şu içerikleri, soruları veya kitapları KESİNLİKLE TEKRAR ETME, tamamen FARKLI ve YENİ alternatifler/kitaplar/sorular seç:\n"${request.excludeSummary}"\n(Varyasyon Tohumu: ${request.variationSeed || Date.now()})\n`
+    ? `\n⚠️ ÇOK ÖNEMLİ - YENİDEN ÜRETİM / FARKLI ALTERNATİF TALEBİ:\nKullanıcı aynı konu ("${topicFocus}") için "Yeniden Dene" butonuna bastı ve FARKLI bir alternatif görmek istiyor! Daha önce üretilen şu başlıkları, maddeleri, soruları veya örnekleri KESİNLİKLE TEKRAR ETME; aynı konuyu tamamen FARKLI bir başlık, farklı soru/örnek ve farklı alt maddelerle ele al:\n"${request.excludeSummary}"\n(Alternatif No: ${seedNum})\n`
     : ''
 }
 
@@ -633,6 +646,7 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       xThreadData: parsed.xThreadData,
       uploadedImageUrl: request.imageBase64,
       createdAt: new Date().toISOString(),
+      sourcePrompt: topicFocus,
     }
 
     // Otomatik AI Görsel Entegrasyonu (Metinden Ziyade Görsel Odaklı Tasarım)
@@ -816,128 +830,239 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
   const focus = toTurkishTitleCase(rawFocus)
   const displayTitle = focus.length > 55 ? `${focus.slice(0, 52)}...` : focus
   const badgeText = (request.subject || request.subTopic || (request.targetGrade === 'LGS' ? 'LGS 2027' : 'AYT & TYT')).toLocaleUpperCase('tr-TR')
-
-  const isDenemeOrTaktik = /(?:deneme|taktik|strateji|süre|zaman|turlama|hata)/i.test(rawFocus)
+  const themes: SlideThemeVariant[] = ['lab_dark', 'neon_orange', 'cyan_cyber', 'purple_matrix']
+  const vIdx = Math.abs((request.variationSeed ?? Math.floor(now / 1000)) - 1)
+  const t1 = themes[vIdx % 4]
+  const t2 = themes[(vIdx + 1) % 4]
+  const t3 = themes[(vIdx + 2) % 4]
+  const t4 = themes[(vIdx + 3) % 4]
 
   if (request.type === 'carousel') {
-    return {
-      id: `post_${now}_car`,
-      title: `${displayTitle} • En Kritik 4 Kural & Püf Noktası`,
-      type: 'carousel',
-      topic: request.topic,
-      topicLabel: request.subject || focus,
-      status: 'draft',
-      targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `${focus} konusunda sınavda en çok puan kaybettiren hatalar ve net kazandıran pratik çözümler! 🎯\n\nBu stratejileri denemelerinde test et, gereksiz net kaybının önüne geç!\n\n💡 DersoLab sınav analiz araçlarıyla eksiklerini kapatmak için profildeki linke tıkla!\n\n#yks2027 #dersolab #ykstayfa #${focus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}`,
-      hashtags: ['#yks2027', '#dersolab', '#ykstayfa', '#sinavtaktikleri'],
-      carouselSlides: [
-        {
-          slideNumber: 1,
-          badge: `${badgeText} • STRATEJİ`,
-          headline: isDenemeOrTaktik
-            ? `${displayTitle}: En Sık Yapılan 3 Hata`
-            : `${displayTitle}: En Çok Karıştırılan Noktalar`,
-          subhead: 'Öğrencilerin sınavda en çok puan kaybettiği kritik tuzaklar ve çözüm yolları',
-          bodyPoints: isDenemeOrTaktik
-            ? [
-                'Sorunun temel mantığını kavramadan kuralları ezberleyip geçmek',
-                'Soru kökündeki sınırlayıcı koşulları ve öncülleri dikkatsizce okumak',
-                'Kaydır; netlerini artıracak 3 adımlı sınav stratejisini keşfet 👉',
-              ]
-            : [
-                'Konunun temel kavram ve mantığını yüzeysel ezberle geçiştirmek',
-                'ÖSYM soru kalıplarındaki çeldirici kelime oyunlarını fark edememek',
-                'Kaydır; net kazandıran adımları sırayla incele 👉',
-              ],
-          highlightTag: 'KAYDETMELİK',
-          footerNote: 'DersoLab Sınav Laboratuvarı • @dersolabegitim',
-          themeVariant: 'lab_dark',
-        },
-        {
-          slideNumber: 2,
-          badge: '1. ALTIN KURAL',
-          headline: isDenemeOrTaktik ? 'Turlama Tekniğini Disiplinle Uygula' : 'Soru Kökünü ve Öncülleri İyi Tara',
-          subhead: `${focus} sorularında ÖSYM tuzaklarına düşmemek için önlem al!`,
-          bodyPoints: isDenemeOrTaktik
-            ? [
-                '1. Turda yalnızca doğrudan çözüm yolunu gördüğün soruları çöz.',
-                '60 saniye içinde çıkmayan sorularla inatlaşma, yanına işaret koyup geç.',
-                'Zor sorulara takılıp sınavın kolay sorularını kaçırma riskini sıfırla.',
-              ]
-            : [
-                'Soru kökündeki "kesinlikle", "olamaz" gibi sınırlayıcı koşulları işaretle.',
-                'Temel formül ve kuralları soru üzerinde adım adım uygula.',
-                'Şıkları elerken en net ve kesin verilerden başla.',
-              ],
-          highlightTag: '+ NET',
-          footerNote: 'DersoLab Taktikleri',
-          themeVariant: 'neon_orange',
-        },
-        {
-          slideNumber: 3,
-          badge: '2. ALTIN KURAL',
-          headline: isDenemeOrTaktik ? 'Hata Defteri Tut ve Deneme Analizi Yap' : 'Mantığı Özümse ve Çeldiricileri Ayıkla',
-          subhead: 'Ezberleme; konunun altında yatan soru çözüm mantığını kavra',
-          bodyPoints: isDenemeOrTaktik
-            ? [
-                'Deneme biter bitmez yanlış ve boş bıraktığın soruların konusunu yaz.',
-                'İşlem hatası mı, bilgi eksikliği mi yoksa dikkatsizlik mi olduğunu tespit et.',
-                'Hatalı olduğun soru tiplerini 3 gün sonra tekrar çözerek kalıcılığı pekiştir.',
-              ]
-            : [
-                'Hangi soru tipinde hangi formülün çalışacağını soru öncesinde kestir.',
-                'Çeldiricileri doğrudan elemek için soru verilerini grafikle eşleştir.',
-                'DersoLab soru çözüm modülleriyle benzer soru pratikleri yap.',
-              ],
-          highlightTag: 'PÜF NOKTASI',
-          footerNote: 'DersoLab L.A.B.',
-          themeVariant: 'cyan_cyber',
-        },
-        {
-          slideNumber: 4,
-          badge: 'ÖZET & HAREKETE GEÇ',
-          headline: 'Bu Stratejiyi Hemen Denemende Test Et!',
-          subhead: 'Unutmamak için bu gönderiyi kaydet ve arkadaşına gönder.',
-          bodyPoints: [
-            '💾 Kaydetmeyi ve denemeye girmeden önce göz gezdirmeyi unutma!',
-            '🦊 DersoLab soru çözüm araçlarıyla zayıf konularını güçlendir.',
-            '🔗 Profildeki linke tıklayarak deneme pratiklerine hemen başla.',
-          ],
-          highlightTag: 'KAYDET',
-          footerNote: '@dersolabegitim',
-          themeVariant: 'purple_matrix',
-        },
-      ],
-      createdAt: new Date().toISOString(),
-    }
+    const carouselAngles = [
+      {
+        titleSuffix: 'En Sık Yapılan 3 Hata & Çözümü',
+        coverHeadline: `${displayTitle}: Adayların En Sık Düştüğü 3 Tuzak`,
+        coverSub: 'ÖSYM sınavlarında gereksiz net kaybettiren kritik hatalar ve kurtarıcı adımlar',
+        coverPoints: [
+          'Konunun mantığını kavramadan yalnızca formül veya kural ezberlemek',
+          'Soru kökündeki olumsuz ve sınırlayıcı ifadeleri gözden kaçırmak',
+          'Kaydır; netlerini kurtaracak 3 adımlı çözümü keşfet 👉',
+        ],
+        s2Badge: '1. KRİTİK TUZAK',
+        s2Headline: 'Soru Kökü ve Öncül Analizi',
+        s2Sub: `${focus} sorularında çeldirici şıklara düşmemek için ilk kural`,
+        s2Points: [
+          'Soru kökündeki "kesinlikle", "daima", "olamaz" kelimelerini daire içine al.',
+          'İlk tanıdık gelen çeldirici şıkka atlamadan önce tüm öncülleri sına.',
+          'Verilen bilgiyi kendi yorumunu katmadan yalnızca öncüle göre değerlendir.',
+        ],
+        s3Badge: '2. PRATİK ÇÖZÜM',
+        s3Headline: 'Adım Adım Doğru Modelleme',
+        s3Sub: 'Zaman kazandıran sistematik soru çözüm yaklaşımı',
+        s3Points: [
+          'Sorudaki verileri zihinde tutmak yerine kenara küçük şema/tablo halinde yaz.',
+          'İki şık arasında kaldığında soru kökünün anahtar kavramına geri dön.',
+          'Deneme sonrasında bu konudaki hatalarını mutlaka analiz defterine not et.',
+        ],
+      },
+      {
+        titleSuffix: 'Süre Kazandıran Hızlı Çözüm Taktikleri',
+        coverHeadline: `${displayTitle}: 45 Saniyede Çözüm Stratejisi`,
+        coverSub: 'Denemelerde hızını 2 katına çıkaracak pratik yaklaşım ve ipuçları',
+        coverPoints: [
+          `${focus} sorularında vakit kaybetmeden doğru cevaba ulaşma yöntemi`,
+          'Uzun işlemleri ve tekrar okumaları ortadan kaldıran teknik',
+          'Kaydır; sınavda 10 dakika kazandıran taktiği öğren 👉',
+        ],
+        s2Badge: 'HIZ KURALI #1',
+        s2Headline: 'Önce Hedefi Belirle, Sonra Veriyi Tara',
+        s2Sub: 'Beynine soruda ne araması gerektiğini baştan söyle!',
+        s2Points: [
+          'Soruyu okumaya başlamadan önce neyin istendiğini netleştir.',
+          'Şıkların yapısına hızlıca göz atarak çözüm stratejini seç.',
+          'Gereksiz ara işlemlere girmeden doğrudan aranan değere odaklan.',
+        ],
+        s3Badge: 'HIZ KURALI #2',
+        s3Headline: 'Turlama ve Eleme Tekniği',
+        s3Sub: 'İnatlaşma, ele ve puanı cebine koy',
+        s3Points: [
+          'İlk 45 saniyede çözüm yolu görünmeyen soruya işaret koyup tur sonuna bırak.',
+          'Kesin yanlış olan 2 şıkkı eleyerek doğru cevap olasılığını %50 üzerine çıkar.',
+          'DersoLab L.A.B. modülleriyle süre tutarak günlük mini antrenman yap.',
+        ],
+      },
+      {
+        titleSuffix: 'ÖSYM Soru Röntgeni & Banko Kalıplar',
+        coverHeadline: `${displayTitle}: ÖSYM Bu Konuyu Nasıl Sorar?`,
+        coverSub: 'Son yılların çıkmış soru kalıpları ve soru yazarlarının gizli şifreleri',
+        coverPoints: [
+          'ÖSYM komisyonunun her yıl yokladığı temel kazanım noktaları',
+          'Klasik bilginin yeni nesil senaryolara dönüştürülme mantığı',
+          'Kaydır; sınavda karşına çıkacak soru kalıbını şimdiden gör 👉',
+        ],
+        s2Badge: 'ÖSYM KALIBI #1',
+        s2Headline: 'Kavramsal Derinlik & Yorum Gücü',
+        s2Sub: 'Ezber bilgiyi değil, kavramlar arası ilişkiyi ölçen sorular',
+        s2Points: [
+          'ÖSYM doğrudan tanım sormak yerine günlük hayat veya deney senaryosu verir.',
+          'Değişkenler arasındaki doğru veya ters orantıyı grafik üzerinden okumanı ister.',
+          'Temel kuralın hangi özel durumlarda değiştiğini (istisnaları) mutlaka bil.',
+        ],
+        s3Badge: 'ÖSYM KALIBI #2',
+        s3Headline: 'Çoklu Öncül (I, II ve III) Soruları',
+        s3Sub: 'Adayların en çok elendiği öncüllü soruların şifresi',
+        s3Points: [
+          'En emin olduğun öncülden başlayarak şıklarda hızlı eleme yap.',
+          'Uç değerleri veya sınır durumları (0, 1, negatif değer vb.) mutlaka kontrol et.',
+          'Benzer çıkmış soruları sınavdan önce en az 2 kez analiz ederek çöz.',
+        ],
+      },
+      {
+        titleSuffix: 'Kalıcı Hafıza & Kodlama Rehberi',
+        coverHeadline: `${displayTitle}: Asla Unutturmayan Kodlama Tekniği`,
+        coverSub: 'Sınav anında heyecanlansan bile bilgiyi anında geri çağıran çalışma metodu',
+        coverPoints: [
+          `${focus} konusunu bir kez çalışıp sınav gününe kadar unutmamanın yolu`,
+          'Görsel hafıza ve aralıklı tekrar ile kalıcı öğrenme',
+          'Kaydır; beynine kazıyacak 3 adımlı sistemi uygula 👉',
+        ],
+        s2Badge: 'KODLAMA ADIMI #1',
+        s2Headline: 'Görselleştir ve Kendi Cümlenle Anlat',
+        s2Sub: 'Feynman tekniği ile konuyu %100 içselleştir',
+        s2Points: [
+          'Konuyu çalıştıktan sonra kitabı kapatıp bir arkadaşına anlatır gibi özetle.',
+          'Takıldığın yer, sınavda soru kaçıracağın gerçek eksik noktandır.',
+          'Kavramları tek sayfalık renkli bir zihin haritasına dönüştür.',
+        ],
+        s3Badge: 'KODLAMA ADIMI #2',
+        s3Headline: '3-7-21 Aralıklı Tekrar Kuralı',
+        s3Sub: 'Unutma eğrisini sıfırlayan bilimsel tekrar takvimi',
+        s3Points: [
+          'Konuyu öğrendikten 3 gün sonra ilk tarama testini çöz.',
+          '7. günde yanlış yaptığın soru tiplerine geri dönüp sağlamasını yap.',
+          '21. günde karma branş denemesiyle konuyu tamamen mühürle.',
+        ],
+      },
+    ]
+    const angle = carouselAngles[vIdx % carouselAngles.length]
+
+    return attachGrokEnhancements(
+      {
+        id: `post_${now}_car_${vIdx}`,
+        title: `${displayTitle} • ${angle.titleSuffix}`,
+        type: 'carousel',
+        topic: request.topic,
+        topicLabel: request.subject || focus,
+        status: 'draft',
+        targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
+        caption: `${focus} (${angle.titleSuffix}) rehberimiz yayında! 🎯🦊\n\nBu adımları denemelerinde uygula, netlerini şansa bırakma!\n\n💡 DersoLab sınav analiz araçlarıyla eksiklerini kapatmak için profildeki linke tıkla!\n\n#yks2027 #dersolab #ykstayfa #${focus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}`,
+        hashtags: ['#yks2027', '#dersolab', '#ykstayfa', '#sinavtaktikleri'],
+        carouselSlides: [
+          {
+            slideNumber: 1,
+            badge: `${badgeText} • ALTERNATİF #${(vIdx % carouselAngles.length) + 1}`,
+            headline: angle.coverHeadline,
+            subhead: angle.coverSub,
+            bodyPoints: angle.coverPoints,
+            highlightTag: 'KAYDETMELİK',
+            footerNote: 'DersoLab Sınav Laboratuvarı • @dersolabegitim',
+            themeVariant: t1,
+          },
+          {
+            slideNumber: 2,
+            badge: angle.s2Badge,
+            headline: angle.s2Headline,
+            subhead: angle.s2Sub,
+            bodyPoints: angle.s2Points,
+            highlightTag: '+ NET',
+            footerNote: 'DersoLab Taktikleri',
+            themeVariant: t2,
+          },
+          {
+            slideNumber: 3,
+            badge: angle.s3Badge,
+            headline: angle.s3Headline,
+            subhead: angle.s3Sub,
+            bodyPoints: angle.s3Points,
+            highlightTag: 'PÜF NOKTASI',
+            footerNote: 'DersoLab L.A.B.',
+            themeVariant: t3,
+          },
+          {
+            slideNumber: 4,
+            badge: 'ÖZET & HAREKETE GEÇ',
+            headline: 'Bu Stratejiyi Hemen Denemende Test Et!',
+            subhead: 'Unutmamak için bu gönderiyi kaydet ve arkadaşına gönder.',
+            bodyPoints: [
+              '💾 Kaydetmeyi ve denemeye girmeden önce göz gezdirmeyi unutma!',
+              '🦊 DersoLab soru çözüm araçlarıyla zayıf konularını güçlendir.',
+              '🔗 Profildeki linke tıklayarak deneme pratiklerine hemen başla.',
+            ],
+            highlightTag: 'KAYDET',
+            footerNote: '@dersolabegitim',
+            themeVariant: t4,
+          },
+        ],
+        createdAt: new Date().toISOString(),
+        sourcePrompt: rawFocus,
+      },
+      request.persona
+    )
   }
 
   if (request.type === 'reels') {
-    return {
-      id: `post_${now}_reel`,
-      title: `Reels: 30 Saniyede ${displayTitle} Taktiği`,
-      type: 'reels',
-      topic: request.topic,
-      topicLabel: `Reels • ${focus}`,
-      status: 'draft',
-      targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `ÖSYM'nin en çok sorduğu ve adayların sıklıkla takıldığı ${focus} konusu! 🤯\n\nSen bu soruda hangi yöntemi kullanıyorsun? Yorumlarda cevabını yaz! 👇\n\n#reels #yksreels #yks2027 #dersolab #ykstayfa`,
-      hashtags: ['#reels', '#yksreels', '#yks2027', '#dersolab'],
-      reelsStoryboard: {
-        hook3s: `Kameraya bakarak ekrana "${displayTitle}" yazısını vur: "Eğer bu konuyu hala böyle çözüyorsan sınavda netlerin gidebilir!"`,
-        visualDirection: 'Ön planda dinamik anlatıcı, arkada DersoLab L.A.B. soru çözüm ekranı. Kritik noktalar parlak yeşil ve turuncu ile vurgulanır.',
-        spokenScript: `${focus} konusunda ÖSYM'nin her yıl yokladığı en kritik nokta burada gizli! Soruyu çözerken yapılan en büyük hata öncülleri aceleyle okumak. Şifre çok basit: Temel kuralı doğrudan uygula ve çeldiricileri adım adım ele. DersoLab L.A.B.'a gir, benzer soruları anında çöz. Profildeki linkten ücretsiz dene!`,
-        onScreenText: [
-          `🚨 ${displayTitle.toLocaleUpperCase('tr-TR')}`,
-          '❌ Hata: Ezbere çözmek',
-          '✅ Çözüm: Kuralı adım adım uygula',
-          'Link Biyoda 🦊',
-        ],
-        musicAudioVibe: 'Enerjik TikTok/Instagram trend beat',
-        callToAction: `DersoLab soru çözüm araçlarını hemen profildeki linkten ücretsiz dene, ${focus} netlerini katla!`,
+    const reelsAngles = [
+      {
+        title: `Reels: 30 Saniyede ${displayTitle} Sırrı`,
+        hook: `Eğer ${displayTitle} sorularını hala uzun yoldan çözüyorsan sınavda 10 dakikan boşa gidiyor!`,
+        visual: `Ön planda enerjik konuşmacı, arkada ${focus} kavram şeması ve neon süre sayacı.`,
+        script: `${focus} konusunda ÖSYM'nin her yıl yokladığı en kritik nokta burada gizli! Soruyu çözerken yapılan en büyük hata öncülleri aceleyle okumak. Şifre çok basit: Temel kuralı doğrudan uygula ve çeldiricileri adım adım ele. Profildeki linkten hemen dene!`,
+        onScreen: [`🚨 ${displayTitle.toLocaleUpperCase('tr-TR')}`, '❌ Hata: Ezbere çözmek', '✅ Çözüm: Kestirme Taktik', 'Link Biyoda 🦊'],
+        vibe: 'Trending Phonk / Fast BPM (128 BPM)',
       },
-      createdAt: new Date().toISOString(),
-    }
+      {
+        title: `Reels: ${displayTitle} Sorularında Adayların %80'inin Düştüğü Tuzak`,
+        hook: `ÖSYM komisyonu ${displayTitle} sorusunda tam olarak bu şıkkı işaretlemeni bekliyor!`,
+        visual: `Kameraya hızlı zoom-in, ekranda A ve B şıkları arasında kırmızı-yeşil analiz animasyonu.`,
+        script: `Denemede ${focus} sorusu geldiğinde ilk tanıdık kelimeye atlıyorsan dikkat! ÖSYM çeldiriciyi her zaman ilk şıklara yerleştirir. Soru kökündeki sınırlayıcı ifadeyi yuvarlak içine al ve sağlamasını yap. DersoLab L.A.B. ile soruların röntgenini çek!`,
+        onScreen: ['⚠️ ÖSYM TUZAĞI!', `${displayTitle.toLocaleUpperCase('tr-TR')}`, '🎯 Soru Köküne Dikkat!', 'Kaydet & Paylaş 🦊'],
+        vibe: 'Dramatic Suspense / Synthwave Beat',
+      },
+      {
+        title: `Reels: Derece Öğrencilerinin ${displayTitle} Çalışma Rutini`,
+        hook: `İlk 1000'e giren öğrenciler ${displayTitle} konusunu nasıl tek seferde hallediyor?`,
+        visual: `Bölünmüş ekran: Üstte klasik yanlış çalışma, altta DersoLab interaktif L.A.B. ekranı.`,
+        script: `Saatlerce özet çıkarmak yerine ${focus} konusunun temel mantığını 3 soru tipi üzerinden modellenmiş halde öğren! Yanlış yaptığın soruyu hata defterine ekle ve 3 gün sonra tekrar çöz. Biyodaki linkten ücretsiz başla!`,
+        onScreen: ['🏆 DERECE TAKTİĞİ', `${displayTitle.toLocaleUpperCase('tr-TR')}`, '📈 +3 Net Garantili Rutin', 'Biyodaki Linke Tıkla 🚀'],
+        vibe: 'Lo-Fi Study Hop / Motivational Drop',
+      },
+    ]
+    const rAngle = reelsAngles[vIdx % reelsAngles.length]
+
+    return attachGrokEnhancements(
+      {
+        id: `post_${now}_reel_${vIdx}`,
+        title: rAngle.title,
+        type: 'reels',
+        topic: request.topic,
+        topicLabel: `Reels • ${focus}`,
+        status: 'draft',
+        targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
+        caption: `${focus} konusunda net kurtaran 30 saniyelik taktik! 🤯⚡\n\nSen bu soruda hangi yöntemi kullanıyorsun? Yorumlarda yaz! 👇\n\n#reels #yksreels #yks2027 #dersolab #ykstayfa`,
+        hashtags: ['#reels', '#yksreels', '#yks2027', '#dersolab'],
+        reelsStoryboard: {
+          hook3s: rAngle.hook,
+          visualDirection: rAngle.visual,
+          spokenScript: rAngle.script,
+          onScreenText: rAngle.onScreen,
+          musicAudioVibe: rAngle.vibe,
+          callToAction: `DersoLab soru çözüm araçlarını hemen profildeki linkten ücretsiz dene, ${focus} netlerini katla!`,
+        },
+        createdAt: new Date().toISOString(),
+        sourcePrompt: rawFocus,
+      },
+      request.persona
+    )
   }
 
   if (request.type === 'story') {
@@ -954,7 +1079,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
           !excludeLower.includes(pair.lise.title.toLocaleLowerCase('tr-TR'))
       )
       const pool = availablePairs.length > 0 ? availablePairs : CURATED_BOOK_PAIRS
-      const seedIdx = Math.abs(request.variationSeed ?? Math.floor(now / 1000)) % pool.length
+      const seedIdx = vIdx % pool.length
       const chosenPair = pool[seedIdx]
 
       const ortBook = {
@@ -970,67 +1095,107 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
           buildBookCoverSvgDataUrl(chosenPair.lise.title, chosenPair.lise.author, chosenPair.lise.genre, 'lise'),
       }
 
-      return {
-        id: `post_${now}_story_book`,
-        title: `Haftalık Kitap Önerisi: ${ortBook.title} & ${liseBook.title}`,
-        type: 'story',
-        topic: 'book_recommendation',
-        topicLabel: 'Pazar Kitap Kulübü • Ortaokul & Lise',
-        status: 'draft',
-        targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
-        caption: `Haftalık Kitap Kulübümüz yayında! 📚🦊\n\n📘 Ortaokul (LGS): ${ortBook.title} — ${ortBook.author}\n📕 Lise (YKS): ${liseBook.title} — ${liseBook.author}\n\nHem LGS hem YKS hazırlığında okuma hızını, odaklanmayı ve sınav derinliğini uçuracak 2 harika başucu kitabı!\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab #kitapkurdu`,
-        hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2027', '#yks2027', '#dersolab'],
-        storyData: {
-          badge: 'PAZAR KİTAP KULÜBÜ 📚',
-          headline: 'Haftanın Kitap Önerileri',
-          subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
-          stickerType: request.storyStickerType || 'none',
-          stickerQuestion: 'Bu hafta hangisini okuyacaksın?',
-          stickerOptions: [`Ortaokul: ${ortBook.title} 📘`, `Lise: ${liseBook.title} 📕`],
-          stickerLinkText: 'Kitap Listesi & İpuçları',
-          stickerLinkUrl: 'https://dersolab.com/lab',
-          themeVariant: 'purple_matrix',
-          uploadedImageUrl: request.imageBase64,
-          dualBookData: {
-            ortaokul: ortBook,
-            lise: liseBook,
+      return attachGrokEnhancements(
+        {
+          id: `post_${now}_story_book_${vIdx}`,
+          title: `Haftalık Kitap Önerisi: ${ortBook.title} & ${liseBook.title}`,
+          type: 'story',
+          topic: 'book_recommendation',
+          topicLabel: 'Pazar Kitap Kulübü • Ortaokul & Lise',
+          status: 'draft',
+          targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
+          caption: `Haftalık Kitap Kulübümüz yayında! 📚🦊\n\n📘 Ortaokul (LGS): ${ortBook.title} — ${ortBook.author}\n📕 Lise (YKS): ${liseBook.title} — ${liseBook.author}\n\nHem LGS hem YKS hazırlığında okuma hızını, odaklanmayı ve sınav derinliğini uçuracak 2 harika başucu kitabı!\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab #kitapkurdu`,
+          hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2027', '#yks2027', '#dersolab'],
+          storyData: {
+            badge: 'PAZAR KİTAP KULÜBÜ 📚',
+            headline: 'Haftanın Kitap Önerileri',
+            subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
+            stickerType: request.storyStickerType || 'none',
+            stickerQuestion: 'Bu hafta hangisini okuyacaksın?',
+            stickerOptions: [`Ortaokul: ${ortBook.title} 📘`, `Lise: ${liseBook.title} 📕`],
+            stickerLinkText: 'Kitap Listesi & İpuçları',
+            stickerLinkUrl: 'https://dersolab.com/lab',
+            themeVariant: t4,
+            uploadedImageUrl: request.imageBase64,
+            dualBookData: {
+              ortaokul: ortBook,
+              lise: liseBook,
+            },
           },
+          uploadedImageUrl: request.imageBase64,
+          createdAt: new Date().toISOString(),
+          sourcePrompt: rawFocus,
+        },
+        request.persona
+      )
+    }
+
+    const storyAngles = [
+      {
+        badge: `GÜNÜN İPUCU • ${badgeText}`,
+        headline: `${displayTitle} • Altın Kural`,
+        subhead: 'Denemeye girmeden önce bu kritik ayrımı mutlaka hatırla!',
+        question: `${focus} sorularında ilk adımın ne olmalı?`,
+        options: ['Soru kökünü analiz et ✅', 'Doğrudan şıklara bak ❌'],
+      },
+      {
+        badge: `ÖSYM TUZAĞI • ${badgeText}`,
+        headline: `${displayTitle} • Sık Yapılan Hata`,
+        subhead: 'Adayların %75’i bu detay yüzünden net kaybediyor!',
+        question: `${focus} konusunda en sık düşülen çeldirici hangisidir?`,
+        options: ['İstisna durumları unutmak ⚠️', 'Birim/işaret hatası yapmak 🔍'],
+      },
+      {
+        badge: `HIZ TAKTİĞİ • ${badgeText}`,
+        headline: `${displayTitle} • 30 Saniye Şifresi`,
+        subhead: 'Uzun işlem yapmadan doğru şıkka ulaşmanın kestirme yolu',
+        question: `${focus} konusunu tamamladın mı?`,
+        options: ['Tamamladım, netler hazır 🔥', 'Bu hafta bitiriyorum 📚'],
+      },
+      {
+        badge: `SINAV NOTU • ${badgeText}`,
+        headline: `${displayTitle} • Banko Kazanım`,
+        subhead: 'Son 5 yılda en çok yoklanan kritik kazanım özeti',
+        question: `${focus} denemelerde kaç net getiriyor?`,
+        options: ['Her deneme banko +1/+2 Net 🎯', 'Tekrar etmem lazım 💪'],
+      },
+    ]
+    const sAngle = storyAngles[vIdx % storyAngles.length]
+
+    return attachGrokEnhancements(
+      {
+        id: `post_${now}_story_${vIdx}`,
+        title: `Story: ${sAngle.headline}`,
+        type: 'story',
+        topic: request.topic,
+        topicLabel: `Story • ${focus}`,
+        status: 'draft',
+        targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
+        caption: `${focus} hakkında bilmen gereken kritik sınav notu! 🦊⚡ #${focus.toLowerCase().replace(/[^a-z0-9]/gi, '')}`,
+        hashtags: ['#yks2027', '#dersolab', '#gununsorusu'],
+        storyData: {
+          badge: sAngle.badge,
+          headline: sAngle.headline,
+          subhead: sAngle.subhead,
+          stickerType: request.storyStickerType || 'none',
+          stickerQuestion: sAngle.question,
+          stickerOptions: sAngle.options,
+          stickerLinkText: 'dersolab.com/lab',
+          stickerLinkUrl: 'https://dersolab.com/lab',
+          themeVariant: t2,
+          uploadedImageUrl: request.imageBase64,
         },
         uploadedImageUrl: request.imageBase64,
         createdAt: new Date().toISOString(),
-      }
-    }
-
-    return {
-      id: `post_${now}_story`,
-      title: `Story: ${displayTitle}`,
-      type: 'story',
-      topic: request.topic,
-      topicLabel: `Story • ${focus}`,
-      status: 'draft',
-      targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `${focus} hakkında bilmen gereken kritik sınav notu! 🦊⚡ #${focus.toLowerCase().replace(/[^a-z0-9]/gi, '')}`,
-      hashtags: ['#yks2027', '#dersolab', '#gununsorusu'],
-      storyData: {
-        badge: `DERSOLAB STORY • ${badgeText}`,
-        headline: `${displayTitle} Püf Noktası`,
-        subhead: 'ÖSYM bu kuralı çok sever, denemeden önce mutlaka göz at!',
-        stickerType: request.storyStickerType || 'none',
-        stickerQuestion: `${focus} konusunda hangisi doğrudur?`,
-        stickerOptions: ['Doğru Kural / Yöntem ✅', 'Sık Yapılan Yanılgı ❌', 'İkisi de Geçerlidir', 'Emin Değilim'],
-        stickerLinkText: 'dersolab.com/lab',
-        stickerLinkUrl: 'https://dersolab.com/lab',
-        themeVariant: 'neon_orange',
-        uploadedImageUrl: request.imageBase64,
+        sourcePrompt: rawFocus,
       },
-      uploadedImageUrl: request.imageBase64,
-      createdAt: new Date().toISOString(),
-    }
+      request.persona
+    )
   }
 
   if (request.type === 'x_thread') {
     const xItem: SocialPostItem = {
-      id: `post_${now}_xthread`,
+      id: `post_${now}_xthread_${vIdx}`,
       title: `X / Twitter Flood: ${displayTitle} Konusunda Hayat Kurtaran 5 Bilgi`,
       type: 'x_thread',
       platform: 'x',
@@ -1075,35 +1240,76 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
         ],
       },
       createdAt: new Date().toISOString(),
+      sourcePrompt: rawFocus,
     }
     return attachGrokEnhancements(xItem, request.persona)
   }
 
-  // Single post
+  // Single post (Tekli Post - 4 farklı alternatif açısı)
+  const singlePostAngles = [
+    {
+      badge: `1 SORU 1 NET • ${badgeText}`,
+      headline: `${displayTitle}: ÖSYM Çeldirici Tuzağı`,
+      summary: `${focus} sorularında adayların en sık düştüğü yanılgı: Soru kökündeki sınırlayıcı koşulu ("kesinlikle" / "olamaz") dikkate almadan ilk öncülü doğru kabul etmek!`,
+      takeaway: `Altın Kural: ${focus} sorularında uç değerleri ve istisnaları mutlaka kontrol et.`,
+      options: [
+        { key: 'A', text: 'Koşulları ve istisnaları sınayarak çözmek (Doğru)', isCorrect: true },
+        { key: 'B', text: 'İlk tanıdık ifadeye göre şık işaretlemek (Tuzak)', isCorrect: false },
+      ],
+    },
+    {
+      badge: `HAP BİLGİ • ${badgeText}`,
+      headline: `${displayTitle}: 30 Saniyede Çözüm Şifresi`,
+      summary: `${focus} konusunda uzun işlemlere veya tekrar okumaya gerek kalmadan doğru cevaba ulaşmanın anahtarı: Verileri soru kökündeki anahtar kavramla eşleştirmek.`,
+      takeaway: `Pratik İpucu: Şıklardan eleme yaparken birbirinin zıttı olan iki seçeneğe odaklan!`,
+      options: [
+        { key: 'A', text: 'Kavram eşleştirmesi ve şık eleme tekniği', isCorrect: true },
+        { key: 'B', text: 'Tüm kuralları ezberden yazmaya çalışmak', isCorrect: false },
+      ],
+    },
+    {
+      badge: `SINAV RÖNTGENİ • ${badgeText}`,
+      headline: `${displayTitle}: Banko Soru Kalıbı`,
+      summary: `ÖSYM son yıllarda ${focus} konusunu doğrudan tanım olarak değil, grafik/tablo veya öncüllü (I, II, III) yorum sorusu olarak sormayı tercih ediyor.`,
+      takeaway: `Unutma: En emin olduğun öncülden başlayarak şıkları elemek süreni yarıya indirir.`,
+      options: [
+        { key: 'A', text: 'Emin olduğun öncülden şık eleyerek gitmek', isCorrect: true },
+        { key: 'B', text: 'Kararsız kalınan öncülde vakit kaybetmek', isCorrect: false },
+      ],
+    },
+    {
+      badge: `KRİTİK FARK • ${badgeText}`,
+      headline: `${displayTitle}: En Çok Karıştırılan Nokta`,
+      summary: `${focus} çalışırken öğrencilerin %70'i neden-sonuç sırasını veya temel kavram çiftlerini birbiriyle karıştırdığı için son adımda net kaybediyor.`,
+      takeaway: `Kontrol Listesi: İşaretlemeden önce birim, yön veya olumsuz soru kökünü son kez doğrula!`,
+      options: [
+        { key: 'A', text: 'Son adımda soru kökü sağlaması yapmak', isCorrect: true },
+        { key: 'B', text: 'Ara işlem sonucunu doğrudan işaretlemek', isCorrect: false },
+      ],
+    },
+  ]
+  const spAngle = singlePostAngles[vIdx % singlePostAngles.length]
+
   const singleItem: SocialPostItem = {
-    id: `post_${now}_single`,
-    title: `Günün Sorusu: ${displayTitle}`,
+    id: `post_${now}_single_${vIdx}`,
+    title: spAngle.headline,
     type: 'post',
     topic: request.topic,
-    topicLabel: `Günün Sorusu • ${focus}`,
+    topicLabel: `1 Soru 1 Net • ${focus}`,
     status: 'draft',
     targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-    caption: `${focus} konusunda ÖSYM tarzı günün sorusu geldi! Bakalım kimler ilk seferde doğru şıkkı bulacak? 🧠\n\nCevabını yoruma bırak, çözümü sabitlediğimiz yorumda incele! 🎯\n\n#gununsorusu #yks2027 #dersolab #sorucozumu`,
+    caption: `${focus} (${spAngle.headline}) notumuz yayında! 🧠🎯\n\n${spAngle.summary}\n\n💡 ${spAngle.takeaway}\n\n#gununsorusu #yks2027 #dersolab #sorucozumu`,
     hashtags: ['#gununsorusu', '#yks2027', '#dersolab', '#sorucozumu'],
     singlePostData: {
-      badge: `GÜNÜN ÖSYM SORUSU • ${badgeText}`,
-      headline: `${displayTitle} Tuzağı`,
-      questionOrSummary: `${focus} konusunda adayların en çok takıldığı soru tipi. Aşağıdaki seçeneklerden hangisi doğru verilmiştir?`,
-      keyTakeaway: `İpucu: ${focus} kuralını doğrudan soru köküyle eşleştir.`,
-      options: [
-        { key: 'A', text: 'Doğru Yargı / Çözüm', isCorrect: true },
-        { key: 'B', text: 'Sık Yapılan Çeldirici', isCorrect: false },
-        { key: 'C', text: 'Eksik Bilgi Şıkkı', isCorrect: false },
-        { key: 'D', text: 'Hatalı Yorum', isCorrect: false },
-      ],
-      themeVariant: 'neon_orange',
+      badge: spAngle.badge,
+      headline: spAngle.headline,
+      questionOrSummary: spAngle.summary,
+      keyTakeaway: spAngle.takeaway,
+      options: spAngle.options,
+      themeVariant: t1,
     },
     createdAt: new Date().toISOString(),
+    sourcePrompt: rawFocus,
   }
   return attachGrokEnhancements(singleItem, request.persona)
 }
