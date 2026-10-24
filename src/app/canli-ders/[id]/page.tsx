@@ -14,6 +14,22 @@ export const metadata = {
 
 export default async function LiveClassroomPage({ params }: LivePageProps) {
   const { id: bookingId } = await params
+
+  // Geliştirme ortamında anında test edebilmek için demo modu
+  if (process.env.NODE_ENV === 'development' && (bookingId === 'demo' || bookingId === 'test')) {
+    return (
+      <LiveClassroomClient
+        bookingId="dersolab-demo-room"
+        currentUserName="DersoLab Test Eğitmeni"
+        isInstructor={true}
+        otherPersonName="Test Öğrencisi"
+        startTime={new Date().toISOString()}
+        endTime={new Date(Date.now() + 40 * 60 * 1000).toISOString()}
+        topicNote="Canlı Ders Odası & 3D Laboratuvar Testi"
+      />
+    )
+  }
+
   const supabase = await createClient()
 
   const {

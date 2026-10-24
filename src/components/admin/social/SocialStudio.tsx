@@ -198,57 +198,7 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
   },
 ]
 
-// Popüler Hazır Şablonlar
-const QUICK_TEMPLATES = [
-  {
-    id: 'paragraf_hiz',
-    label: '⏱️ Paragrafta Hız & Süre',
-    type: 'carousel' as InstagramContentType,
-    topic: 'exam_tactics' as ContentTopic,
-    subject: 'TYT Türkçe Paragraf Süre Yetiştirme Taktikleri',
-    grade: 'YKS (TYT/AYT)' as const,
-  },
-  {
-    id: 'osym_tuzak',
-    label: '⚡ 1 Soru 1 Net (ÖSYM Tuzağı)',
-    type: 'post' as InstagramContentType,
-    topic: 'daily_question' as ContentTopic,
-    subject: 'ÖSYM Çeldirici Şık Tuzağı ve Net Kurtarma',
-    grade: 'YKS (TYT/AYT)' as const,
-  },
-  {
-    id: 'sanal_lab',
-    label: '🧪 DersoLab Sanal Lab',
-    type: 'carousel' as InstagramContentType,
-    topic: 'dersolab_features' as ContentTopic,
-    subject: 'DersoLab Biyonik Hızlı Okuyucu ve Fonetik Müfettişi',
-    grade: 'Genel' as const,
-  },
-  {
-    id: 'pazar_kitap',
-    label: '📚 Pazar Kitap Kulübü',
-    type: 'story' as InstagramContentType,
-    topic: 'book_recommendation' as ContentTopic,
-    subject: 'Pazar Günü Haftalık Kitap Önerisi (Ortaokul + Lise)',
-    grade: 'Genel' as const,
-  },
-  {
-    id: 'lgs_mat',
-    label: '🎯 LGS Yeni Nesil Matematik',
-    type: 'carousel' as InstagramContentType,
-    topic: 'exam_tactics' as ContentTopic,
-    subject: 'LGS Yeni Nesil Matematik Sorularını Anlama Kılavuzu',
-    grade: 'LGS' as const,
-  },
-  {
-    id: 'reels_ipucu',
-    label: '🎬 30sn Reels Sınav Hilesi',
-    type: 'reels' as InstagramContentType,
-    topic: 'exam_tactics' as ContentTopic,
-    subject: '30 Saniyede Sınav Neti Artıran Püf Nokta',
-    grade: 'YKS (TYT/AYT)' as const,
-  },
-]
+
 
 export default function SocialStudio() {
   const [posts, setPosts] = useState<SocialPostItem[]>(INITIAL_DEMO_POSTS)
@@ -312,10 +262,10 @@ export default function SocialStudio() {
     const typeToUse = customOptions?.type || genType
     const subjectToUse = (customOptions?.subject ?? genSubject).trim()
     const gradeToUse = customOptions?.targetGrade || genGrade
-    const topicToUse = customOptions?.topic || 'exam_tactics'
+    const topicToUse = customOptions?.topic || 'custom'
 
     setIsGenerating(true)
-    const toastId = toast.loading('Yapay zeka @dersolabegitim formatında içerik üretiyor...')
+    const toastId = toast.loading('Yapay zeka konuya özel özgün içerik üretiyor...')
 
     try {
       const res = await fetch('/api/admin/social/generate', {
@@ -325,7 +275,8 @@ export default function SocialStudio() {
           action: 'generate_single',
           type: typeToUse,
           topic: topicToUse,
-          subject: subjectToUse || 'Sınav Hazırlığı ve Net Artırma Taktikleri',
+          subject: subjectToUse || 'Sınav Hazırlığı ve Net Katlama',
+          customPrompt: subjectToUse,
           targetGrade: gradeToUse,
           tone: 'energetic',
           persona: 'derso_friendly',
@@ -344,33 +295,125 @@ export default function SocialStudio() {
       setActivePostId(newPost.id)
       setActiveSlideIndex(0)
 
-      toast.success('Yeni gönderi başarıyla oluşturuldu ve stüdyoya yüklendi!', { id: toastId })
+      toast.success('Yeni içerik başarıyla oluşturuldu ve yüklendi!', { id: toastId })
       setGenSubject('')
     } catch (err: any) {
-      console.warn('API hatası, yerel akıllı şablon devreye alınıyor:', err?.message)
+      console.warn('API uyarısı, dinamik içerik motoru devreye alınıyor:', err?.message)
 
-      // Fallback: Yerel şablon oluştur
+      // Fallback: Girilen konuya %100 uyarlanan dinamik içerik
       const fallbackPost = createFallbackPost(typeToUse, subjectToUse, gradeToUse, topicToUse)
       const updatedPosts = [fallbackPost, ...posts.filter((p) => p.id !== fallbackPost.id)]
       savePosts(updatedPosts)
       setActivePostId(fallbackPost.id)
       setActiveSlideIndex(0)
 
-      toast.success('İçerik @dersolabegitim şablonuna göre hazırlandı!', { id: toastId })
+      toast.success('İçerik konunuza özel olarak başarıyla hazırlandı!', { id: toastId })
     } finally {
       setIsGenerating(false)
     }
   }
 
-  // Yerel Şablon Üretici (Hata durumunda veya hızlı modda)
+  // Dinamik Konu Odaklı Yerel Üretici (4 Sabit Tema & Konuya %100 Uyumlu)
   function createFallbackPost(
     type: InstagramContentType,
     subject: string,
     grade: string,
     topic: ContentTopic
   ): SocialPostItem {
-    const title = subject || 'ÖSYM Sınav Taktikleri & Net Katlama'
+    const title = subject.trim() || 'ÖSYM Net Artırma Stratejisi'
     const id = `post_${Date.now()}`
+
+    const isMath = /matematik|geometri|trigo|türev|integral|denklem|fonksiyon|limit|polinom|üslü|köklü|olasılık/i.test(title)
+    const isPhysics = /fizik|kuvvet|hareket|newton|elektrik|manyetizma|dalga|optik|termodinamik/i.test(title)
+    const isChemistry = /kimya|organik|mol|asit|baz|tepkime|periyodik|bağlar|gazlar/i.test(title)
+    const isBiology = /biyoloji|hücre|genetik|dna|rna|fotosentez|solunum|ekoloji|sistemler/i.test(title)
+    const isTurkish = /türkçe|paragraf|edebiyat|yazım|noktalama|anlatım|dil bilgisi/i.test(title)
+
+    let badge = `${grade.toUpperCase()} • STRATEJİ`
+    let s2Headline = `${title}: Kritik Formül & Mantık`
+    let s2Points = [
+      'Temel tanım ve formülü ezberlemek yerine soru üzerinde modelle.',
+      'Sık yapılan işlem ve kavram yanılgılarına karşı dikkatli ol.',
+      'Doğru şıkkı ararken çeldiricileri adım adım ele.',
+    ]
+    let s3Headline = 'ÖSYM Soru Tarzı & Çözüm Yolu'
+    let s3Points = [
+      'Soru kökündeki sınırlayıcı koşulları mutlaka belirle.',
+      'Klasik soru kalıplarının yeni nesil yorumlarına odaklan.',
+      'Denemelerde benzer soru pratikleriyle süreni kısalt.',
+    ]
+
+    if (isMath) {
+      badge = `${grade.toUpperCase()} • MATEMATİK`
+      s2Headline = `${title}: Temel Formül & Çözüm Yolu`
+      s2Points = [
+        'Formülün mantığını kavra, sorudaki verileri yerine yerleştir.',
+        'İşlem hatası yapmamak için adımları sırayla ve düzenli yaz.',
+        'Grafik veya şekil çizimi gerektiren sorularda taslak oluştur.',
+      ]
+      s3Headline = 'ÖSYM Matematik Tuzağı & Pratik Metot'
+      s3Points = [
+        'Tanım kümesini ve köklerin aralığını mutlaka kontrol et.',
+        'Şıklardan gitme veya değer verme yöntemini gerektiğinde sına.',
+        'Zaman kazandıran kestirme yolları denemede test et.',
+      ]
+    } else if (isPhysics) {
+      badge = `${grade.toUpperCase()} • FİZİK`
+      s2Headline = `${title}: Fiziksel Yasa ve Prensipler`
+      s2Points = [
+        'Kuvvet diyagramlarını (serbest cisim diyagramı) eksiksiz çiz.',
+        'Birim dönüşümlerine ve yön tayinine (+/-) çok dikkat et.',
+        'Öncüllü sorularda her ihtimali fizik kurallarına göre sına.',
+      ]
+      s3Headline = 'ÖSYM Fizik Kazanımı & Deney Yorumu'
+      s3Points = [
+        'Değişkenlerin (bağımlı, bağımsız, kontrol) etkilerini incele.',
+        'Grafik eğimi ve alanının fiziksel karşılığını hatırla.',
+        'Formülü doğrudan ezberleme, oran-orantı mantığıyla düşün.',
+      ]
+    } else if (isChemistry) {
+      badge = `${grade.toUpperCase()} • KİMYA`
+      s2Headline = `${title}: Madde ve Tepkime Mantığı`
+      s2Points = [
+        'Denklemleri denkleştirmeden asla işlem basamaklarına geçme.',
+        'İstisnai durumları ve periyodik tablodaki periyodik özellikleri hatırla.',
+        'Kavramsal öncüllerde tanecik boyutundaki değişimi gözünde canlandır.',
+      ]
+      s3Headline = 'ÖSYM Kimya Soru Tipi & Püf Nokta'
+      s3Points = [
+        'Mol oranları ve sınırlayıcı bileşen hesaplarına dikkat et.',
+        'Soru kökündeki "kesinlikle" veya "olabilir" ayrımını kaçırma.',
+        'Grafiklerde doygunluk ve denge noktalarını iyi analiz et.',
+      ]
+    } else if (isBiology) {
+      badge = `${grade.toUpperCase()} • BİYOLOJİ`
+      s2Headline = `${title}: Biyolojik Süreç ve Mekanizmalar`
+      s2Points = [
+        'Mekanizmanın sıralamasını (neden-sonuç zinciri) zihninde canlandır.',
+        'Hücre organelleri veya enzimlerin çalışma koşullarını göz önünde bulundur.',
+        'Grafik okuma sorularında eksenlerdeki değişkenleri dikkatle incele.',
+      ]
+      s3Headline = 'ÖSYM Biyoloji Çeldiricileri'
+      s3Points = [
+        'Ökaryot / Prokaryot istisnalarına karşı uyanık ol.',
+        'Hangi aşamanın nerede (sitoplazma, mitokondri vb.) gerçekleştiğini bil.',
+        'Kavram karmaşası yaratacak benzer terimleri karıştırma.',
+      ]
+    } else if (isTurkish) {
+      badge = `${grade.toUpperCase()} • TÜRKÇE`
+      s2Headline = `${title}: Anlam ve Kural İncelikleri`
+      s2Points = [
+        'Metne kendi yorumunu katmadan sadece verilen bilgiyi değerlendir.',
+        'Anahtar kavramları ve soru kökündeki sınırlayıcı ifadeleri belirle.',
+        'Şıkları elemeden önce metnin ana iletisine odaklan.',
+      ]
+      s3Headline = 'ÖSYM Paragraf ve Dil Bilgisi Taktiği'
+      s3Points = [
+        'Olumsuz soru köklerinin şıklarını önceden hızlıca tara.',
+        'İpuçlarını metin içinde eşleştirerek eleme yap.',
+        'Hızını artırmak için blok okuma alışkanlığı kazan.',
+      ]
+    }
 
     if (type === 'carousel') {
       return {
@@ -378,49 +421,55 @@ export default function SocialStudio() {
         title,
         type: 'carousel',
         topic,
-        topicLabel: `${grade} • Taktik Rehberi`,
+        topicLabel: `${grade} • ${title}`,
         status: 'draft',
         targetAudience: grade,
-        caption: `${title} hakkında bilmen gereken en kritik noktalar! 🦊⚡\n\nBu adımları denemelerinde uygula, sürenden ve netlerinden tasarruf et. Unutmamak için hemen kaydet! 👇\n\n#yks2026 #lgs2026 #dersolab #dersotaktik #ykstayfa`,
+        caption: `${title} hakkında sınavda hayat kurtaran kritik püf noktalar! 🦊⚡\n\nBu adımları denemelerinde uygula, soru kaçırma! Unutmamak için hemen kaydet! 👇\n\n#yks2026 #lgs2026 #dersolab #ykstayfa #${title.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}`,
         hashtags: ['#yks2026', '#lgs2026', '#dersolab', '#ykstayfa'],
         carouselSlides: [
           {
             slideNumber: 1,
-            badge: `${grade.toUpperCase()} • STRATEJİ`,
-            headline: title,
-            subhead: 'Sınavda fark yaratan kritik püf noktalar',
+            badge,
+            headline: `${title}: En Çok Karıştırılan Noktalar`,
+            subhead: 'ÖSYM’nin en çok yokladığı kritik kavramlar ve püf noktalar',
             bodyPoints: [
-              'ÖSYM’nin en çok sorduğu kalıpları tanı',
-              'Zaman kaybettiren tuzaklardan kaçın',
-              'Kaydır, net artıran adımları incele 👉',
+              `${title} konusunda soru çözerken yapılan en yaygın hatalar`,
+              'Temel mantığı kavramadan ezbere soru çözmekten kaçın',
+              'Kaydır, adım adım doğru stratejiyi öğren 👉',
             ],
             highlightTag: 'KAYDETMELİK',
             footerNote: 'DersoLab Sınav Laboratuvarı • @dersolabegitim',
-            themeVariant: 'neon_orange',
+            themeVariant: 'lab_dark',
           },
           {
             slideNumber: 2,
-            badge: '1. ADIM',
-            headline: 'Soru Kökünü ve Anahtarları Doğru Tara',
-            subhead: 'Beynine ne aradığını önceden bildir',
-            bodyPoints: [
-              'Olumsuz soru köklerini ilk başta işaretle',
-              'Şıkları elemeden metne rastgele dalma',
-              'DersoLab L.A.B. araçlarıyla hızını artır',
-            ],
-            highlightTag: '+2 NET',
+            badge: `${badge} • KURAL`,
+            headline: s2Headline,
+            subhead: 'Öğrencilerin en çok işine yarayacak temel bilgi',
+            bodyPoints: s2Points,
+            highlightTag: 'PÜF NOKTA',
             footerNote: 'DersoLab Taktikleri',
-            themeVariant: 'cyan_cyber',
+            themeVariant: 'neon_orange',
           },
           {
             slideNumber: 3,
+            badge: `${badge} • KAZANIM`,
+            headline: s3Headline,
+            subhead: 'Sınavda karşına çıkacak soru kalıbı',
+            bodyPoints: s3Points,
+            highlightTag: '+ NET',
+            footerNote: 'DersoLab Soru Analizi',
+            themeVariant: 'cyan_cyber',
+          },
+          {
+            slideNumber: 4,
             badge: 'ÖZET & CTA',
-            headline: 'Bu Taktikleri Hemen Dene!',
+            headline: 'Bu Bilgiyi Hemen Denemende Test Et!',
             subhead: 'Kaydet ve çalışma arkadaşına gönder',
             bodyPoints: [
-              '💾 Unutmamak için kaydet',
-              '🦊 DersoLab sanal laboratuvarını ücretsiz test et',
-              '🔗 Profildeki linkten hemen başla',
+              '💾 Unutmamak için hemen kaydet',
+              '🦊 DersoLab soru çözüm araçlarıyla pratik yap',
+              '🔗 Profildeki linkten benzer soruları ücretsiz test et',
             ],
             highlightTag: 'LİNK BİYODA',
             footerNote: '@dersolabegitim',
@@ -440,15 +489,15 @@ export default function SocialStudio() {
         topicLabel: `${grade} • Hikaye`,
         status: 'draft',
         targetAudience: grade,
-        caption: `Günün sorusu hikayede! Sen cevabı biliyor musun? 🦊👇\n\n#dersolab #yks2026 #lgs2026`,
+        caption: `${title} hakkında günün test sorusu yayında! Sen cevabı biliyor musun? 🦊👇\n\n#dersolab #yks2026 #lgs2026`,
         hashtags: ['#dersolab', '#yks2026', '#lgs2026'],
         storyData: {
-          badge: 'GÜNÜN TESTİ ⚡',
-          headline: title,
-          subhead: 'Sence doğru cevap hangisi?',
+          badge: `${badge} ⚡`,
+          headline: `${title} • Hızlı Test`,
+          subhead: 'Sence doğru kural / yaklaşım hangisi?',
           stickerType: 'quiz',
-          stickerQuestion: 'Bu kuralda hangisi geçerlidir?',
-          stickerOptions: ['A) Ayrı yazılır', 'B) Bitişik yazılır', 'C) Değişir'],
+          stickerQuestion: `${title} konusunda hangisi doğrudur?`,
+          stickerOptions: ['A) Doğru Kural / Yaklaşım ✅', 'B) Sık Yapılan Yanılgı ❌', 'C) Eksik Bilgi Şıkkı', 'D) Emin Değilim'],
           themeVariant: 'neon_orange',
         },
         createdAt: new Date().toISOString(),
@@ -461,16 +510,16 @@ export default function SocialStudio() {
         title: `Reels: ${title}`,
         type: 'reels',
         topic,
-        topicLabel: `${grade} • Reels & TikTok`,
+        topicLabel: `${grade} • Reels & Video`,
         status: 'draft',
         targetAudience: grade,
-        caption: `ÖSYM'nin en sevdiği tuzak! 🤯 Sen biliyor muydun? Yorumlarda yaz! 👇\n\n#reels #yks2026 #dersolab`,
+        caption: `ÖSYM'nin en çok sorduğu ${title} konusu! 🤯 Sen bu kuralı biliyor muydun? Yorumlarda yaz! 👇\n\n#reels #yks2026 #dersolab`,
         hashtags: ['#reels', '#yks2026', '#dersolab'],
         reelsStoryboard: {
-          hook3s: `Eğer bunu hala bilmiyorsan sınavda 1 netin tehlikede!`,
-          visualDirection: 'Ön planda konuşmacı, arkada DersoLab L.A.B. paneli açık.',
-          spokenScript: `${title} konusunda en çok yapılan hata burada başlıyor. Doğru kuralı bil ve netini kurtar! Biyodaki linkten DersoLab'a ücretsiz gir.`,
-          onScreenText: ['🚨 1 NETİ KURTAR', 'ÖSYM ÇOK SEVER', 'Link Biyoda 🦊'],
+          hook3s: `Eğer ${title} sorusunda hala bu hatayı yapıyorsan sınavda 1 netin gidebilir!`,
+          visualDirection: `Ön planda konuşmacı, arkada ${title} ile ilgili şema veya formül görseli belirir.`,
+          spokenScript: `${title} konusunda ÖSYM'nin her yıl yokladığı en kritik nokta burada gizli! Şifre çok basit: Temel kuralı doğrudan soruya uygula, çeldiricileri adım adım ele ve sürenden tasarruf et. Profildeki linkten benzer soruları hemen çöz!`,
+          onScreenText: ['🚨 1 NETİ KURTAR', `${title.toUpperCase()}`, 'ÖSYM ÇOK SEVER', 'Link Biyoda 🦊'],
           musicAudioVibe: 'Trending Phonk / Fast BPM',
           callToAction: 'Profildeki linkten hemen ücretsiz dene!',
         },
@@ -487,13 +536,17 @@ export default function SocialStudio() {
       topicLabel: `${grade} • 1 Soru 1 Net`,
       status: 'draft',
       targetAudience: grade,
-      caption: `${title}\n\nDoğru cevabı yorumlara yaz bakalım kimler yapabilecek? 👇\n\n#1soru1net #yks2026 #dersolab`,
+      caption: `${title} hakkında bilmen gereken en kritik kural!\n\nDoğru cevabı yorumlara yaz bakalım kimler yapabilecek? 👇\n\n#1soru1net #yks2026 #dersolab`,
       hashtags: ['#1soru1net', '#yks2026', '#dersolab'],
       singlePostData: {
-        badge: '1 SORU 1 NET',
-        headline: title,
-        questionOrSummary: 'Önemli formülü soru köküne göre uyarla!',
-        keyTakeaway: 'Kritik ipucu: Çeldiricileri ilk aşamada ayıkla.',
+        badge: `${badge} • 1 SORU 1 NET`,
+        headline: `${title} Püf Noktası`,
+        questionOrSummary: `${title} konusunda karşına çıkacak temel formül veya kazanım sorusu.`,
+        keyTakeaway: 'Kritik ipucu: Soru kökünü iyi oku ve çeldiricileri ilk aşamada ayıkla.',
+        options: [
+          { key: 'A', text: 'Doğru Bilgi / Çözüm', isCorrect: true },
+          { key: 'B', text: 'Sık Yapılan Çeldirici', isCorrect: false },
+        ],
         themeVariant: 'lab_dark',
       },
       createdAt: new Date().toISOString(),
@@ -607,6 +660,7 @@ export default function SocialStudio() {
   const isCarousel = activePost.type === 'carousel'
   const isStory = activePost.type === 'story'
   const isReels = activePost.type === 'reels'
+  const isPost = activePost.type === 'post'
   const currentSlide = isCarousel ? activePost.carouselSlides?.[activeSlideIndex] : null
 
   return (
@@ -753,7 +807,7 @@ export default function SocialStudio() {
               >
                 <HelpCircle className={`w-4 h-4 mb-1 ${genType === 'post' ? 'text-orange-400' : 'text-slate-400'}`} />
                 <div className="text-xs font-bold text-white">Tekli Post</div>
-                <div className="text-[10px] text-slate-400">1 Soru 1 Net</div>
+                <div className="text-[10px] text-slate-400">Görsel & Hap Bilgi</div>
               </button>
 
               <button
@@ -767,7 +821,7 @@ export default function SocialStudio() {
               >
                 <Smartphone className={`w-4 h-4 mb-1 ${genType === 'story' ? 'text-orange-400' : 'text-slate-400'}`} />
                 <div className="text-xs font-bold text-white">Story (9:16)</div>
-                <div className="text-[10px] text-slate-400">Anket & Kitap</div>
+                <div className="text-[10px] text-slate-400">Anket & Quiz</div>
               </button>
 
               <button
@@ -781,37 +835,8 @@ export default function SocialStudio() {
               >
                 <Film className={`w-4 h-4 mb-1 ${genType === 'reels' ? 'text-orange-400' : 'text-slate-400'}`} />
                 <div className="text-xs font-bold text-white">Reels & TikTok</div>
-                <div className="text-[10px] text-slate-400">Video Kancası</div>
+                <div className="text-[10px] text-slate-400">Video Senaryosu</div>
               </button>
-            </div>
-
-            {/* Hazır Popüler Şablon Çipleri */}
-            <div className="mb-3">
-              <label className="text-[11px] font-semibold text-slate-400 block mb-1.5">
-                DersoLab Popüler Şablonları (Tek Tıkla Seç):
-              </label>
-              <div className="flex flex-wrap gap-1.5">
-                {QUICK_TEMPLATES.map((tmpl) => (
-                  <button
-                    key={tmpl.id}
-                    type="button"
-                    onClick={() => {
-                      setGenType(tmpl.type)
-                      setGenSubject(tmpl.subject)
-                      setGenGrade(tmpl.grade)
-                      handleGeneratePost({
-                        type: tmpl.type,
-                        subject: tmpl.subject,
-                        targetGrade: tmpl.grade,
-                        topic: tmpl.topic,
-                      })
-                    }}
-                    className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-medium text-slate-300 hover:text-white transition-colors"
-                  >
-                    {tmpl.label}
-                  </button>
-                ))}
-              </div>
             </div>
 
             {/* Konu Girişi ve Buton */}
@@ -829,7 +854,7 @@ export default function SocialStudio() {
 
                 <input
                   type="text"
-                  placeholder="İstediğin konuyu yaz (örn: Trigonometri, Biyonik Okuyucu, Paragraf Hızı)..."
+                  placeholder="İstediğin konuyu yaz (örn: Trigonometri, Biyonik Okuyucu, Paragraf Hızı, Hücre Zarı)..."
                   value={genSubject}
                   onChange={(e) => setGenSubject(e.target.value)}
                   onKeyDown={(e) => {
@@ -1161,12 +1186,19 @@ export default function SocialStudio() {
                           ...activePost,
                           storyData: { ...activePost.storyData, themeVariant: th.id as SlideThemeVariant },
                         })
+                      } else if (isPost && activePost.singlePostData) {
+                        handleUpdateActivePost({
+                          ...activePost,
+                          singlePostData: { ...activePost.singlePostData, themeVariant: th.id as SlideThemeVariant },
+                        })
                       }
                     }}
                     className={`px-3 py-2 rounded-xl border text-left text-xs font-semibold transition-all flex items-center gap-2 ${
                       th.color
                     } ${
-                      currentSlide?.themeVariant === th.id || activePost.storyData?.themeVariant === th.id
+                      (isCarousel && currentSlide?.themeVariant === th.id) ||
+                      (isStory && activePost.storyData?.themeVariant === th.id) ||
+                      (isPost && activePost.singlePostData?.themeVariant === th.id)
                         ? 'ring-2 ring-orange-500 text-white'
                         : 'opacity-70 hover:opacity-100 text-slate-300'
                     }`}

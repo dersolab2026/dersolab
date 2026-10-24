@@ -22,53 +22,45 @@ import type {
 } from '@/types/social'
 import { generateSocialImage } from './imageGenerator'
 
-const SYSTEM_INSTRUCTION = `Sen DersoLab'ın Baş Sosyal Medya Büyüme ve İçerik Ajanısın (Instagram Growth Lead & Creative Strategist).
+const SYSTEM_INSTRUCTION = `Sen DersoLab'ın Baş Sosyal Medya İçerik ve Büyüme Uzmanısın (Instagram Growth Lead & Creative Educator).
 
 DERSOLAB HAKKINDA:
-- DersoLab, YKS (TYT / AYT) ve LGS öğrencilerine yönelik yeni nesil bir dijital eğitim, 1'e 1 özel ders, koçluk ve inovatif öğrenme laboratuvarı (L.A.B.) platformudur.
-- Bünyesindeki özel araçlar:
-  1. L.A.B. Bionic Speed Reader (Biyonik Hızlı Paragraf Okuma)
-  2. L.A.B. Phonetic Inspector (Türkçe Ses Bilgisi & Yazım Kuralları Müfettişi)
-  3. Netlerim & Deneme Takip Sistemi (Öğrencinin net grafiğini analiz eder)
-  4. AI Soru Asistanı (Fotoğrafını çek, anında adım adım çöz)
-  5. 1'e 1 Canlı Ders ve Sınav Koçluğu
+- DersoLab, YKS (TYT / AYT) ve LGS öğrencilerine yönelik yeni nesil bir dijital eğitim, sınav koçluğu ve soru çözüm platformudur.
 - Maskot: Zeki, dinamik ve sevimli Tilki (Fox).
 - Marka Renkleri & Havası: Koyu uzay siyahı, siber camgöbeği (cyan) ve enerjik neon turuncu (orange).
 - Instagram Hesabı: @dersolabegitim
 
 HEDEF KİTLE VE İÇERİK DİLİ:
-- 14-19 yaş arası sınav hazırlığı yapan öğrenciler ve ebeveynler.
-- Dil samimi, motive edici, sınav jargonuna hakim (ÖSYM soru tipleri, kazanım mantığı, net artırma, formül ve kavram püf noktaları).
-- Asla yapay, sıkıcı veya ansiklopedik yazma! Doğrudan etkileşim, "Kaydet", "Arkadaşına Gönder" ve "Biyodaki linke tıkla" psikolojisini tetikle.
+- 14-19 yaş arası sınav hazırlığı yapan öğrenciler ve veliler.
+- Dil samimi, motive edici, gençlerin ilgisini çeken, sınav terminolojisine ve ders müfredatına hakim (ÖSYM soru tipleri, kazanım mantığı, net artırma, formül ve kavram püf noktaları).
+- Asla yapay, kuru veya kopyala-yapıştır şablon gibi yazma!
 
-KONU UYUMU (EN KRİTİK KURAL):
-- Kullanıcının talep ettiği ders ve konuya %100 SADIK KAL.
-- Örneğin kullanıcı "Organik Kimya", "Kimya", "Biyoloji", "Fizik", "Matematik" veya "Tarih" istediyse, BAŞLIK, SLAYTLAR VE TÜM METİNLER KESİNLİKLE O KONU HAKKINDA OLMALIDIR. Asla alakasız başka bir ders veya Türkçe paragraf taktiği YAZMA!
+ÖZGÜR VE KONUYA ÖZEL İÇERİK ÜRETİMİ (ŞABLONSUZ & YARATICI):
+- KESİNLİKLE kalıplaşmış şablonlara veya yapay baskılara takılıp kalma (örn: her postta sürekli aynı Türkçe paragraf hızı taktiği, hep aynı "Paragrafta süre yetiştiremeyenlerin 3 hatası", gereksiz araç reklamı veya alakasız kitap kulübü ZORLAMA)!
+- Kullanıcı giriş kutusuna ne yazdıysa (Örn: "Trigonometri", "Organik Kimya", "Newton'un Hareket Yasaları", "Hücre Bölünmesi", "Milli Edebiyat", "Paragrafta Hız", "LGS Yeni Nesil Geometri", "Sınav Kaygısı" vb.), içerik %100 O DERS VE KONUNUN GERÇEK KAZANIMI, FORMÜLÜ, MANTIĞI VE PÜF NOKTASI üzerine kurulmalıdır.
 
-PAZAR KİTAP ÖNERİSİ HİKAYELERİ (ORTAOKUL + LİSE):
-- DersoLab her Pazar günü hem ORTAOKUL (LGS düzeyi, 10-14 yaş) hem de LİSE (YKS düzeyi, 14-18 yaş) için TEK BİR HİKAYEDE (Story) haftalık kitap önerisi paylaşır.
-- Eğer konu 'book_recommendation' veya Pazar kitap önerisi ise:
-  - Tek bir 9:16 Story içerisinde hem Ortaokul hem Lise için 2 farklı kitap belirle.
-  - Ortaokul Kitabı: LGS yeni nesil paragraf, hayal gücü ve kelime dağarcığını geliştirecek sürükleyici bir kitap (Örn: Momo, Küçük Prens, Samed Behrengi, Beyaz Diş, Çizgili Pijamalı Çocuk, Şeker Portakalı vb.).
-  - Lise Kitabı: TYT paragraf hızı, analitik/felsefi düşünme ve AYT edebiyat derinliği katacak bir başucu kitabı (Örn: Simyacı, 1984, Dönüşüm, Kürk Mantolu Madonna, Saatleri Ayarlama Enstitüsü, Fahrenheit 451 vb.).
-  - 'dualBookData' alanını ortaokul ve lise kitaplarıyla eksiksiz doldur.
-  - Etkileşim çıkartması (sticker) olarak anket (Poll: "Hangisini okuyacaksın? Ortaokul 📘 / Lise 📕") veya soru kutusu oluştur.
+4 SABİT DERSOLAB TEMASI:
+Slaytlarda ve görsel verilerinde SADECE şu 4 tema varyantını kullan:
+1. "lab_dark" (DersoLab Koyu)
+2. "neon_orange" (Neon Turuncu)
+3. "cyan_cyber" (Siber Camgöbeği)
+4. "purple_matrix" (Mor Matris)
+
+4 İÇERİK FORMATI:
+1. carousel: Konuyu derinlemesine, adım adım aktaran 3-5 slaytlık kaydırmalı gönderi.
+2. post: Konunun en kritik özünü veya 1 soru 1 netini özetleyen tekil gönderi.
+3. story: 9:16 oranında, konuya dair anket veya quiz içeren etkileşimli hikaye.
+4. reels: 30 saniyelik, güçlü ilk 3 saniye kancalı ve konu anlatımlı video senaryosu.
 
 ÇIKTI FORMATI:
 Sadece ve sadece istenilen JSON formatında yanıt ver. Markdown blokları (\`\`\`json ... \`\`\`) içine alarak ver.`
 
 // Model Hiyerarşisi:
-// 1. gemini-3.6-flash: 503 vermeyen, ultra kararlı ve hızlı üretim modeli
-// 2. gemini-3.5-flash: İkinci kademe yüksek hızlı flash model
-// 3. gemini-flash-lite-latest: Düşük gecikmeli hafif model
-// 4. gemini-3.8-flash: Yoğunluk bittiğinde devreye girecek model
-// 5. gemini-4-argon: Ücretli kota açıldığında devreye girecek frontier reasoning modeli
+// 1. gemini-3.8-flash: Güncel, ultra kararlı ve yüksek kaliteli üretim modeli
+// 2. gemini-flash-lite-latest: Düşük gecikmeli hafif model
 const MODEL_CASCADE = [
-  'gemini-3.6-flash',
-  'gemini-3.5-flash',
-  'gemini-flash-lite-latest',
   'gemini-3.8-flash',
-  'gemini-4-argon',
+  'gemini-flash-lite-latest',
 ]
 
 async function callGenAIModel(
@@ -116,109 +108,115 @@ export async function generateSocialPost(request: GeneratePostRequest): Promise<
     const topicFocus = (request.customPrompt || request.subTopic || request.subject || 'Sınav Hazırlığı').trim()
 
     const userPrompt = `
-Lütfen aşağıdaki parametrelere göre 1 adet yüksek etkileşimli Instagram içeriği üret:
-- İçerik Tipi: ${request.type} (${request.type === 'carousel' ? 'Kaydırmalı Carousel' : request.type === 'reels' ? 'Reels / Kısa Video Senaryosu' : request.type === 'story' ? 'Instagram Story' : 'Tekli Görsel / Günün Sorusu'})
-- KESİNLİKLE ODAKLANILACAK KONU: "${topicFocus}"
-- Konu Kategorisi: ${request.topic}
-${request.subject ? `- İlgili Ders / Branş: ${request.subject}` : `- İlgili Ders: "${topicFocus}" konusunun ait olduğu ders (Örn: Kimya, Matematik, Biyoloji, Türkçe vb.)`}
-${request.subTopic ? `- Odak Konu / Ünite: ${request.subTopic}` : ''}
+Lütfen aşağıdaki parametrelere göre yüksek etkileşimli ve öğretici 1 adet Instagram içeriği üret:
+- İçerik Formatı: ${request.type} (${request.type === 'carousel' ? 'Kaydırmalı Carousel' : request.type === 'reels' ? 'Reels / Video Senaryosu' : request.type === 'story' ? 'Instagram Story' : 'Tekli Görsel / Bilgi Gönderisi'})
+- İÇERİK KONUSU VEYA TALİMAT: "${topicFocus}"
 - Hedef Kitle: ${request.targetGrade || 'YKS (TYT/AYT)'}
-- Ton: ${request.tone || 'energetic'}
-${request.customPrompt ? `- Özel Talimat / Ekstra Not: ${request.customPrompt}` : ''}
+- Anlatım Tonu: ${request.tone || 'energetic'}
+${request.customPrompt && request.customPrompt !== topicFocus ? `- Ek Not / Talimat: ${request.customPrompt}` : ''}
 
-ÖNEMLİ KURAL:
-İçeriğin başlığı, slaytları, kancası, maddeleri ve tüm metinleri KESİNLİKLE "${topicFocus}" konusu üzerine olmalıdır! Konuyla alakasız başka ders veya paragraf taktikleri YAZMA!
+ÖNEMLİ KURALLAR:
+1. ŞABLONSUZ & ÖZGÜR: Asla basmakalıp hazır şablon cümleleri yazma. İçerik KESİNLİKLE "${topicFocus}" konusunun gerçek ders içeriği, kuralları, formülleri, soru çözme mantığı veya püf noktaları üzerine odaklanmalıdır!
+2. 4 SABİT TEMA: Her slayt ve görsel için 'themeVariant' değerini SADECE şu 4 temadan biri olarak belirle:
+   - "lab_dark" (DersoLab Koyu)
+   - "neon_orange" (Neon Turuncu)
+   - "cyan_cyber" (Siber Camgöbeği)
+   - "purple_matrix" (Mor Matris)
 
-Yanıtını kesinlikle şu JSON şemasına uygun döndür:
+Yanıtını kesinlikle şu JSON formatında döndür:
 {
-  "title": "İçerik başlığı (${topicFocus} ile doğrudan ilgili)",
-  "topicLabel": "Konu etiketi (Örn: AYT Kimya • Organik Kimya, TYT Matematik vb.)",
-  "targetAudience": "YKS 2026 Adayları",
-  "caption": "Instagram gönderi açıklaması (${topicFocus} ile ilgili, emojili, kancalı, CTA'li)",
-  "hashtags": ["#yks2026", "#dersolab"],
+  "title": "${topicFocus} konusunu yansıtan çekici ve öğretici başlık",
+  "topicLabel": "Ders & Konu Etiketi (Örn: TYT Matematik • ${topicFocus}, AYT Fizik vb.)",
+  "targetAudience": "${request.targetGrade || 'YKS 2026 Adayları'}",
+  "caption": "${topicFocus} konusunu anlatan, emojili, kancalı, kaydetmeye teşvik eden özgün Instagram açıklaması",
+  "hashtags": ["#yks2026", "#dersolab", "#ykstayfa", "#${topicFocus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}"],
   ${
     request.type === 'carousel'
       ? `"carouselSlides": [
     {
       "slideNumber": 1,
       "badge": "DERS VEYA KONU ADI",
-      "headline": "Vurucu Kapak Başlığı",
-      "subhead": "Merak uyandırıcı alt başlık",
-      "bodyPoints": ["Neden bu konuyu kaçırıyorsun?", "Kaydır ve püf noktayı kap 👉"],
+      "headline": "${topicFocus} ile İlgili Dikkat Çekici Kapak Başlığı",
+      "subhead": "Konunun önemini ve sınavdaki yerini belirten merak uyandırıcı alt başlık",
+      "bodyPoints": [
+        "${topicFocus} konusunda öğrencilerin en sık takıldığı nokta veya soru",
+        "Kaydır, pratik çözüm mantığını ve formülü adım adım öğren 👉"
+      ],
       "highlightTag": "KAYDETMELİK",
       "footerNote": "DersoLab • Sınav Laboratuvarı",
-      "themeVariant": "lab_dark" // "lab_dark" | "neon_orange" | "cyan_cyber" | "purple_matrix"
+      "themeVariant": "lab_dark"
     },
     {
       "slideNumber": 2,
-      "badge": "1. ADIM",
-      "headline": "Kural veya Püf Nokta Başlığı",
-      "subhead": "Önemli açıklama",
-      "bodyPoints": ["Madde 1", "Madde 2", "Örnek mantık"],
-      "highlightTag": "ÖNEMLİ",
+      "badge": "TEMEL KURAL & FORMÜL",
+      "headline": "1. Kritik Mantık: ${topicFocus}",
+      "subhead": "Öğrencinin bilmesi gereken temel yasa veya kural",
+      "bodyPoints": [
+        "${topicFocus} ile ilgili 1. temel formül, kural veya kavram tanımı",
+        "Bu kural uygulanırken dikkat edilmesi gereken kritik nokta"
+      ],
+      "highlightTag": "PÜF NOKTA",
       "footerNote": "DersoLab",
       "themeVariant": "neon_orange"
     },
     {
       "slideNumber": 3,
-      "badge": "ÖZET & CTA",
-      "headline": "Netlerini Artırmak Bu Kadar Kolay",
-      "subhead": "Biyodaki linkten ücretsiz deneme dersini kap!",
-      "bodyPoints": ["Bu postu kaydet, tekrar bak", "Çalışma arkadaşına gönder", "DersoLab L.A.B.'ı ücretsiz dene"],
-      "highlightTag": "LİNK BİYODA",
-      "footerNote": "@dersolabegitim",
+      "badge": "ÖSYM KAZANIMI & TAKTİK",
+      "headline": "Sınavda Nasıl Çıkar & Çözüm Yolu",
+      "subhead": "ÖSYM'nin soru tipi ve çeldirici ayrımı",
+      "bodyPoints": [
+        "Soru kökünde hangi ipuçlarına bakılmalı?",
+        "Zaman kazandıran pratik işlem veya eleme adımı"
+      ],
+      "highlightTag": "+ NET",
+      "footerNote": "DersoLab",
       "themeVariant": "cyan_cyber"
+    },
+    {
+      "slideNumber": 4,
+      "badge": "ÖZET & HAREKETE GEÇ",
+      "headline": "Bu Bilgiyi Denemende Test Et!",
+      "subhead": "Unutmamak için bu gönderiyi kaydet ve arkadaşına gönder.",
+      "bodyPoints": [
+        "💾 Kaydetmeyi ve denemeden önce göz gezdirmeyi unutma!",
+        "🔗 Profildeki linkten ${topicFocus} sorularını çözmeye hemen başla."
+      ],
+      "highlightTag": "KAYDET",
+      "footerNote": "@dersolabegitim",
+      "themeVariant": "purple_matrix"
     }
   ]`
       : request.type === 'reels'
         ? `"reelsStoryboard": {
-    "hook3s": "İlk 3 saniye kancası: (${topicFocus} ile ilgili şaşırtıcı kanca veya tuzak uyarısı)",
-    "visualDirection": "Dinamik sunum veya DersoLab ekranı ile görsel animasyon.",
-    "spokenScript": "Tam konuşma metni (${topicFocus} mantığını anlatan)...",
-    "onScreenText": ["Kritik Kural!", "Hata Yapma!", "Link Biyoda 🦊"],
-    "musicAudioVibe": "Hızlı, dinamik trend beat",
-    "callToAction": "${topicFocus} konusunda eksiklerini kapatmak için profildeki linke tıkla!"
+    "hook3s": "${topicFocus} ile ilgili ilk 3 saniyede izleyiciyi durduran kanca cümlesi",
+    "visualDirection": "Konuşmacı ön planda, arkada ${topicFocus} ile ilgili şema veya formül görseli belirir.",
+    "spokenScript": "${topicFocus} konusundaki kritik püf noktayı ve çözüm kuralını anlatan 30 saniyelik samimi seslendirme metni...",
+    "onScreenText": ["🚨 DİKKAT!", "${topicFocus.toUpperCase()}", "ÖSYM KAZANIMI", "Link Biyoda 🦊"],
+    "musicAudioVibe": "Enerjik / Hızlı BPM Trend Beat",
+    "callToAction": "${topicFocus} netlerini artırmak için profildeki linke tıkla!"
   }`
       : request.type === 'story'
         ? `"storyData": {
-    "badge": "GÜNÜN QUIZI / PAZAR KİTAP KULÜBÜ",
-    "headline": "${topicFocus} Püf Noktası / Haftanın Kitap Önerileri",
-    "subhead": "Doğru şıkkı tahmin edebilecek misin? / Ortaokul & Lise İçin Seçtik",
-    "stickerType": "${request.storyStickerType || (request.topic === 'book_recommendation' ? 'poll' : 'quiz')}", // "quiz" | "poll" | "link" | "countdown" | "question_box"
-    "stickerQuestion": "${request.topic === 'book_recommendation' ? 'Bu hafta hangisini okuyacaksın?' : `${topicFocus} sorusu?`}",
-    "stickerOptions": ${request.topic === 'book_recommendation' ? '["Ortaokul: Kitap Adı 📘", "Lise: Kitap Adı 📕"]' : '["Şık A", "Şık B", "Şık C", "Şık D"]'},
+    "badge": "GÜNÜN TESTİ ⚡",
+    "headline": "${topicFocus} Sorusu",
+    "subhead": "Sence doğru cevap hangisi?",
+    "stickerType": "${request.storyStickerType || 'quiz'}",
+    "stickerQuestion": "${topicFocus} ile ilgili sınav sorusu veya kavram testi?",
+    "stickerOptions": ["A) Doğru Seçenek / Kural", "B) Çeldirici Yanılgı", "C) Yanlış Yaklaşım", "D) Diğer"],
     "stickerLinkText": "DersoLab",
     "stickerLinkUrl": "https://dersolab.com/lab",
-    "themeVariant": "purple_matrix",
-    "dualBookData": { // EĞER KONU 'book_recommendation' VEYA KİTAP İSE ZORUNLUDUR:
-      "ortaokul": {
-        "title": "Kitap Adı (Ortaokul/LGS)",
-        "author": "Yazar Adı",
-        "genre": "Felsefi Masal / Macera / Bilim Kurgu vb.",
-        "whyRead": "LGS yeni nesil paragraf sorularında hız, odaklanma ve hayal gücü katkısı",
-        "highlightTag": "ORTAOKUL & LGS (10-14 YAŞ)"
-      },
-      "lise": {
-        "title": "Kitap Adı (Lise/YKS)",
-        "author": "Yazar Adı",
-        "genre": "Klasik / Alegorik Roman / Distopya vb.",
-        "whyRead": "TYT derin anlama, AYT edebiyat tahlili ve analitik düşünme katkısı",
-        "highlightTag": "LİSE & YKS (14-18 YAŞ)"
-      }
-    }
+    "themeVariant": "neon_orange"
   }`
       : `"singlePostData": {
-    "badge": "GÜNÜN ÖSYM SORUSU",
-    "headline": "${topicFocus} Tuzağı!",
-    "questionOrSummary": "${topicFocus} ile ilgili soru metni veya özet ipucu...",
-    "keyTakeaway": "Püf nokta: Bu soru tipinde dikkat edilmesi gereken kural.",
+    "badge": "1 SORU 1 NET",
+    "headline": "${topicFocus} • Kritik Bilgi",
+    "questionOrSummary": "${topicFocus} hakkında sınavda hayat kurtaran temel özet veya soru kökü.",
+    "keyTakeaway": "ÖSYM bu ayrımı sıklıkla sorar, kuralı zihnine kazı!",
     "options": [
-      { "key": "A", "text": "Doğru Şık", "isCorrect": true },
-      { "key": "B", "text": "Çeldirici Şık 1", "isCorrect": false },
-      { "key": "C", "text": "Çeldirici Şık 2", "isCorrect": false },
-      { "key": "D", "text": "Çeldirici Şık 3", "isCorrect": false }
+      { "key": "A", "text": "Doğru Bilgi / Çözüm", "isCorrect": true },
+      { "key": "B", "text": "Çeldirici Tuzak", "isCorrect": false }
     ],
-    "themeVariant": "neon_orange"
+    "themeVariant": "lab_dark"
   }`
   }
 }

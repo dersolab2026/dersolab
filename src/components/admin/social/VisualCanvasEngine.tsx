@@ -300,11 +300,11 @@ export function VisualCanvasEngine({
     }
   }
 
-  // Tema Değiştirme
+  // Tema Değiştirme (4 Sabit DersoLab Teması)
   function cycleTheme() {
     if (!isCarousel || !currentSlide || !onSlideUpdate) return
-    const themes: SlideThemeVariant[] = ['lab_dark', 'neon_orange', 'cyan_cyber', 'purple_matrix', 'emerald_glow']
-    const currentIndex = themes.indexOf(currentSlide.themeVariant)
+    const themes: SlideThemeVariant[] = ['lab_dark', 'neon_orange', 'cyan_cyber', 'purple_matrix']
+    const currentIndex = themes.indexOf(currentSlide.themeVariant as any)
     const nextTheme = themes[(currentIndex + 1) % themes.length]
     onSlideUpdate(activeSlideIndex, {
       ...currentSlide,
@@ -435,7 +435,7 @@ export function VisualCanvasEngine({
             <button
               onClick={cycleTheme}
               className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs font-medium text-slate-300 transition-colors"
-              title="Temayı Değiştir (Emerald Glow, Lab Dark, Neon Orange, Cyan Cyber, Purple Matrix)"
+              title="Temayı Değiştir (DersoLab Koyu, Neon Turuncu, Siber Mavi, Mor Gece)"
             >
               <Palette className="w-3.5 h-3.5 text-orange-400" />
               <span>Tema</span>
