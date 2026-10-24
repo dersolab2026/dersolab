@@ -31,7 +31,7 @@ export type SlideThemeVariant =
   | 'emerald_glow'
   | 'grok_cyber'
 
-export type StoryStickerType = 'quiz' | 'poll' | 'link' | 'countdown' | 'question_box'
+export type StoryStickerType = 'none' | 'quiz' | 'poll' | 'link' | 'countdown' | 'question_box'
 
 export type ImageStylePreset =
   | 'cyber_lab'
@@ -207,6 +207,8 @@ export interface GeneratePostRequest {
   platform?: SocialPlatform
   imageBase64?: string
   storyStickerType?: StoryStickerType
+  excludeSummary?: string
+  variationSeed?: number
 }
 
 export interface WeeklyCalendarRequest {

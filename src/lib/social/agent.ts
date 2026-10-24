@@ -160,6 +160,211 @@ async function callGenAIModel(
 }
 
 /**
+ * Kitap kapakları için dinamik vektörel kapak illüstrasyonu (SVG Data URL) üretir.
+ * Momo ve Simyacı için mevcut yüksek çözünürlüklü kapak görsellerini kullanır;
+ * diğer tüm kitaplar için kitabın adına, yazarına ve türüne özel şık 3D kapak tasarlar.
+ */
+export function buildBookCoverSvgDataUrl(
+  title: string,
+  author: string,
+  genre: string = 'Edebiyat Klasiği',
+  level: 'ortaokul' | 'lise' = 'ortaokul'
+): string {
+  const cleanTitle = (title || '').trim()
+  if (/^momo$/i.test(cleanTitle)) return '/books/momo.jpg'
+  if (/^simyacı$|^simyaci$/i.test(cleanTitle)) return '/books/simyaci.jpg'
+
+  const esc = (s: string) =>
+    (s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+
+  const isOrtaokul = level === 'ortaokul'
+  const bg1 = isOrtaokul ? '#061826' : '#1f0d06'
+  const bg2 = isOrtaokul ? '#0e3a52' : '#431407'
+  const accent = isOrtaokul ? '#38bdf8' : '#fb923c'
+  const accentSoft = isOrtaokul ? 'rgba(56,189,248,0.22)' : 'rgba(251,146,60,0.22)'
+  const badgeLabel = isOrtaokul ? 'LGS & ORTAOKUL SEÇKİSİ' : 'YKS & LİSE KLASİĞİ'
+
+  // Başlığı 2 satıra böl
+  const words = cleanTitle.split(/\s+/)
+  let line1 = cleanTitle
+  let line2 = ''
+  if (cleanTitle.length > 14 && words.length >= 2) {
+    const mid = Math.ceil(words.length / 2)
+    line1 = words.slice(0, mid).join(' ')
+    line2 = words.slice(mid).join(' ')
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 640" width="430" height="640">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${bg1}"/>
+        <stop offset="100%" stop-color="${bg2}"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="50%" cy="38%" r="48%">
+        <stop offset="0%" stop-color="${accent}" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="${bg1}" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="430" height="640" rx="22" fill="url(#bg)"/>
+    <rect width="430" height="640" rx="22" fill="url(#glow)"/>
+    <rect x="18" y="18" width="394" height="604" rx="16" fill="none" stroke="${accent}" stroke-opacity="0.45" stroke-width="2"/>
+    <rect x="30" y="30" width="370" height="580" rx="12" fill="none" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1"/>
+    <rect x="0" y="0" width="16" height="640" fill="#ffffff" fill-opacity="0.08"/>
+    <rect x="55" y="54" width="320" height="36" rx="18" fill="${accentSoft}" stroke="${accent}" stroke-opacity="0.5"/>
+    <text x="215" y="78" text-anchor="middle" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="800" letter-spacing="1.5">${esc(badgeLabel)}</text>
+    <circle cx="215" cy="240" r="86" fill="${accentSoft}" stroke="${accent}" stroke-width="2" stroke-dasharray="6 6"/>
+    <circle cx="215" cy="240" r="58" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5"/>
+    <path d="M175 255 Q215 225 255 255 L255 215 Q215 185 175 215 Z" fill="${accent}" fill-opacity="0.85"/>
+    <path d="M215 198 L215 262" stroke="${bg1}" stroke-width="3"/>
+    <text x="215" y="${line2 ? '395' : '415'}" text-anchor="middle" fill="#ffffff" font-family="Inter, system-ui, sans-serif" font-size="${line1.length > 15 ? '30' : '36'}" font-weight="900">${esc(line1)}</text>
+    ${line2 ? `<text x="215" y="438" text-anchor="middle" fill="#ffffff" font-family="Inter, system-ui, sans-serif" font-size="${line2.length > 15 ? '30' : '36'}" font-weight="900">${esc(line2)}</text>` : ''}
+    <line x1="115" y1="468" x2="315" y2="468" stroke="${accent}" stroke-opacity="0.5" stroke-width="2"/>
+    <text x="215" y="506" text-anchor="middle" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700">${esc(author)}</text>
+    <text x="215" y="544" text-anchor="middle" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="500">${esc(genre)}</text>
+    <text x="215" y="592" text-anchor="middle" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="700" letter-spacing="2">DERSOLAB KÜTÜPHANESİ</text>
+  </svg>`
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+}
+
+export const CURATED_BOOK_PAIRS = [
+  {
+    ortaokul: {
+      title: 'Momo',
+      author: 'Michael Ende',
+      genre: 'Felsefi Masal & Zaman Macerası',
+      whyRead: 'LGS yeni nesil sorularda zaman algısı ve dikkat süresini geliştirir.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: '/books/momo.jpg',
+    },
+    lise: {
+      title: 'Simyacı',
+      author: 'Paulo Coelho',
+      genre: 'Alegorik Roman',
+      whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve derin anlama becerisi kazandırır.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: '/books/simyaci.jpg',
+    },
+  },
+  {
+    ortaokul: {
+      title: 'Küçük Prens',
+      author: 'Antoine de Saint-Exupéry',
+      genre: 'Felsefi Öykü & İmgelem',
+      whyRead: 'Soyut düşünme ve LGS paragraf sorularında ana fikir yakalama yeteneğini güçlendirir.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+    },
+    lise: {
+      title: 'Beyaz Zambaklar Ülkesinde',
+      author: 'Grigory Petrov',
+      genre: 'Düşünce & Azim Klasiği',
+      whyRead: 'Çalışma disiplini, irade eğitimi ve hedefe odaklanma konusunda eşsiz bir başucu eseridir.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+    },
+  },
+  {
+    ortaokul: {
+      title: 'Şeker Portakalı',
+      author: 'José Mauro de Vasconcelos',
+      genre: 'Büyüme & Empati Romanı',
+      whyRead: 'Duygusal zeka, söz varlığı ve uzun metinlerde kopmadan okuma alışkanlığı kazandırır.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+    },
+    lise: {
+      title: 'Satranç',
+      author: 'Stefan Zweig',
+      genre: 'Psikolojik Analiz & Novella',
+      whyRead: 'Zihinsel strateji, odaklanma psikolojisi ve TYT Türkçe derin çıkarım sorularına hız katar.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+    },
+  },
+  {
+    ortaokul: {
+      title: 'Sol Ayağım',
+      author: 'Christy Brown',
+      genre: 'Otobiyografi & Azim Öyküsü',
+      whyRead: 'Zorluklar karşısında pes etmeme bilinci ve güçlü anlatım tekniklerini kavratır.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+    },
+    lise: {
+      title: 'Dönüşüm',
+      author: 'Franz Kafka',
+      genre: 'Modern Klasik & Metafor',
+      whyRead: 'ÖSYM’nin çok sevdiği soyut ve felsefi paragraf metinlerini tek okumada çözme pratiği sağlar.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+    },
+  },
+  {
+    ortaokul: {
+      title: 'Martı Jonathan Livingston',
+      author: 'Richard Bach',
+      genre: 'Özgürlük & Başarı Alegorisi',
+      whyRead: 'Kendi sınırlarını aşma cesareti ve sembolik metinleri yorumlama becerisi kazandırır.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+    },
+    lise: {
+      title: 'Fahrenheit 451',
+      author: 'Ray Bradbury',
+      genre: 'Distopya & Eleştirel Düşünce',
+      whyRead: 'Okuma kültürü, eleştirel bakış açısı ve TYT-AYT düşünce yazısı analizinde fark yaratır.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+    },
+  },
+  {
+    ortaokul: {
+      title: 'Pal Sokağı Çocukları',
+      author: 'Ferenc Molnár',
+      genre: 'Dostluk & Sorumluluk Klasiği',
+      whyRead: 'Olay örgüsü takibi, karakter analizi ve hızlı okuma pratiği için en etkili eserlerdendir.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+    },
+    lise: {
+      title: 'Fareler ve İnsanlar',
+      author: 'John Steinbeck',
+      genre: 'Toplumcu Klasik Roman',
+      whyRead: 'Hayaller, gerçeklik ve karakter tahlili üzerinden edebiyat ve paragraf yorum gücünü artırır.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+    },
+  },
+  {
+    ortaokul: {
+      title: 'Beyaz Diş',
+      author: 'Jack London',
+      genre: 'Doğa & Hayatta Kalma Macerası',
+      whyRead: 'Betimleme gücü yüksek metinlerde dikkat toplama ve kelime hazinesini zenginleştirir.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+    },
+    lise: {
+      title: 'Kürk Mantolu Madonna',
+      author: 'Sabahattin Ali',
+      genre: 'Türk Edebiyatı Başyapıtı',
+      whyRead: 'AYT Edebiyat bireyin iç dünyasını esas alan eserler kazanımı ve psikolojik tahlil gücü sağlar.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+    },
+  },
+  {
+    ortaokul: {
+      title: 'Uçan Sınıf',
+      author: 'Erich Kästner',
+      genre: 'Okul & Dayanışma Romanı',
+      whyRead: 'Akıcı diyalogları ve sıcak kurgusuyla okuma hızını ve anlam bütünlüğü kurmayı destekler.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+    },
+    lise: {
+      title: 'İnsan Ne İle Yaşar?',
+      author: 'Lev Tolstoy',
+      genre: 'Felsefi Hikayeler & Değerler',
+      whyRead: 'Kısa ama derinlikli metinlerden ana düşünce ve yardımcı düşünce çıkarma hızını katlar.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+    },
+  },
+]
+
+/**
  * Tekil Instagram Gönderisi Üretir
  */
 export async function generateSocialPost(request: GeneratePostRequest): Promise<SocialPostItem> {
@@ -173,6 +378,10 @@ export async function generateSocialPost(request: GeneratePostRequest): Promise<
     const ai = new GoogleGenAI({ apiKey })
 
     const topicFocus = (request.customPrompt || request.subTopic || request.subject || 'Sınav Hazırlığı').trim()
+    const isBookTopic =
+      request.topic === 'book_recommendation' ||
+      /kitap|roman|okuma kulübü|pazar hikayesi|kitap öneri/i.test(topicFocus)
+    const chosenSticker = request.storyStickerType || 'none'
 
     const userPrompt = `
 Lütfen aşağıdaki parametrelere göre yüksek etkileşimli ve öğretici 1 adet Instagram içeriği üret:
@@ -181,6 +390,11 @@ Lütfen aşağıdaki parametrelere göre yüksek etkileşimli ve öğretici 1 ad
 - Hedef Kitle: ${request.targetGrade || 'YKS (TYT/AYT)'}
 - Anlatım Tonu: ${request.tone || 'energetic'}
 ${request.customPrompt && request.customPrompt !== topicFocus ? `- Ek Not / Talimat: ${request.customPrompt}` : ''}
+${
+  request.excludeSummary
+    ? `\n⚠️ ÇOK ÖNEMLİ - YENİDEN ÜRETİM / FARKLI ALTERNATİF TALEBİ:\nKullanıcı bir önceki içeriği beğenmedi ve "Yeniden Dene" butonuna bastı! Daha önce gösterilen şu içerikleri, soruları veya kitapları KESİNLİKLE TEKRAR ETME, tamamen FARKLI ve YENİ alternatifler/kitaplar/sorular seç:\n"${request.excludeSummary}"\n(Varyasyon Tohumu: ${request.variationSeed || Date.now()})\n`
+    : ''
+}
 
 ÖNEMLİ KURALLAR:
 1. ŞABLONSUZ & ÖZGÜR: Asla basmakalıp hazır şablon cümleleri yazma. İçerik KESİNLİKLE "${topicFocus}" konusunun gerçek ders içeriği, kuralları, formülleri, soru çözme mantığı veya püf noktaları üzerine odaklanmalıdır!
@@ -263,11 +477,39 @@ Yanıtını kesinlikle şu JSON formatında döndür:
     "callToAction": "${topicFocus} netlerini artırmak için profildeki linke tıkla!"
   }`
       : request.type === 'story'
-        ? `"storyData": {
-    "badge": "GÜNÜN TESTİ ⚡",
-    "headline": "${topicFocus} Sorusu",
-    "subhead": "Sence doğru cevap hangisi?",
-    "stickerType": "${request.storyStickerType || 'quiz'}",
+        ? isBookTopic
+          ? `"storyData": {
+    "badge": "PAZAR KİTAP KULÜBÜ 📚",
+    "headline": "Haftanın Kitap Önerileri",
+    "subhead": "Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik",
+    "stickerType": "${chosenSticker}",
+    "stickerQuestion": "Bu hafta hangisini okuyacaksın?",
+    "stickerOptions": ["Ortaokul Kitabı 📘", "Lise Kitabı 📕"],
+    "stickerLinkText": "DersoLab",
+    "stickerLinkUrl": "https://dersolab.com/lab",
+    "themeVariant": "purple_matrix",
+    "dualBookData": {
+      "ortaokul": {
+        "title": "Ortaokul (10-14 yaş) için seçilen edebi kitabın adı",
+        "author": "Yazar adı",
+        "genre": "Kitabın türü",
+        "whyRead": "LGS paragraf ve odaklanma becerisine katkısı (1 cümle)",
+        "highlightTag": "ORTAOKUL & LGS (10-14 YAŞ)"
+      },
+      "lise": {
+        "title": "Lise (14-18 yaş) için seçilen edebi kitabın adı",
+        "author": "Yazar adı",
+        "genre": "Kitabın türü",
+        "whyRead": "YKS derin anlama ve analiz becerisine katkısı (1 cümle)",
+        "highlightTag": "LİSE & YKS (14-18 YAŞ)"
+      }
+    }
+  }`
+          : `"storyData": {
+    "badge": "DERSOLAB STORY ⚡",
+    "headline": "${topicFocus} Püf Noktası",
+    "subhead": "Sınavda net kurtaran kritik bilgi ve özet not",
+    "stickerType": "${chosenSticker}",
     "stickerQuestion": "${topicFocus} ile ilgili sınav sorusu veya kavram testi?",
     "stickerOptions": ["A) Doğru Seçenek / Kural", "B) Çeldirici Yanılgı", "C) Yanlış Yaklaşım", "D) Diğer"],
     "stickerLinkText": "DersoLab",
@@ -320,7 +562,7 @@ Yanıtını kesinlikle şu JSON formatında döndür:
     const response = await callGenAIModel(ai, {
       contents,
       systemInstruction: SYSTEM_INSTRUCTION,
-      temperature: 0.7,
+      temperature: request.excludeSummary || request.variationSeed ? 0.9 : 0.7,
       maxOutputTokens: 2500,
     })
 
@@ -337,11 +579,40 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       badge: slide.badge ? slide.badge.toLocaleUpperCase('tr-TR') : undefined,
     }))
 
+    // Story kitap önerisi ise dualBookData kapak görsellerini hazırla
+    let normalizedStoryData = parsed.storyData
+      ? {
+          ...parsed.storyData,
+          headline: toTurkishTitleCase(parsed.storyData.headline || ''),
+          badge: parsed.storyData.badge?.toLocaleUpperCase('tr-TR'),
+          stickerType: request.storyStickerType || parsed.storyData.stickerType || 'none',
+        }
+      : undefined
+
+    if (normalizedStoryData?.dualBookData?.ortaokul && normalizedStoryData?.dualBookData?.lise) {
+      const ort = normalizedStoryData.dualBookData.ortaokul
+      const lis = normalizedStoryData.dualBookData.lise
+      normalizedStoryData.dualBookData = {
+        ortaokul: {
+          ...ort,
+          imageUrl: ort.imageUrl || buildBookCoverSvgDataUrl(ort.title, ort.author, ort.genre, 'ortaokul'),
+        },
+        lise: {
+          ...lis,
+          imageUrl: lis.imageUrl || buildBookCoverSvgDataUrl(lis.title, lis.author, lis.genre, 'lise'),
+        },
+      }
+      normalizedStoryData.stickerOptions = [
+        `Ortaokul: ${ort.title} 📘`,
+        `Lise: ${lis.title} 📕`,
+      ]
+    }
+
     const postItem: SocialPostItem = {
       id: `post_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       title: formattedTitle,
       type: request.type,
-      topic: request.topic,
+      topic: isBookTopic ? 'book_recommendation' : request.topic,
       topicLabel: toTurkishTitleCase(parsed.topicLabel || 'Eğitim ve Sınav'),
       status: 'draft',
       caption: parsed.caption || '',
@@ -357,13 +628,7 @@ Yanıtını kesinlikle şu JSON formatında döndür:
             badge: parsed.singlePostData.badge?.toLocaleUpperCase('tr-TR'),
           }
         : undefined,
-      storyData: parsed.storyData
-        ? {
-            ...parsed.storyData,
-            headline: toTurkishTitleCase(parsed.storyData.headline || ''),
-            badge: parsed.storyData.badge?.toLocaleUpperCase('tr-TR'),
-          }
-        : undefined,
+      storyData: normalizedStoryData,
       reelsStoryboard: parsed.reelsStoryboard,
       xThreadData: parsed.xThreadData,
       uploadedImageUrl: request.imageBase64,
@@ -371,7 +636,8 @@ Yanıtını kesinlikle şu JSON formatında döndür:
     }
 
     // Otomatik AI Görsel Entegrasyonu (Metinden Ziyade Görsel Odaklı Tasarım)
-    if (!postItem.uploadedImageUrl && request.type !== 'x_thread') {
+    // Not: Kitap önerisi (dualBookData) olan Story'lerde çift kitap kartı zaten kendi kapak görsellerini çizdiği için üst görsel kutusu eklenmez.
+    if (!postItem.uploadedImageUrl && request.type !== 'x_thread' && !postItem.storyData?.dualBookData) {
       try {
         const visualSubject = request.subject || parsed.topicLabel || parsed.title
         const visualPrompt = `${parsed.title}: ${parsed.topicLabel || 'Bilimsel infografik ve kavram şeması'}`
@@ -388,8 +654,6 @@ Yanıtını kesinlikle şu JSON formatında döndür:
         })
         if (img?.imageUrl) {
           postItem.uploadedImageUrl = img.imageUrl
-          // Carousel slaytlarında maddeler (bodyPoints) varsa görsel kutusu metinleri sıkıştırmasın.
-          // Yalnızca slaytta madde yoksa (saf görsel/diyagram slaytı) slayta görsel bağla.
           if (
             !isExplicitMascot &&
             postItem.carouselSlides &&
@@ -679,47 +943,57 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
   if (request.type === 'story') {
     const isBook =
       request.topic === 'book_recommendation' ||
-      (request.customPrompt && /kitap|pazar/i.test(request.customPrompt))
+      (request.customPrompt && /kitap|pazar|roman|okuma/i.test(request.customPrompt)) ||
+      (request.subject && /kitap|pazar|roman|okuma/i.test(request.subject))
 
     if (isBook) {
+      const excludeLower = (request.excludeSummary || '').toLocaleLowerCase('tr-TR')
+      const availablePairs = CURATED_BOOK_PAIRS.filter(
+        (pair) =>
+          !excludeLower.includes(pair.ortaokul.title.toLocaleLowerCase('tr-TR')) &&
+          !excludeLower.includes(pair.lise.title.toLocaleLowerCase('tr-TR'))
+      )
+      const pool = availablePairs.length > 0 ? availablePairs : CURATED_BOOK_PAIRS
+      const seedIdx = Math.abs(request.variationSeed ?? Math.floor(now / 1000)) % pool.length
+      const chosenPair = pool[seedIdx]
+
+      const ortBook = {
+        ...chosenPair.ortaokul,
+        imageUrl:
+          chosenPair.ortaokul.imageUrl ||
+          buildBookCoverSvgDataUrl(chosenPair.ortaokul.title, chosenPair.ortaokul.author, chosenPair.ortaokul.genre, 'ortaokul'),
+      }
+      const liseBook = {
+        ...chosenPair.lise,
+        imageUrl:
+          chosenPair.lise.imageUrl ||
+          buildBookCoverSvgDataUrl(chosenPair.lise.title, chosenPair.lise.author, chosenPair.lise.genre, 'lise'),
+      }
+
       return {
         id: `post_${now}_story_book`,
-        title: 'Pazar Hikayesi: Ortaokul & Lise Haftalık Kitap Önerisi',
+        title: `Haftalık Kitap Önerisi: ${ortBook.title} & ${liseBook.title}`,
         type: 'story',
         topic: 'book_recommendation',
         topicLabel: 'Pazar Kitap Kulübü • Ortaokul & Lise',
         status: 'draft',
         targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
-        caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) grubumuz için okuma hızını, odaklanmayı ve sınav derinliğini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab #kitapkurdu`,
+        caption: `Haftalık Kitap Kulübümüz yayında! 📚🦊\n\n📘 Ortaokul (LGS): ${ortBook.title} — ${ortBook.author}\n📕 Lise (YKS): ${liseBook.title} — ${liseBook.author}\n\nHem LGS hem YKS hazırlığında okuma hızını, odaklanmayı ve sınav derinliğini uçuracak 2 harika başucu kitabı!\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab #kitapkurdu`,
         hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2027', '#yks2027', '#dersolab'],
         storyData: {
           badge: 'PAZAR KİTAP KULÜBÜ 📚',
           headline: 'Haftanın Kitap Önerileri',
           subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
-          stickerType: 'poll',
-          stickerQuestion: 'Bu Pazar hangisini okuyacaksın?',
-          stickerOptions: ['Ortaokul: Momo 📘', 'Lise: Simyacı 📕'],
+          stickerType: request.storyStickerType || 'none',
+          stickerQuestion: 'Bu hafta hangisini okuyacaksın?',
+          stickerOptions: [`Ortaokul: ${ortBook.title} 📘`, `Lise: ${liseBook.title} 📕`],
           stickerLinkText: 'Kitap Listesi & İpuçları',
           stickerLinkUrl: 'https://dersolab.com/lab',
           themeVariant: 'purple_matrix',
           uploadedImageUrl: request.imageBase64,
           dualBookData: {
-            ortaokul: {
-              title: 'Momo',
-              author: 'Michael Ende',
-              genre: 'Felsefi Masal & Zaman Macerası',
-              whyRead: 'LGS yeni nesil sorularda zaman algısı ve dikkat süresini geliştirir.',
-              highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
-              imageUrl: '/books/momo.jpg',
-            },
-            lise: {
-              title: 'Simyacı',
-              author: 'Paulo Coelho',
-              genre: 'Alegorik Roman',
-              whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve derin anlama becerisi kazandırır.',
-              highlightTag: 'LİSE & YKS (14-18 YAŞ)',
-              imageUrl: '/books/simyaci.jpg',
-            },
+            ortaokul: ortBook,
+            lise: liseBook,
           },
         },
         uploadedImageUrl: request.imageBase64,
@@ -729,19 +1003,19 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
 
     return {
       id: `post_${now}_story`,
-      title: `Story: Günün ${displayTitle} Quizi`,
+      title: `Story: ${displayTitle}`,
       type: 'story',
       topic: request.topic,
       topicLabel: `Story • ${focus}`,
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `Doğru şıkkı bulanlar kimler? Hikayedeki teste katıl, cevabı gör! 🦊 #${focus.toLowerCase().replace(/[^a-z0-9]/gi, '')}`,
+      caption: `${focus} hakkında bilmen gereken kritik sınav notu! 🦊⚡ #${focus.toLowerCase().replace(/[^a-z0-9]/gi, '')}`,
       hashtags: ['#yks2027', '#dersolab', '#gununsorusu'],
       storyData: {
-        badge: `GÜNÜN QUIZI • ${badgeText}`,
+        badge: `DERSOLAB STORY • ${badgeText}`,
         headline: `${displayTitle} Püf Noktası`,
-        subhead: 'ÖSYM bu kuralı çok sever, hemen doğru şıkkı işaretle! 👇',
-        stickerType: request.storyStickerType || 'quiz',
+        subhead: 'ÖSYM bu kuralı çok sever, denemeden önce mutlaka göz at!',
+        stickerType: request.storyStickerType || 'none',
         stickerQuestion: `${focus} konusunda hangisi doğrudur?`,
         stickerOptions: ['Doğru Kural / Yöntem ✅', 'Sık Yapılan Yanılgı ❌', 'İkisi de Geçerlidir', 'Emin Değilim'],
         stickerLinkText: 'dersolab.com/lab',

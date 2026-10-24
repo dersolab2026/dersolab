@@ -196,7 +196,11 @@ function drawStorySticker(
   width: number
 ): number {
   const cardW = width - 160
-  const stickerType = story.stickerType || 'quiz'
+  const stickerType = story.stickerType || 'none'
+
+  if (stickerType === 'none') {
+    return cursorY
+  }
 
   if (stickerType === 'quiz') {
     const options = story.stickerOptions || ['A Seçeneği', 'B Seçeneği', 'C Seçeneği', 'D Seçeneği']
@@ -254,6 +258,9 @@ function drawStorySticker(
     ctx.fillText(story.stickerQuestion || 'Bu taktiği denemende deneyecek misin?', width / 2, cursorY + 65)
     ctx.textAlign = 'left'
 
+    const optLeft = (story.stickerOptions && story.stickerOptions[0]) || 'Evet! 🔥'
+    const optRight = (story.stickerOptions && story.stickerOptions[1]) || 'Henüz Değil 🤔'
+
     const btnW = (cardW - 80) / 2
     ctx.fillStyle = '#10b981'
     roundRect(ctx, 110, cursorY + 105, btnW, 70, 20)
@@ -261,13 +268,13 @@ function drawStorySticker(
     ctx.font = 'bold 24px Inter, system-ui, sans-serif'
     ctx.fillStyle = '#ffffff'
     ctx.textAlign = 'center'
-    ctx.fillText('Evet! 🔥', 110 + btnW / 2, cursorY + 148)
+    ctx.fillText(optLeft, 110 + btnW / 2, cursorY + 148)
 
     ctx.fillStyle = '#64748b'
     roundRect(ctx, 110 + btnW + 20, cursorY + 105, btnW, 70, 20)
     ctx.fill()
     ctx.fillStyle = '#ffffff'
-    ctx.fillText('Henüz Değil 🤔', 110 + btnW + 20 + btnW / 2, cursorY + 148)
+    ctx.fillText(optRight, 110 + btnW + 20 + btnW / 2, cursorY + 148)
     ctx.textAlign = 'left'
 
     return cursorY + cardH + 30
@@ -544,7 +551,15 @@ function drawDualBookStoryCards(
   }
   ctx.restore()
 
-  // 3. ANKET ÇIKARTMASI
+  // 3. ÇIKARTMA (YALNIZCA KULLANICI SEÇTİYSE ÇİZİLİR - ZORUNLU ANKET/QUIZ YOK)
+  if (!story.stickerType || story.stickerType === 'none') {
+    return card2Y + cardH + 30
+  }
+
+  if (story.stickerType === 'quiz' || story.stickerType === 'link') {
+    return drawStorySticker(ctx, story, card2Y + cardH + 28, width)
+  }
+
   const pollY = card2Y + cardH + 28
   const pollH = 175
 

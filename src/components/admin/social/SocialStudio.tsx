@@ -28,6 +28,7 @@ import {
   Flame,
   Send,
   Cloud,
+  BookOpen,
 } from 'lucide-react'
 import type {
   CarouselSlide,
@@ -44,7 +45,11 @@ import type {
 import { SocialPhoneMockup } from './SocialPhoneMockup'
 import { PublishSuccessModal, type PublishResultData } from './PublishSuccessModal'
 import { downloadAllPostMedia, generateAllPostMediaFiles } from '@/lib/social/canvasRenderer'
-import { toTurkishTitleCase } from '@/lib/social/agent'
+import {
+  toTurkishTitleCase,
+  buildBookCoverSvgDataUrl,
+  CURATED_BOOK_PAIRS,
+} from '@/lib/social/agent'
 import {
   getSocialPostsFromDb,
   upsertSocialPostToDb,
@@ -52,7 +57,7 @@ import {
 } from '@/actions/social-posts'
 import { toast } from 'sonner'
 
-const STORAGE_KEY = 'dersolab_social_posts_v7'
+const STORAGE_KEY = 'dersolab_social_posts_v8'
 
 const INITIAL_DEMO_POSTS: SocialPostItem[] = [
   {
@@ -156,13 +161,13 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
     topicLabel: 'Pazar Kitap Kulübü • 9:16 Story',
     status: 'approved',
     targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
-    caption: `Pazar gününün klasiği: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nHem LGS hem YKS hazırlığında okuma hızını ve analitik düşünme gücünü katlayacak 2 muazzam başucu kitabı!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab`,
+    caption: `Pazar gününün klasiği: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nHem LGS hem YKS hazırlığında okuma hızını ve analitik düşünme gücünü katlayacak 2 muazzam başucu kitabı!\n\nSen bu hafta hangisine başlıyorsun? 👇\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab`,
     hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2027', '#yks2027', '#dersolab'],
     storyData: {
       badge: 'PAZAR KİTAP KULÜBÜ 📚',
       headline: 'Haftanın Kitap Önerileri',
       subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
-      stickerType: 'poll',
+      stickerType: 'none',
       stickerQuestion: 'Bu hafta hangisini okuyacaksın? 📚',
       stickerOptions: ['Ortaokul: Momo 📘', 'Lise: Simyacı 📕'],
       stickerLinkText: 'Kitap Listesi & İpuçları',
@@ -175,6 +180,7 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
           genre: 'Felsefi Masal / Zaman',
           whyRead: 'Zaman yönetimi ve hayal gücünü geliştirir, LGS yeni nesil paragraf analizine harika katkı sağlar.',
           highlightTag: 'ORTAOKUL & LGS',
+          imageUrl: '/books/momo.jpg',
         },
         lise: {
           title: 'Simyacı',
@@ -182,6 +188,7 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
           genre: 'Felsefi Roman / Macera',
           whyRead: 'Kişisel menkıbe ve odaklanma üzerine bir başyapıt. TYT derin anlama ve AYT analiz gücü kazandırır.',
           highlightTag: 'LİSE & YKS',
+          imageUrl: '/books/simyaci.jpg',
         },
       },
     },
@@ -214,10 +221,48 @@ function sanitizePostList(rawList: SocialPostItem[]): SocialPostItem[] {
   return rawList.map((post: SocialPostItem) => {
     const cleanTitle = toTurkishTitleCase(post.title || '')
     const cleanTopicLabel = toTurkishTitleCase(post.topicLabel || '')
+    const nextStoryData = post.storyData
+      ? {
+          ...post.storyData,
+          // Eski demo_story_3 kaydında dayatılan anket varsa çıkartmasız ('none') yap
+          stickerType:
+            post.id === 'demo_story_3' && post.storyData.stickerType === 'poll'
+              ? ('none' as StoryStickerType)
+              : post.storyData.stickerType || ('none' as StoryStickerType),
+          dualBookData: post.storyData.dualBookData
+            ? {
+                ortaokul: {
+                  ...post.storyData.dualBookData.ortaokul,
+                  imageUrl:
+                    post.storyData.dualBookData.ortaokul.imageUrl ||
+                    buildBookCoverSvgDataUrl(
+                      post.storyData.dualBookData.ortaokul.title,
+                      post.storyData.dualBookData.ortaokul.author,
+                      post.storyData.dualBookData.ortaokul.genre,
+                      'ortaokul'
+                    ),
+                },
+                lise: {
+                  ...post.storyData.dualBookData.lise,
+                  imageUrl:
+                    post.storyData.dualBookData.lise.imageUrl ||
+                    buildBookCoverSvgDataUrl(
+                      post.storyData.dualBookData.lise.title,
+                      post.storyData.dualBookData.lise.author,
+                      post.storyData.dualBookData.lise.genre,
+                      'lise'
+                    ),
+                },
+              }
+            : undefined,
+        }
+      : undefined
+
     return {
       ...post,
       title: cleanTitle,
       topicLabel: cleanTopicLabel,
+      storyData: nextStoryData,
       carouselSlides: post.carouselSlides?.map((slide) => {
         const hasDensePoints = slide.bodyPoints && slide.bodyPoints.length > 0
         const isMascot =
@@ -248,8 +293,14 @@ export default function SocialStudio() {
   const [genType, setGenType] = useState<InstagramContentType>('carousel')
   const [genGrade, setGenGrade] = useState<'YKS (TYT/AYT)' | 'LGS' | 'Genel'>('YKS (TYT/AYT)')
   const [genSubject, setGenSubject] = useState<string>('')
+  const [genStorySticker, setGenStorySticker] = useState<StoryStickerType>('none')
   const [isGenerating, setIsGenerating] = useState<boolean>(false)
+  const [isRegenerating, setIsRegenerating] = useState<boolean>(false)
   const [isBatchLoading, setIsBatchLoading] = useState<boolean>(false)
+
+  // "Yeniden Dene" Geçmişi & Varyasyon Sayacı (Aynı kitap veya gönderinin tekrar gelmesini önler)
+  const seenHistoryRef = useRef<string[]>([])
+  const variationSeedRef = useRef<number>(1)
 
   // Görsel & İllüstrasyon Stüdyosu Durumları
   const [imageStylePreset, setImageStylePreset] = useState<ImageStylePreset>('cyber_lab')
@@ -277,7 +328,10 @@ export default function SocialStudio() {
   useEffect(() => {
     let localPosts: SocialPostItem[] = []
     try {
-      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('dersolab_social_posts_v6')
+      const saved =
+        localStorage.getItem(STORAGE_KEY) ||
+        localStorage.getItem('dersolab_social_posts_v7') ||
+        localStorage.getItem('dersolab_social_posts_v6')
       if (saved) {
         const parsed = JSON.parse(saved)
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -355,17 +409,44 @@ export default function SocialStudio() {
     scheduleDbUpsert(updated)
   }
 
+  // Aktif gönderinin özetini "daha önce gösterilenler" listesine ekle
+  function recordPostInHistory(post: SocialPostItem) {
+    const itemsToRecord: string[] = []
+    if (post.title) itemsToRecord.push(post.title)
+    if (post.storyData?.dualBookData) {
+      itemsToRecord.push(post.storyData.dualBookData.ortaokul.title)
+      itemsToRecord.push(post.storyData.dualBookData.lise.title)
+    }
+    if (post.storyData?.headline) {
+      itemsToRecord.push(post.storyData.headline)
+    }
+    const nextHistory = Array.from(new Set([...seenHistoryRef.current, ...itemsToRecord])).slice(-18)
+    seenHistoryRef.current = nextHistory
+    return nextHistory.join(', ')
+  }
+
   // Yeni Yapay Zeka Gönderisi Üret
   async function handleGeneratePost(customOptions?: {
     type?: InstagramContentType
     subject?: string
     targetGrade?: 'YKS (TYT/AYT)' | 'LGS' | 'Genel'
     topic?: ContentTopic
+    storyStickerType?: StoryStickerType
+    replacePostId?: string
   }) {
     const typeToUse = customOptions?.type || genType
-    const subjectToUse = toTurkishTitleCase((customOptions?.subject ?? genSubject).trim())
+    const rawSubject = (customOptions?.subject ?? genSubject).trim()
+    const subjectToUse = rawSubject ? toTurkishTitleCase(rawSubject) : ''
+    const isBookQuery = /kitap|roman|okuma|pazar|hikaye öneri/i.test(rawSubject)
+    const topicToUse: ContentTopic =
+      customOptions?.topic || (isBookQuery ? 'book_recommendation' : 'custom')
     const gradeToUse = customOptions?.targetGrade || genGrade
-    const topicToUse = customOptions?.topic || 'custom'
+    const stickerToUse: StoryStickerType =
+      customOptions?.storyStickerType ?? (typeToUse === 'story' ? genStorySticker : 'none')
+
+    const nextSeed = variationSeedRef.current + 1
+    variationSeedRef.current = nextSeed
+    const excludeSummary = recordPostInHistory(activePost)
 
     setIsGenerating(true)
     const toastId = toast.loading('Yapay zeka konuya özel özgün içerik üretiyor...')
@@ -383,6 +464,9 @@ export default function SocialStudio() {
           targetGrade: gradeToUse,
           tone: 'energetic',
           persona: 'derso_friendly',
+          storyStickerType: stickerToUse,
+          excludeSummary,
+          variationSeed: nextSeed,
         }),
       })
 
@@ -392,28 +476,171 @@ export default function SocialStudio() {
         throw new Error(data.error || 'İçerik üretilemedi.')
       }
 
-      const newPost: SocialPostItem = data.item
-      const updatedPosts = [newPost, ...posts.filter((p) => p.id !== newPost.id)]
-      savePosts(updatedPosts)
-      setActivePostId(newPost.id)
-      setActiveSlideIndex(0)
-      upsertSocialPostToDb(newPost).catch(() => {})
+      const newPost: SocialPostItem = sanitizePostList([data.item])[0]
+      recordPostInHistory(newPost)
+
+      if (customOptions?.replacePostId) {
+        const replacedPost: SocialPostItem = {
+          ...newPost,
+          id: customOptions.replacePostId,
+        }
+        const updatedPosts = posts.map((p) => (p.id === customOptions.replacePostId ? replacedPost : p))
+        savePosts(updatedPosts)
+        setActivePostId(replacedPost.id)
+        setActiveSlideIndex(0)
+        upsertSocialPostToDb(replacedPost).catch(() => {})
+      } else {
+        const updatedPosts = [newPost, ...posts.filter((p) => p.id !== newPost.id)]
+        savePosts(updatedPosts)
+        setActivePostId(newPost.id)
+        setActiveSlideIndex(0)
+        upsertSocialPostToDb(newPost).catch(() => {})
+      }
 
       toast.success('Yeni içerik başarıyla oluşturuldu ve yüklendi!', { id: toastId })
-      setGenSubject('')
+      if (!customOptions?.replacePostId) {
+        setGenSubject('')
+      }
     } catch (err: any) {
       console.warn('API uyarısı, dinamik içerik motoru devreye alınıyor:', err?.message)
 
-      const fallbackPost = createFallbackPost(typeToUse, subjectToUse, gradeToUse, topicToUse)
-      const updatedPosts = [fallbackPost, ...posts.filter((p) => p.id !== fallbackPost.id)]
-      savePosts(updatedPosts)
-      setActivePostId(fallbackPost.id)
-      setActiveSlideIndex(0)
-      upsertSocialPostToDb(fallbackPost).catch(() => {})
+      const fallbackPost = createFallbackPost(
+        typeToUse,
+        subjectToUse,
+        gradeToUse,
+        topicToUse,
+        stickerToUse,
+        excludeSummary,
+        nextSeed
+      )
+      recordPostInHistory(fallbackPost)
 
-      toast.success('İçerik konunuza özel olarak başarıyla hazırlandı!', { id: toastId })
+      if (customOptions?.replacePostId) {
+        const replacedFallback: SocialPostItem = {
+          ...fallbackPost,
+          id: customOptions.replacePostId,
+        }
+        const updatedPosts = posts.map((p) => (p.id === customOptions.replacePostId ? replacedFallback : p))
+        savePosts(updatedPosts)
+        setActivePostId(replacedFallback.id)
+        setActiveSlideIndex(0)
+        upsertSocialPostToDb(replacedFallback).catch(() => {})
+      } else {
+        const updatedPosts = [fallbackPost, ...posts.filter((p) => p.id !== fallbackPost.id)]
+        savePosts(updatedPosts)
+        setActivePostId(fallbackPost.id)
+        setActiveSlideIndex(0)
+        upsertSocialPostToDb(fallbackPost).catch(() => {})
+      }
+
+      toast.success('Yeni alternatif içerik başarıyla hazırlandı!', { id: toastId })
     } finally {
       setIsGenerating(false)
+    }
+  }
+
+  // Beğenilmeyen Gönderiyi Yeniden Üret ("Yeniden Dene / Farklı Alternatif Üret")
+  async function handleRegenerateActivePost() {
+    if (isRegenerating || isGenerating) return
+    setIsRegenerating(true)
+
+    const isBookPost =
+      activePost.topic === 'book_recommendation' ||
+      Boolean(activePost.storyData?.dualBookData) ||
+      /kitap/i.test(activePost.title)
+
+    const currentSticker: StoryStickerType = activePost.storyData?.stickerType || 'none'
+    const nextSeed = variationSeedRef.current + 1
+    variationSeedRef.current = nextSeed
+    const excludeSummary = recordPostInHistory(activePost)
+
+    const toastId = toast.loading(
+      isBookPost
+        ? 'Farklı iki kitap önerisi ve yeni kapak tasarımları hazırlanıyor...'
+        : 'Beğenmediğiniz gönderi yerine yepyeni bir alternatif üretiliyor...'
+    )
+
+    try {
+      const subjectClean = isBookPost
+        ? 'Haftalık Ortaokul ve Lise Kitap Önerisi'
+        : genSubject.trim() ||
+          activePost.topicLabel.split('•').pop()?.trim() ||
+          activePost.title.replace(/^(Story:|Reels:|1 Soru 1 Net:)\s*/i, '').trim()
+
+      const res = await fetch('/api/admin/social/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate_single',
+          type: activePost.type,
+          topic: isBookPost ? 'book_recommendation' : activePost.topic || 'custom',
+          subject: subjectClean,
+          customPrompt: subjectClean,
+          targetGrade: genGrade,
+          tone: 'energetic',
+          persona: 'derso_friendly',
+          storyStickerType: currentSticker,
+          excludeSummary,
+          variationSeed: nextSeed,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok || !data.item) {
+        throw new Error(data.error || 'Alternatif üretilemedi.')
+      }
+
+      const freshPost: SocialPostItem = sanitizePostList([
+        {
+          ...data.item,
+          id: activePost.id,
+          storyData: data.item.storyData
+            ? {
+                ...data.item.storyData,
+                stickerType: currentSticker,
+              }
+            : undefined,
+        },
+      ])[0]
+
+      recordPostInHistory(freshPost)
+      handleUpdateActivePost(freshPost)
+      setActiveSlideIndex(0)
+
+      toast.success(
+        isBookPost
+          ? `Yeni kitap önerileri hazır: ${freshPost.storyData?.dualBookData?.ortaokul.title || ''} & ${freshPost.storyData?.dualBookData?.lise.title || ''}!`
+          : 'Yeni alternatif gönderi başarıyla yüklendi!',
+        { id: toastId }
+      )
+    } catch {
+      const subjectClean = isBookPost
+        ? 'Haftalık Ortaokul ve Lise Kitap Önerisi'
+        : genSubject.trim() || activePost.title
+      const fallback = createFallbackPost(
+        activePost.type,
+        subjectClean,
+        genGrade,
+        isBookPost ? 'book_recommendation' : activePost.topic || 'custom',
+        currentSticker,
+        excludeSummary,
+        nextSeed
+      )
+      const replacedFallback: SocialPostItem = {
+        ...fallback,
+        id: activePost.id,
+      }
+      recordPostInHistory(replacedFallback)
+      handleUpdateActivePost(replacedFallback)
+      setActiveSlideIndex(0)
+      toast.success(
+        isBookPost
+          ? `Yeni kitap önerileri yüklendi: ${replacedFallback.storyData?.dualBookData?.ortaokul.title} & ${replacedFallback.storyData?.dualBookData?.lise.title}!`
+          : 'Yeni alternatif gönderi hazırlandı!',
+        { id: toastId }
+      )
+    } finally {
+      setIsRegenerating(false)
     }
   }
 
@@ -436,7 +663,7 @@ export default function SocialStudio() {
       if (!res.ok || !Array.isArray(data.items) || data.items.length === 0) {
         throw new Error(data.error || 'Günlük paket üretilemedi.')
       }
-      const batchItems: SocialPostItem[] = data.items
+      const batchItems: SocialPostItem[] = sanitizePostList(data.items)
       const newIds = new Set(batchItems.map((i) => i.id))
       const updatedPosts = [...batchItems, ...posts.filter((p) => !newIds.has(p.id))]
       savePosts(updatedPosts)
@@ -445,7 +672,7 @@ export default function SocialStudio() {
       for (const item of batchItems) {
         upsertSocialPostToDb(item).catch(() => {})
       }
-      toast.success('Günün 3 otonom içeriği (Sabah Quizi, Öğle Rehberi, Akşam Reels) üretildi!', { id: toastId })
+      toast.success('Günün 3 otonom içeriği (Sabah Hikayesi, Öğle Rehberi, Akşam Reels) üretildi!', { id: toastId })
     } catch (err: any) {
       toast.error(err?.message || 'Otonom paket üretilirken bir hata oluştu.', { id: toastId })
     } finally {
@@ -472,7 +699,7 @@ export default function SocialStudio() {
       if (!res.ok || !Array.isArray(data.items) || data.items.length === 0) {
         throw new Error(data.error || 'Haftalık takvim üretilemedi.')
       }
-      const weeklyItems: SocialPostItem[] = data.items
+      const weeklyItems: SocialPostItem[] = sanitizePostList(data.items)
       const newIds = new Set(weeklyItems.map((i) => i.id))
       const updatedPosts = [...weeklyItems, ...posts.filter((p) => !newIds.has(p.id))]
       savePosts(updatedPosts)
@@ -694,7 +921,7 @@ export default function SocialStudio() {
         // ignore clipboard permission issues
       }
 
-      // 4. API üzerinden paylaşım / 스토리지 yüklemesi yap
+      // 4. API üzerinden paylaşım / depolama yüklemesi yap
       const res = await fetch('/api/admin/social/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -725,15 +952,81 @@ export default function SocialStudio() {
     }
   }
 
-  // Dinamik Konu Odaklı Yerel Üretici (4 Sabit Tema & Konuya %100 Uyumlu)
+  // Dinamik Konu Odaklı Yerel Üretici (4 Sabit Tema & Konuya %100 Uyumlu + Kitap Havuzu Desteği)
   function createFallbackPost(
     type: InstagramContentType,
     subject: string,
     grade: string,
-    topic: ContentTopic
+    topic: ContentTopic,
+    storyStickerType: StoryStickerType = 'none',
+    excludeSummary: string = '',
+    variationSeed: number = 1
   ): SocialPostItem {
     const title = toTurkishTitleCase(subject.trim() || 'ÖSYM Net Artırma Stratejisi')
     const id = `post_${Date.now()}`
+    const isBook = topic === 'book_recommendation' || /kitap|okuma|roman/i.test(title)
+
+    if (isBook && type === 'story') {
+      const excludedLower = excludeSummary.toLocaleLowerCase('tr-TR')
+      const availablePairs = CURATED_BOOK_PAIRS.filter(
+        (pair) =>
+          !excludedLower.includes(pair.ortaokul.title.toLocaleLowerCase('tr-TR')) &&
+          !excludedLower.includes(pair.lise.title.toLocaleLowerCase('tr-TR'))
+      )
+      const pool = availablePairs.length > 0 ? availablePairs : CURATED_BOOK_PAIRS
+      const chosen = pool[variationSeed % pool.length]
+
+      return {
+        id,
+        title: `Pazar Hikayesi: ${chosen.ortaokul.title} & ${chosen.lise.title}`,
+        type: 'story',
+        topic: 'book_recommendation',
+        topicLabel: 'Pazar Kitap Kulübü • 9:16 Story',
+        status: 'draft',
+        targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
+        caption: `Pazar Kitap Kulübümüzde bu haftanın seçkisi! 📚🦊\n\n📘 Ortaokul (LGS): ${chosen.ortaokul.title} - ${chosen.ortaokul.author}\n📕 Lise (YKS): ${chosen.lise.title} - ${chosen.lise.author}\n\nParagraf hızını ve derin analiz yeteneğini geliştirmek için bu hafta mutlaka listene ekle! 👇\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab`,
+        hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2027', '#yks2027', '#dersolab'],
+        storyData: {
+          badge: 'PAZAR KİTAP KULÜBÜ 📚',
+          headline: 'Haftanın Kitap Önerileri',
+          subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
+          stickerType: storyStickerType,
+          stickerQuestion: 'Bu hafta hangisini okuyacaksın? 📚',
+          stickerOptions: [
+            `Ortaokul: ${chosen.ortaokul.title} 📘`,
+            `Lise: ${chosen.lise.title} 📕`,
+          ],
+          stickerLinkText: 'Kitap Listesi & İpuçları',
+          stickerLinkUrl: 'https://dersolab.com/lab',
+          themeVariant: (['purple_matrix', 'lab_dark', 'cyan_cyber', 'neon_orange'] as SlideThemeVariant[])[
+            variationSeed % 4
+          ],
+          dualBookData: {
+            ortaokul: {
+              ...chosen.ortaokul,
+              highlightTag: 'ORTAOKUL & LGS',
+              imageUrl: buildBookCoverSvgDataUrl(
+                chosen.ortaokul.title,
+                chosen.ortaokul.author,
+                chosen.ortaokul.genre,
+                'ortaokul'
+              ),
+            },
+            lise: {
+              ...chosen.lise,
+              highlightTag: 'LİSE & YKS',
+              imageUrl: buildBookCoverSvgDataUrl(
+                chosen.lise.title,
+                chosen.lise.author,
+                chosen.lise.genre,
+                'lise'
+              ),
+            },
+          },
+        },
+        createdAt: new Date().toISOString(),
+      }
+    }
 
     const isDeneme = /deneme|taktik|strateji|süre|zaman|turlama|hata/i.test(title)
     const isMath = /matematik|geometri|trigo|türev|integral|denklem|fonksiyon|limit|polinom|üslü|köklü|olasılık/i.test(title)
@@ -924,18 +1217,20 @@ export default function SocialStudio() {
         topicLabel: `${grade} • Hikaye`,
         status: 'draft',
         targetAudience: grade,
-        caption: `${title} hakkında günün test sorusu yayında! Sen cevabı biliyor musun? 🦊👇\n\n#dersolab #yks2027 #lgs2027`,
+        caption: `${title} hakkında günün hikayesi yayında! 🦊👇\n\n#dersolab #yks2027 #lgs2027`,
         hashtags: ['#dersolab', '#yks2027', '#lgs2027'],
         storyData: {
           badge: `${badge} ⚡`,
-          headline: `${title} • Hızlı Test`,
-          subhead: 'Sence doğru kural / yaklaşım hangisi?',
-          stickerType: 'quiz',
+          headline: `${title} • Kritik İpucu`,
+          subhead: 'Sınavda +1 net kazandıran altın kuralı unutma!',
+          stickerType: storyStickerType,
           stickerQuestion: `${title} konusunda hangisi doğrudur?`,
-          stickerOptions: ['A) Doğru Kural / Yaklaşım ✅', 'B) Sık Yapılan Yanılgı ❌', 'C) Eksik Bilgi Şıkkı', 'D) Emin Değilim'],
+          stickerOptions: ['A) Doğru Kural / Yaklaşım ✅', 'B) Sık Yapılan Yanılgı ❌'],
           stickerLinkText: 'DersoLab L.A.B.',
           stickerLinkUrl: 'https://dersolab.com/lab',
-          themeVariant: 'neon_orange',
+          themeVariant: (['neon_orange', 'lab_dark', 'cyan_cyber', 'purple_matrix'] as SlideThemeVariant[])[
+            variationSeed % 4
+          ],
         },
         createdAt: new Date().toISOString(),
       }
@@ -1100,6 +1395,8 @@ export default function SocialStudio() {
   const isStory = activePost.type === 'story'
   const isReels = activePost.type === 'reels'
   const isPost = activePost.type === 'post'
+  const isBookStory =
+    isStory && (Boolean(activePost.storyData?.dualBookData) || activePost.topic === 'book_recommendation')
   const currentSlide = isCarousel ? activePost.carouselSlides?.[activeSlideIndex] : null
 
   const activeTargetImageUrl = isCarousel
@@ -1276,7 +1573,7 @@ export default function SocialStudio() {
               >
                 <Smartphone className={`w-4 h-4 mb-1 ${genType === 'story' ? 'text-orange-400' : 'text-slate-400'}`} />
                 <div className="text-xs font-bold text-white">Story (9:16)</div>
-                <div className="text-[10px] text-slate-400">Anket & Quiz</div>
+                <div className="text-[10px] text-slate-400">9:16 Dikey Hikaye</div>
               </button>
 
               <button
@@ -1294,7 +1591,37 @@ export default function SocialStudio() {
               </button>
             </div>
 
-            {/* Konu Girişi ve Buton */}
+            {/* Story seçildiğinde İsteğe Bağlı Çıkartma Tercihi (Varsayılan: Çıkartma Yok) */}
+            {genType === 'story' && (
+              <div className="mb-3.5 p-2.5 rounded-xl bg-white/5 border border-white/10 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[11px] font-semibold text-slate-300">
+                  Story Etkileşim Çıkartması (İsteğe Bağlı):
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {[
+                    { id: 'none', label: '✨ Çıkartma Yok (Saf Görsel)' },
+                    { id: 'poll', label: '📊 İkili Anket (Poll)' },
+                    { id: 'quiz', label: '❓ Çoktan Seçmeli Test (Quiz)' },
+                    { id: 'link', label: '🔗 Bağlantı (Link)' },
+                  ].map((st) => (
+                    <button
+                      key={st.id}
+                      type="button"
+                      onClick={() => setGenStorySticker(st.id as StoryStickerType)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                        genStorySticker === st.id
+                          ? 'bg-orange-500 text-white shadow-xs'
+                          : 'bg-black/40 text-slate-400 hover:text-white border border-white/10'
+                      }`}
+                    >
+                      {st.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Konu Girişi ve Butonlar */}
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1 flex gap-2">
                 <select
@@ -1309,7 +1636,7 @@ export default function SocialStudio() {
 
                 <input
                   type="text"
-                  placeholder="İstediğin konuyu yaz (örn: Trigonometri, Biyonik Okuyucu, Paragraf Hızı, Hücre Zarı)..."
+                  placeholder="İstediğin konuyu yaz (örn: Kitap Önerisi, Trigonometri, Paragraf Hızı, Hücre Zarı)..."
                   value={genSubject}
                   onChange={(e) => setGenSubject(e.target.value)}
                   onKeyDown={(e) => {
@@ -1322,24 +1649,37 @@ export default function SocialStudio() {
                 />
               </div>
 
-              <button
-                type="button"
-                disabled={isGenerating || isBatchLoading}
-                onClick={() => handleGeneratePost()}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-orange-500/20 transition-all shrink-0 active:scale-95 cursor-pointer"
-              >
-                {isGenerating ? (
-                  <>
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Oluşturuluyor...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>İçerik Üret (AI)</span>
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  disabled={isGenerating || isRegenerating || isBatchLoading}
+                  onClick={() => handleGeneratePost()}
+                  className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-orange-500/20 transition-all shrink-0 active:scale-95 cursor-pointer"
+                >
+                  {isGenerating ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Oluşturuluyor...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>İçerik Üret (AI)</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  disabled={isRegenerating || isGenerating || isBatchLoading}
+                  onClick={handleRegenerateActivePost}
+                  title="Mevcut gönderiyi beğenmediysen farklı içerik/kitap önerisiyle yeniden üret"
+                  className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-orange-500/40 text-orange-300 hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shrink-0 active:scale-95 cursor-pointer"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? 'animate-spin' : ''}`} />
+                  <span>{isBookStory ? 'Farklı 2 Kitap Öner' : 'Yeniden Dene'}</span>
+                </button>
+              </div>
             </div>
 
             {/* Otonom Günlük Paket (3 Post) & 7 Günlük Haftalık Takvim Hızlı Butonları */}
@@ -1368,22 +1708,37 @@ export default function SocialStudio() {
 
           {/* KART 2: CANLI GÖNDERİ DÜZENLEYİCİ */}
           <div className="rounded-2xl border border-white/10 bg-[#0B0F19]/80 backdrop-blur-md p-4 sm:p-5 shadow-xl flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
               <div className="flex items-center gap-2">
                 <Edit3 className="w-4 h-4 text-orange-400" />
                 <h3 className="text-sm font-bold text-white">Gönderi Düzenleyici</h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold text-slate-400 uppercase">
+                <span className="text-[11px] font-bold text-slate-400 uppercase px-2 py-0.5 rounded-md bg-white/5">
                   {activePost.type === 'carousel'
                     ? '📸 Carousel'
                     : activePost.type === 'story'
-                      ? '📱 Story'
+                      ? '📱 Story (9:16)'
                       : activePost.type === 'reels'
                         ? '🎬 Reels'
                         : '📝 Tekli Post'}
                 </span>
               </div>
+
+              {/* Beğenmedim / Yeniden Dene Butonu */}
+              <button
+                type="button"
+                disabled={isRegenerating || isGenerating}
+                onClick={handleRegenerateActivePost}
+                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 hover:from-orange-500/30 hover:to-amber-500/30 border border-orange-500/40 text-orange-300 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? 'animate-spin' : ''}`} />
+                <span>
+                  {isRegenerating
+                    ? 'Alternatif Üretiliyor...'
+                    : isBookStory
+                      ? '🔄 Kitapları Beğenmedim, Farklı 2 Kitap Öner'
+                      : '🔄 Beğenmedim, Yeniden Dene'}
+                </span>
+              </button>
             </div>
 
             {/* Başlık ve Rozet */}
@@ -1761,8 +2116,16 @@ export default function SocialStudio() {
 
             {/* 3. STORY ALANLARI */}
             {isStory && activePost.storyData && (
-              <div className="border border-white/10 rounded-xl p-3.5 bg-black/30 flex flex-col gap-2.5">
-                <div className="text-xs font-bold text-orange-400">Story (9:16) Çıkartma ve İçerik Ayarları</div>
+              <div className="border border-white/10 rounded-xl p-3.5 bg-black/30 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-bold text-orange-400">Story (9:16) İçerik ve Çıkartma Ayarları</div>
+                  <span className="text-[10px] text-slate-400">
+                    {activePost.storyData.stickerType === 'none' || !activePost.storyData.stickerType
+                      ? '✨ Saf Görsel (Çıkartmasız)'
+                      : '🎯 Etkileşim Çıkartması Aktif'}
+                  </span>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
                     <label className="text-[10px] font-semibold text-slate-400 block mb-1">Üst Rozet</label>
@@ -1779,9 +2142,11 @@ export default function SocialStudio() {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-semibold text-slate-400 block mb-1">Çıkartma Tipi</label>
+                    <label className="text-[10px] font-semibold text-slate-400 block mb-1">
+                      Çıkartma Tipi (İsteğe Bağlı)
+                    </label>
                     <select
-                      value={activePost.storyData.stickerType}
+                      value={activePost.storyData.stickerType || 'none'}
                       onChange={(e) =>
                         handleUpdateActivePost({
                           ...activePost,
@@ -1790,9 +2155,18 @@ export default function SocialStudio() {
                       }
                       className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white"
                     >
-                      <option value="quiz" className="bg-neutral-900">Çoktan Seçmeli Test (Quiz)</option>
-                      <option value="poll" className="bg-neutral-900">İkili Anket (Poll)</option>
-                      <option value="link" className="bg-neutral-900">Bağlantı Çıkartması (Link)</option>
+                      <option value="none" className="bg-neutral-900">
+                        ✨ Çıkartma Yok (Sadece Görsel & İçerik)
+                      </option>
+                      <option value="poll" className="bg-neutral-900">
+                        📊 İkili Anket (Poll)
+                      </option>
+                      <option value="quiz" className="bg-neutral-900">
+                        ❓ Çoktan Seçmeli Test (Quiz)
+                      </option>
+                      <option value="link" className="bg-neutral-900">
+                        🔗 Bağlantı Çıkartması (Link)
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -1828,111 +2202,387 @@ export default function SocialStudio() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-[10px] font-semibold text-slate-400 block mb-1">Anket / Soru Çıkartması Başlığı</label>
-                  <input
-                    type="text"
-                    value={activePost.storyData.stickerQuestion || ''}
-                    onChange={(e) =>
-                      handleUpdateActivePost({
-                        ...activePost,
-                        storyData: { ...activePost.storyData!, stickerQuestion: e.target.value },
-                      })
-                    }
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white"
-                  />
-                </div>
-
-                {(activePost.storyData.stickerType === 'quiz' || activePost.storyData.stickerType === 'poll') && (
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-[10px] font-semibold text-slate-400">Çıkartma Seçenekleri</label>
+                {/* İKİLİ KİTAP ÖNERİSİ EDİTÖRÜ (ORTAOKUL & LİSE) */}
+                {activePost.storyData.dualBookData && (
+                  <div className="p-3 rounded-xl bg-purple-950/20 border border-purple-500/30 flex flex-col gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <BookOpen className="w-4 h-4 text-purple-400" />
+                        <span className="text-xs font-bold text-white">
+                          Haftalık Kitap Önerisi Kartları (Ortaokul & Lise)
+                        </span>
+                      </div>
                       <button
                         type="button"
-                        onClick={() => {
-                          const opts = activePost.storyData?.stickerOptions || []
-                          handleUpdateActivePost({
-                            ...activePost,
-                            storyData: {
-                              ...activePost.storyData!,
-                              stickerOptions: [...opts, 'Yeni Seçenek'],
-                            },
-                          })
-                        }}
-                        className="text-[10px] font-bold text-orange-400 hover:text-orange-300"
+                        disabled={isRegenerating || isGenerating}
+                        onClick={handleRegenerateActivePost}
+                        className="px-2.5 py-1 rounded-lg bg-purple-500/25 hover:bg-purple-500/35 border border-purple-400/40 text-purple-200 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer"
                       >
-                        + Seçenek Ekle
+                        <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin' : ''}`} />
+                        <span>🔄 Farklı İki Kitap Öner</span>
                       </button>
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                      {(activePost.storyData.stickerOptions || []).map((opt, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5">
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Ortaokul Kitabı */}
+                      <div className="p-2.5 rounded-lg bg-black/40 border border-sky-500/25 flex flex-col gap-1.5">
+                        <span className="text-[10px] font-black text-sky-400 uppercase">
+                          📘 Ortaokul (LGS) Kitabı
+                        </span>
+                        <input
+                          type="text"
+                          placeholder="Kitap Adı"
+                          value={activePost.storyData.dualBookData.ortaokul.title}
+                          onChange={(e) => {
+                            const nextTitle = e.target.value
+                            const currentBook = activePost.storyData!.dualBookData!.ortaokul
+                            handleUpdateActivePost({
+                              ...activePost,
+                              storyData: {
+                                ...activePost.storyData!,
+                                dualBookData: {
+                                  ...activePost.storyData!.dualBookData!,
+                                  ortaokul: {
+                                    ...currentBook,
+                                    title: nextTitle,
+                                    imageUrl: buildBookCoverSvgDataUrl(
+                                      nextTitle,
+                                      currentBook.author,
+                                      currentBook.genre,
+                                      'ortaokul'
+                                    ),
+                                  },
+                                },
+                              },
+                            })
+                          }}
+                          className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-xs text-white font-bold"
+                        />
+                        <div className="grid grid-cols-2 gap-1.5">
                           <input
                             type="text"
-                            value={opt}
+                            placeholder="Yazar"
+                            value={activePost.storyData.dualBookData.ortaokul.author}
                             onChange={(e) => {
-                              const next = [...(activePost.storyData?.stickerOptions || [])]
-                              next[idx] = e.target.value
+                              const nextAuthor = e.target.value
+                              const currentBook = activePost.storyData!.dualBookData!.ortaokul
                               handleUpdateActivePost({
                                 ...activePost,
-                                storyData: { ...activePost.storyData!, stickerOptions: next },
+                                storyData: {
+                                  ...activePost.storyData!,
+                                  dualBookData: {
+                                    ...activePost.storyData!.dualBookData!,
+                                    ortaokul: {
+                                      ...currentBook,
+                                      author: nextAuthor,
+                                      imageUrl: buildBookCoverSvgDataUrl(
+                                        currentBook.title,
+                                        nextAuthor,
+                                        currentBook.genre,
+                                        'ortaokul'
+                                      ),
+                                    },
+                                  },
+                                },
                               })
                             }}
-                            className="flex-1 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-slate-200"
+                            className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[11px] text-slate-200"
                           />
-                          {(activePost.storyData?.stickerOptions?.length || 0) > 2 && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const next = (activePost.storyData?.stickerOptions || []).filter((_, i) => i !== idx)
-                                handleUpdateActivePost({
-                                  ...activePost,
-                                  storyData: { ...activePost.storyData!, stickerOptions: next },
-                                })
-                              }}
-                              className="text-slate-500 hover:text-red-400 p-1"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          )}
+                          <input
+                            type="text"
+                            placeholder="Tür"
+                            value={activePost.storyData.dualBookData.ortaokul.genre}
+                            onChange={(e) => {
+                              const nextGenre = e.target.value
+                              const currentBook = activePost.storyData!.dualBookData!.ortaokul
+                              handleUpdateActivePost({
+                                ...activePost,
+                                storyData: {
+                                  ...activePost.storyData!,
+                                  dualBookData: {
+                                    ...activePost.storyData!.dualBookData!,
+                                    ortaokul: {
+                                      ...currentBook,
+                                      genre: nextGenre,
+                                      imageUrl: buildBookCoverSvgDataUrl(
+                                        currentBook.title,
+                                        currentBook.author,
+                                        nextGenre,
+                                        'ortaokul'
+                                      ),
+                                    },
+                                  },
+                                },
+                              })
+                            }}
+                            className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[11px] text-slate-200"
+                          />
                         </div>
-                      ))}
+                        <textarea
+                          rows={2}
+                          placeholder="Neden okunmalı?"
+                          value={activePost.storyData.dualBookData.ortaokul.whyRead}
+                          onChange={(e) => {
+                            const currentBook = activePost.storyData!.dualBookData!.ortaokul
+                            handleUpdateActivePost({
+                              ...activePost,
+                              storyData: {
+                                ...activePost.storyData!,
+                                dualBookData: {
+                                  ...activePost.storyData!.dualBookData!,
+                                  ortaokul: {
+                                    ...currentBook,
+                                    whyRead: e.target.value,
+                                  },
+                                },
+                              },
+                            })
+                          }}
+                          className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[11px] text-slate-300"
+                        />
+                      </div>
+
+                      {/* Lise Kitabı */}
+                      <div className="p-2.5 rounded-lg bg-black/40 border border-orange-500/25 flex flex-col gap-1.5">
+                        <span className="text-[10px] font-black text-orange-400 uppercase">
+                          📕 Lise (YKS) Kitabı
+                        </span>
+                        <input
+                          type="text"
+                          placeholder="Kitap Adı"
+                          value={activePost.storyData.dualBookData.lise.title}
+                          onChange={(e) => {
+                            const nextTitle = e.target.value
+                            const currentBook = activePost.storyData!.dualBookData!.lise
+                            handleUpdateActivePost({
+                              ...activePost,
+                              storyData: {
+                                ...activePost.storyData!,
+                                dualBookData: {
+                                  ...activePost.storyData!.dualBookData!,
+                                  lise: {
+                                    ...currentBook,
+                                    title: nextTitle,
+                                    imageUrl: buildBookCoverSvgDataUrl(
+                                      nextTitle,
+                                      currentBook.author,
+                                      currentBook.genre,
+                                      'lise'
+                                    ),
+                                  },
+                                },
+                              },
+                            })
+                          }}
+                          className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-xs text-white font-bold"
+                        />
+                        <div className="grid grid-cols-2 gap-1.5">
+                          <input
+                            type="text"
+                            placeholder="Yazar"
+                            value={activePost.storyData.dualBookData.lise.author}
+                            onChange={(e) => {
+                              const nextAuthor = e.target.value
+                              const currentBook = activePost.storyData!.dualBookData!.lise
+                              handleUpdateActivePost({
+                                ...activePost,
+                                storyData: {
+                                  ...activePost.storyData!,
+                                  dualBookData: {
+                                    ...activePost.storyData!.dualBookData!,
+                                    lise: {
+                                      ...currentBook,
+                                      author: nextAuthor,
+                                      imageUrl: buildBookCoverSvgDataUrl(
+                                        currentBook.title,
+                                        nextAuthor,
+                                        currentBook.genre,
+                                        'lise'
+                                      ),
+                                    },
+                                  },
+                                },
+                              })
+                            }}
+                            className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[11px] text-slate-200"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Tür"
+                            value={activePost.storyData.dualBookData.lise.genre}
+                            onChange={(e) => {
+                              const nextGenre = e.target.value
+                              const currentBook = activePost.storyData!.dualBookData!.lise
+                              handleUpdateActivePost({
+                                ...activePost,
+                                storyData: {
+                                  ...activePost.storyData!,
+                                  dualBookData: {
+                                    ...activePost.storyData!.dualBookData!,
+                                    lise: {
+                                      ...currentBook,
+                                      genre: nextGenre,
+                                      imageUrl: buildBookCoverSvgDataUrl(
+                                        currentBook.title,
+                                        currentBook.author,
+                                        nextGenre,
+                                        'lise'
+                                      ),
+                                    },
+                                  },
+                                },
+                              })
+                            }}
+                            className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[11px] text-slate-200"
+                          />
+                        </div>
+                        <textarea
+                          rows={2}
+                          placeholder="Neden okunmalı?"
+                          value={activePost.storyData.dualBookData.lise.whyRead}
+                          onChange={(e) => {
+                            const currentBook = activePost.storyData!.dualBookData!.lise
+                            handleUpdateActivePost({
+                              ...activePost,
+                              storyData: {
+                                ...activePost.storyData!,
+                                dualBookData: {
+                                  ...activePost.storyData!.dualBookData!,
+                                  lise: {
+                                    ...currentBook,
+                                    whyRead: e.target.value,
+                                  },
+                                },
+                              },
+                            })
+                          }}
+                          className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[11px] text-slate-300"
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-[10px] font-semibold text-slate-400 block mb-1">Link Çıkartma Metni</label>
-                    <input
-                      type="text"
-                      value={activePost.storyData.stickerLinkText || ''}
-                      onChange={(e) =>
-                        handleUpdateActivePost({
-                          ...activePost,
-                          storyData: { ...activePost.storyData!, stickerLinkText: e.target.value },
-                        })
-                      }
-                      placeholder="Örn: DersoLab L.A.B."
-                      className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-semibold text-slate-400 block mb-1">Link Hedef URL</label>
-                    <input
-                      type="text"
-                      value={activePost.storyData.stickerLinkUrl || ''}
-                      onChange={(e) =>
-                        handleUpdateActivePost({
-                          ...activePost,
-                          storyData: { ...activePost.storyData!, stickerLinkUrl: e.target.value },
-                        })
-                      }
-                      placeholder="https://dersolab.com/lab"
-                      className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white"
-                    />
-                  </div>
-                </div>
+                {/* Çıkartma Ayarları yalnızca çıkartma seçildiyse gösterilir */}
+                {activePost.storyData.stickerType && activePost.storyData.stickerType !== 'none' && (
+                  <>
+                    {(activePost.storyData.stickerType === 'quiz' || activePost.storyData.stickerType === 'poll') && (
+                      <>
+                        <div>
+                          <label className="text-[10px] font-semibold text-slate-400 block mb-1">
+                            Anket / Soru Çıkartması Başlığı
+                          </label>
+                          <input
+                            type="text"
+                            value={activePost.storyData.stickerQuestion || ''}
+                            onChange={(e) =>
+                              handleUpdateActivePost({
+                                ...activePost,
+                                storyData: { ...activePost.storyData!, stickerQuestion: e.target.value },
+                              })
+                            }
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white"
+                          />
+                        </div>
+
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] font-semibold text-slate-400">Çıkartma Seçenekleri</label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const opts = activePost.storyData?.stickerOptions || []
+                                handleUpdateActivePost({
+                                  ...activePost,
+                                  storyData: {
+                                    ...activePost.storyData!,
+                                    stickerOptions: [...opts, 'Yeni Seçenek'],
+                                  },
+                                })
+                              }}
+                              className="text-[10px] font-bold text-orange-400 hover:text-orange-300"
+                            >
+                              + Seçenek Ekle
+                            </button>
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            {(activePost.storyData.stickerOptions || []).map((opt, idx) => (
+                              <div key={idx} className="flex items-center gap-1.5">
+                                <input
+                                  type="text"
+                                  value={opt}
+                                  onChange={(e) => {
+                                    const next = [...(activePost.storyData?.stickerOptions || [])]
+                                    next[idx] = e.target.value
+                                    handleUpdateActivePost({
+                                      ...activePost,
+                                      storyData: { ...activePost.storyData!, stickerOptions: next },
+                                    })
+                                  }}
+                                  className="flex-1 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-slate-200"
+                                />
+                                {(activePost.storyData?.stickerOptions?.length || 0) > 2 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const next = (activePost.storyData?.stickerOptions || []).filter(
+                                        (_, i) => i !== idx
+                                      )
+                                      handleUpdateActivePost({
+                                        ...activePost,
+                                        storyData: { ...activePost.storyData!, stickerOptions: next },
+                                      })
+                                    }}
+                                    className="text-slate-500 hover:text-red-400 p-1"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {activePost.storyData.stickerType === 'link' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[10px] font-semibold text-slate-400 block mb-1">
+                            Link Çıkartma Metni
+                          </label>
+                          <input
+                            type="text"
+                            value={activePost.storyData.stickerLinkText || ''}
+                            onChange={(e) =>
+                              handleUpdateActivePost({
+                                ...activePost,
+                                storyData: { ...activePost.storyData!, stickerLinkText: e.target.value },
+                              })
+                            }
+                            placeholder="Örn: DersoLab L.A.B."
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-semibold text-slate-400 block mb-1">Link Hedef URL</label>
+                          <input
+                            type="text"
+                            value={activePost.storyData.stickerLinkUrl || ''}
+                            onChange={(e) =>
+                              handleUpdateActivePost({
+                                ...activePost,
+                                storyData: { ...activePost.storyData!, stickerLinkUrl: e.target.value },
+                              })
+                            }
+                            placeholder="https://dersolab.com/lab"
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
 
@@ -2452,7 +3102,7 @@ export default function SocialStudio() {
             onSlideChange={(idx) => setActiveSlideIndex(idx)}
           />
 
-          {/* HIZLI DIŞA AKTARMA VE TEK TUŞLA PAYLAŞIM PANELİ */}
+          {/* HIZLI DIŞA AKTARMA, YENİDEN DENE VE TEK TUŞLA PAYLAŞIM PANELİ */}
           <div className="w-full max-w-[390px] rounded-2xl border border-white/10 bg-[#0B0F19]/90 backdrop-blur-md p-4 shadow-xl flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-white">Yayın Hazırlığı & Paylaşım</span>
@@ -2461,6 +3111,23 @@ export default function SocialStudio() {
                 1080p Hazır
               </span>
             </div>
+
+            {/* Beğenmedim / Yeniden Dene Butonu (Telefonun Hemen Altında) */}
+            <button
+              type="button"
+              disabled={isRegenerating || isGenerating || isPublishing}
+              onClick={handleRegenerateActivePost}
+              className="w-full py-2 px-4 rounded-xl bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-orange-500/20 hover:from-indigo-500/30 hover:to-orange-500/30 border border-orange-500/40 disabled:opacity-50 text-orange-200 hover:text-white text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-98 cursor-pointer"
+            >
+              <RefreshCw className={`w-4 h-4 text-orange-400 ${isRegenerating ? 'animate-spin' : ''}`} />
+              <span>
+                {isRegenerating
+                  ? 'Yeni Alternatif Hazırlanıyor...'
+                  : isBookStory
+                    ? 'Beğenmedim, Farklı İki Kitap Öner'
+                    : 'Beğenmedim, Yeniden Dene (Farklı Üret)'}
+              </span>
+            </button>
 
             {/* Tek Tuşla Instagram & TikTok Paylaşım Butonu */}
             <button
@@ -2626,6 +3293,7 @@ export default function SocialStudio() {
                   if (confirm('Tüm kayıtlı taslakları sıfırlayıp fabrika ayarlarına dönmek istediğinize emin misiniz?')) {
                     try {
                       localStorage.removeItem(STORAGE_KEY)
+                      localStorage.removeItem('dersolab_social_posts_v7')
                       localStorage.removeItem('dersolab_social_posts_v6')
                     } catch {
                       // ignore
