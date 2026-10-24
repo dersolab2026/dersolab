@@ -194,9 +194,9 @@ Yanıtını kesinlikle şu JSON formatında döndür:
 {
   "title": "${topicFocus} konusunu yansıtan çekici ve öğretici başlık",
   "topicLabel": "Ders & Konu Etiketi (Örn: TYT Matematik • ${topicFocus}, AYT Fizik vb.)",
-  "targetAudience": "${request.targetGrade || 'YKS 2026 Adayları'}",
+  "targetAudience": "${request.targetGrade || 'YKS 2027 Adayları'}",
   "caption": "${topicFocus} konusunu anlatan, emojili, kancalı, kaydetmeye teşvik eden özgün Instagram açıklaması",
-  "hashtags": ["#yks2026", "#dersolab", "#ykstayfa", "#${topicFocus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}"],
+  "hashtags": ["#yks2027", "#dersolab", "#ykstayfa", "#${topicFocus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}"],
   ${
     request.type === 'carousel'
       ? `"carouselSlides": [
@@ -345,7 +345,7 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       topicLabel: toTurkishTitleCase(parsed.topicLabel || 'Eğitim ve Sınav'),
       status: 'draft',
       caption: parsed.caption || '',
-      hashtags: parsed.hashtags || ['#dersolab', '#yks2026'],
+      hashtags: parsed.hashtags || ['#dersolab', '#yks2027'],
       targetAudience: parsed.targetAudience || request.targetGrade || 'YKS Adayları',
       platform: request.platform || (request.type === 'x_thread' ? 'x' : 'instagram'),
       persona: request.persona || 'derso_friendly',
@@ -455,9 +455,9 @@ Yanıtını kesinlikle 7 elemanlı bir JSON dizisi [ ... ] olarak döndür. Her 
     "type": "carousel",
     "topic": "weekly_plan",
     "topicLabel": "Çalışma Disiplini",
-    "targetAudience": "YKS 2026",
+    "targetAudience": "YKS 2027",
     "caption": "...",
-    "hashtags": ["#yks2026", "#dersolab"],
+    "hashtags": ["#yks2027", "#dersolab"],
     "carouselSlides": [ ... en az 4 slayt ... ]
   },
   ...
@@ -551,7 +551,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
   const rawFocus = custom || (request.topic === 'book_recommendation' ? 'Haftalık Kitap Önerisi' : 'Sınav Başarı Taktikleri')
   const focus = toTurkishTitleCase(rawFocus)
   const displayTitle = focus.length > 55 ? `${focus.slice(0, 52)}...` : focus
-  const badgeText = (request.subject || request.subTopic || (request.targetGrade === 'LGS' ? 'LGS 2026' : 'AYT & TYT')).toLocaleUpperCase('tr-TR')
+  const badgeText = (request.subject || request.subTopic || (request.targetGrade === 'LGS' ? 'LGS 2027' : 'AYT & TYT')).toLocaleUpperCase('tr-TR')
 
   const isDenemeOrTaktik = /(?:deneme|taktik|strateji|süre|zaman|turlama|hata)/i.test(rawFocus)
 
@@ -564,8 +564,8 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
       topicLabel: request.subject || focus,
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `${focus} konusunda sınavda en çok puan kaybettiren hatalar ve net kazandıran pratik çözümler! 🎯\n\nBu stratejileri denemelerinde test et, gereksiz net kaybının önüne geç!\n\n💡 DersoLab sınav analiz araçlarıyla eksiklerini kapatmak için profildeki linke tıkla!\n\n#yks2026 #dersolab #ykstayfa #${focus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}`,
-      hashtags: ['#yks2026', '#dersolab', '#ykstayfa', '#sinavtaktikleri'],
+      caption: `${focus} konusunda sınavda en çok puan kaybettiren hatalar ve net kazandıran pratik çözümler! 🎯\n\nBu stratejileri denemelerinde test et, gereksiz net kaybının önüne geç!\n\n💡 DersoLab sınav analiz araçlarıyla eksiklerini kapatmak için profildeki linke tıkla!\n\n#yks2027 #dersolab #ykstayfa #${focus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}`,
+      hashtags: ['#yks2027', '#dersolab', '#ykstayfa', '#sinavtaktikleri'],
       carouselSlides: [
         {
           slideNumber: 1,
@@ -657,8 +657,8 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
       topicLabel: `Reels • ${focus}`,
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `ÖSYM'nin en çok sorduğu ve adayların sıklıkla takıldığı ${focus} konusu! 🤯\n\nSen bu soruda hangi yöntemi kullanıyorsun? Yorumlarda cevabını yaz! 👇\n\n#reels #yksreels #yks2026 #dersolab #ykstayfa`,
-      hashtags: ['#reels', '#yksreels', '#yks2026', '#dersolab'],
+      caption: `ÖSYM'nin en çok sorduğu ve adayların sıklıkla takıldığı ${focus} konusu! 🤯\n\nSen bu soruda hangi yöntemi kullanıyorsun? Yorumlarda cevabını yaz! 👇\n\n#reels #yksreels #yks2027 #dersolab #ykstayfa`,
+      hashtags: ['#reels', '#yksreels', '#yks2027', '#dersolab'],
       reelsStoryboard: {
         hook3s: `Kameraya bakarak ekrana "${displayTitle}" yazısını vur: "Eğer bu konuyu hala böyle çözüyorsan sınavda netlerin gidebilir!"`,
         visualDirection: 'Ön planda dinamik anlatıcı, arkada DersoLab L.A.B. soru çözüm ekranı. Kritik noktalar parlak yeşil ve turuncu ile vurgulanır.',
@@ -690,8 +690,8 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
         topicLabel: 'Pazar Kitap Kulübü • Ortaokul & Lise',
         status: 'draft',
         targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
-        caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) grubumuz için okuma hızını, odaklanmayı ve sınav derinliğini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2026 #yks2026 #dersolab #kitapkurdu`,
-        hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2026', '#yks2026', '#dersolab'],
+        caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) grubumuz için okuma hızını, odaklanmayı ve sınav derinliğini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab #kitapkurdu`,
+        hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2027', '#yks2027', '#dersolab'],
         storyData: {
           badge: 'PAZAR KİTAP KULÜBÜ 📚',
           headline: 'Haftanın Kitap Önerileri',
@@ -736,7 +736,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
       caption: `Doğru şıkkı bulanlar kimler? Hikayedeki teste katıl, cevabı gör! 🦊 #${focus.toLowerCase().replace(/[^a-z0-9]/gi, '')}`,
-      hashtags: ['#yks2026', '#dersolab', '#gununsorusu'],
+      hashtags: ['#yks2027', '#dersolab', '#gununsorusu'],
       storyData: {
         badge: `GÜNÜN QUIZI • ${badgeText}`,
         headline: `${displayTitle} Püf Noktası`,
@@ -765,8 +765,8 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
       topicLabel: `X / Twitter Flood • ${focus}`,
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-      caption: `${focus} konusunda en çok yapılan 5 hata ve net kurtaran çözümleri 🧵👇 #yks2026 #dersolab`,
-      hashtags: ['#yks2026', '#dersolab', '#ykstayfa'],
+      caption: `${focus} konusunda en çok yapılan 5 hata ve net kurtaran çözümleri 🧵👇 #yks2027 #dersolab`,
+      hashtags: ['#yks2027', '#dersolab', '#ykstayfa'],
       xThreadData: {
         threadHook: `${focus} sınavda en çok belirleyici olan konulardan biri. Sorularda süre ve net kaybediyorsan işte bilmen gereken 5 kritik kural 🧵👇`,
         totalTweets: 5,
@@ -814,8 +814,8 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
     topicLabel: `Günün Sorusu • ${focus}`,
     status: 'draft',
     targetAudience: request.targetGrade || 'YKS (TYT/AYT)',
-    caption: `${focus} konusunda ÖSYM tarzı günün sorusu geldi! Bakalım kimler ilk seferde doğru şıkkı bulacak? 🧠\n\nCevabını yoruma bırak, çözümü sabitlediğimiz yorumda incele! 🎯\n\n#gununsorusu #yks2026 #dersolab #sorucozumu`,
-    hashtags: ['#gununsorusu', '#yks2026', '#dersolab', '#sorucozumu'],
+    caption: `${focus} konusunda ÖSYM tarzı günün sorusu geldi! Bakalım kimler ilk seferde doğru şıkkı bulacak? 🧠\n\nCevabını yoruma bırak, çözümü sabitlediğimiz yorumda incele! 🎯\n\n#gununsorusu #yks2027 #dersolab #sorucozumu`,
+    hashtags: ['#gununsorusu', '#yks2027', '#dersolab', '#sorucozumu'],
     singlePostData: {
       badge: `GÜNÜN ÖSYM SORUSU • ${badgeText}`,
       headline: `${displayTitle} Tuzağı`,
@@ -844,8 +844,8 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
       topicLabel: 'Çalışma Disiplini',
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS',
-      caption: `Yeni haftaya hazır mıyız? Pazartesi gününü doğru planlayan öğrenci haftayı önde bitirir. Bu hafta denemelerinde "Turlama Yöntemini" dene!\n\n#pazartesi #yks2026 #dersolab`,
-      hashtags: ['#pazartesi', '#yks2026', '#dersolab', '#motivasyon'],
+      caption: `Yeni haftaya hazır mıyız? Pazartesi gününü doğru planlayan öğrenci haftayı önde bitirir. Bu hafta denemelerinde "Turlama Yöntemini" dene!\n\n#pazartesi #yks2027 #dersolab`,
+      hashtags: ['#pazartesi', '#yks2027', '#dersolab', '#motivasyon'],
       carouselSlides: [
         {
           slideNumber: 1,
@@ -902,8 +902,8 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
       topicLabel: 'TYT Matematik',
       status: 'draft',
       targetAudience: request.targetGrade || 'YKS',
-      caption: `Her denemede garanti gelen ama dikkatsizlikten kaçan 3 soru tipi! Kaydet ve hafta sonu denemenden önce tekrar et. 📐\n\n#tytmatematik #yks2026 #dersolab`,
-      hashtags: ['#tytmatematik', '#yks2026', '#dersolab'],
+      caption: `Her denemede garanti gelen ama dikkatsizlikten kaçan 3 soru tipi! Kaydet ve hafta sonu denemenden önce tekrar et. 📐\n\n#tytmatematik #yks2027 #dersolab`,
+      hashtags: ['#tytmatematik', '#yks2027', '#dersolab'],
       carouselSlides: [
         {
           slideNumber: 1,
@@ -997,8 +997,8 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
       topicLabel: 'Pazar Kitap Kulübü • Ortaokul & Lise',
       status: 'draft',
       targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
-      caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) adaylarımız için okuma hızını, odaklanmayı ve sınav paragraf netlerini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2026 #yks2026 #paragrafhizi #dersolab #kitapkurdu`,
-      hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2026', '#yks2026', '#paragrafhizi', '#dersolab'],
+      caption: `Pazar gününün vazgeçilmezi: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nBu hafta hem ortaokul (LGS) hem de lise (YKS) adaylarımız için okuma hızını, odaklanmayı ve sınav paragraf netlerini uçuracak 2 harika başucu kitabı seçtik!\n\nSen bu hafta hangisine başlıyorsun? Hikayedeki ankete katıl! 👇\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #paragrafhizi #dersolab #kitapkurdu`,
+      hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2027', '#yks2027', '#paragrafhizi', '#dersolab'],
       storyData: {
         badge: 'PAZAR KİTAP KULÜBÜ 📚',
         headline: 'Haftanın Kitap Önerileri',
@@ -1247,7 +1247,7 @@ export function buildDefaultComments(title: string, caption: string): SimulatedC
   return [
     {
       id: 'sim_comm_1',
-      userHandle: '@yks2026_melisa',
+      userHandle: '@yks2027_melisa',
       commentText: 'Hocam denemede bu soru gelse kesin yanlış yapardım, cevap neden A şıkkı?',
       userType: 'doubtful',
       suggestedReplies: [
@@ -1300,7 +1300,7 @@ export function buildDefaultComments(title: string, caption: string): SimulatedC
     {
       id: 'sim_comm_3',
       userHandle: '@eren_ayt',
-      commentText: 'Bu konudan 2026 sınavında kaç soru gelir kesin çıkar mı?',
+      commentText: 'Bu konudan 2027 sınavında kaç soru gelir kesin çıkar mı?',
       userType: 'curious',
       suggestedReplies: [
         {
@@ -1332,7 +1332,7 @@ export function runPedagogicalAudit(post: SocialPostItem): PedagogicalAudit {
   const text = `${title} ${caption}`
 
   const checkedRules: string[] = [
-    'ÖSYM 2026 güncel soru kökü & format uyumu',
+    'ÖSYM 2027 güncel soru kökü & format uyumu',
     'MEB müfredat dışı formül ve ezber içermeme denetimi',
     'Bilişsel yükü azaltan açıklayıcı görsel-şema eşleştirmesi',
     'Çeldirici analizi ve stratejik kazanım rehberliği',
@@ -1340,7 +1340,7 @@ export function runPedagogicalAudit(post: SocialPostItem): PedagogicalAudit {
   ]
 
   let osymRelevance = 96
-  let notes = 'İçerik ÖSYM 2026 soru kalıplarına ve MEB güncel kazanım çizelgesine %100 uygundur.'
+  let notes = 'İçerik ÖSYM 2027 soru kalıplarına ve MEB güncel kazanım çizelgesine %100 uygundur.'
 
   if (text.includes('paragraf') || text.includes('türkçe') || text.includes('okuma')) {
     osymRelevance = 98
@@ -1540,8 +1540,8 @@ export async function generateAutonomousDailyBatch(
       status: 'approved',
       isAutoPilot: true,
       targetAudience: targetGrade,
-      caption: `Güne zihnini açacak bir soruyla başla! ÖSYM bu soru tipini çift köklerde öğrencileri avlamak için soruyor. Hikayedeki teste dokun! 🎯 #yks2026 #sabahsorusu #dersolab`,
-      hashtags: ['#yks2026', '#tytmatematik', '#dersolab', '#gununsorusu'],
+      caption: `Güne zihnini açacak bir soruyla başla! ÖSYM bu soru tipini çift köklerde öğrencileri avlamak için soruyor. Hikayedeki teste dokun! 🎯 #yks2027 #sabahsorusu #dersolab`,
+      hashtags: ['#yks2027', '#tytmatematik', '#dersolab', '#gununsorusu'],
       storyData: {
         badge: 'GÜNÜN SABAH TUZAĞI 🌅',
         headline: 'Kök(x²) İfadesi Dışarı Nasıl Çıkar?',
@@ -1571,8 +1571,8 @@ export async function generateAutonomousDailyBatch(
       status: 'approved',
       isAutoPilot: true,
       targetAudience: targetGrade,
-      caption: `Öğle molasında netlerini kurtaracak 4 dakikalık rehber! 🥪⚡\n\nParagraflarda son şıkka gelince ilk şıkkı unutanlar, bu 4 adımlı biyonik yöntemi denemelerinde hemen uygulasın!\n\nKaydet, hafta sonu denemenden önce tekrar bak! 💾\n\n#paragraftaktikleri #yks2026 #biyonikokuma #dersolab`,
-      hashtags: ['#paragraftaktikleri', '#yks2026', '#biyonikokuma', '#dersolab'],
+      caption: `Öğle molasında netlerini kurtaracak 4 dakikalık rehber! 🥪⚡\n\nParagraflarda son şıkka gelince ilk şıkkı unutanlar, bu 4 adımlı biyonik yöntemi denemelerinde hemen uygulasın!\n\nKaydet, hafta sonu denemenden önce tekrar bak! 💾\n\n#paragraftaktikleri #yks2027 #biyonikokuma #dersolab`,
+      hashtags: ['#paragraftaktikleri', '#yks2027', '#biyonikokuma', '#dersolab'],
       carouselSlides: [
         {
           slideNumber: 1,
@@ -1635,8 +1635,8 @@ export async function generateAutonomousDailyBatch(
       status: 'approved',
       isAutoPilot: true,
       targetAudience: targetGrade,
-      caption: `ÖSYM soru yazarlarının çeldirici hazırlarken başvurduğu 3 gizli psikolojik hile! 🎬⚡\n\nVideodaki taktiği kaydedip denemede uygula, netini kurtar!\n\nSen en çok hangi şıkta eleniyorsun? Yorumlara yaz 👇\n\n#yks2026 #ykstayfa #dersolab #tiktokegitim #reels`,
-      hashtags: ['#yks2026', '#ykstayfa', '#dersolab', '#tiktokegitim', '#reels'],
+      caption: `ÖSYM soru yazarlarının çeldirici hazırlarken başvurduğu 3 gizli psikolojik hile! 🎬⚡\n\nVideodaki taktiği kaydedip denemede uygula, netini kurtar!\n\nSen en çok hangi şıkta eleniyorsun? Yorumlara yaz 👇\n\n#yks2027 #ykstayfa #dersolab #tiktokegitim #reels`,
+      hashtags: ['#yks2027', '#ykstayfa', '#dersolab', '#tiktokegitim', '#reels'],
       reelsStoryboard: {
         hook3s: 'ÖSYM soru yazarları senin neyi bildiğini değil, nerede acele edeceğini test eder. İşte 3 psikolojik hile:',
         visualDirection: 'Hızlı zoom-in, neon kırmızı soru işareti flaşı ve DersoLab soru röntgeni animasyonu.',
@@ -1813,7 +1813,7 @@ export async function processNaturalLanguageAgentCommand(request: SocialAgentCom
     command.includes('3 post')
   ) {
     logs.push(`[INTENT] 'Otonom Günlük İçerik Paketi (Sabah + Öğle + Akşam)' tespit edildi.`)
-    logs.push(`[ANALYSIS] 2026 Sınav takvimi ve hedef kitlenin en çok zorlandığı 3 kritik konu eşleştirildi.`)
+    logs.push(`[ANALYSIS] 2027 Sınav takvimi ve hedef kitlenin en çok zorlandığı 3 kritik konu eşleştirildi.`)
     logs.push(`[GENERATING] 1 Adet Story Testi, 1 Adet Taktik Carousel, 1 Adet Prime Time X Flood ve AI görselleri sentezleniyor...`)
 
     const batch = await generateAutonomousDailyBatch(request.targetGrade, request.focusSubject, persona)

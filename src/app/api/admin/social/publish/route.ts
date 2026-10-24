@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getInstagramConfig, publishToInstagram } from '@/lib/social/instagram'
 import { getTikTokConfig, publishToTikTok } from '@/lib/social/tiktok'
+import { uploadSocialDataUrlToStorage } from '@/actions/social-posts'
 
 export async function GET() {
   const supabase = await createClient()
@@ -74,6 +75,24 @@ export async function POST(request: NextRequest) {
     const shouldPublishInstagram = platform === 'both' || platform === 'all' || platform === 'instagram'
     const shouldPublishTikTok = platform === 'both' || platform === 'all' || platform === 'tiktok'
 
+    // Eğer data:image/... formatında görseller geldiyse ve API yapılandırılmışsa Supabase Storage'a yükleyip public HTTPS URL al
+    const igConfigured = getInstagramConfig().isConfigured
+    const ttConfigured = getTikTokConfig().isConfigured
+    let resolvedImageUrls: string[] | undefined = imageUrls
+
+    if (Array.isArray(imageUrls) && imageUrls.length > 0 && (igConfigured || ttConfigured)) {
+      const uploaded = await Promise.all(
+        imageUrls.map(async (url: string, idx: number) => {
+          if (url.startsWith('data:image/')) {
+            const pubUrl = await uploadSocialDataUrlToStorage(url, `${postId || 'post'}_${idx + 1}`)
+            return pubUrl || url
+          }
+          return url
+        })
+      )
+      resolvedImageUrls = uploaded
+    }
+
     let instagramResult = null
     let tiktokResult = null
 
@@ -83,7 +102,7 @@ export async function POST(request: NextRequest) {
       tasks.push(
         publishToInstagram({
           caption: caption || '',
-          imageUrls,
+          imageUrls: resolvedImageUrls,
           videoUrl,
           isReels: isActualReels,
           isStory,
@@ -97,7 +116,7 @@ export async function POST(request: NextRequest) {
       tasks.push(
         publishToTikTok({
           caption: caption || '',
-          imageUrls,
+          imageUrls: resolvedImageUrls,
           videoUrl,
           isReels: isActualReels,
           isStory,

@@ -46,7 +46,11 @@ export async function publishToInstagram({
   const { isConfigured, token, accountId } = getInstagramConfig()
   const actionType: 'story' | 'post' = isStory ? 'story' : 'post'
 
-  if (!isConfigured) {
+  const validPublicUrls = (imageUrls || []).filter(
+    (u) => u.startsWith('http://') || u.startsWith('https://')
+  )
+
+  if (!isConfigured || (!videoUrl && validPublicUrls.length === 0)) {
     return {
       success: true,
       mode: 'manual_fallback',
