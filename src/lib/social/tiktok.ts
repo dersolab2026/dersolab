@@ -16,8 +16,8 @@ export interface TikTokPublishResult {
   message: string
 }
 
-export function getTikTokConfig() {
-  const token = process.env.TIKTOK_ACCESS_TOKEN
+export function getTikTokConfig(customToken?: string) {
+  const token = customToken?.trim() || process.env.TIKTOK_ACCESS_TOKEN
   const openId = process.env.TIKTOK_OPEN_ID
   const clientKey = process.env.TIKTOK_CLIENT_KEY || process.env.TIKTOK_APP_ID
 
@@ -39,6 +39,7 @@ export async function publishToTikTok({
   isStory = false,
   isReels = false,
   title,
+  customToken,
 }: {
   caption: string
   imageUrls?: string[]
@@ -46,8 +47,9 @@ export async function publishToTikTok({
   isStory?: boolean
   isReels?: boolean
   title?: string
+  customToken?: string
 }): Promise<TikTokPublishResult> {
-  const { isConfigured, token } = getTikTokConfig()
+  const { isConfigured, token } = getTikTokConfig(customToken)
   const actionType: 'story' | 'post' = isStory ? 'story' : 'post'
 
   // Akıllı Web & Creator Studio Modu (API anahtarı yoksa veya fallback)

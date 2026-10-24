@@ -16,9 +16,9 @@ export interface InstagramPublishResult {
   message: string
 }
 
-export function getInstagramConfig() {
-  const token = process.env.INSTAGRAM_ACCESS_TOKEN
-  const accountId = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID
+export function getInstagramConfig(customToken?: string, customAccountId?: string) {
+  const token = customToken?.trim() || process.env.INSTAGRAM_ACCESS_TOKEN
+  const accountId = customAccountId?.trim() || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID
 
   return {
     isConfigured: Boolean(token && accountId),
@@ -36,14 +36,18 @@ export async function publishToInstagram({
   videoUrl,
   isReels = false,
   isStory = false,
+  customToken,
+  customAccountId,
 }: {
   caption: string
   imageUrls?: string[]
   videoUrl?: string
   isReels?: boolean
   isStory?: boolean
+  customToken?: string
+  customAccountId?: string
 }): Promise<InstagramPublishResult> {
-  const { isConfigured, token, accountId } = getInstagramConfig()
+  const { isConfigured, token, accountId } = getInstagramConfig(customToken, customAccountId)
   const actionType: 'story' | 'post' = isStory ? 'story' : 'post'
 
   const validPublicUrls = (imageUrls || []).filter(

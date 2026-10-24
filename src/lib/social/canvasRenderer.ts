@@ -1332,3 +1332,235 @@ export async function downloadAllPostMedia(
 
   return files.length
 }
+
+/**
+ * Sıfır bağımlılıklı (Zero-Dependency) standart ZIP arşiv oluşturucu (CRC32 + Store)
+ */
+function createZipBlob(entries: { filename: string; data: Uint8Array }[]): Blob {
+  const crcTable = new Uint32Array(256)
+  for (let n = 0; n < 256; n++) {
+    let c = n
+    for (let k = 0; k < 8; k++) {
+      c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
+    }
+    crcTable[n] = c >>> 0
+  }
+
+  function crc32(buf: Uint8Array): number {
+    let crc = 0xffffffff
+    for (let i = 0; i < buf.length; i++) {
+      crc = crcTable[(crc ^ buf[i]) & 0xff] ^ (crc >>> 8)
+    }
+    return (crc ^ 0xffffffff) >>> 0
+  }
+
+  const encoder = new TextEncoder()
+  const localParts: Uint8Array[] = []
+  const centralParts: Uint8Array[] = []
+  let offset = 0
+
+  for (const entry of entries) {
+    const nameBytes = encoder.encode(entry.filename)
+    const data = entry.data
+    const crc = crc32(data)
+
+    const localHeader = new Uint8Array(30 + nameBytes.length)
+    const lv = new DataView(localHeader.buffer)
+    lv.setUint32(0, 0x04034b50, true)
+    lv.setUint16(4, 20, true)
+    lv.setUint16(6, 0x0800, true) // UTF-8
+    lv.setUint16(8, 0, true) // Store (uncompressed)
+    lv.setUint16(10, 0, true)
+    lv.setUint16(12, 0, true)
+    lv.setUint32(14, crc, true)
+    lv.setUint32(18, data.length, true)
+    lv.setUint32(22, data.length, true)
+    lv.setUint16(26, nameBytes.length, true)
+    lv.setUint16(28, 0, true)
+    localHeader.set(nameBytes, 30)
+
+    const centralHeader = new Uint8Array(46 + nameBytes.length)
+    const cv = new DataView(centralHeader.buffer)
+    cv.setUint32(0, 0x02014b50, true)
+    cv.setUint16(4, 20, true)
+    cv.setUint16(6, 20, true)
+    cv.setUint16(8, 0x0800, true)
+    cv.setUint16(10, 0, true)
+    cv.setUint16(12, 0, true)
+    cv.setUint16(14, 0, true)
+    cv.setUint32(16, crc, true)
+    cv.setUint32(20, data.length, true)
+    cv.setUint32(24, data.length, true)
+    cv.setUint16(28, nameBytes.length, true)
+    cv.setUint16(30, 0, true)
+    cv.setUint16(32, 0, true)
+    cv.setUint16(34, 0, true)
+    cv.setUint16(36, 0, true)
+    cv.setUint32(38, 0, true)
+    cv.setUint32(42, offset, true)
+    centralHeader.set(nameBytes, 46)
+
+    localParts.push(localHeader, data)
+    centralParts.push(centralHeader)
+    offset += localHeader.length + data.length
+  }
+
+  const centralSize = centralParts.reduce((acc, p) => acc + p.length, 0)
+  const eocd = new Uint8Array(22)
+  const ev = new DataView(eocd.buffer)
+  ev.setUint32(0, 0x06054b50, true)
+  ev.setUint16(4, 0, true)
+  ev.setUint16(6, 0, true)
+  ev.setUint16(8, entries.length, true)
+  ev.setUint16(10, entries.length, true)
+  ev.setUint32(12, centralSize, true)
+  ev.setUint32(16, offset, true)
+  ev.setUint16(20, 0, true)
+
+  return new Blob([...localParts, ...centralParts, eocd] as BlobPart[], { type: 'application/zip' })
+}
+
+function dataUrlToUint8Array(dataUrl: string): Uint8Array {
+  const base64 = dataUrl.split(',')[1] || ''
+  const bin = atob(base64)
+  const bytes = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) {
+    bytes[i] = bin.charCodeAt(i)
+  }
+  return bytes
+}
+
+/**
+ * Tüm slayt görsellerini + açıklama metnini tek bir .ZIP paketi olarak indirir
+ */
+export async function downloadPostAsZip(
+  post: SocialPostItem,
+  onProgress?: (current: number, total: number) => void
+): Promise<number> {
+  const files = await generateAllPostMediaFiles(post, onProgress)
+  if (files.length === 0) return 0
+
+  const entries: { filename: string; data: Uint8Array }[] = files.map((f) => ({
+    filename: f.filename,
+    data: dataUrlToUint8Array(f.dataUrl),
+  }))
+
+  const fullCaption = `${post.title}\n\n${post.caption}\n\n${(post.hashtags || [])
+    .map((h) => (h.startsWith('#') ? h : `#${h}`))
+    .join(' ')}`
+  entries.push({
+    filename: 'aciklama_ve_etiketler.txt',
+    data: new TextEncoder().encode(fullCaption),
+  })
+
+  const zipBlob = createZipBlob(entries)
+  const url = URL.createObjectURL(zipBlob)
+  triggerDownload(url, `dersolab_${post.type}_paketi.zip`)
+  setTimeout(() => URL.revokeObjectURL(url), 4000)
+  return files.length
+}
+
+/**
+ * Reels gönderisi için 9:16 dikey hareketli (animasyonlu) video (.webm / .mp4) üretir
+ * ve hem Data URL hem de indirilebilir URL döner.
+ */
+export async function generateReelsAnimatedVideoDataUrl(
+  post: SocialPostItem,
+  onProgress?: (percent: number) => void
+): Promise<{ dataUrl: string; ext: string }> {
+  if (typeof document === 'undefined' || typeof MediaRecorder === 'undefined') {
+    throw new Error('Tarayıcınız video kaydını desteklemiyor.')
+  }
+
+  const canvas = document.createElement('canvas')
+  canvas.width = 1080
+  canvas.height = 1920
+
+  const rb = post.reelsStoryboard || {
+    hook3s: post.title,
+    visualDirection: 'DersoLab 9:16 Dikey Video',
+    spokenScript: post.caption,
+    onScreenText: ['🚨 ÖSYM TAKTİĞİ', post.title, '+1 NET KAZAN', 'Link Biyoda 🦊'],
+    musicAudioVibe: 'Trending Fast BPM',
+    callToAction: 'Profildeki linkten hemen ücretsiz dene!',
+  }
+
+  const allTags = rb.onScreenText && rb.onScreenText.length > 0 ? rb.onScreenText : ['🚨 DİKKAT', post.title, 'Link Biyoda 🦊']
+  const logoImg = await loadImageSafely('/fox-head.png')
+  const mainImg = await loadImageSafely(rb.uploadedImageUrl || post.uploadedImageUrl)
+
+  const mimeTypes = ['video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
+  const supportedMime = mimeTypes.find((m) => MediaRecorder.isTypeSupported(m)) || 'video/webm'
+  const ext = supportedMime.includes('mp4') ? 'mp4' : 'webm'
+
+  const stream = canvas.captureStream(30)
+  const recorder = new MediaRecorder(stream, {
+    mimeType: supportedMime,
+    videoBitsPerSecond: 4_500_000,
+  })
+
+  const chunks: BlobPart[] = []
+  recorder.ondataavailable = (e) => {
+    if (e.data && e.data.size > 0) chunks.push(e.data)
+  }
+
+  const totalFrames = 90 // ~3.6 saniye akıcı 30fps animasyon (hızlı render + tam sahne akışı)
+  recorder.start()
+
+  for (let f = 0; f <= totalFrames; f++) {
+    const progress = f / totalFrames
+    onProgress?.(Math.round(progress * 100))
+
+    // Görünür tag sayısını animasyon ilerledikçe artır
+    const visibleTagCount = Math.max(1, Math.min(allTags.length, Math.ceil(progress * (allTags.length + 0.5))))
+    const partialStoryboard: ReelsStoryboard = {
+      ...rb,
+      onScreenText: allTags.slice(0, visibleTagCount),
+      spokenScript: progress > 0.3 ? rb.spokenScript : '',
+      callToAction: progress > 0.55 ? rb.callToAction : '',
+    }
+
+    await renderSlideToCanvas(canvas, {
+      isReels: true,
+      reelsStoryboard: partialStoryboard,
+      postTitle: post.title,
+      postCaption: post.caption,
+      themeVariant: (['neon_orange', 'lab_dark', 'cyan_cyber', 'purple_matrix'] as SlideThemeVariant[])[
+        Math.floor(progress * 2) % 4
+      ],
+      preloadedImages: {
+        logo: logoImg,
+        mainImage: mainImg,
+      },
+    })
+
+    // Üstte canlı video ilerleme çubuğu (Instagram Reels / TikTok barı)
+    const ctx = canvas.getContext('2d')
+    if (ctx) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
+      roundRect(ctx, 80, 52, 920, 8, 4)
+      ctx.fill()
+      ctx.fillStyle = '#f97316'
+      roundRect(ctx, 80, 52, Math.max(16, 920 * progress), 8, 4)
+      ctx.fill()
+    }
+
+    await new Promise((r) => setTimeout(r, 32))
+  }
+
+  const videoBlob: Blob = await new Promise((resolve) => {
+    recorder.onstop = () => {
+      resolve(new Blob(chunks, { type: supportedMime }))
+    }
+    recorder.stop()
+  })
+
+  const dataUrl: string = await new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(videoBlob)
+  })
+
+  return { dataUrl, ext }
+}

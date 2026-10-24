@@ -161,17 +161,23 @@ export function PublishSuccessModal({
                   </span>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
+                  publishResult?.instagram?.mode === 'api'
+                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                }`}
+              >
                 <CheckCircle2 className="w-3 h-3" />
-                <span>Hazır</span>
+                <span>{publishResult?.instagram?.mode === 'api' ? 'API ile Yayınlandı' : 'Buluta Yüklendi'}</span>
               </span>
             </div>
 
             <p className="text-[11px] text-slate-300 leading-relaxed">
               {publishResult?.instagram?.message ||
                 (isStory
-                  ? '9:16 dikey hikaye şablonu ve çıkartma hazırlandı.'
-                  : 'Gönderi görselleri ve açıklama Instagram için optimize edildi.')}
+                  ? '9:16 dikey hikaye şablonu buluta yüklendi ve Instagram için hazırlandı.'
+                  : 'Gönderi görselleri ve açıklama Instagram için buluta yüklendi.')}
             </p>
 
             <a
@@ -200,9 +206,15 @@ export function PublishSuccessModal({
                   </span>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
+                  publishResult?.tiktok?.mode === 'api'
+                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                }`}
+              >
                 <CheckCircle2 className="w-3 h-3" />
-                <span>Hazır</span>
+                <span>{publishResult?.tiktok?.mode === 'api' ? 'API ile Yayınlandı' : 'Buluta Yüklendi'}</span>
               </span>
             </div>
 
@@ -231,11 +243,19 @@ export function PublishSuccessModal({
           <div className="flex items-center gap-2 text-emerald-400 font-semibold">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>
-              {downloadCount > 1
-                ? `${downloadCount} adet yüksek çözünürlüklü slayt görseli cihazınıza indirildi`
-                : '1080p yüksek çözünürlüklü görsel cihazınıza indirildi'}
+              Görseller 1080p yüksek çözünürlükte <strong>DersoLab Bulut Depolamaya (Supabase Storage)</strong> yüklendi ve API'ye iletildi
             </span>
           </div>
+          {downloadCount > 0 && (
+            <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+              <span>
+                {downloadCount > 1
+                  ? `${downloadCount} adet yüksek çözünürlüklü slayt görseli cihazınıza da aktarıldı`
+                  : '1080p yüksek çözünürlüklü görsel cihazınıza da aktarıldı'}
+              </span>
+            </div>
+          )}
           <div className="flex items-center gap-2 text-emerald-400 font-semibold">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>Açıklama metni ve trend hashtag'ler panoya otomatik kopyalandı</span>

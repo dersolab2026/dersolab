@@ -52,16 +52,25 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const {
-      postId,
-      platform = 'both',
-      caption,
-      imageUrls,
-      videoUrl,
-      contentType,
-      isReels = false,
-      title,
-    } = body
+    const postObj = body.post || {}
+    const postId = body.postId || postObj.id
+    const platform = body.platform || postObj.platform || 'both'
+    const rawCaption = body.caption ?? postObj.caption ?? ''
+    const hashtags: string[] = body.hashtags || postObj.hashtags || []
+    const caption =
+      hashtags.length > 0 && !rawCaption.includes('#')
+        ? `${rawCaption}\n\n${hashtags.map((h: string) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
+        : rawCaption
+    const imageUrls: string[] | undefined = body.imageUrls
+    const videoUrl: string | undefined = body.videoUrl
+    const contentType = body.contentType || postObj.type || 'post'
+    const isReels = Boolean(body.isReels || contentType === 'reels')
+    const title = body.title || postObj.title || 'DersoLab'
+
+    // İsteğe bağlı: Admin panelinden girilen API anahtarları
+    const customIgToken: string | undefined = body.instagramAccessToken
+    const customIgAccountId: string | undefined = body.instagramAccountId
+    const customTtToken: string | undefined = body.tiktokAccessToken
 
     // Gönderi mi Story mi? Otomatik tespit
     const isStory = Boolean(body.isStory || contentType === 'story')
@@ -75,12 +84,11 @@ export async function POST(request: NextRequest) {
     const shouldPublishInstagram = platform === 'both' || platform === 'all' || platform === 'instagram'
     const shouldPublishTikTok = platform === 'both' || platform === 'all' || platform === 'tiktok'
 
-    // Eğer data:image/... formatında görseller geldiyse ve API yapılandırılmışsa Supabase Storage'a yükleyip public HTTPS URL al
-    const igConfigured = getInstagramConfig().isConfigured
-    const ttConfigured = getTikTokConfig().isConfigured
+    // Görselleri ve videoları Supabase Storage'a yükleyip public HTTPS URL al (Meta Graph API & TikTok API için zorunlu)
     let resolvedImageUrls: string[] | undefined = imageUrls
+    let resolvedVideoUrl: string | undefined = videoUrl
 
-    if (Array.isArray(imageUrls) && imageUrls.length > 0 && (igConfigured || ttConfigured)) {
+    if (Array.isArray(imageUrls) && imageUrls.length > 0) {
       const uploaded = await Promise.all(
         imageUrls.map(async (url: string, idx: number) => {
           if (url.startsWith('data:image/')) {
@@ -93,6 +101,13 @@ export async function POST(request: NextRequest) {
       resolvedImageUrls = uploaded
     }
 
+    if (videoUrl && videoUrl.startsWith('data:video/')) {
+      const pubVideoUrl = await uploadSocialDataUrlToStorage(videoUrl, `${postId || 'reels'}_video`)
+      if (pubVideoUrl) {
+        resolvedVideoUrl = pubVideoUrl
+      }
+    }
+
     let instagramResult = null
     let tiktokResult = null
 
@@ -103,9 +118,11 @@ export async function POST(request: NextRequest) {
         publishToInstagram({
           caption: caption || '',
           imageUrls: resolvedImageUrls,
-          videoUrl,
+          videoUrl: resolvedVideoUrl,
           isReels: isActualReels,
           isStory,
+          customToken: customIgToken,
+          customAccountId: customIgAccountId,
         }).then((res) => {
           instagramResult = res
         })
@@ -117,10 +134,11 @@ export async function POST(request: NextRequest) {
         publishToTikTok({
           caption: caption || '',
           imageUrls: resolvedImageUrls,
-          videoUrl,
+          videoUrl: resolvedVideoUrl,
           isReels: isActualReels,
           isStory,
           title,
+          customToken: customTtToken,
         }).then((res) => {
           tiktokResult = res
         })

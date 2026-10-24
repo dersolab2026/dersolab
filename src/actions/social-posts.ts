@@ -120,7 +120,7 @@ export async function uploadSocialDataUrlToStorage(
   dataUrl: string,
   prefix = 'slide'
 ): Promise<string | null> {
-  if (!dataUrl.startsWith('data:image/')) {
+  if (!dataUrl.startsWith('data:image/') && !dataUrl.startsWith('data:video/')) {
     return dataUrl.startsWith('http') ? dataUrl : null
   }
 
@@ -133,16 +133,24 @@ export async function uploadSocialDataUrlToStorage(
     if (!buckets?.some((b) => b.name === bucketName)) {
       await admin.storage.createBucket(bucketName, {
         public: true,
-        fileSizeLimit: 10 * 1024 * 1024,
+        fileSizeLimit: 25 * 1024 * 1024,
       })
     }
 
-    const match = dataUrl.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/)
+    const match = dataUrl.match(/^data:((?:image|video)\/[a-zA-Z0-9+.;=-]+);base64,(.+)$/)
     if (!match) return null
 
-    const mimeType = match[1]
+    const rawMime = match[1].split(';')[0]
     const base64Data = match[2]
-    const ext = mimeType.includes('svg') ? 'svg' : mimeType.includes('jpeg') ? 'jpg' : 'png'
+    const ext = rawMime.includes('webm')
+      ? 'webm'
+      : rawMime.includes('mp4')
+        ? 'mp4'
+        : rawMime.includes('svg')
+          ? 'svg'
+          : rawMime.includes('jpeg')
+            ? 'jpg'
+            : 'png'
     const fileName = `posts/${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`
 
     const buffer = Buffer.from(base64Data, 'base64')
@@ -150,7 +158,7 @@ export async function uploadSocialDataUrlToStorage(
     const { error: uploadError } = await admin.storage
       .from(bucketName)
       .upload(fileName, buffer, {
-        contentType: mimeType,
+        contentType: rawMime,
         upsert: true,
       })
 

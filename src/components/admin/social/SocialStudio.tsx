@@ -29,6 +29,11 @@ import {
   Send,
   Cloud,
   BookOpen,
+  Clock,
+  Volume2,
+  Archive,
+  Settings,
+  Video,
 } from 'lucide-react'
 import type {
   CarouselSlide,
@@ -44,7 +49,12 @@ import type {
 } from '@/types/social'
 import { SocialPhoneMockup } from './SocialPhoneMockup'
 import { PublishSuccessModal, type PublishResultData } from './PublishSuccessModal'
-import { downloadAllPostMedia, generateAllPostMediaFiles } from '@/lib/social/canvasRenderer'
+import {
+  downloadAllPostMedia,
+  generateAllPostMediaFiles,
+  downloadPostAsZip,
+  generateReelsAnimatedVideoDataUrl,
+} from '@/lib/social/canvasRenderer'
 import {
   toTurkishTitleCase,
   buildBookCoverSvgDataUrl,
@@ -323,18 +333,38 @@ export default function SocialStudio() {
 
   // İndirme, Kopyalama ve Tek Tuşla Paylaşım Durumları
   const [isDownloading, setIsDownloading] = useState<boolean>(false)
+  const [isZipDownloading, setIsZipDownloading] = useState<boolean>(false)
+  const [isVideoRendering, setIsVideoRendering] = useState<boolean>(false)
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
   const [downloadProgress, setDownloadProgress] = useState<string>('')
   const [isCopied, setIsCopied] = useState<boolean>(false)
   const [isDraftsOpen, setIsDraftsOpen] = useState<boolean>(false)
   const [isPublishing, setIsPublishing] = useState<boolean>(false)
   const [publishResult, setPublishResult] = useState<PublishResultData | null>(null)
   const [isPublishModalOpen, setIsPublishModalOpen] = useState<boolean>(false)
-  const [lastDownloadCount, setLastDownloadCount] = useState<number>(1)
+  const [lastDownloadCount, setLastDownloadCount] = useState<number>(0)
+
+  // Doğrudan Instagram Graph API & TikTok API Bağlantı Ayarları
+  const [isApiConfigOpen, setIsApiConfigOpen] = useState<boolean>(false)
+  const [customIgToken, setCustomIgToken] = useState<string>('')
+  const [customIgAccountId, setCustomIgAccountId] = useState<string>('')
+  const [customTiktokToken, setCustomTiktokToken] = useState<string>('')
 
   const dbSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Yerel Depolamadan + Supabase Veritabanından Yükleme ve Senkronizasyon
   useEffect(() => {
+    try {
+      const savedApiKeys = localStorage.getItem('dersolab_social_api_keys_v1')
+      if (savedApiKeys) {
+        const parsedKeys = JSON.parse(savedApiKeys)
+        if (parsedKeys.igToken) setCustomIgToken(parsedKeys.igToken)
+        if (parsedKeys.igAccountId) setCustomIgAccountId(parsedKeys.igAccountId)
+        if (parsedKeys.tiktokToken) setCustomTiktokToken(parsedKeys.tiktokToken)
+      }
+    } catch {
+      // ignore
+    }
     let localPosts: SocialPostItem[] = []
     try {
       const saved =
@@ -926,19 +956,29 @@ export default function SocialStudio() {
     toast.success('Seçilen viral kanca başlığa uygulandı!')
   }
 
-  // Tek Tuşla Instagram & TikTok Paylaşımı
+  // Tek Tuşla Instagram & TikTok Paylaşımı (Cihaza zorunlu indirme yapmadan doğrudan Bulut + Graph API / TikTok API üzerinden paylaşır)
   async function handleOneClickPublish() {
     setIsPublishing(true)
-    const toastId = toast.loading('1080p görseller üretiliyor ve Instagram & TikTok paylaşımı hazırlanıyor...')
+    const toastId = toast.loading(
+      '1080p medya buluta yükleniyor ve Instagram Graph API & TikTok API üzerinden paylaşılıyor...'
+    )
     try {
-      // 1. Görselleri 1080p PNG olarak üret
+      // 1. Görselleri bellekte 1080p PNG olarak üret (cihaza zorla İNDİRMEZ!)
       const mediaFiles = await generateAllPostMediaFiles(activePost)
-      setLastDownloadCount(mediaFiles.length)
+      setLastDownloadCount(0)
 
-      // 2. Cihaza indir
-      await downloadAllPostMedia(activePost)
+      // 2. Eğer gönderi Reels ise ayrıca 9:16 hareketli video üret
+      let reelsVideoDataUrl: string | undefined
+      if (activePost.type === 'reels') {
+        try {
+          const videoRes = await generateReelsAnimatedVideoDataUrl(activePost)
+          reelsVideoDataUrl = videoRes.dataUrl
+        } catch {
+          // Tarayıcı MediaRecorder desteklemiyorsa kapak görseliyle devam et
+        }
+      }
 
-      // 3. Açıklama ve hashtag'leri panoya kopyala
+      // 3. Açıklama ve hashtag'leri kolaylık için panoya kopyala
       const fullText = `${activePost.caption}\n\n${(activePost.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
       try {
         await navigator.clipboard.writeText(fullText)
@@ -946,14 +986,25 @@ export default function SocialStudio() {
         // ignore clipboard permission issues
       }
 
-      // 4. API üzerinden paylaşım / depolama yüklemesi yap
+      // 4. API üzerinden doğrudan bulut yüklemesi ve Instagram / TikTok paylaşımı yap
       const res = await fetch('/api/admin/social/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          postId: activePost.id,
           post: activePost,
+          caption: activePost.caption,
+          hashtags: activePost.hashtags,
+          contentType: activePost.type,
+          isStory: activePost.type === 'story',
+          isReels: activePost.type === 'reels',
+          title: activePost.title,
           imageUrls: mediaFiles.map((f) => f.dataUrl),
+          videoUrl: reelsVideoDataUrl,
           platform: 'both',
+          instagramAccessToken: customIgToken.trim() || undefined,
+          instagramAccountId: customIgAccountId.trim() || undefined,
+          tiktokAccessToken: customTiktokToken.trim() || undefined,
         }),
       })
       const data = await res.json()
@@ -968,12 +1019,37 @@ export default function SocialStudio() {
 
       setPublishResult(data)
       setIsPublishModalOpen(true)
-      toast.success('Gönderi başarıyla hazırlandı ve yayınlandı!', { id: toastId })
+
+      if (data.directApiPublished) {
+        toast.success('Gönderi doğrudan Instagram & TikTok hesaplarında yayınlandı!', { id: toastId })
+      } else {
+        toast.success(
+          'Görseller buluta yüklendi! Doğrudan otomatik paylaşım için API anahtarı bağlayabilir veya tek tıkla paylaşabilirsin.',
+          { id: toastId }
+        )
+      }
     } catch (err: any) {
       console.error(err)
       toast.error(err?.message || 'Paylaşım sırasında bir sorun oluştu.', { id: toastId })
     } finally {
       setIsPublishing(false)
+    }
+  }
+
+  function handleSaveApiConfig() {
+    try {
+      localStorage.setItem(
+        'dersolab_social_api_keys_v1',
+        JSON.stringify({
+          igToken: customIgToken.trim(),
+          igAccountId: customIgAccountId.trim(),
+          tiktokToken: customTiktokToken.trim(),
+        })
+      )
+      setIsApiConfigOpen(false)
+      toast.success('Instagram & TikTok API bağlantı ayarları kaydedildi!')
+    } catch {
+      toast.error('Ayarlar kaydedilirken hata oluştu.')
     }
   }
 
@@ -1408,6 +1484,290 @@ export default function SocialStudio() {
     }
   }
 
+  // Tüm Slaytları + Açıklama Metnini Tek .ZIP Paketi Olarak İndir
+  async function handleDownloadZip() {
+    setIsZipDownloading(true)
+    const toastId = toast.loading('Tüm slaytlar ve açıklama metni tek .ZIP paketinde birleştiriliyor...')
+    try {
+      await downloadPostAsZip(activePost, (curr, tot) => {
+        setDownloadProgress(`ZIP Hazırlanıyor: ${curr}/${tot}`)
+      })
+      toast.success('Tüm slaytlar + açıklama.txt tek bir .ZIP paketi olarak indirildi!', { id: toastId })
+    } catch (err: any) {
+      console.error(err)
+      toast.error('ZIP paketi oluşturulurken bir hata oluştu.', { id: toastId })
+    } finally {
+      setIsZipDownloading(false)
+      setDownloadProgress('')
+    }
+  }
+
+  // Reels İçin 9:16 Hareketli Video (.WEBM / .MP4) Üret ve İndir
+  async function handleExportReelsVideo() {
+    setIsVideoRendering(true)
+    const toastId = toast.loading('9:16 dikey hareketli Reels videosu kare kare oluşturuluyor...')
+    try {
+      const videoRes = await generateReelsAnimatedVideoDataUrl(activePost)
+      const videoFileName = `dersolab_reels_${Date.now()}.${videoRes.ext}`
+      const link = document.createElement('a')
+      link.href = videoRes.dataUrl
+      link.download = videoFileName
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      toast.success(`Hareketli Reels videosu (${videoFileName}) hazırlandı ve indirildi!`, { id: toastId })
+    } catch (err: any) {
+      console.error(err)
+      toast.error(err?.message || 'Hareketli video oluşturulurken hata oluştu.', { id: toastId })
+    } finally {
+      setIsVideoRendering(false)
+    }
+  }
+
+  // Reels Konuşma Metnini Sesli Oku (TTS Voiceover Önizleme)
+  function handleSpeakReelsScript() {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      toast.error('Tarayıcınız ses sentezleme (TTS) özelliğini desteklemiyor.')
+      return
+    }
+    if (isSpeaking) {
+      window.speechSynthesis.cancel()
+      setIsSpeaking(false)
+      return
+    }
+    const textToRead =
+      activePost.reelsStoryboard?.spokenScript ||
+      `${activePost.title}. ${activePost.caption.replace(/#\S+/g, '')}`
+
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(textToRead)
+    utterance.lang = 'tr-TR'
+    utterance.rate = 1.04
+    utterance.pitch = 1.0
+    const voices = window.speechSynthesis.getVoices()
+    const trVoice = voices.find((v) => v.lang.toLowerCase().includes('tr'))
+    if (trVoice) utterance.voice = trVoice
+
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    utterance.onerror = () => setIsSpeaking(false)
+
+    window.speechSynthesis.speak(utterance)
+    toast.success('Türkçe seslendirme (TTS) başlatıldı!')
+  }
+
+  // ÖZELLİK 1: 2 Slaytlı "Önce Soru, Kaydırınca Çözüm" Mini-Carousel Üretici
+  function handleGenerateQuestionSolutionCarousel() {
+    const rawSubject = genSubject.trim() || 'Paragrafta Ana Düşünce ve Çeldirici Eleme'
+    const cleanTopic = toTurkishTitleCase(rawSubject)
+    const nextSeed = variationSeedRef.current + 1
+    variationSeedRef.current = nextSeed
+
+    const qaBank = [
+      {
+        badge: `${genGrade} • ÖSYM PROVA SORUSU`,
+        questionTitle: `${cleanTopic}: Bu Soruyu 40 Saniyede Çözebilir Misin?`,
+        questionSub: 'Önce kendi cevabını yorumlara yaz, sonra çözümü görmek için sola kaydır 👉',
+        options: [
+          `Soru: ${cleanTopic} kapsamında verilen öncüllerden hangisi her koşulda kesinlikle doğrudur?`,
+          'A) Yalnız I  •  B) Yalnız II  •  C) I ve II',
+          'D) II ve III (Doğru Cevap Adayı)  •  E) I, II ve III',
+        ],
+        solutionTitle: 'Adım Adım Çözüm & Çeldirici Analizi ✅',
+        solutionSub: 'Öğrencilerin %78’i C şıkkındaki sınır değer tuzağına düşüyor!',
+        solutionSteps: [
+          '1. Adım: Soru kökündeki "kesinlikle doğrudur" ifadesi uç değerlerin de sağlanmasını zorunlu kılar.',
+          '2. Adım: I. öncül sınır değerde sağlansa bile negatif/istisnai durumda bozulduğu için elenir (Çeldirici!).',
+          '3. Adım: II ve III. öncüller tanım kümesinin tamamında sağlandığı için doğru yanıt D seçeneğidir.',
+        ],
+      },
+      {
+        badge: `${genGrade} • 1 SORU 1 NET`,
+        questionTitle: `${cleanTopic}: Sınavda Çıkarsa Eleyici Olacak Soru!`,
+        questionSub: 'Çoğu kişinin B ve E şıkkı arasında kaldığı o soru kalıbı • Kaydır ve Çözümü Gör 👉',
+        options: [
+          `Soru: ${cleanTopic} kurallarına göre aşağıdaki ifadelerden hangisinde kavram yanılgısı vardır?`,
+          'A) Temel bağıntı doğrudan korunur  •  B) Birim dönüşümü sabit kalır',
+          'C) Oran-orantı modeli uygulanır  •  D) Sınır koşulu denetlenir  •  E) İstisna durumu hariç tutulur',
+        ],
+        solutionTitle: 'Doğru Cevap: B Şıkkı • Neden Yanıltıcı? 🎯',
+        solutionSub: 'ÖSYM’nin en sevdiği "birim ve işaret" çeldiricisini yakala!',
+        solutionSteps: [
+          '1. Adım: A, C, D ve E şıkları konunun çekirdek kazanımıyla birebir örtüşmektedir.',
+          '2. Adım: B şıkkında verilen "birim dönüşümü sabit kalır" ifadesi boyut analizi yapıldığında yanlıştır.',
+          '3. Adım: Net Kurtaran Taktik: İşlemi bitirmeden önce birim ve işaret kontrolü yapmayı alışkanlık haline getir!',
+        ],
+      },
+      {
+        badge: `${genGrade} • DERECE SORUSU`,
+        questionTitle: `${cleanTopic}: İlk Bakışta Kolay Görünüyor Ama...`,
+        questionSub: 'Bakalım çeldiriciye düşmeden doğru şıkkı bulabilecek misin? Sola kaydır 👉',
+        options: [
+          `Soru: ${cleanTopic} ile ilgili I, II ve III numaralı yargılardan hangilerine ulaşılabilir?`,
+          'A) Yalnız I  •  B) Yalnız III  •  C) I ve III',
+          'D) II ve III  •  E) I, II ve III',
+        ],
+        solutionTitle: 'Çözüm & ÖSYM Tuzak Rehberi (Cevap: C) 🧠',
+        solutionSub: 'II. öncüldeki "tümü / tamamı" genellemesi klasik bir ÖSYM çeldiricisidir!',
+        solutionSteps: [
+          '1. Adım: I. yargı verilen temel ilkenin doğrudan sonucudur (+).',
+          '2. Adım: II. yargıdaki aşırı genelleme ("her zaman tüm durumlarda") tek bir aksi örnekle çürütülür (-).',
+          '3. Adım: III. yargı neden-sonuç ilişkisini doğru kurduğu için cevap C (I ve III) olur.',
+        ],
+      },
+    ]
+
+    const chosen = qaBank[nextSeed % qaBank.length]
+    const themes: SlideThemeVariant[] = ['neon_orange', 'lab_dark', 'cyan_cyber', 'purple_matrix']
+
+    const qaPost: SocialPostItem = {
+      id: `post_qa_${Date.now()}`,
+      title: chosen.questionTitle,
+      type: 'carousel',
+      topic: 'exam_tactics',
+      topicLabel: `${genGrade} • Soru + Çözüm (2 Slayt)`,
+      sourcePrompt: rawSubject,
+      status: 'draft',
+      targetAudience: genGrade,
+      caption: `❓ Önce Soru, Kaydırınca Çözüm! (${cleanTopic}) 🦊🎯\n\nKaydırmadan önce bulduğun şıkkı yorumlara yaz, sonra 2. slayttaki çeldirici analizini kontrol et! 👇\n\n💾 Sınav öncesi tekrar etmek için kaydetmeyi unutma!\n\n#1soru1net #yks2027 #lgs2027 #dersolab #soruçözüm`,
+      hashtags: ['#1soru1net', '#yks2027', '#lgs2027', '#dersolab', '#soruçözüm'],
+      carouselSlides: [
+        {
+          slideNumber: 1,
+          badge: chosen.badge,
+          headline: chosen.questionTitle,
+          subhead: chosen.questionSub,
+          bodyPoints: chosen.options,
+          highlightTag: '1. SLAYT: SORU ❓',
+          footerNote: 'Cevabını Yorumlara Yaz • Çözüm İçin Kaydır 👉',
+          themeVariant: themes[nextSeed % 4],
+        },
+        {
+          slideNumber: 2,
+          badge: '2. SLAYT • ADIM ADIM ÇÖZÜM & ÇELDİRİCİ ANALİZİ',
+          headline: chosen.solutionTitle,
+          subhead: chosen.solutionSub,
+          bodyPoints: chosen.solutionSteps,
+          highlightTag: '2. SLAYT: ÇÖZÜM ✅',
+          footerNote: 'DersoLab L.A.B. • @dersolabegitim',
+          themeVariant: themes[(nextSeed + 1) % 4],
+        },
+      ],
+      createdAt: new Date().toISOString(),
+    }
+
+    const updated = [qaPost, ...posts]
+    savePosts(updated)
+    setActivePostId(qaPost.id)
+    setActiveSlideIndex(0)
+    setGenType('carousel')
+    upsertSocialPostToDb(qaPost).catch(() => {})
+    toast.success('2 Slaytlı "Önce Soru, Kaydırınca Çözüm" gönderisi oluşturuldu!')
+  }
+
+  // ÖZELLİK 2: YKS 2027 & LGS 2027 Otomatik Canlı Geri Sayım (Countdown) Şablonu
+  function handleGenerateCountdownPost() {
+    const now = new Date()
+    const isLgs = genGrade === 'LGS'
+    // Tahmini resmi sınav takvimi: YKS 2027 -> 19 Haziran 2027, LGS 2027 -> 6 Haziran 2027
+    const targetDate = isLgs ? new Date('2027-06-06T09:30:00') : new Date('2027-06-19T10:15:00')
+    const diffMs = targetDate.getTime() - now.getTime()
+    const daysLeft = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)))
+    const examName = isLgs ? 'LGS 2027' : 'YKS 2027'
+    const focusTopic = toTurkishTitleCase(genSubject.trim() || (isLgs ? 'Paragraf & Yeni Nesil Matematik' : 'TYT Türkçe & AYT Matematik'))
+
+    const nextSeed = variationSeedRef.current + 1
+    variationSeedRef.current = nextSeed
+    const themes: SlideThemeVariant[] = ['cyan_cyber', 'neon_orange', 'purple_matrix', 'lab_dark']
+    const chosenTheme = themes[nextSeed % themes.length]
+
+    if (genType === 'story') {
+      const countdownStory: SocialPostItem = {
+        id: `post_countdown_${Date.now()}`,
+        title: `⏳ ${examName}'ye ${daysLeft} Gün Kaldı!`,
+        type: 'story',
+        topic: 'motivation',
+        topicLabel: `${examName} • Canlı Geri Sayım (${daysLeft} Gün)`,
+        sourcePrompt: `${examName} Geri Sayım`,
+        status: 'draft',
+        targetAudience: examName,
+        caption: `⏳ ${examName}'ye tam ${daysLeft} gün kaldı! Bugün hedefin için masanın başında mısın? 🔥🦊\n\nGünün Odak Konusu: ${focusTopic}\n\n#yks2027 #lgs2027 #gerisayım #dersolab #motivasyon`,
+        hashtags: ['#yks2027', '#lgs2027', '#gerisayım', '#dersolab', '#motivasyon'],
+        storyData: {
+          badge: `⏳ ${examName} GERİ SAYIM SAYACI`,
+          headline: `${examName}'ye ${daysLeft} Gün Kaldı!`,
+          subhead: `Bugünün Odak Görevi: ${focusTopic} konusundan en az 40 soru çöz ve yanlışlarını analiz et! 🎯`,
+          stickerType: genStorySticker,
+          stickerQuestion: `Bugün ${daysLeft}. gün hedefini tamamladın mı?`,
+          stickerOptions: ['Hedef Tamamlandı 🔥', 'Şimdi Başlıyorum 💪'],
+          stickerLinkText: 'Günlük Çalışma Planı',
+          stickerLinkUrl: 'https://dersolab.com/lab',
+          themeVariant: chosenTheme,
+        },
+        createdAt: new Date().toISOString(),
+      }
+      const updated = [countdownStory, ...posts]
+      savePosts(updated)
+      setActivePostId(countdownStory.id)
+      setActiveSlideIndex(0)
+      upsertSocialPostToDb(countdownStory).catch(() => {})
+      toast.success(`${examName}'ye ${daysLeft} Gün Kaldı hikaye şablonu hazırlandı!`)
+      return
+    }
+
+    const countdownCarousel: SocialPostItem = {
+      id: `post_countdown_${Date.now()}`,
+      title: `⏳ ${examName}'ye ${daysLeft} Gün Kaldı: Bugün Ne Yapmalısın?`,
+      type: 'carousel',
+      topic: 'motivation',
+      topicLabel: `${examName} • ${daysLeft} Gün Geri Sayım`,
+      sourcePrompt: `${examName} Geri Sayım`,
+      status: 'draft',
+      targetAudience: examName,
+      caption: `⏳ ${examName} Maratonunda Son ${daysLeft} Gün! 🦊🔥\n\nKalan ${daysLeft} günü en verimli şekilde değerlendirmek için bugünün 3 kritik görevini kaydırarak incele ve kaydet! 👇\n\n#yks2027 #lgs2027 #gerisayım #dersolab #studygram`,
+      hashtags: ['#yks2027', '#lgs2027', '#gerisayım', '#dersolab', '#studygram'],
+      carouselSlides: [
+        {
+          slideNumber: 1,
+          badge: `⏳ CANLI GERİ SAYIM • ${examName}`,
+          headline: `${examName}'ye ${daysLeft} Gün Kaldı!`,
+          subhead: 'Zaman daralırken netlerini sıçratacak günlük çalışma disiplini',
+          bodyPoints: [
+            `📅 Bugünün Odak Konusu: ${focusTopic}`,
+            '⏱️ 20 dakika kesintisiz paragraf + 40 dakika branş denemesi rutini',
+            'Kaydır; kalan sürede netlerini +15 artıracak planı gör 👉',
+          ],
+          highlightTag: `SON ${daysLeft} GÜN`,
+          footerNote: 'DersoLab Sınav Laboratuvarı • @dersolabegitim',
+          themeVariant: chosenTheme,
+        },
+        {
+          slideNumber: 2,
+          badge: `GÜNÜN 3 ALTIN GÖREVİ • ${daysLeft}. GÜN`,
+          headline: 'Bugün Masadan Kalkmadan Önce Bu 3 Adımı Tamamla',
+          subhead: 'Ertelemeyi bırak, bugün çözdüğün her soru sınav günü +1 net demek!',
+          bodyPoints: [
+            `1. Görev: ${focusTopic} başlığındaki eksik kazanımlarını 30 dakikada tekrar et.`,
+            '2. Görev: Süre tutarak 2 test çöz ve boş/yanlış sorularının çözümünü hemen öğren.',
+            '3. Görev: Yorumlara "Bugünkü hedefim tamam!" yazarak zinciri kırma 🔥',
+          ],
+          highlightTag: 'ZİNCİRİ KIRMA 🔥',
+          footerNote: 'DersoLab L.A.B. • @dersolabegitim',
+          themeVariant: themes[(nextSeed + 1) % 4],
+        },
+      ],
+      createdAt: new Date().toISOString(),
+    }
+
+    const updated = [countdownCarousel, ...posts]
+    savePosts(updated)
+    setActivePostId(countdownCarousel.id)
+    setActiveSlideIndex(0)
+    setGenType('carousel')
+    upsertSocialPostToDb(countdownCarousel).catch(() => {})
+    toast.success(`${examName}'ye ${daysLeft} Gün Kaldı geri sayım şablonu oluşturuldu!`)
+  }
+
   // Açıklamayı Panoya Kopyala
   function handleCopyCaption() {
     const fullText = `${activePost.caption}\n\n${activePost.hashtags.map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
@@ -1562,6 +1922,16 @@ export default function SocialStudio() {
 
         {/* Üst Sağ Aksiyon Butonları */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={() => setIsApiConfigOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-xs font-semibold text-emerald-300 hover:text-white transition-all cursor-pointer"
+            title="Instagram Graph API ve TikTok API Doğrudan Paylaşım Ayarları"
+          >
+            <Settings className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden md:inline">Doğrudan API Ayarları</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setIsDraftsOpen(!isDraftsOpen)}
@@ -1785,23 +2155,43 @@ export default function SocialStudio() {
               </div>
             </div>
 
-            {/* Otonom Günlük Paket (3 Post) & 7 Günlük Haftalık Takvim Hızlı Butonları */}
-            <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center gap-2">
+            {/* Otonom Günlük Paket (3 Post), 7 Günlük Haftalık Takvim, 2 Slayt Soru+Çözüm ve Canlı Geri Sayım Hızlı Butonları */}
+            <div className="mt-3 pt-3 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                type="button"
+                disabled={isBatchLoading || isGenerating}
+                onClick={handleGenerateQuestionSolutionCarousel}
+                className="py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+                <span>❓ Önce Soru, Kaydırınca Çözüm (2 Slayt)</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={isBatchLoading || isGenerating}
+                onClick={handleGenerateCountdownPost}
+                className="py-2 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
+              >
+                <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                <span>⏳ YKS & LGS 2027 Canlı Geri Sayım Şablonu</span>
+              </button>
+
               <button
                 type="button"
                 disabled={isBatchLoading || isGenerating}
                 onClick={handleGenerateDailyBatch}
-                className="flex-1 min-w-[200px] py-2 px-3 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/25 text-cyan-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
+                className="py-2 px-3 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/25 text-cyan-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
               >
                 <Flame className="w-3.5 h-3.5 text-cyan-400" />
-                <span>⚡ Otonom Günlük Paket (3 Post: Sabah + Öğle + Akşam)</span>
+                <span>⚡ Otonom Günlük Paket (3 Post)</span>
               </button>
 
               <button
                 type="button"
                 disabled={isBatchLoading || isGenerating}
                 onClick={handleGenerateWeeklyCalendar}
-                className="flex-1 min-w-[180px] py-2 px-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/25 text-purple-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
+                className="py-2 px-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/25 text-purple-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
               >
                 <Calendar className="w-3.5 h-3.5 text-purple-400" />
                 <span>📅 7 Günlük Haftalık Takvim Üret</span>
@@ -2688,7 +3078,28 @@ export default function SocialStudio() {
             {/* 4. REELS ALANLARI */}
             {isReels && activePost.reelsStoryboard && (
               <div className="border border-white/10 rounded-xl p-3.5 bg-black/30 flex flex-col gap-2.5">
-                <div className="text-xs font-bold text-orange-400">Reels & TikTok Tam Senaryo Ayarları</div>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-xs font-bold text-orange-400">Reels & TikTok Tam Senaryo + Video Stüdyosu</div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={handleSpeakReelsScript}
+                      className="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-200 text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer"
+                    >
+                      <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>{isSpeaking ? 'Seslendirmeyi Durdur' : 'Seslendirmeyi Dinle (TTS)'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isVideoRendering}
+                      onClick={handleExportReelsVideo}
+                      className="px-2.5 py-1 rounded-lg bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/40 text-orange-200 text-[11px] font-bold flex items-center gap-1 transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      <Video className="w-3.5 h-3.5 text-orange-400" />
+                      <span>{isVideoRendering ? 'Video Hazırlanıyor...' : 'Hareketli Video İndir (.WEBM/.MP4)'}</span>
+                    </button>
+                  </div>
+                </div>
                 <div>
                   <label className="text-[10px] font-semibold text-slate-400 block mb-1">İlk 3 Saniye Kancası (Hook)</label>
                   <input
@@ -3226,70 +3637,100 @@ export default function SocialStudio() {
               </span>
             </button>
 
-            {/* Tek Tuşla Instagram & TikTok Paylaşım Butonu */}
+            {/* Tek Tuşla Instagram & TikTok Paylaşım Butonu (Zorla İndirmez, Doğrudan Bulut & API Kullanır) */}
             <button
               type="button"
-              disabled={isPublishing || isDownloading}
+              disabled={isPublishing || isDownloading || isZipDownloading}
               onClick={handleOneClickPublish}
               className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-pink-500 via-orange-500 to-amber-500 hover:from-pink-600 hover:to-amber-600 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-pink-500/20 transition-all active:scale-98 cursor-pointer"
             >
               {isPublishing ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Paylaşıma Hazırlanıyor...</span>
+                  <span>Buluta Yükleniyor & API İle Paylaşılıyor...</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  <span>Tek Tuşla Paylaş (Instagram & TikTok)</span>
+                  <span>Tek Tuşla Doğrudan Paylaş (Instagram & TikTok)</span>
                 </>
               )}
             </button>
 
-            {/* 1080p PNG İndirme Butonu */}
-            <button
-              type="button"
-              disabled={isDownloading || isPublishing}
-              onClick={handleDownloadAll}
-              className="w-full py-2 px-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              {isDownloading ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>{downloadProgress || 'Görseller İndiriliyor...'}</span>
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4 text-orange-400" />
-                  <span>
-                    {isCarousel
-                      ? `Tüm Slaytları İndir (${activePost.carouselSlides?.length || 1} PNG)`
-                      : 'Görseli Cihaza İndir (1080p PNG)'}
-                  </span>
-                </>
-              )}
-            </button>
+            {/* Reels ise Hareketli Video & TTS Hızlı Aksiyonları */}
+            {isReels && (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  disabled={isVideoRendering || isPublishing}
+                  onClick={handleExportReelsVideo}
+                  className="py-2 px-3 rounded-xl bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/30 text-orange-200 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  <Video className={`w-3.5 h-3.5 text-orange-400 ${isVideoRendering ? 'animate-pulse' : ''}`} />
+                  <span>{isVideoRendering ? 'Video Üretiliyor...' : 'Hareketli Video (.MP4)'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSpeakReelsScript}
+                  className="py-2 px-3 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-200 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>{isSpeaking ? 'Sesi Durdur' : 'Sesli Oku (TTS)'}</span>
+                </button>
+              </div>
+            )}
 
-            {/* İkincil Eylemler (Metin Kopyala + Instagram'da Aç) */}
+            {/* İsteğe Bağlı İndirme Seçenekleri: Tek .ZIP Paketi veya PNG İndir */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                type="button"
+                disabled={isZipDownloading || isDownloading || isPublishing}
+                onClick={handleDownloadZip}
+                className="py-2 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 disabled:opacity-50 text-emerald-200 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                title="Tüm slaytları ve açıklama metnini tek bir .ZIP paketi olarak indirir"
+              >
+                <Archive className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="truncate">
+                  {isZipDownloading ? 'ZIP Hazırlanıyor...' : '📦 Tek .ZIP Paketi İndir'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                disabled={isDownloading || isZipDownloading || isPublishing}
+                onClick={handleDownloadAll}
+                className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 disabled:opacity-50 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                <span className="truncate">
+                  {isDownloading
+                    ? downloadProgress || 'İndiriliyor...'
+                    : isCarousel
+                      ? `PNG İndir (${activePost.carouselSlides?.length || 1})`
+                      : 'PNG İndir (1080p)'}
+                </span>
+              </button>
+            </div>
+
+            {/* İkincil Eylemler (Metin Kopyala + API Ayarları) */}
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={handleCopyCaption}
-                className="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white flex items-center justify-center gap-1.5 transition-colors"
+                className="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
                 {isCopied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>Metni Kopyala</span>
               </button>
 
-              <a
-                href="https://www.instagram.com/dersolabegitim/"
-                target="_blank"
-                rel="noreferrer"
-                className="py-2 px-3 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/20 text-xs font-semibold text-pink-300 hover:text-pink-200 flex items-center justify-center gap-1.5 transition-colors"
+              <button
+                type="button"
+                onClick={() => setIsApiConfigOpen(true)}
+                className="py-2 px-3 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/20 text-xs font-semibold text-pink-300 hover:text-pink-200 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Instagram'a Git</span>
-              </a>
+                <Settings className="w-3.5 h-3.5" />
+                <span>API Bağlantısı</span>
+              </button>
             </div>
           </div>
         </section>
@@ -3303,6 +3744,97 @@ export default function SocialStudio() {
         publishResult={publishResult}
         downloadCount={lastDownloadCount}
       />
+
+      {/* DOĞRUDAN INSTAGRAM GRAPH API & TIKTOK API BAĞLANTI AYARLARI MODALI */}
+      {isApiConfigOpen && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-[#0E1322] border border-white/15 rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Settings className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-sm font-bold text-white">
+                  Instagram & TikTok Doğrudan Paylaşım (API) Ayarları
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsApiConfigOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs text-slate-200 leading-relaxed space-y-1.5">
+              <div className="font-bold text-emerald-300">Neden Cihaza İndirmeden Doğrudan Paylaşım?</div>
+              <p className="text-[11px] text-slate-300">
+                <strong>"Tek Tuşla Doğrudan Paylaş"</strong> butonuna bastığında görseller/videolar artık cihazına zorla indirilmez; otomatik olarak <strong>Supabase Bulut Depolamaya</strong> yüklenir.
+              </p>
+              <p className="text-[11px] text-slate-300">
+                Meta (Instagram Graph API v21.0) ve TikTok Content Posting API v2 güvenlik kuralları gereği, hesabına dışarıdan otomatik gönderi atılabilmesi için resmi <strong>Access Token</strong> ve <strong>Business Account ID</strong> tanımlanmalıdır (Vercel ortam değişkenlerinden veya aşağıdaki alandan).
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-[11px] font-bold text-pink-300 block mb-1">
+                  Instagram Business Account ID (INSTAGRAM_BUSINESS_ACCOUNT_ID)
+                </label>
+                <input
+                  type="text"
+                  value={customIgAccountId}
+                  onChange={(e) => setCustomIgAccountId(e.target.value)}
+                  placeholder="Örn: 17841405822304914 (Sunucu env'de tanımlıysa boş bırakabilirsiniz)"
+                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-pink-300 block mb-1">
+                  Instagram Graph API Access Token (INSTAGRAM_ACCESS_TOKEN)
+                </label>
+                <input
+                  type="password"
+                  value={customIgToken}
+                  onChange={(e) => setCustomIgToken(e.target.value)}
+                  placeholder="EAA... (Meta Developer Portal > Instagram Graph API Token)"
+                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-cyan-300 block mb-1">
+                  TikTok Content Posting API Access Token (TIKTOK_ACCESS_TOKEN)
+                </label>
+                <input
+                  type="password"
+                  value={customTiktokToken}
+                  onChange={(e) => setCustomTiktokToken(e.target.value)}
+                  placeholder="act.... (TikTok Developer Portal > video.publish yetkili Token)"
+                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setIsApiConfigOpen(false)}
+                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300"
+              >
+                Vazgeç
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveApiConfig}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-xs font-bold text-white shadow-lg"
+              >
+                Kaydet ve Etkinleştir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* KAYITLI GÖNDERİLER ÇEKMECESİ (DRAWER / MODAL) */}
       {isDraftsOpen && (
