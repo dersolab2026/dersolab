@@ -148,7 +148,7 @@ export async function uploadSocialDataUrlToStorage(
         ? 'mp4'
         : rawMime.includes('svg')
           ? 'svg'
-          : rawMime.includes('jpeg')
+          : rawMime.includes('jpeg') || rawMime.includes('jpg')
             ? 'jpg'
             : 'png'
     const fileName = `posts/${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`

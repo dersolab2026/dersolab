@@ -129,55 +129,94 @@ export async function publishToTikTok({
         }
       }
 
-      // Geliştirici ve Sandbox ortamında TikTok doğrudan profil yayını yerine
-      // creator hesabının gelen kutusuna (MEDIA_UPLOAD) yüklemeyi destekler (video.upload kapsamı yeterlidir).
-      const response = await fetch(`${TIKTOK_API_BASE}/post/publish/content/init/`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: JSON.stringify({
-          post_info: {
-            title: (title || caption).slice(0, 150),
-            description: caption.slice(0, 2200),
-            privacy_level: 'PUBLIC_TO_EVERYONE',
-          },
-          source_info: {
-            source: 'PULL_FROM_URL',
-            photo_cover_index: 1,
-            photo_images: validPublicUrls,
-          },
-          post_mode: 'MEDIA_UPLOAD',
-          media_type: 'PHOTO',
-        }),
-      })
+      // 1. Önce doğrudan profilde yayınlamak için DIRECT_POST dene (video.publish yetkisi varsa)
+      let publishData: any = null
+      let isDirectPublished = false
 
-      const data = await response.json()
-      if (!response.ok || data.error?.code !== 'ok') {
-        throw new Error(data.error?.message || 'TikTok içerik yayınlama hatası oluştu.')
+      try {
+        const directRes = await fetch(`${TIKTOK_API_BASE}/post/publish/content/init/`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: JSON.stringify({
+            post_mode: 'DIRECT_POST',
+            media_type: 'PHOTO',
+            post_info: {
+              title: (title || caption).slice(0, 150),
+              description: caption.slice(0, 2200),
+              privacy_level: 'PUBLIC_TO_EVERYONE',
+              disable_comment: false,
+            },
+            source_info: {
+              source: 'PULL_FROM_URL',
+              photo_images: validPublicUrls,
+              photo_cover_index: 0,
+            },
+          }),
+        })
+
+        const directJson = await directRes.json()
+        console.log('TikTok DIRECT_POST denemesi yanıtı:', JSON.stringify(directJson))
+
+        if (directRes.ok && directJson.error?.code === 'ok') {
+          publishData = directJson
+          isDirectPublished = true
+        } else {
+          console.warn('TikTok DIRECT_POST kullanılamıyor, MEDIA_UPLOAD (Taslak / Gelen Kutusu) moduna geçiliyor...')
+        }
+      } catch (err) {
+        console.warn('TikTok DIRECT_POST çağrısı sırasında hata oluştu, MEDIA_UPLOAD deneniyor:', err)
+      }
+
+      // 2. DIRECT_POST başarısız olduysa veya sandbox izinleri varsa MEDIA_UPLOAD ile Creator Gelen Kutusuna yükle
+      if (!publishData) {
+        const mediaRes = await fetch(`${TIKTOK_API_BASE}/post/publish/content/init/`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: JSON.stringify({
+            post_mode: 'MEDIA_UPLOAD',
+            media_type: 'PHOTO',
+            post_info: {
+              title: (title || caption).slice(0, 150),
+              description: caption.slice(0, 2200),
+            },
+            source_info: {
+              source: 'PULL_FROM_URL',
+              photo_images: validPublicUrls,
+              photo_cover_index: 0,
+            },
+          }),
+        })
+
+        const mediaJson = await mediaRes.json()
+        console.log('TikTok MEDIA_UPLOAD yanıtı:', JSON.stringify(mediaJson))
+
+        if (!mediaRes.ok || mediaJson.error?.code !== 'ok') {
+          const errMsg = mediaJson.error?.message || JSON.stringify(mediaJson.error || mediaJson)
+          throw new Error(`TikTok yükleme hatası: ${errMsg}`)
+        }
+
+        publishData = mediaJson
       }
 
       return {
         success: true,
-        postId: data.data?.publish_id,
+        postId: publishData.data?.publish_id,
         shareUrl: 'https://www.tiktok.com/@dersolabegitim',
         mode: 'api',
         action: actionType,
-        message: isStory
-          ? 'Story görseli TikTok hesabınıza (@dersolabegitim) iletildi! TikTok uygulamasında Gelen Kutusu / Bildirimler alanından anında tek dokunuşla paylaşabilirsiniz.'
-          : 'Fotoğraf albümü TikTok hesabınıza iletildi! TikTok uygulamasında Gelen Kutusu\'ndan tek dokunuşla paylaşabilirsiniz.',
-      }
-
-      return {
-        success: true,
-        postId: data.data?.publish_id,
-        shareUrl: 'https://www.tiktok.com/@dersolabegitim',
-        mode: 'api',
-        action: actionType,
-        message: isStory
-          ? 'Story başarıyla TikTok hesabınızda yayınlandı!'
-          : 'Fotoğraf albümü başarıyla TikTok hesabınızda yayınlandı!',
+        message: isDirectPublished
+          ? (isStory
+              ? '🎉 TikTok Story doğrudan @dersolabegitim profilinizde yayınlandı!'
+              : '🎉 Fotoğraf albümü doğrudan @dersolabegitim profilinizde yayınlandı!')
+          : (isStory
+              ? '📱 TikTok Story @dersolabegitim hesabınıza başarıyla iletildi! TikTok mobil uygulamasında "Gelen Kutusu" (Inbox) > "Sistem Bildirimleri" alanına dokunarak tek tıkla Story olarak paylaşabilirsiniz.'
+              : '📱 Gönderi @dersolabegitim hesabınıza başarıyla iletildi! TikTok mobil uygulamasında "Gelen Kutusu"ndan tek tıkla onaylayıp paylaşabilirsiniz.'),
       }
     }
 

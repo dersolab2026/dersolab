@@ -644,18 +644,34 @@ export function PostEditorDrawer({
       }
 
       // 5. Sunucu API çağrısı yap (Instagram + TikTok)
+      let localApiKeys: { igToken?: string; igAccountId?: string; tiktokToken?: string } = {}
+      try {
+        localApiKeys = JSON.parse(localStorage.getItem('dersolab_social_api_keys_v1') || '{}')
+      } catch {}
+
+      const effectiveImageUrls =
+        mediaFiles.length > 0
+          ? mediaFiles.map((m) => m.dataUrl)
+          : post.uploadedImageUrl
+            ? [post.uploadedImageUrl]
+            : undefined
+
       const res = await fetch('/api/admin/social/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           postId: post.id,
+          post,
           platform: selectedPlatform,
           contentType: post.type,
           isStory: isPostStory,
           isReels: post.type === 'reels',
           caption: fullText,
           title: post.title,
-          imageUrls: post.uploadedImageUrl ? [post.uploadedImageUrl] : undefined,
+          imageUrls: effectiveImageUrls,
+          instagramAccessToken: localApiKeys.igToken || undefined,
+          instagramAccountId: localApiKeys.igAccountId || undefined,
+          tiktokAccessToken: localApiKeys.tiktokToken || undefined,
         }),
       })
 

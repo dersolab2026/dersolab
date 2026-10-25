@@ -431,11 +431,11 @@ function drawSingleBookCard(
   cardW: number,
   cardH: number,
   level: 'ortaokul' | 'lise',
-  loadedImg?: HTMLImageElement | null
+  loadedImg?: HTMLImageElement | null,
+  cardX = 70
 ) {
   const isOrtaokul = level === 'ortaokul'
-  const cardX = 80
-  const pad = 26
+  const pad = 24
 
   const cardBg = isOrtaokul ? 'rgba(6, 182, 212, 0.08)' : 'rgba(249, 115, 22, 0.08)'
   const cardBorder = isOrtaokul ? 'rgba(6, 182, 212, 0.45)' : 'rgba(249, 115, 22, 0.5)'
@@ -444,11 +444,11 @@ function drawSingleBookCard(
   const authorColor = isOrtaokul ? '#38bdf8' : '#fb923c'
   const boxBg = isOrtaokul ? 'rgba(6, 182, 212, 0.12)' : 'rgba(249, 115, 22, 0.12)'
   const boxBorder = isOrtaokul ? 'rgba(6, 182, 212, 0.28)' : 'rgba(249, 115, 22, 0.28)'
-  const defaultTag = isOrtaokul ? '📘 ORTAOKUL & LGS' : '📕 LİSE & YKS'
+  const defaultTag = isOrtaokul ? '📘 ORTAOKUL & LGS SEÇKİSİ' : '📕 LİSE & YKS SEÇKİSİ'
 
   ctx.save()
   // Dış kart çerçevesi ve taşma kilidi
-  roundRect(ctx, cardX, cardY, cardW, cardH, 26)
+  roundRect(ctx, cardX, cardY, cardW, cardH, 24)
   ctx.fillStyle = cardBg
   ctx.fill()
   ctx.strokeStyle = cardBorder
@@ -458,13 +458,13 @@ function drawSingleBookCard(
 
   const imgX = cardX + pad
   const imgY = cardY + pad
-  const imgW = 212
+  const imgW = 224
   const imgH = cardH - pad * 2
 
   if (loadedImg) {
     ctx.save()
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.65)'
-    ctx.shadowBlur = 22
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.75)'
+    ctx.shadowBlur = 24
     ctx.shadowOffsetX = 6
     ctx.shadowOffsetY = 8
     roundRect(ctx, imgX, imgY, imgW, imgH, 16)
@@ -482,59 +482,74 @@ function drawSingleBookCard(
     ctx.lineWidth = 2
     roundRect(ctx, imgX, imgY, imgW, imgH, 16)
     ctx.stroke()
+  } else {
+    // Kitap kapağı yüklenmediyse şık bir fallback kitap ikonu kutusu çiz
+    ctx.save()
+    roundRect(ctx, imgX, imgY, imgW, imgH, 16)
+    ctx.fillStyle = isOrtaokul ? 'rgba(6, 182, 212, 0.2)' : 'rgba(249, 115, 22, 0.2)'
+    ctx.fill()
+    ctx.strokeStyle = imgBorder
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    ctx.font = '54px "Apple Color Emoji", "Segoe UI Emoji", sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('📖', imgX + imgW / 2, imgY + imgH / 2 + 18)
+    ctx.textAlign = 'left'
+    ctx.restore()
   }
 
-  const rightX = loadedImg ? imgX + imgW + 26 : cardX + pad
+  const rightX = imgX + imgW + 26
   const rightW = cardX + cardW - pad - rightX
 
   // 1. Üst Seviye Etiketi (Dinamik genişlikli pill)
   const rawTag = book.highlightTag || defaultTag
   const tagText = rawTag.startsWith('📘') || rawTag.startsWith('📕') ? rawTag : `${isOrtaokul ? '📘' : '📕'} ${rawTag}`
   ctx.font = '800 14px Inter, system-ui, sans-serif'
-  const pillW = Math.min(rightW, Math.max(180, ctx.measureText(tagText).width + 28))
-  const pillH = 32
+  const pillW = Math.min(rightW, Math.max(200, ctx.measureText(tagText).width + 30))
+  const pillH = 34
   const pillY = cardY + pad
 
   ctx.fillStyle = pillBg
   roundRect(ctx, rightX, pillY, pillW, pillH, 10)
   ctx.fill()
   ctx.fillStyle = '#ffffff'
-  drawFittedSingleLine(ctx, tagText, rightX + 14, pillY + 21, pillW - 24, 14, 11, '800', 'left')
+  drawFittedSingleLine(ctx, tagText, rightX + 14, pillY + 22, pillW - 24, 14, 11, '800', 'left')
 
-  // 2. Kitap Adı (1 veya 2 satır dinamik yükseklik — Yazar satırıyla asla çakışmaz)
-  ctx.font = 'bold 31px Inter, system-ui, sans-serif'
+  // 2. Kitap Adı (1 veya 2 satır dinamik yükseklik)
+  ctx.font = 'bold 32px Inter, system-ui, sans-serif'
   let titleLines = getWrappedLines(ctx, book.title, rightW, 2)
-  let titleFontSize = 31
-  let titleLineH = 36
+  let titleFontSize = 32
+  let titleLineH = 38
   if (titleLines.length > 1) {
-    titleFontSize = 27
-    titleLineH = 32
+    titleFontSize = 28
+    titleLineH = 34
     ctx.font = `bold ${titleFontSize}px Inter, system-ui, sans-serif`
     titleLines = getWrappedLines(ctx, book.title, rightW, 2)
   }
 
   ctx.fillStyle = '#ffffff'
-  const titleFirstBaseline = pillY + pillH + (titleLines.length > 1 ? 30 : 34)
+  const titleFirstBaseline = pillY + pillH + (titleLines.length > 1 ? 32 : 36)
   titleLines.forEach((ln, idx) => {
     ctx.fillText(ln, rightX, titleFirstBaseline + idx * titleLineH)
   })
   const afterTitleY = titleFirstBaseline + (titleLines.length - 1) * titleLineH
 
-  // 3. Yazar ve Tür Satırları (Başlığın bittiği yere göre dinamik konumlanır)
-  const authorY = afterTitleY + 28
+  // 3. Yazar ve Tür Satırları
+  const authorY = afterTitleY + 30
   ctx.fillStyle = authorColor
-  drawFittedSingleLine(ctx, `Yazar: ${book.author}`, rightX, authorY, rightW, 20, 14, '600', 'left')
+  drawFittedSingleLine(ctx, `Yazar: ${book.author}`, rightX, authorY, rightW, 21, 15, '600', 'left')
 
-  const genreY = authorY + 25
+  const genreY = authorY + 26
   if (book.genre) {
     ctx.fillStyle = '#94a3b8'
     drawFittedSingleLine(ctx, `Tür: ${book.genre}`, rightX, genreY, rightW, 17, 13, '500', 'left')
   }
 
-  // 4. Ayırıcı Çizgi ve Açıklama (whyRead) Kutusu — Sağdan ve alttan tam 26px içeride biter
+  // 4. "NEDEN OKUNMALI?" Insight Kutusu
   const boxBottom = cardY + cardH - pad
-  const boxY = Math.max(genreY + 16, cardY + 228)
-  const boxH = Math.max(84, boxBottom - boxY)
+  const boxY = Math.max(genreY + 18, cardY + 235)
+  const boxH = Math.max(90, boxBottom - boxY)
 
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
   ctx.lineWidth = 1
@@ -550,20 +565,23 @@ function drawSingleBookCard(
   ctx.lineWidth = 1
   ctx.stroke()
 
+  // Kutu içi mini başlık: 💡 NEDEN OKUNMALI?
+  ctx.font = '800 13px Inter, system-ui, sans-serif'
+  ctx.fillStyle = isOrtaokul ? '#38bdf8' : '#fb923c'
+  ctx.fillText('💡 NEDEN OKUNMALI?', rightX + 16, boxY + 24)
+
   const whyText =
     book.whyRead ||
     (isOrtaokul
-      ? 'LGS yeni nesil paragraf sorularında hız ve dikkat süresini geliştirir.'
-      : 'TYT derin anlama ve AYT edebiyat tahlil gücü kazandırır.')
+      ? 'LGS yeni nesil paragraf sorularında hız, dikkat ve derin analiz gücü kazandırır.'
+      : 'TYT derin okuma hızı ve AYT edebiyat tahlil yeteneğini zirveye taşır.')
 
-  ctx.font = '600 17px Inter, system-ui, sans-serif'
+  ctx.font = '500 17px Inter, system-ui, sans-serif'
   ctx.fillStyle = '#e2e8f0'
-  const whyLines = getWrappedLines(ctx, whyText, rightW - 32, 3)
-  const whyLineH = 23
-  const totalWhyH = whyLines.length * whyLineH
-  const whyStartY = boxY + (boxH - totalWhyH) / 2 + 17
+  const whyLines = getWrappedLines(ctx, whyText, rightW - 32, 4)
+  const whyLineH = 24
   whyLines.forEach((ln, idx) => {
-    ctx.fillText(ln, rightX + 16, whyStartY + idx * whyLineH)
+    ctx.fillText(ln, rightX + 16, boxY + 50 + idx * whyLineH)
   })
 
   ctx.restore()
@@ -581,69 +599,62 @@ function drawDualBookStoryCards(
   loadedLiseImg?: HTMLImageElement | null
 ): number {
   const { ortaokul, lise } = story.dualBookData!
-  const cardW = width - 160
-  const cardH = 374
+  const cardX = 70
+  const cardW = width - 140
+  const cardH = 465
 
   // 1. ORTAOKUL & LGS KARTI
   const card1Y = cursorY
-  drawSingleBookCard(ctx, ortaokul, card1Y, cardW, cardH, 'ortaokul', loadedOrtaokulImg)
+  drawSingleBookCard(ctx, ortaokul, card1Y, cardW, cardH, 'ortaokul', loadedOrtaokulImg, cardX)
 
   // 2. LİSE & YKS KARTI
-  const card2Y = card1Y + cardH + 26
-  drawSingleBookCard(ctx, lise, card2Y, cardW, cardH, 'lise', loadedLiseImg)
+  const card2Y = card1Y + cardH + 24
+  drawSingleBookCard(ctx, lise, card2Y, cardW, cardH, 'lise', loadedLiseImg, cardX)
 
-  // 3. ÇIKARTMA (YALNIZCA KULLANICI SEÇTİYSE ÇİZİLİR - ZORUNLU ANKET/QUIZ YOK)
-  if (!story.stickerType || story.stickerType === 'none') {
-    return card2Y + cardH + 30
+  // 3. ALT ÇAĞRI / ETKİLEŞİM VEYA STICKER (Alt kısımdaki boşluğu kapatır ve etkileşim sağlar)
+  const ctaY = card2Y + cardH + 24
+  if (story.stickerType && story.stickerType !== 'none') {
+    return drawStorySticker(ctx, story, ctaY, width)
   }
 
-  if (story.stickerType === 'quiz' || story.stickerType === 'link') {
-    return drawStorySticker(ctx, story, card2Y + cardH + 26, width)
-  }
-
-  const pollY = card2Y + cardH + 26
-  const pollH = 172
-
+  // Varsayılan Etkileşim Kutusu (Instagram "Yanıt Gönder" yönlendirmesi)
+  const ctaH = 145
   ctx.save()
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)'
-  ctx.shadowBlur = 20
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
-  roundRect(ctx, 80, pollY, cardW, pollH, 26)
+  roundRect(ctx, cardX, ctaY, cardW, ctaH, 20)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.04)'
   ctx.fill()
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)'
+  ctx.lineWidth = 1.5
+  ctx.stroke()
+
+  // Sol Vurgulu İkon Rozeti
+  const iconSize = 56
+  const iconX = cardX + 22
+  const iconY = ctaY + (ctaH - iconSize) / 2
+  roundRect(ctx, iconX, iconY, iconSize, iconSize, 16)
+  const iconGrad = ctx.createLinearGradient(iconX, iconY, iconX + iconSize, iconY + iconSize)
+  iconGrad.addColorStop(0, '#f97316')
+  iconGrad.addColorStop(1, '#ec4899')
+  ctx.fillStyle = iconGrad
+  ctx.fill()
+
+  ctx.font = '28px "Apple Color Emoji", "Segoe UI Emoji", sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillText('💬', iconX + iconSize / 2, iconY + iconSize / 2 + 10)
+  ctx.textAlign = 'left'
+
+  // Metin Alanı
+  const textX = iconX + iconSize + 20
+  ctx.font = '900 22px Inter, system-ui, sans-serif'
+  ctx.fillStyle = '#ffffff'
+  ctx.fillText('BU HAFTA HANGİSİNİ OKUYACAKSIN?', textX, ctaY + 54)
+
+  ctx.font = '500 17px Inter, system-ui, sans-serif'
+  ctx.fillStyle = 'rgba(226, 232, 240, 0.85)'
+  ctx.fillText('Aşağıdaki "Yanıt Gönder" kutusundan bize yaz, hikayemizde paylaşalım! 👇', textX, ctaY + 92)
+
   ctx.restore()
-
-  ctx.fillStyle = '#0f172a'
-  drawFittedSingleLine(
-    ctx,
-    story.stickerQuestion || 'Bu hafta hangisini okuyacaksın? 📚',
-    width / 2,
-    pollY + 46,
-    cardW - 56,
-    23,
-    15,
-    'bold',
-    'center'
-  )
-
-  const btnW = (cardW - 68) / 2
-  const leftBtnX = 104
-  const rightBtnX = 104 + btnW + 20
-  const btnY = pollY + 72
-  const btnH = 74
-
-  ctx.fillStyle = '#0284c7'
-  roundRect(ctx, leftBtnX, btnY, btnW, btnH, 18)
-  ctx.fill()
-  const opt1 = (story.stickerOptions && story.stickerOptions[0]) || `📘 ${ortaokul.title}`
-  drawPollButtonText(ctx, opt1, leftBtnX, btnY, btnW, btnH, 18)
-
-  ctx.fillStyle = '#ea580c'
-  roundRect(ctx, rightBtnX, btnY, btnW, btnH, 18)
-  ctx.fill()
-  const opt2 = (story.stickerOptions && story.stickerOptions[1]) || `📕 ${lise.title}`
-  drawPollButtonText(ctx, opt2, rightBtnX, btnY, btnW, btnH, 18)
-
-  return pollY + pollH + 30
+  return ctaY + ctaH + 20
 }
 
 /**
@@ -759,15 +770,20 @@ export async function renderSlideToCanvas(
       : await loadImageSafely(storyData?.dualBookData?.lise?.imageUrl)
 
   // 5. ÜST HEADER: DersoLab Logo ve Sayfa Sayacı
+  // Instagram Stories ve Reels için üstte profil, avatar ve ilerleme çubuğu olduğundan güvenli alan Y=230'dan başlar
+  const headerTopY = isStory ? 230 : isReels ? 210 : 76
+  const headerBaselineY = headerTopY + 38
+  const headerDividerY = headerTopY + 68
+
   let logoStartX = 80
   if (loadedLogo) {
-    ctx.drawImage(loadedLogo, 80, 76, 44, 44)
+    ctx.drawImage(loadedLogo, 80, headerTopY, 44, 44)
     logoStartX = 136
   }
 
   ctx.font = 'bold 38px Inter, system-ui, sans-serif'
   ctx.fillStyle = '#ffffff'
-  ctx.fillText('Derso', logoStartX, 114)
+  ctx.fillText('Derso', logoStartX, headerBaselineY)
 
   const dersoW = ctx.measureText('Derso').width
   const labX = logoStartX + dersoW + 4
@@ -776,26 +792,26 @@ export async function renderSlideToCanvas(
   logoGrad.addColorStop(0, theme.accentColor)
   logoGrad.addColorStop(1, theme.secondaryAccent)
   ctx.fillStyle = logoGrad
-  ctx.fillText('Lab', labX, 114)
+  ctx.fillText('Lab', labX, headerBaselineY)
 
   if (isStory) {
     ctx.font = 'bold 22px Inter, system-ui, sans-serif'
     ctx.fillStyle = theme.accentColor
     ctx.textAlign = 'right'
-    ctx.fillText('⚡ DERSOLAB STORY', width - 80, 115)
+    ctx.fillText('⚡ DERSOLAB STORY', width - 80, headerBaselineY - 2)
     ctx.textAlign = 'left'
   } else if (isReels) {
     ctx.font = 'bold 22px Inter, system-ui, sans-serif'
     ctx.fillStyle = theme.accentColor
     ctx.textAlign = 'right'
-    ctx.fillText('🎬 REELS & TIKTOK', width - 80, 115)
+    ctx.fillText('🎬 REELS & TIKTOK', width - 80, headerBaselineY - 2)
     ctx.textAlign = 'left'
   } else if (isCarousel) {
     const pageText = `${activeSlideIndex + 1} / ${totalSlides}`
     ctx.font = 'bold 24px Inter, system-ui, sans-serif'
     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
     ctx.textAlign = 'right'
-    ctx.fillText(pageText, width - 80, 115)
+    ctx.fillText(pageText, width - 80, headerBaselineY - 2)
     ctx.textAlign = 'left'
   }
 
@@ -803,12 +819,12 @@ export async function renderSlideToCanvas(
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
   ctx.lineWidth = 1.5
   ctx.beginPath()
-  ctx.moveTo(80, 150)
-  ctx.lineTo(width - 80, 150)
+  ctx.moveTo(80, headerDividerY)
+  ctx.lineTo(width - 80, headerDividerY)
   ctx.stroke()
 
   // 6. İÇERİK ALANI
-  let cursorY = 175
+  let cursorY = headerDividerY + 28
   const isMascotAsset = Boolean(
     effectiveImageUrl &&
       (/(?:fox-mascot|fox-head|mascot-icon|zeki|maskot)/i.test(effectiveImageUrl) ||
@@ -915,8 +931,9 @@ export async function renderSlideToCanvas(
     'Sınavda Başarıyı Getiren Strateji'
   const headline = toTurkishTitleCase(rawHeadline)
 
-  const headlineFontSize = hasImage ? (isStory || isReels ? 46 : 42) : isStory || isReels ? 56 : 50
-  const headlineLineHeight = hasImage ? (isStory || isReels ? 58 : 52) : isStory || isReels ? 68 : 62
+  const isDualBookStory = Boolean(isStory && storyData?.dualBookData)
+  const headlineFontSize = isDualBookStory ? 38 : hasImage ? (isStory || isReels ? 46 : 42) : isStory || isReels ? 56 : 50
+  const headlineLineHeight = isDualBookStory ? 46 : hasImage ? (isStory || isReels ? 58 : 52) : isStory || isReels ? 68 : 62
 
   cursorY += Math.round(headlineFontSize * 0.85)
   ctx.font = `900 ${headlineFontSize}px Inter, system-ui, sans-serif`
@@ -930,15 +947,15 @@ export async function renderSlideToCanvas(
     storyData?.subhead ||
     (postCaption && !isReels ? postCaption.split('\n')[0].slice(0, 100) : '')
   if (subhead) {
-    const subheadFontSize = hasImage ? 23 : 26
-    const subheadLineHeight = hasImage ? 32 : 36
-    cursorY += 12 + Math.round(subheadFontSize * 0.85)
+    const subheadFontSize = isDualBookStory ? 20 : hasImage ? 23 : 26
+    const subheadLineHeight = isDualBookStory ? 28 : hasImage ? 32 : 36
+    cursorY += (isDualBookStory ? 8 : 12) + Math.round(subheadFontSize * 0.85)
     ctx.font = `500 ${subheadFontSize}px Inter, system-ui, sans-serif`
     ctx.fillStyle = 'rgba(226, 232, 240, 0.85)'
     cursorY = wrapText(ctx, subhead, 80, cursorY, width - 160, subheadLineHeight, 2)
   }
 
-  cursorY += 22
+  cursorY += isDualBookStory ? 16 : 22
 
   const safeContentBottom = height - 130
   const availableSpace = safeContentBottom - cursorY
@@ -1160,17 +1177,20 @@ export async function renderSlideToCanvas(
     wrapText(ctx, singlePost.keyTakeaway, 105, boxY + 76, cardW - 50, 30, 2)
   }
 
-  // 7. ALT FOOTER
+  // 7. ALT FOOTER (Instagram Story ve Reels'da alt mesajlaşma çubuğunun üstünde kalacak şekilde güvenli alan)
+  const footerLineY = isStory ? height - 190 : height - 110
+  const footerTextY = isStory ? height - 145 : height - 62
+
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
   ctx.lineWidth = 1.5
   ctx.beginPath()
-  ctx.moveTo(80, height - 110)
-  ctx.lineTo(width - 80, height - 110)
+  ctx.moveTo(80, footerLineY)
+  ctx.lineTo(width - 80, footerLineY)
   ctx.stroke()
 
   ctx.font = '600 20px Inter, system-ui, sans-serif'
   ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
-  ctx.fillText('@dersolabegitim  •  🛡️ ÖSYM KAZANIM ONAYLI', 80, height - 62)
+  ctx.fillText('@dersolabegitim  •  🛡️ ÖSYM KAZANIM ONAYLI', 80, footerTextY)
 
   const footerRightText = isStory
     ? 'Yanıt Gönder 💬'
@@ -1183,11 +1203,12 @@ export async function renderSlideToCanvas(
   ctx.font = 'bold 22px Inter, system-ui, sans-serif'
   ctx.fillStyle = theme.accentColor
   ctx.textAlign = 'right'
-  ctx.fillText(footerRightText, width - 80, height - 62)
+  ctx.fillText(footerRightText, width - 80, footerTextY)
+  ctx.textAlign = 'left'
 }
 
 /**
- * Tek bir slaytı veya görseli offscreen canvas kullanarak PNG Data URL olarak dışa aktarır
+ * Tek bir slaytı veya görseli offscreen canvas kullanarak JPEG Data URL olarak dışa aktarır
  */
 export async function exportSlideDataUrl(options: RenderSlideOptions): Promise<string> {
   if (typeof document === 'undefined') {
@@ -1197,7 +1218,8 @@ export async function exportSlideDataUrl(options: RenderSlideOptions): Promise<s
   const canvas = document.createElement('canvas')
   try {
     await renderSlideToCanvas(canvas, options)
-    return canvas.toDataURL('image/png')
+    // Instagram Graph API ve TikTok Content Posting API için optimum format standart JPEG'dir (0.95 kalite)
+    return canvas.toDataURL('image/jpeg', 0.95)
   } catch (err) {
     // Tainted canvas (CORS) durumunda dış görseli çizmeden temiz bir kopya üret
     console.warn('Canvas toDataURL CORS koruması devreye girdi, harici görsel hariç tutularak tekrar çiziliyor...', err)
@@ -1210,7 +1232,7 @@ export async function exportSlideDataUrl(options: RenderSlideOptions): Promise<s
         mainImage: null,
       },
     })
-    return fallbackCanvas.toDataURL('image/png')
+    return fallbackCanvas.toDataURL('image/jpeg', 0.95)
   }
 }
 
@@ -1229,7 +1251,7 @@ export function triggerDownload(urlOrData: string, filename: string) {
 
 /**
  * Gönderinin TÜM görsellerini (Carousel slaytları, Story, Post veya Reels)
- * 1080p yüksek çözünürlüklü PNG formatında sırayla oluşturur ve Data URL listesi döner.
+ * 1080p yüksek çözünürlüklü JPEG formatında sırayla oluşturur ve Data URL listesi döner.
  */
 export async function generateAllPostMediaFiles(
   post: SocialPostItem,
@@ -1256,7 +1278,7 @@ export async function generateAllPostMediaFiles(
         customImageUrl: post.uploadedImageUrl,
       })
       exportedFiles.push({
-        filename: `dersolab_slayt_${i + 1}.png`,
+        filename: `dersolab_slayt_${i + 1}.jpg`,
         dataUrl,
       })
     }
@@ -1270,7 +1292,7 @@ export async function generateAllPostMediaFiles(
       customImageUrl: post.storyData?.uploadedImageUrl || post.uploadedImageUrl,
     })
     exportedFiles.push({
-      filename: `dersolab_story.png`,
+      filename: `dersolab_story.jpg`,
       dataUrl,
     })
   } else if (post.type === 'reels' || Boolean(post.reelsStoryboard)) {
@@ -1283,7 +1305,7 @@ export async function generateAllPostMediaFiles(
       customImageUrl: post.reelsStoryboard?.uploadedImageUrl || post.uploadedImageUrl,
     })
     exportedFiles.push({
-      filename: `dersolab_reels_kapak.png`,
+      filename: `dersolab_reels_kapak.jpg`,
       dataUrl,
     })
     if (post.uploadedImageUrl && post.uploadedImageUrl.startsWith('data:')) {
@@ -1304,7 +1326,7 @@ export async function generateAllPostMediaFiles(
       customImageUrl: post.uploadedImageUrl,
     })
     exportedFiles.push({
-      filename: `dersolab_gonderi.png`,
+      filename: `dersolab_gonderi.jpg`,
       dataUrl,
     })
     if (post.uploadedImageUrl && post.uploadedImageUrl.startsWith('data:')) {
