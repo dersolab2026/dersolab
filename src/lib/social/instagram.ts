@@ -65,6 +65,87 @@ async function callInstagramEndpoint(
 }
 
 /**
+ * Instagram CDN medya işleme tamamlanana kadar (FINISHED) bekler
+ */
+async function waitForContainerReady(
+  baseUrl: string,
+  containerId: string,
+  token: string,
+  maxAttempts = 10,
+  delayMs = 2000
+): Promise<void> {
+  // İlk kontrolden önce kısa bekleme (Instagram sunucularının indirmesi için)
+  await new Promise((r) => setTimeout(r, 2000))
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      const url = new URL(`${baseUrl}/${containerId}`)
+      url.searchParams.set('fields', 'status_code,status')
+      url.searchParams.set('access_token', token)
+
+      const res = await fetch(url.toString())
+      if (res.ok) {
+        const data = await res.json()
+        const status = data.status_code || data.status
+        if (status === 'FINISHED') {
+          return
+        }
+        if (status === 'ERROR' || status === 'EXPIRED') {
+          throw new Error(`Instagram medya işleme hatası: ${status}`)
+        }
+      }
+    } catch (err: any) {
+      if (err?.message?.includes('Instagram medya işleme hatası')) {
+        throw err
+      }
+    }
+    await new Promise((r) => setTimeout(r, delayMs))
+  }
+}
+
+/**
+ * "Media ID is not available" yarış durumlarını önlemek için güvenli yayınlama mekanizması
+ */
+async function publishWithRetry(
+  baseUrl: string,
+  accountId: string,
+  creationId: string,
+  token: string,
+  maxRetries = 5,
+  delayMs = 2500
+): Promise<any> {
+  let lastError: any = null
+
+  for (let i = 0; i < maxRetries; i++) {
+    const { ok, data } = await callInstagramEndpoint(baseUrl, accountId, 'media_publish', {
+      creation_id: creationId,
+      access_token: token,
+    })
+
+    if (ok && data.id) {
+      return data
+    }
+
+    const errMsg = data.error?.message || ''
+    const subcode = data.error?.error_subcode
+    // "Media ID is not available" veya "media not ready" hatasında Instagram CDN henüz bitirmemiştir, bekle ve dene
+    if (
+      errMsg.includes('Media ID is not available') ||
+      errMsg.includes('not ready') ||
+      subcode === 2207027
+    ) {
+      lastError = new Error(errMsg || 'Medya Instagram sunucularında henüz işleniyor')
+      await new Promise((r) => setTimeout(r, delayMs))
+      continue
+    }
+
+    throw new Error(errMsg || 'Instagram gönderisi yayınlanamadı')
+  }
+
+  throw lastError || new Error('Instagram medya yayınlama zaman aşımına uğradı')
+}
+
+/**
  * Tekli görsel veya carousel gönderisini Instagram'a gönderir
  */
 export async function publishToInstagram({
@@ -94,7 +175,7 @@ export async function publishToInstagram({
     (u) => u.startsWith('http://') || u.startsWith('https://')
   )
 
-  if (!isConfigured || (!videoUrl && validPublicUrls.length === 0)) {
+  if (!isConfigured || !token || (!videoUrl && validPublicUrls.length === 0)) {
     return {
       success: true,
       mode: 'manual_fallback',
@@ -105,6 +186,8 @@ export async function publishToInstagram({
         : 'Instagram Gönderisi başarıyla hazırlandı. Görseller cihazınıza indirildi, açıklama panoya kopyalandı ve Instagram açıldı.',
     }
   }
+
+  const validToken = token
 
   try {
     const GRAPH_API_BASE = isIgLoginToken
@@ -122,7 +205,7 @@ export async function publishToInstagram({
         {
           media_type: 'STORIES',
           image_url: validPublicUrls[0],
-          access_token: token,
+          access_token: validToken,
         }
       )
 
@@ -130,19 +213,14 @@ export async function publishToInstagram({
         throw new Error(containerData.error?.message || 'Story container oluşturulamadı')
       }
 
-      const { ok: pOk, data: publishData } = await callInstagramEndpoint(
+      await waitForContainerReady(GRAPH_API_BASE, containerData.id, validToken)
+
+      const publishData = await publishWithRetry(
         GRAPH_API_BASE,
         targetAccountId,
-        'media_publish',
-        {
-          creation_id: containerData.id,
-          access_token: token,
-        }
+        containerData.id,
+        validToken
       )
-
-      if (!pOk || !publishData.id) {
-        throw new Error(publishData.error?.message || 'Story yayınlanamadı')
-      }
 
       return {
         success: true,
@@ -164,7 +242,7 @@ export async function publishToInstagram({
           media_type: 'REELS',
           video_url: videoUrl,
           caption,
-          access_token: token,
+          access_token: validToken,
         }
       )
 
@@ -172,19 +250,14 @@ export async function publishToInstagram({
         throw new Error(containerData.error?.message || 'Reels container oluşturulamadı')
       }
 
-      const { ok: pOk, data: publishData } = await callInstagramEndpoint(
+      await waitForContainerReady(GRAPH_API_BASE, containerData.id, validToken)
+
+      const publishData = await publishWithRetry(
         GRAPH_API_BASE,
         targetAccountId,
-        'media_publish',
-        {
-          creation_id: containerData.id,
-          access_token: token,
-        }
+        containerData.id,
+        validToken
       )
-
-      if (!pOk || !publishData.id) {
-        throw new Error(publishData.error?.message || 'Reels yayınlanamadı')
-      }
 
       return {
         success: true,
@@ -208,7 +281,7 @@ export async function publishToInstagram({
           {
             image_url: imgUrl,
             is_carousel_item: 'true',
-            access_token: token,
+            access_token: validToken,
           }
         )
         if (iOk && itemData.id) {
@@ -220,6 +293,10 @@ export async function publishToInstagram({
         throw new Error('Carousel için en az 2 slayt görseli gereklidir.')
       }
 
+      for (const cId of itemContainerIds) {
+        await waitForContainerReady(GRAPH_API_BASE, cId, validToken)
+      }
+
       const { ok: cOk, data: carouselData } = await callInstagramEndpoint(
         GRAPH_API_BASE,
         targetAccountId,
@@ -228,7 +305,7 @@ export async function publishToInstagram({
           media_type: 'CAROUSEL',
           children: itemContainerIds.join(','),
           caption,
-          access_token: token,
+          access_token: validToken,
         }
       )
 
@@ -236,19 +313,14 @@ export async function publishToInstagram({
         throw new Error(carouselData.error?.message || 'Carousel container oluşturulamadı')
       }
 
-      const { ok: pOk, data: publishData } = await callInstagramEndpoint(
+      await waitForContainerReady(GRAPH_API_BASE, carouselData.id, validToken)
+
+      const publishData = await publishWithRetry(
         GRAPH_API_BASE,
         targetAccountId,
-        'media_publish',
-        {
-          creation_id: carouselData.id,
-          access_token: token,
-        }
+        carouselData.id,
+        validToken
       )
-
-      if (!pOk || !publishData.id) {
-        throw new Error(publishData.error?.message || 'Carousel yayınlanamadı')
-      }
 
       return {
         success: true,
@@ -269,7 +341,7 @@ export async function publishToInstagram({
         {
           image_url: validPublicUrls[0],
           caption,
-          access_token: token,
+          access_token: validToken,
         }
       )
 
@@ -277,19 +349,14 @@ export async function publishToInstagram({
         throw new Error(containerData.error?.message || 'Görsel container oluşturulamadı')
       }
 
-      const { ok: pOk, data: publishData } = await callInstagramEndpoint(
+      await waitForContainerReady(GRAPH_API_BASE, containerData.id, validToken)
+
+      const publishData = await publishWithRetry(
         GRAPH_API_BASE,
         targetAccountId,
-        'media_publish',
-        {
-          creation_id: containerData.id,
-          access_token: token,
-        }
+        containerData.id,
+        validToken
       )
-
-      if (!pOk || !publishData.id) {
-        throw new Error(publishData.error?.message || 'Gönderi yayınlanamadı')
-      }
 
       return {
         success: true,

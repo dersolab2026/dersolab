@@ -94,6 +94,14 @@ export function PublishSuccessModal({
   const isStory = publishResult?.isStory ?? post.type === 'story'
   const fullText = `${post.caption}\n\n${(post.hashtags || []).map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
 
+  const igSuccess = Boolean(publishResult?.instagram?.success)
+  const igIsApi = publishResult?.instagram?.mode === 'api'
+
+  const ttSuccess = Boolean(publishResult?.tiktok?.success)
+  const ttIsApi = publishResult?.tiktok?.mode === 'api'
+
+  const anyApiSuccess = (igSuccess && igIsApi) || (ttSuccess && ttIsApi)
+
   function handleCopy() {
     navigator.clipboard.writeText(fullText)
     setCopied(true)
@@ -129,7 +137,7 @@ export function PublishSuccessModal({
           </div>
 
           <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight flex flex-wrap items-center gap-2">
-            <span>🎉 Başarıyla Yayınlandı & Hazırlandı!</span>
+            <span>{anyApiSuccess ? '🎉 Başarıyla Yayınlandı!' : '📋 Görseller Hazırlandı & Buluta Yüklendi!'}</span>
             <span className={`text-xs px-2.5 py-0.5 rounded-full border font-bold ${
               isStory
                 ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
@@ -140,8 +148,9 @@ export function PublishSuccessModal({
           </h3>
 
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            İçeriğiniz hem <strong>Instagram</strong> hem de <strong>TikTok</strong> için tek tıklamayla
-            {isStory ? ' 9:16 dikey Hikaye (Story) formatında' : ' tam çözünürlüklü Gönderi formatında'} başarıyla hazırlandı ve paylaşıldı.
+            {anyApiSuccess
+              ? `İçeriğiniz seçili platformlar için ${isStory ? '9:16 dikey Hikaye (Story) formatında' : 'tam çözünürlüklü Gönderi formatında'} başarıyla paylaşıldı.`
+              : `Görselleriniz 1080p yüksek çözünürlükte bulut depolamaya yüklendi ve cihazınıza aktarıldı. Açıklama metni panoya kopyalandı.`}
           </p>
         </div>
 
@@ -163,13 +172,21 @@ export function PublishSuccessModal({
               </div>
               <span
                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
-                  publishResult?.instagram?.mode === 'api'
+                  igSuccess && igIsApi
                     ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    : !igSuccess && igIsApi
+                    ? 'bg-rose-500/20 text-rose-300 border-rose-500/30'
                     : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                 }`}
               >
                 <CheckCircle2 className="w-3 h-3" />
-                <span>{publishResult?.instagram?.mode === 'api' ? 'API ile Yayınlandı' : 'Buluta Yüklendi'}</span>
+                <span>
+                  {igSuccess && igIsApi
+                    ? 'API ile Yayınlandı'
+                    : !igSuccess && igIsApi
+                    ? 'API Uyarısı (Web ile Aç)'
+                    : 'Buluta Yüklendi'}
+                </span>
               </span>
             </div>
 
@@ -208,13 +225,21 @@ export function PublishSuccessModal({
               </div>
               <span
                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
-                  publishResult?.tiktok?.mode === 'api'
+                  ttSuccess && ttIsApi
                     ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    : !ttSuccess && ttIsApi
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                     : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                 }`}
               >
                 <CheckCircle2 className="w-3 h-3" />
-                <span>{publishResult?.tiktok?.mode === 'api' ? 'API ile Yayınlandı' : 'Buluta Yüklendi'}</span>
+                <span>
+                  {ttSuccess && ttIsApi
+                    ? 'API ile Yayınlandı'
+                    : !ttSuccess && ttIsApi
+                    ? 'Yetki / İzin Gerekli'
+                    : 'Buluta Yüklendi'}
+                </span>
               </span>
             </div>
 
