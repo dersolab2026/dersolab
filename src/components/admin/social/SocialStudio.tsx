@@ -418,6 +418,42 @@ export default function SocialStudio() {
         // ignore offline/table errors
       }
     })()
+
+    // TikTok OAuth Yetkilendirme Dönüşü (Callback) Otomatik Token Değişimi
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const tiktokAuthCode = urlParams.get('code')
+      if (tiktokAuthCode) {
+        const toastId = toast.loading('TikTok yetkilendirmesi tamamlanıyor ve token alınıyor...')
+        fetch('/api/admin/social/tiktok/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: tiktokAuthCode }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.accessToken) {
+              setCustomTiktokToken(data.accessToken)
+              try {
+                const current = JSON.parse(localStorage.getItem('dersolab_social_api_keys_v1') || '{}')
+                localStorage.setItem(
+                  'dersolab_social_api_keys_v1',
+                  JSON.stringify({ ...current, tiktokToken: data.accessToken })
+                )
+              } catch {
+                // ignore
+              }
+              toast.success('TikTok hesabı (@dersolabegitim) başarıyla bağlandı!', { id: toastId })
+              window.history.replaceState({}, '', window.location.pathname)
+            } else {
+              toast.error(data.error || 'TikTok token alınırken bir sorun oluştu.', { id: toastId })
+            }
+          })
+          .catch(() => {
+            toast.error('TikTok token değişimi sırasında sunucuya ulaşılamadı.', { id: toastId })
+          })
+      }
+    }
   }, [])
 
   // Değişiklikleri Yerel Depolamaya Kaydet
