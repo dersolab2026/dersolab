@@ -43,6 +43,21 @@ export const CURATED_COVER_MAP: Record<string, string> = {
   'george orwell 1984': 'https://covers.openlibrary.org/b/id/12539702-L.jpg',
   'suc ve ceza': 'https://covers.openlibrary.org/b/id/12089454-L.jpg',
   'suç ve ceza': 'https://covers.openlibrary.org/b/id/12089454-L.jpg',
+  'define adasi': 'https://covers.openlibrary.org/b/id/8231856-L.jpg',
+  'define adası': 'https://covers.openlibrary.org/b/id/8231856-L.jpg',
+  'cocuk kalbi': 'https://covers.openlibrary.org/b/id/7892305-L.jpg',
+  'çocuk kalbi': 'https://covers.openlibrary.org/b/id/7892305-L.jpg',
+  'yasli adam ve deniz': 'https://covers.openlibrary.org/b/id/12843468-L.jpg',
+  'yaşlı adam ve deniz': 'https://covers.openlibrary.org/b/id/12843468-L.jpg',
+  'tom sawyer': 'https://covers.openlibrary.org/b/id/10543225-L.jpg',
+  'tom sawyerin maceralari': 'https://covers.openlibrary.org/b/id/10543225-L.jpg',
+  "tom sawyer'ın maceraları": 'https://covers.openlibrary.org/b/id/10543225-L.jpg',
+  'siddhartha': 'https://covers.openlibrary.org/b/id/8302062-L.jpg',
+  'oliver twist': 'https://covers.openlibrary.org/b/id/8231996-L.jpg',
+  'gulliverin gezileri': 'https://covers.openlibrary.org/b/id/11195610-L.jpg',
+  "gulliver'in gezileri": 'https://covers.openlibrary.org/b/id/11195610-L.jpg',
+  'cavdar tarlasinda cocuklar': 'https://covers.openlibrary.org/b/id/8226191-L.jpg',
+  'çavdar tarlasında çocuklar': 'https://covers.openlibrary.org/b/id/8226191-L.jpg',
 }
 
 /**

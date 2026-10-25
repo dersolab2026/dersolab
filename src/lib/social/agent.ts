@@ -163,8 +163,7 @@ async function callGenAIModel(
 
 /**
  * Kitap kapakları için dinamik vektörel kapak illüstrasyonu (SVG Data URL) üretir.
- * Momo ve Simyacı için mevcut yüksek çözünürlüklü kapak görsellerini kullanır;
- * diğer tüm kitaplar için kitabın adına, yazarına ve türüne özel şık 3D kapak tasarlar.
+ * Kitabın adına, yazarına ve türüne özel şık 3D kapak tasarlar.
  */
 export function buildBookCoverSvgDataUrl(
   title: string,
@@ -173,9 +172,6 @@ export function buildBookCoverSvgDataUrl(
   level: 'ortaokul' | 'lise' = 'ortaokul'
 ): string {
   const cleanTitle = (title || '').trim()
-  if (/^momo$/i.test(cleanTitle)) return '/books/momo.jpg'
-  if (/^simyacı$|^simyaci$/i.test(cleanTitle)) return '/books/simyaci.jpg'
-
   const esc = (s: string) =>
     (s || '')
       .replace(/&/g, '&amp;')
@@ -258,25 +254,52 @@ export function buildBookCoverSvgDataUrl(
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 }
 
+// Kullanıcının havuzdan kaldırılmasını istediği yasaklı kitaplar listesi
+export const BLACKLISTED_BOOKS: string[] = [
+  'küçük kara balık',
+  'kucuk kara balik',
+  'fareler ve insanlar',
+  'bilim öyküleri',
+  'bilim oykuleri',
+  'simyacı',
+  'simyaci',
+  'uçan sınıf',
+  'ucan sinif',
+  'kürk mantolu madonna',
+  'kurk mantolu madonna',
+  "mo'nun gizemi",
+  'monun gizemi',
+  'mo nun gizemi',
+  'denemeler',
+  'momo',
+  'dava',
+  'bu ülke',
+  'bu ulke',
+  'sol ayağım',
+  'sol ayagim',
+  'bulantı',
+  'bulanti',
+  'satranç',
+  'satranc',
+  'gece yarısı kütüphanesi',
+  'gece yarisi kutuphanesi',
+]
+
+/**
+ * Verilen kitap adının yasaklı / havuzdan kaldırılmış kitaplar arasında olup olmadığını kontrol eder.
+ */
+export function isBlacklistedBook(titleOrBook?: { title?: string; author?: string } | string | null): boolean {
+  if (!titleOrBook) return false
+  const title = typeof titleOrBook === 'string' ? titleOrBook : titleOrBook.title || ''
+  if (!title) return false
+  const norm = title.toLocaleLowerCase('tr-TR').replace(/['"’]/g, '').trim()
+  return BLACKLISTED_BOOKS.some((bad) => {
+    const cleanBad = bad.toLocaleLowerCase('tr-TR').replace(/['"’]/g, '').trim()
+    return norm === cleanBad || norm.includes(cleanBad) || cleanBad.includes(norm)
+  })
+}
+
 export const CURATED_BOOK_PAIRS = [
-  {
-    ortaokul: {
-      title: 'Momo',
-      author: 'Michael Ende',
-      genre: 'Felsefi Masal & Zaman',
-      whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
-      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
-      imageUrl: 'https://covers.openlibrary.org/b/id/8574580-L.jpg',
-    },
-    lise: {
-      title: 'Simyacı',
-      author: 'Paulo Coelho',
-      genre: 'Alegorik Roman',
-      whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve derin anlama becerisi kazandırır.',
-      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
-      imageUrl: 'https://covers.openlibrary.org/b/id/7414780-L.jpg',
-    },
-  },
   {
     ortaokul: {
       title: 'Küçük Prens',
@@ -303,24 +326,6 @@ export const CURATED_BOOK_PAIRS = [
       whyRead: 'Duygusal zeka, söz varlığı ve uzun metinlerde kopmadan okuma alışkanlığı kazandırır.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
       imageUrl: 'https://covers.openlibrary.org/b/id/10413035-L.jpg',
-    },
-    lise: {
-      title: 'Satranç',
-      author: 'Stefan Zweig',
-      genre: 'Psikolojik Analiz & Novella',
-      whyRead: 'Zihinsel strateji, odaklanma psikolojisi ve TYT Türkçe derin çıkarım sorularına hız katar.',
-      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
-      imageUrl: 'https://covers.openlibrary.org/b/id/5548285-L.jpg',
-    },
-  },
-  {
-    ortaokul: {
-      title: 'Sol Ayağım',
-      author: 'Christy Brown',
-      genre: 'Otobiyografi & Azim Öyküsü',
-      whyRead: 'Zorluklar karşısında pes etmeme bilinci ve güçlü anlatım tekniklerini kavratır.',
-      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
-      imageUrl: 'https://covers.openlibrary.org/b/id/10314710-L.jpg',
     },
     lise: {
       title: 'Dönüşüm',
@@ -359,12 +364,12 @@ export const CURATED_BOOK_PAIRS = [
       imageUrl: 'https://covers.openlibrary.org/b/id/7819755-L.jpg',
     },
     lise: {
-      title: 'Fareler ve İnsanlar',
-      author: 'John Steinbeck',
-      genre: 'Toplumcu Klasik Roman',
-      whyRead: 'Hayaller, gerçeklik ve karakter tahlili üzerinden edebiyat ve paragraf yorum gücünü artırır.',
+      title: '1984',
+      author: 'George Orwell',
+      genre: 'Distopik Roman & Düşünce',
+      whyRead: 'Toplumsal analiz, kavramsal düşünme ve TYT-AYT derin anlam çıkarma sorularında hız kazandırır.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
-      imageUrl: 'https://covers.openlibrary.org/b/id/14319003-L.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/id/12539702-L.jpg',
     },
   },
   {
@@ -377,22 +382,22 @@ export const CURATED_BOOK_PAIRS = [
       imageUrl: 'https://covers.openlibrary.org/b/id/8236920-L.jpg',
     },
     lise: {
-      title: 'Kürk Mantolu Madonna',
-      author: 'Sabahattin Ali',
-      genre: 'Türk Edebiyatı Başyapıtı',
-      whyRead: 'AYT Edebiyat bireyin iç dünyasını esas alan eserler kazanımı ve psikolojik tahlil gücü sağlar.',
+      title: 'Suç ve Ceza',
+      author: 'Fyodor Dostoyevski',
+      genre: 'Psikolojik Roman & Dünya Klasiği',
+      whyRead: 'Vicdan muhakemesi, iç çözümleme ve AYT Edebiyat roman tahlillerinde en üst düzey kavrayış sağlar.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
-      imageUrl: 'https://covers.openlibrary.org/b/id/12762238-L.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/id/12089454-L.jpg',
     },
   },
   {
     ortaokul: {
-      title: 'Uçan Sınıf',
-      author: 'Erich Kästner',
-      genre: 'Okul & Dayanışma Romanı',
-      whyRead: 'Akıcı diyalogları ve sıcak kurgusuyla okuma hızını ve anlam bütünlüğü kurmayı destekler.',
+      title: 'Define Adası',
+      author: 'Robert Louis Stevenson',
+      genre: 'Macera & Keşif Klasiği',
+      whyRead: 'Olay örgüsü takibi, cesaret ve LGS paragraf sorularında dikkat yoğunluğunu geliştirir.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
-      imageUrl: 'https://covers.openlibrary.org/b/id/72344-L.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/id/8231856-L.jpg',
     },
     lise: {
       title: 'İnsan Ne İle Yaşar?',
@@ -439,10 +444,47 @@ export const CURATED_BOOK_PAIRS = [
       imageUrl: 'https://covers.openlibrary.org/b/id/10848805-L.jpg',
     },
   },
+  {
+    ortaokul: {
+      title: 'Çocuk Kalbi',
+      author: 'Edmondo De Amicis',
+      genre: 'Günlük & Değerler Romanı',
+      whyRead: 'Duygusal zeka, akıcı okuma ve metin içi çıkarım yapma yeteneğini güçlendirir.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/7892305-L.jpg',
+    },
+    lise: {
+      title: 'Yaşlı Adam ve Deniz',
+      author: 'Ernest Hemingway',
+      genre: 'Azim & Mücadele Novellası',
+      whyRead: 'Yalın anlatım dili, sabır ve sınav maratonunda yılmadan mücadele etme motivasyonu aşılar.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/12843468-L.jpg',
+    },
+  },
+  {
+    ortaokul: {
+      title: "Tom Sawyer'ın Maceraları",
+      author: 'Mark Twain',
+      genre: 'Mizah & Macera Klasiği',
+      whyRead: 'Hızlı okuma temposu, zihinsel esneklik ve paragrafta ana fikir yakalama refleksini geliştirir.',
+      highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/10543225-L.jpg',
+    },
+    lise: {
+      title: 'Siddhartha',
+      author: 'Hermann Hesse',
+      genre: 'Felsefi Roman & İçsel Arayış',
+      whyRead: 'Zihinsel dinginlik, odaklanma disiplini ve felsefi metinleri ilk okumada anlama pratiği katar.',
+      highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/8302062-L.jpg',
+    },
+  },
 ]
 
 export function isFakeOrInvalidBook(book?: { title?: string; author?: string } | null): boolean {
   if (!book || !book.title || !book.author) return true
+  if (isBlacklistedBook(book.title)) return true
   const combined = `${book.title} ${book.author}`.toLocaleLowerCase('tr-TR')
   // Yapay zekanın uydurduğu ders kitabı / kurum adı / sahte yazar kalıplarını yakala
   return /dersolab|ösym|osym|lgs|yks|tyt|ayt|kazanım|paragraf|tersine mühendislik|pedagoji|ölçme|komisyon|strateji|taktik|soru bankası|fasikül|anonim|yazar adı|edebi kitabın adı/i.test(
@@ -454,12 +496,13 @@ export function pickCuratedBookPair(excludeSummary: string = '', variationSeed: 
   const excludeLower = (excludeSummary || '').toLocaleLowerCase('tr-TR')
   const availablePairs = CURATED_BOOK_PAIRS.filter(
     (pair) =>
+      !isBlacklistedBook(pair.ortaokul.title) &&
+      !isBlacklistedBook(pair.lise.title) &&
       !excludeLower.includes(pair.ortaokul.title.toLocaleLowerCase('tr-TR')) &&
       !excludeLower.includes(pair.lise.title.toLocaleLowerCase('tr-TR'))
   )
   const pool = availablePairs.length > 0 ? availablePairs : CURATED_BOOK_PAIRS
-  const idx = Math.abs(variationSeed - 1) % pool.length
-  return pool[idx]
+  return pool[Math.abs(variationSeed) % pool.length]
 }
 
 const VARIATION_ANGLES = [
@@ -520,7 +563,10 @@ ${
 ÖNEMLİ KURALLAR:
 1. ${
       isBookTopic
-        ? 'GERÇEK EDEBİ ESER ZORUNLULUĞU: Asla "LGS Paragraf Mantığı" veya "Yazar: DersoLab Ekibi" gibi sahte/uydurma kitaplar üretme! Sadece gerçek edebi roman/öykü klasiklerini ve gerçek yazarlarını kullan.'
+        ? `GERÇEK EDEBİ ESER ZORUNLULUĞU & YASAKLI KİTAPLAR: Asla "LGS Paragraf Mantığı" veya "Yazar: DersoLab Ekibi" gibi sahte/uydurma kitaplar üretme!
+AYRICA KULLANICI ŞU KİTAPLARI HAVUZDAN KALDIRDI, BUNLARI KESİNLİKLE SEÇME VEYA ÖNERME:
+[Küçük Kara Balık, Fareler ve İnsanlar, Bilim Öyküleri, Simyacı, Uçan Sınıf, Kürk Mantolu Madonna, Mo'nun Gizemi, Denemeler, Momo, Dava, Bu Ülke, Sol Ayağım, Bulantı, Satranç, Gece Yarısı Kütüphanesi].
+Yalnızca yukarıdaki çiftte belirtilen veya yasaklı olmayan diğer taze edebi klasik eserleri ve gerçek yazarlarını kullan!`
         : `ŞABLONSUZ & ÖZGÜR: Asla basmakalıp hazır şablon cümleleri yazma. İçerik KESİNLİKLE "${topicFocus}" konusunun gerçek ders içeriği, kuralları, formülleri, soru çözme mantığı veya püf noktaları üzerine odaklanmalıdır!`
     }
 2. 4 SABİT TEMA: Her slayt ve görsel için 'themeVariant' değerini SADECE şu 4 temadan biri olarak belirle:
@@ -1222,15 +1268,7 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
       (request.subject && /kitap|pazar|roman|okuma/i.test(request.subject))
 
     if (isBook) {
-      const excludeLower = (request.excludeSummary || '').toLocaleLowerCase('tr-TR')
-      const availablePairs = CURATED_BOOK_PAIRS.filter(
-        (pair) =>
-          !excludeLower.includes(pair.ortaokul.title.toLocaleLowerCase('tr-TR')) &&
-          !excludeLower.includes(pair.lise.title.toLocaleLowerCase('tr-TR'))
-      )
-      const pool = availablePairs.length > 0 ? availablePairs : CURATED_BOOK_PAIRS
-      const seedIdx = vIdx % pool.length
-      const chosenPair = pool[seedIdx]
+      const chosenPair = pickCuratedBookPair(request.excludeSummary, vIdx)
 
       const ortBook = {
         ...chosenPair.ortaokul,
@@ -1635,26 +1673,26 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
         subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
         stickerType: 'poll',
         stickerQuestion: 'Bu hafta hangisini okuyacaksın?',
-        stickerOptions: ['Ortaokul: Momo 📘', 'Lise: Simyacı 📕'],
+        stickerOptions: ['Ortaokul: Küçük Prens 📘', 'Lise: Beyaz Zambaklar 📕'],
         stickerLinkText: 'Kitap Listesi & İpuçları',
         stickerLinkUrl: 'https://dersolab.com/lab',
         themeVariant: 'purple_matrix',
         dualBookData: {
           ortaokul: {
-            title: 'Momo',
-            author: 'Michael Ende',
-            genre: 'Felsefi Masal & Zaman Macerası',
-            whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
+            title: 'Küçük Prens',
+            author: 'Antoine de Saint-Exupéry',
+            genre: 'Felsefi Öykü & İmgelem',
+            whyRead: 'Soyut düşünme ve LGS paragraf sorularında ana fikir yakalama yeteneğini güçlendirir.',
             highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
-            imageUrl: 'https://covers.openlibrary.org/b/id/8574580-L.jpg',
+            imageUrl: 'https://covers.openlibrary.org/b/id/12219639-L.jpg',
           },
           lise: {
-            title: 'Simyacı',
-            author: 'Paulo Coelho',
-            genre: 'Alegorik Roman',
-            whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
+            title: 'Beyaz Zambaklar Ülkesinde',
+            author: 'Grigory Petrov',
+            genre: 'Düşünce & Azim Klasiği',
+            whyRead: 'Çalışma disiplini, irade eğitimi ve hedefe odaklanma konusunda eşsiz bir başucu eseridir.',
             highlightTag: 'LİSE & YKS (14-18 YAŞ)',
-            imageUrl: 'https://covers.openlibrary.org/b/id/7414780-L.jpg',
+            imageUrl: 'https://covers.openlibrary.org/b/id/10848805-L.jpg',
           },
         },
       },
@@ -1978,7 +2016,7 @@ export function runPedagogicalAudit(post: SocialPostItem): PedagogicalAudit {
   } else if (text.includes('türev') || text.includes('parabol') || text.includes('matematik')) {
     osymRelevance = 97
     notes = 'Matematiksel fonksiyon ve analitik gösterimler ÖSYM AYT kazanım sınırları içinde kalmaktadır.'
-  } else if (text.includes('kitap') || text.includes('momo') || text.includes('simyacı')) {
+  } else if (text.includes('kitap') || text.includes('roman') || text.includes('edebiyat')) {
     osymRelevance = 95
     notes = 'LGS ve YKS yaş gruplarının bilişsel gelişim ve derin anlama seviyesine pedagojik olarak uygundur.'
   }

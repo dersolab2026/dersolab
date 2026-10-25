@@ -167,13 +167,13 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
   },
   {
     id: 'demo_story_3',
-    title: 'Pazar Hikayesi: Ortaokul & Lise Haftalık Kitap Önerisi',
+    title: 'Pazar Hikayesi: Küçük Prens & Beyaz Zambaklar',
     type: 'story',
     topic: 'book_recommendation',
     topicLabel: 'Pazar Kitap Kulübü • 9:16 Story',
     status: 'approved',
     targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
-    caption: `Pazar gününün klasiği: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\nHem LGS hem YKS hazırlığında okuma hızını ve analitik düşünme gücünü katlayacak 2 muazzam başucu kitabı!\n\nSen bu hafta hangisine başlıyorsun? 👇\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab`,
+    caption: `Pazar gününün klasiği: Haftalık Kitap Kulübümüz yayında! 📚🦊\n\n📘 Ortaokul (LGS): Küçük Prens — Antoine de Saint-Exupéry\n📕 Lise (YKS): Beyaz Zambaklar Ülkesinde — Grigory Petrov\n\nHem LGS hem YKS hazırlığında okuma hızını ve analitik düşünme gücünü katlayacak 2 muazzam başucu kitabı!\n\nSen bu hafta hangisine başlıyorsun? 👇\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab`,
     hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2027', '#yks2027', '#dersolab'],
     storyData: {
       badge: 'PAZAR KİTAP KULÜBÜ 📚',
@@ -181,26 +181,26 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
       subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
       stickerType: 'none',
       stickerQuestion: 'Bu hafta hangisini okuyacaksın? 📚',
-      stickerOptions: ['Ortaokul: Momo 📘', 'Lise: Simyacı 📕'],
+      stickerOptions: ['📘 Küçük Prens', '📕 Beyaz Zambaklar'],
       stickerLinkText: 'Kitap Listesi & İpuçları',
       stickerLinkUrl: 'https://dersolab.com/lab',
       themeVariant: 'purple_matrix',
       dualBookData: {
         ortaokul: {
-          title: 'Momo',
-          author: 'Michael Ende',
-          genre: 'Felsefi Masal / Zaman',
-          whyRead: 'Zaman yönetimi ve hayal gücünü geliştirir, LGS yeni nesil paragraf analizine harika katkı sağlar.',
+          title: 'Küçük Prens',
+          author: 'Antoine de Saint-Exupéry',
+          genre: 'Felsefi Öykü & İmgelem',
+          whyRead: 'Soyut düşünme ve LGS paragraf sorularında ana fikir yakalama yeteneğini güçlendirir.',
           highlightTag: 'ORTAOKUL & LGS',
-          imageUrl: 'https://covers.openlibrary.org/b/id/8574580-L.jpg',
+          imageUrl: 'https://covers.openlibrary.org/b/id/12219639-L.jpg',
         },
         lise: {
-          title: 'Simyacı',
-          author: 'Paulo Coelho',
-          genre: 'Felsefi Roman / Macera',
-          whyRead: 'Kişisel menkıbe ve odaklanma üzerine bir başyapıt. TYT derin anlama ve AYT analiz gücü kazandırır.',
+          title: 'Beyaz Zambaklar Ülkesinde',
+          author: 'Grigory Petrov',
+          genre: 'Düşünce & Azim Klasiği',
+          whyRead: 'Çalışma disiplini, irade eğitimi ve hedefe odaklanma konusunda eşsiz bir başucu eseridir.',
           highlightTag: 'LİSE & YKS',
-          imageUrl: 'https://covers.openlibrary.org/b/id/7414780-L.jpg',
+          imageUrl: 'https://covers.openlibrary.org/b/id/10848805-L.jpg',
         },
       },
     },
@@ -1153,14 +1153,7 @@ export default function SocialStudio() {
     const primaryTheme = themes[variationSeed % themes.length]
 
     if (isBook && type === 'story') {
-      const excludedLower = excludeSummary.toLocaleLowerCase('tr-TR')
-      const availablePairs = CURATED_BOOK_PAIRS.filter(
-        (pair) =>
-          !excludedLower.includes(pair.ortaokul.title.toLocaleLowerCase('tr-TR')) &&
-          !excludedLower.includes(pair.lise.title.toLocaleLowerCase('tr-TR'))
-      )
-      const pool = availablePairs.length > 0 ? availablePairs : CURATED_BOOK_PAIRS
-      const chosen = pool[variationSeed % pool.length]
+      const chosen = pickCuratedBookPair(excludeSummary, variationSeed)
 
       return {
         id,
