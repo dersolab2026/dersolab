@@ -254,50 +254,8 @@ export function buildBookCoverSvgDataUrl(
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 }
 
-// Kullanıcının havuzdan kaldırılmasını istediği yasaklı kitaplar listesi
-export const BLACKLISTED_BOOKS: string[] = [
-  'küçük kara balık',
-  'kucuk kara balik',
-  'fareler ve insanlar',
-  'bilim öyküleri',
-  'bilim oykuleri',
-  'simyacı',
-  'simyaci',
-  'uçan sınıf',
-  'ucan sinif',
-  'kürk mantolu madonna',
-  'kurk mantolu madonna',
-  "mo'nun gizemi",
-  'monun gizemi',
-  'mo nun gizemi',
-  'denemeler',
-  'momo',
-  'dava',
-  'bu ülke',
-  'bu ulke',
-  'sol ayağım',
-  'sol ayagim',
-  'bulantı',
-  'bulanti',
-  'satranç',
-  'satranc',
-  'gece yarısı kütüphanesi',
-  'gece yarisi kutuphanesi',
-]
-
-/**
- * Verilen kitap adının yasaklı / havuzdan kaldırılmış kitaplar arasında olup olmadığını kontrol eder.
- */
-export function isBlacklistedBook(titleOrBook?: { title?: string; author?: string } | string | null): boolean {
-  if (!titleOrBook) return false
-  const title = typeof titleOrBook === 'string' ? titleOrBook : titleOrBook.title || ''
-  if (!title) return false
-  const norm = title.toLocaleLowerCase('tr-TR').replace(/['"’]/g, '').trim()
-  return BLACKLISTED_BOOKS.some((bad) => {
-    const cleanBad = bad.toLocaleLowerCase('tr-TR').replace(/['"’]/g, '').trim()
-    return norm === cleanBad || norm.includes(cleanBad) || cleanBad.includes(norm)
-  })
-}
+export { BLACKLISTED_BOOKS, isBlacklistedBook } from './bookPoolManager'
+import { pickNextBookPair, isBlacklistedBook } from './bookPoolManager'
 
 export const CURATED_BOOK_PAIRS = [
   {
@@ -493,6 +451,32 @@ export function isFakeOrInvalidBook(book?: { title?: string; author?: string } |
 }
 
 export function pickCuratedBookPair(excludeSummary: string = '', variationSeed: number = 1) {
+  try {
+    const pair = pickNextBookPair(excludeSummary, variationSeed, true)
+    if (pair && pair.ortaokul && pair.lise) {
+      return {
+        ortaokul: {
+          title: pair.ortaokul.title,
+          author: pair.ortaokul.author,
+          genre: pair.ortaokul.genre,
+          whyRead: pair.ortaokul.whyRead,
+          highlightTag: pair.ortaokul.highlightTag || 'ORTAOKUL & LGS (10-14 YAŞ)',
+          imageUrl: pair.ortaokul.imageUrl,
+        },
+        lise: {
+          title: pair.lise.title,
+          author: pair.lise.author,
+          genre: pair.lise.genre,
+          whyRead: pair.lise.whyRead,
+          highlightTag: pair.lise.highlightTag || 'LİSE & YKS (14-18 YAŞ)',
+          imageUrl: pair.lise.imageUrl,
+        },
+      }
+    }
+  } catch (err) {
+    console.warn('pickNextBookPair failed, falling back to static pairs:', err)
+  }
+
   const excludeLower = (excludeSummary || '').toLocaleLowerCase('tr-TR')
   const availablePairs = CURATED_BOOK_PAIRS.filter(
     (pair) =>

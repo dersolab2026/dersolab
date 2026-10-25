@@ -63,6 +63,14 @@ import {
   pickCuratedBookPair,
 } from '@/lib/social/agent'
 import {
+  getPoolStats,
+  pickNextBookPair,
+  pickNextSingleBook,
+  resetUsedPool,
+  markPairAsUsed,
+  BOOK_POOL_EVENT,
+} from '@/lib/social/bookPoolManager'
+import {
   getSocialPostsFromDb,
   upsertSocialPostToDb,
   deleteSocialPostFromDb,
@@ -357,6 +365,15 @@ export default function SocialStudio() {
   const [customIgAccountId, setCustomIgAccountId] = useState<string>('')
   const [customTiktokToken, setCustomTiktokToken] = useState<string>('')
   const [isSearchingCover, setIsSearchingCover] = useState<{ ortaokul?: boolean; lise?: boolean }>({})
+  const [poolStats, setPoolStats] = useState(() => getPoolStats())
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setPoolStats(getPoolStats())
+    }
+    window.addEventListener(BOOK_POOL_EVENT, handleUpdate)
+    return () => window.removeEventListener(BOOK_POOL_EVENT, handleUpdate)
+  }, [])
 
   const dbSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -1133,6 +1150,124 @@ export default function SocialStudio() {
     } finally {
       setIsSearchingCover((prev) => ({ ...prev, [level]: false }))
     }
+  }
+
+  async function handlePickNextPairFromPool() {
+    if (!activePost?.storyData?.dualBookData) return
+    const pair = pickNextBookPair('', Math.floor(Math.random() * 1000), true)
+
+    let ortCover = pair.ortaokul.imageUrl
+    if (!ortCover) {
+      try {
+        const res = await fetch(
+          `/api/admin/social/books/cover?title=${encodeURIComponent(pair.ortaokul.title)}&author=${encodeURIComponent(pair.ortaokul.author)}`
+        )
+        const data = await res.json()
+        if (data?.coverUrl) ortCover = data.coverUrl
+      } catch {}
+    }
+    if (!ortCover) {
+      ortCover = buildBookCoverSvgDataUrl(pair.ortaokul.title, pair.ortaokul.author, pair.ortaokul.genre, 'ortaokul')
+    }
+
+    let lisCover = pair.lise.imageUrl
+    if (!lisCover) {
+      try {
+        const res = await fetch(
+          `/api/admin/social/books/cover?title=${encodeURIComponent(pair.lise.title)}&author=${encodeURIComponent(pair.lise.author)}`
+        )
+        const data = await res.json()
+        if (data?.coverUrl) lisCover = data.coverUrl
+      } catch {}
+    }
+    if (!lisCover) {
+      lisCover = buildBookCoverSvgDataUrl(pair.lise.title, pair.lise.author, pair.lise.genre, 'lise')
+    }
+
+    const updatedOrt = {
+      title: pair.ortaokul.title,
+      author: pair.ortaokul.author,
+      genre: pair.ortaokul.genre,
+      whyRead: pair.ortaokul.whyRead,
+      highlightTag: pair.ortaokul.highlightTag || 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: ortCover,
+    }
+
+    const updatedLis = {
+      title: pair.lise.title,
+      author: pair.lise.author,
+      genre: pair.lise.genre,
+      whyRead: pair.lise.whyRead,
+      highlightTag: pair.lise.highlightTag || 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: lisCover,
+    }
+
+    handleUpdateActivePost({
+      ...activePost,
+      title: `Haftalık Kitap Önerisi: ${updatedOrt.title} & ${updatedLis.title}`,
+      caption: `Haftalık Kitap Kulübümüz yayında! 📚🦊\n\n📘 Ortaokul (LGS): ${updatedOrt.title} — ${updatedOrt.author}\n📕 Lise (YKS): ${updatedLis.title} — ${updatedLis.author}\n\nHem LGS hem YKS hazırlığında okuma hızını, odaklanmayı ve sınav derinliğini uçuracak 2 harika başucu kitabı!\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab #kitapkurdu`,
+      storyData: {
+        ...activePost.storyData,
+        dualBookData: {
+          ortaokul: updatedOrt,
+          lise: updatedLis,
+        },
+        stickerOptions: [`📘 ${updatedOrt.title}`, `📕 ${updatedLis.title}`],
+      },
+    })
+
+    toast.success(`Yeni kitap çifti seçildi ve havuzdan çıkarıldı: "${pair.ortaokul.title}" & "${pair.lise.title}"`)
+  }
+
+  async function handlePickNextSingleBookFromPool(level: 'ortaokul' | 'lise') {
+    if (!activePost?.storyData?.dualBookData) return
+    const book = pickNextSingleBook(level, true)
+
+    let cover = book.imageUrl
+    if (!cover) {
+      try {
+        const res = await fetch(
+          `/api/admin/social/books/cover?title=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}`
+        )
+        const data = await res.json()
+        if (data?.coverUrl) cover = data.coverUrl
+      } catch {}
+    }
+    if (!cover) {
+      cover = buildBookCoverSvgDataUrl(book.title, book.author, book.genre, level)
+    }
+
+    const updatedBook = {
+      title: book.title,
+      author: book.author,
+      genre: book.genre,
+      whyRead: book.whyRead,
+      highlightTag: book.highlightTag || (level === 'ortaokul' ? 'ORTAOKUL & LGS (10-14 YAŞ)' : 'LİSE & YKS (14-18 YAŞ)'),
+      imageUrl: cover,
+    }
+
+    const currentDual = activePost.storyData.dualBookData
+    const newDual = {
+      ...currentDual,
+      [level]: updatedBook,
+    }
+
+    handleUpdateActivePost({
+      ...activePost,
+      title: `Haftalık Kitap Önerisi: ${newDual.ortaokul.title} & ${newDual.lise.title}`,
+      storyData: {
+        ...activePost.storyData,
+        dualBookData: newDual,
+        stickerOptions: [`📘 ${newDual.ortaokul.title}`, `📕 ${newDual.lise.title}`],
+      },
+    })
+
+    toast.success(`Sıradaki ${level === 'ortaokul' ? 'Ortaokul' : 'Lise'} eseri seçildi ve havuzdan çıkarıldı: "${book.title}"`)
+  }
+
+  function handleResetBookPool() {
+    resetUsedPool()
+    toast.success('Kitap havuzu sıfırlandı! 1000 Ortaokul ve 1000 Lise eseri tekrar kullanılabilir.')
   }
 
   // Dinamik Konu Odaklı Yerel Üretici (4 Sabit Tema & Konuya %100 Uyumlu + Tüm Gönderi Türleri İçin Çoklu Alternatif Desteği)
@@ -2780,23 +2915,73 @@ export default function SocialStudio() {
                           Haftalık Kitap Önerisi Kartları (Ortaokul & Lise)
                         </span>
                       </div>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={handlePickNextPairFromPool}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-500/25 hover:bg-emerald-500/35 border border-emerald-400/40 text-emerald-200 text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+                          title="1000'er kitaplık havuzdan sıradaki kullanılmamış Ortaokul ve Lise eserlerini çeker ve havuzdan çıkarır."
+                        >
+                          <span>🎲 Sıradaki Çifti Çek</span>
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isRegenerating || isGenerating}
+                          onClick={handleRegenerateActivePost}
+                          className="px-2.5 py-1 rounded-lg bg-purple-500/25 hover:bg-purple-500/35 border border-purple-400/40 text-purple-200 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin' : ''}`} />
+                          <span>🔄 Yeniden Dene</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* CANLI KİTAP HAVUZU İSTATİSTİK ŞERİDİ (1000 Ortaokul + 1000 Lise) */}
+                    <div className="px-3 py-2 rounded-lg bg-gradient-to-r from-purple-950/60 via-slate-900/80 to-purple-950/60 border border-purple-400/30 flex flex-wrap items-center justify-between gap-2 shadow-inner">
+                      <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                        <span className="font-bold text-purple-300 flex items-center gap-1">
+                          📚 Canlı Kitap Havuzu:
+                        </span>
+                        <div className="flex items-center gap-1 bg-sky-500/15 border border-sky-500/30 px-2 py-0.5 rounded text-sky-200 font-semibold">
+                          <span>📘 Ortaokul:</span>
+                          <strong className="text-sky-300 font-black">{poolStats.ortaokul.remaining}</strong>
+                          <span className="text-sky-400/70 text-[10px]">/ {poolStats.ortaokul.total}</span>
+                        </div>
+                        <div className="flex items-center gap-1 bg-orange-500/15 border border-orange-500/30 px-2 py-0.5 rounded text-orange-200 font-semibold">
+                          <span>📕 Lise:</span>
+                          <strong className="text-orange-300 font-black">{poolStats.lise.remaining}</strong>
+                          <span className="text-orange-400/70 text-[10px]">/ {poolStats.lise.total}</span>
+                        </div>
+                        <span className="text-emerald-400 font-semibold text-[10px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                          ✓ {poolStats.ortaokul.used + poolStats.lise.used} Eser Kullanıldı
+                        </span>
+                      </div>
                       <button
                         type="button"
-                        disabled={isRegenerating || isGenerating}
-                        onClick={handleRegenerateActivePost}
-                        className="px-2.5 py-1 rounded-lg bg-purple-500/25 hover:bg-purple-500/35 border border-purple-400/40 text-purple-200 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                        onClick={handleResetBookPool}
+                        className="text-[10px] px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/15 transition-all cursor-pointer font-medium"
+                        title="Tüm kullanılan kitap kayıtlarını sıfırlar; 1000 Ortaokul ve 1000 Lise eseri tekrar taze havuz olur."
                       >
-                        <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin' : ''}`} />
-                        <span>🔄 Yeniden Dene (Farklı Alternatif)</span>
+                        🔄 Havuzu Sıfırla
                       </button>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {/* Ortaokul Kitabı */}
                       <div className="p-2.5 rounded-lg bg-black/40 border border-sky-500/25 flex flex-col gap-1.5">
-                        <span className="text-[10px] font-black text-sky-400 uppercase">
-                          📘 Ortaokul (LGS) Kitabı
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black text-sky-400 uppercase">
+                            📘 Ortaokul (LGS) Kitabı
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handlePickNextSingleBookFromPool('ortaokul')}
+                            className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 border border-sky-500/30 font-semibold cursor-pointer transition-all flex items-center gap-1"
+                            title="1000 kitaplık Ortaokul havuzundan sıradaki kullanılmamış eseri getirir."
+                          >
+                            <span>🎲 Sıradaki Eser</span>
+                          </button>
+                        </div>
                         <input
                           type="text"
                           placeholder="Kitap Adı"
@@ -2971,9 +3156,19 @@ export default function SocialStudio() {
 
                       {/* Lise Kitabı */}
                       <div className="p-2.5 rounded-lg bg-black/40 border border-orange-500/25 flex flex-col gap-1.5">
-                        <span className="text-[10px] font-black text-orange-400 uppercase">
-                          📕 Lise (YKS) Kitabı
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black text-orange-400 uppercase">
+                            📕 Lise (YKS) Kitabı
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handlePickNextSingleBookFromPool('lise')}
+                            className="text-[10px] px-1.5 py-0.5 rounded bg-orange-500/20 hover:bg-orange-500/30 text-orange-200 border border-orange-500/30 font-semibold cursor-pointer transition-all flex items-center gap-1"
+                            title="1000 kitaplık Lise havuzundan sıradaki kullanılmamış eseri getirir."
+                          >
+                            <span>🎲 Sıradaki Eser</span>
+                          </button>
+                        </div>
                         <input
                           type="text"
                           placeholder="Kitap Adı"
