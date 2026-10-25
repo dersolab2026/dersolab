@@ -151,8 +151,47 @@ export async function publishToTikTok({
         }),
       })
 
-      const data = await response.json()
+      let data = await response.json()
+
+      // Eğer DIRECT_POST yetki (scope) eksikliğinden hata verirse, video.upload izniyle MEDIA_UPLOAD olarak dene
       if (!response.ok || data.error?.code !== 'ok') {
+        const isScopeError = /scope|authorize the scope|permission/i.test(data.error?.message || '')
+        if (isScopeError) {
+          const fallbackRes = await fetch(`${TIKTOK_API_BASE}/post/publish/content/init/`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: JSON.stringify({
+              post_info: {
+                title: (title || caption).slice(0, 150),
+                description: caption.slice(0, 2200),
+                privacy_level: 'PUBLIC_TO_EVERYONE',
+              },
+              source_info: {
+                source: 'PULL_FROM_URL',
+                photo_cover_index: 1,
+                photo_images: validPublicUrls,
+              },
+              post_mode: 'MEDIA_UPLOAD',
+              media_type: 'PHOTO',
+            }),
+          })
+
+          const fallbackData = await fallbackRes.json()
+          if (fallbackRes.ok && fallbackData.error?.code === 'ok') {
+            return {
+              success: true,
+              postId: fallbackData.data?.publish_id,
+              shareUrl: 'https://www.tiktok.com/@dersolabegitim',
+              mode: 'api',
+              action: actionType,
+              message: 'Story görseli TikTok hesabınıza (@dersolabegitim) iletildi! TikTok uygulamasında "Gelen Kutusu / Bildirimler" alanından tek tıkla yayına alabilirsiniz.',
+            }
+          }
+        }
+
         throw new Error(data.error?.message || 'TikTok içerik yayınlama hatası oluştu.')
       }
 
