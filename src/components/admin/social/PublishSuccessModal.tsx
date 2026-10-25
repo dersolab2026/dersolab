@@ -227,8 +227,6 @@ export function PublishSuccessModal({
                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
                   ttSuccess && ttIsApi
                     ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                    : !ttSuccess && ttIsApi
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                     : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                 }`}
               >
@@ -236,9 +234,7 @@ export function PublishSuccessModal({
                 <span>
                   {ttSuccess && ttIsApi
                     ? 'API ile Yayınlandı'
-                    : !ttSuccess && ttIsApi
-                    ? 'Yetki / İzin Gerekli'
-                    : 'Buluta Yüklendi'}
+                    : 'Görsel Cihazda • Web Yüklemesi'}
                 </span>
               </span>
             </div>
@@ -246,7 +242,7 @@ export function PublishSuccessModal({
             <p className="text-[11px] text-slate-300 leading-relaxed">
               {publishResult?.tiktok?.message ||
                 (isStory
-                  ? 'TikTok Story 9:16 dikey video/görsel formatında hazırlandı.'
+                  ? 'TikTok Story 9:16 dikey video/görsel formatında cihazınıza aktarıldı, metin kopyalandı.'
                   : 'TikTok fotoğraf albümü ve trend etiketler hazırlandı.')}
             </p>
 
@@ -257,7 +253,7 @@ export function PublishSuccessModal({
               className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-200 text-xs font-bold transition-all hover:scale-[1.02] active:scale-95"
             >
               <TikTokIcon className="w-3.5 h-3.5" />
-              <span>TikTok Creator'da Aç</span>
+              <span>{ttSuccess && ttIsApi ? 'TikTok Profilini Gör' : "TikTok'ta Hemen Paylaş (5 sn)"}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>

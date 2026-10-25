@@ -223,13 +223,13 @@ export async function publishToTikTok({
     throw new Error('TikTok için geçerli görsel veya video bulunamadı.')
   } catch (error: any) {
     console.error('TikTok API publish error:', error)
-    const isScopeError = /scope|authorize the scope|permission/i.test(error?.message || '')
+    const isScopeError = /scope|authorize the scope|permission|product/i.test(error?.message || '')
     const msg = isScopeError
-      ? 'TikTok hesabınızda doğrudan API yayın izni (video.publish) henüz verilmemiş. Doğrudan API Ayarları > "TikTok Hesabını Bağla" butonuna basarak yetkiyi yenileyebilirsiniz.'
+      ? 'TikTok hesabınızda doğrudan API yayın izni (Content Posting API) henüz etkin değil. TikTok Geliştirici Portalında "+ Add products > Content Posting API" eklenene kadar aşağıdaki butonla 5 saniyede Story yükleyebilirsiniz.'
       : error?.message || 'TikTok API çağrısı sırasında bir sorun oluştu.'
     return {
       success: false,
-      mode: 'api',
+      mode: 'manual_fallback',
       action: actionType,
       shareUrl: isStory ? 'https://www.tiktok.com/upload' : 'https://www.tiktok.com/creator-center/upload',
       message: msg,

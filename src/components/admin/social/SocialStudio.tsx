@@ -4216,6 +4216,20 @@ export default function SocialStudio() {
                     <span>🔗 TikTok'a Tek Tıkla Bağlan (@dersolabegitim)</span>
                   </a>
                 </div>
+                <div className="mt-2 p-2.5 rounded-lg bg-cyan-950/20 border border-cyan-500/15 text-[10px] text-slate-300 space-y-1">
+                  <p className="font-bold text-cyan-300 flex items-center gap-1">
+                    <span>💡 Otomatik API Yayını İçin 1 Kereye Mahsus Adım:</span>
+                  </p>
+                  <p className="text-slate-400">
+                    1. <a href="https://developers.tiktok.com" target="_blank" rel="noreferrer" className="text-cyan-300 underline font-semibold">TikTok Developer Portal</a>&apos;da uygulamanıza girin.
+                  </p>
+                  <p className="text-slate-400">
+                    2. Sağ üstteki <strong className="text-rose-400 font-bold">+ Add products</strong> butonuna tıklayıp <strong className="text-white">Content Posting API</strong>&apos;yi ekleyin.
+                  </p>
+                  <p className="text-slate-400">
+                    3. Ardından yukarıdaki <span className="text-cyan-300 font-semibold">&quot;TikTok&apos;a Tek Tıkla Bağlan&quot;</span> butonuna basıp yetki verin.
+                  </p>
+                </div>
               </div>
             </div>
 
