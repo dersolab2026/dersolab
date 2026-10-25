@@ -19,10 +19,11 @@ export interface InstagramPublishResult {
 export function getInstagramConfig(customToken?: string, customAccountId?: string) {
   const token = customToken?.trim() || process.env.INSTAGRAM_ACCESS_TOKEN
   const isIgLoginToken = Boolean(token && token.startsWith('IG'))
-  const accountId =
-    customAccountId?.trim() ||
-    process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID ||
-    (isIgLoginToken ? 'me' : undefined)
+  let accountId = customAccountId?.trim() || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID
+  if (!accountId && isIgLoginToken) {
+    // Doğrulanmış Instagram Business Scoped ID (@dersolabegitim)
+    accountId = '17841443400092890'
+  }
 
   return {
     isConfigured: Boolean(token && accountId),
@@ -30,6 +31,37 @@ export function getInstagramConfig(customToken?: string, customAccountId?: strin
     accountId,
     isIgLoginToken,
   }
+}
+
+/**
+ * Meta & Instagram Graph API için parametreleri hem query hem URL-encoded form uyumlu gönderen yardımcı
+ */
+async function callInstagramEndpoint(
+  baseUrl: string,
+  accountId: string,
+  endpoint: 'media' | 'media_publish',
+  params: Record<string, string | undefined>
+) {
+  const url = new URL(`${baseUrl}/${accountId}/${endpoint}`)
+  const bodyParams = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) {
+      url.searchParams.set(key, value)
+      bodyParams.set(key, value)
+    }
+  }
+
+  const res = await fetch(url.toString(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: bodyParams.toString(),
+  })
+
+  const data = await res.json()
+  return { ok: res.ok, data }
 }
 
 /**
@@ -79,34 +111,36 @@ export async function publishToInstagram({
       ? 'https://graph.instagram.com/v21.0'
       : 'https://graph.facebook.com/v21.0'
 
-    // STORY (HİKAYE) PAYLAŞIMI
-    if (isStory && imageUrls && imageUrls.length > 0) {
-      const containerRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          media_type: 'STORIES',
-          image_url: imageUrls[0],
-          access_token: token,
-        }),
-      })
+    const targetAccountId = accountId || '17841443400092890'
 
-      const containerData = await containerRes.json()
-      if (!containerRes.ok || !containerData.id) {
+    // 1. STORY (HİKAYE) PAYLAŞIMI
+    if (isStory && validPublicUrls.length > 0) {
+      const { ok: cOk, data: containerData } = await callInstagramEndpoint(
+        GRAPH_API_BASE,
+        targetAccountId,
+        'media',
+        {
+          media_type: 'STORIES',
+          image_url: validPublicUrls[0],
+          access_token: token,
+        }
+      )
+
+      if (!cOk || !containerData.id) {
         throw new Error(containerData.error?.message || 'Story container oluşturulamadı')
       }
 
-      const publishRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media_publish`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { ok: pOk, data: publishData } = await callInstagramEndpoint(
+        GRAPH_API_BASE,
+        targetAccountId,
+        'media_publish',
+        {
           creation_id: containerData.id,
           access_token: token,
-        }),
-      })
+        }
+      )
 
-      const publishData = await publishRes.json()
-      if (!publishRes.ok || !publishData.id) {
+      if (!pOk || !publishData.id) {
         throw new Error(publishData.error?.message || 'Story yayınlanamadı')
       }
 
@@ -120,36 +154,35 @@ export async function publishToInstagram({
       }
     }
 
-    // REELS / VIDEO PAYLAŞIMI
+    // 2. REELS / VIDEO PAYLAŞIMI
     if (isReels && videoUrl) {
-      const containerRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { ok: cOk, data: containerData } = await callInstagramEndpoint(
+        GRAPH_API_BASE,
+        targetAccountId,
+        'media',
+        {
           media_type: 'REELS',
           video_url: videoUrl,
           caption,
           access_token: token,
-        }),
-      })
+        }
+      )
 
-      const containerData = await containerRes.json()
-      if (!containerRes.ok || !containerData.id) {
+      if (!cOk || !containerData.id) {
         throw new Error(containerData.error?.message || 'Reels container oluşturulamadı')
       }
 
-      // Yayınla
-      const publishRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media_publish`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { ok: pOk, data: publishData } = await callInstagramEndpoint(
+        GRAPH_API_BASE,
+        targetAccountId,
+        'media_publish',
+        {
           creation_id: containerData.id,
           access_token: token,
-        }),
-      })
+        }
+      )
 
-      const publishData = await publishRes.json()
-      if (!publishRes.ok || !publishData.id) {
+      if (!pOk || !publishData.id) {
         throw new Error(publishData.error?.message || 'Reels yayınlanamadı')
       }
 
@@ -163,23 +196,22 @@ export async function publishToInstagram({
       }
     }
 
-    // CAROUSEL GÖNDERİSİ
-    if (imageUrls && imageUrls.length > 1) {
-      // 1. Her bir slayt için alt container (item) oluştur
+    // 3. CAROUSEL GÖNDERİSİ (Çoklu Slayt)
+    if (validPublicUrls.length > 1) {
       const itemContainerIds: string[] = []
 
-      for (const imgUrl of imageUrls) {
-        const itemRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+      for (const imgUrl of validPublicUrls) {
+        const { ok: iOk, data: itemData } = await callInstagramEndpoint(
+          GRAPH_API_BASE,
+          targetAccountId,
+          'media',
+          {
             image_url: imgUrl,
-            is_carousel_item: true,
+            is_carousel_item: 'true',
             access_token: token,
-          }),
-        })
-        const itemData = await itemRes.json()
-        if (itemData.id) {
+          }
+        )
+        if (iOk && itemData.id) {
           itemContainerIds.push(itemData.id)
         }
       }
@@ -188,35 +220,33 @@ export async function publishToInstagram({
         throw new Error('Carousel için en az 2 slayt görseli gereklidir.')
       }
 
-      // 2. Ana Carousel Container oluştur
-      const carouselRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { ok: cOk, data: carouselData } = await callInstagramEndpoint(
+        GRAPH_API_BASE,
+        targetAccountId,
+        'media',
+        {
           media_type: 'CAROUSEL',
           children: itemContainerIds.join(','),
           caption,
           access_token: token,
-        }),
-      })
+        }
+      )
 
-      const carouselData = await carouselRes.json()
-      if (!carouselRes.ok || !carouselData.id) {
+      if (!cOk || !carouselData.id) {
         throw new Error(carouselData.error?.message || 'Carousel container oluşturulamadı')
       }
 
-      // 3. Yayınla
-      const publishRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media_publish`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { ok: pOk, data: publishData } = await callInstagramEndpoint(
+        GRAPH_API_BASE,
+        targetAccountId,
+        'media_publish',
+        {
           creation_id: carouselData.id,
           access_token: token,
-        }),
-      })
+        }
+      )
 
-      const publishData = await publishRes.json()
-      if (!publishRes.ok || !publishData.id) {
+      if (!pOk || !publishData.id) {
         throw new Error(publishData.error?.message || 'Carousel yayınlanamadı')
       }
 
@@ -230,34 +260,34 @@ export async function publishToInstagram({
       }
     }
 
-    // TEKLİ FOTOĞRAF GÖNDERİSİ
-    if (imageUrls && imageUrls.length === 1) {
-      const containerRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image_url: imageUrls[0],
+    // 4. TEKLİ FOTOĞRAF GÖNDERİSİ
+    if (validPublicUrls.length === 1) {
+      const { ok: cOk, data: containerData } = await callInstagramEndpoint(
+        GRAPH_API_BASE,
+        targetAccountId,
+        'media',
+        {
+          image_url: validPublicUrls[0],
           caption,
           access_token: token,
-        }),
-      })
+        }
+      )
 
-      const containerData = await containerRes.json()
-      if (!containerRes.ok || !containerData.id) {
+      if (!cOk || !containerData.id) {
         throw new Error(containerData.error?.message || 'Görsel container oluşturulamadı')
       }
 
-      const publishRes = await fetch(`${GRAPH_API_BASE}/${accountId}/media_publish`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { ok: pOk, data: publishData } = await callInstagramEndpoint(
+        GRAPH_API_BASE,
+        targetAccountId,
+        'media_publish',
+        {
           creation_id: containerData.id,
           access_token: token,
-        }),
-      })
+        }
+      )
 
-      const publishData = await publishRes.json()
-      if (!publishRes.ok || !publishData.id) {
+      if (!pOk || !publishData.id) {
         throw new Error(publishData.error?.message || 'Gönderi yayınlanamadı')
       }
 
