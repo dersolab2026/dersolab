@@ -18,12 +18,17 @@ export interface InstagramPublishResult {
 
 export function getInstagramConfig(customToken?: string, customAccountId?: string) {
   const token = customToken?.trim() || process.env.INSTAGRAM_ACCESS_TOKEN
-  const accountId = customAccountId?.trim() || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID
+  const isIgLoginToken = Boolean(token && token.startsWith('IG'))
+  const accountId =
+    customAccountId?.trim() ||
+    process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID ||
+    (isIgLoginToken ? 'me' : undefined)
 
   return {
     isConfigured: Boolean(token && accountId),
     token,
     accountId,
+    isIgLoginToken,
   }
 }
 
@@ -47,7 +52,10 @@ export async function publishToInstagram({
   customToken?: string
   customAccountId?: string
 }): Promise<InstagramPublishResult> {
-  const { isConfigured, token, accountId } = getInstagramConfig(customToken, customAccountId)
+  const { isConfigured, token, accountId, isIgLoginToken } = getInstagramConfig(
+    customToken,
+    customAccountId
+  )
   const actionType: 'story' | 'post' = isStory ? 'story' : 'post'
 
   const validPublicUrls = (imageUrls || []).filter(
@@ -67,7 +75,9 @@ export async function publishToInstagram({
   }
 
   try {
-    const GRAPH_API_BASE = 'https://graph.facebook.com/v21.0'
+    const GRAPH_API_BASE = isIgLoginToken
+      ? 'https://graph.instagram.com/v21.0'
+      : 'https://graph.facebook.com/v21.0'
 
     // STORY (HİKAYE) PAYLAŞIMI
     if (isStory && imageUrls && imageUrls.length > 0) {
