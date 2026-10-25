@@ -4207,10 +4207,10 @@ export default function SocialStudio() {
                 />
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-1.5 p-2 rounded-lg bg-cyan-950/30 border border-cyan-500/20">
                   <span className="text-[10px] text-slate-300">
-                    Token kopyalamak yerine tek tıkla tam yetkili izin verin:
+                    Token kopyalamak yerine tek tıkla izin verin:
                   </span>
                   <a
-                    href="https://www.tiktok.com/v2/auth/authorize/?client_key=sbawm5ipgpytsjdnp9&scope=user.info.basic,video.upload,video.publish&response_type=code&redirect_uri=https%3A%2F%2Fdersolab.com%2Fadmin%2Fsocial"
+                    href="https://www.tiktok.com/v2/auth/authorize/?client_key=sbawm5ipgpytsjdnp9&scope=user.info.basic,video.upload&response_type=code&redirect_uri=https%3A%2F%2Fdersolab.com%2Fadmin%2Fsocial"
                     className="text-[10px] px-2.5 py-1 rounded bg-cyan-500/25 hover:bg-cyan-500/35 text-cyan-200 border border-cyan-500/40 font-bold flex items-center gap-1 transition-all"
                   >
                     <span>🔗 TikTok'a Tek Tıkla Bağlan (@dersolabegitim)</span>
