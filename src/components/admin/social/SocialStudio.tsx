@@ -192,7 +192,7 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
           genre: 'Felsefi Masal / Zaman',
           whyRead: 'Zaman yönetimi ve hayal gücünü geliştirir, LGS yeni nesil paragraf analizine harika katkı sağlar.',
           highlightTag: 'ORTAOKUL & LGS',
-          imageUrl: '/books/momo.jpg',
+          imageUrl: 'https://covers.openlibrary.org/b/id/8574580-L.jpg',
         },
         lise: {
           title: 'Simyacı',
@@ -200,7 +200,7 @@ const INITIAL_DEMO_POSTS: SocialPostItem[] = [
           genre: 'Felsefi Roman / Macera',
           whyRead: 'Kişisel menkıbe ve odaklanma üzerine bir başyapıt. TYT derin anlama ve AYT analiz gücü kazandırır.',
           highlightTag: 'LİSE & YKS',
-          imageUrl: '/books/simyaci.jpg',
+          imageUrl: 'https://covers.openlibrary.org/b/id/7414780-L.jpg',
         },
       },
     },
@@ -261,16 +261,23 @@ function sanitizePostList(rawList: SocialPostItem[]): SocialPostItem[] {
           nextStoryData.stickerQuestion = 'Bu hafta hangisini okuyacaksın? 📚'
         }
 
+        const useRealOrtCover = safeOrt.imageUrl && !safeOrt.imageUrl.startsWith('data:image/svg')
+        const useRealLisCover = safeLis.imageUrl && !safeLis.imageUrl.startsWith('data:image/svg')
+
         nextStoryData.dualBookData = {
           ortaokul: {
             ...safeOrt,
             highlightTag: 'ORTAOKUL & LGS',
-            imageUrl: buildBookCoverSvgDataUrl(safeOrt.title, safeOrt.author, safeOrt.genre, 'ortaokul'),
+            imageUrl: useRealOrtCover
+              ? safeOrt.imageUrl
+              : (fallbackPair.ortaokul.imageUrl || buildBookCoverSvgDataUrl(safeOrt.title, safeOrt.author, safeOrt.genre, 'ortaokul')),
           },
           lise: {
             ...safeLis,
             highlightTag: 'LİSE & YKS',
-            imageUrl: buildBookCoverSvgDataUrl(safeLis.title, safeLis.author, safeLis.genre, 'lise'),
+            imageUrl: useRealLisCover
+              ? safeLis.imageUrl
+              : (fallbackPair.lise.imageUrl || buildBookCoverSvgDataUrl(safeLis.title, safeLis.author, safeLis.genre, 'lise')),
           },
         }
         nextStoryData.stickerOptions = [`📘 ${safeOrt.title}`, `📕 ${safeLis.title}`]
@@ -349,6 +356,7 @@ export default function SocialStudio() {
   const [customIgToken, setCustomIgToken] = useState<string>('')
   const [customIgAccountId, setCustomIgAccountId] = useState<string>('')
   const [customTiktokToken, setCustomTiktokToken] = useState<string>('')
+  const [isSearchingCover, setIsSearchingCover] = useState<{ ortaokul?: boolean; lise?: boolean }>({})
 
   const dbSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -1089,6 +1097,44 @@ export default function SocialStudio() {
     }
   }
 
+  async function handleAutoFindBookCover(level: 'ortaokul' | 'lise') {
+    if (!activePost?.storyData?.dualBookData) return
+    const currentBook = activePost.storyData.dualBookData[level]
+    if (!currentBook?.title) {
+      toast.error('Lütfen önce kitap adını girin.')
+      return
+    }
+    setIsSearchingCover((prev) => ({ ...prev, [level]: true }))
+    try {
+      const res = await fetch(
+        `/api/admin/social/books/cover?title=${encodeURIComponent(currentBook.title)}&author=${encodeURIComponent(currentBook.author || '')}`
+      )
+      const data = await res.json()
+      if (data.found && data.imageUrl) {
+        handleUpdateActivePost({
+          ...activePost,
+          storyData: {
+            ...activePost.storyData,
+            dualBookData: {
+              ...activePost.storyData.dualBookData,
+              [level]: {
+                ...currentBook,
+                imageUrl: data.imageUrl,
+              },
+            },
+          },
+        })
+        toast.success(`"${currentBook.title}" için gerçek kapak bulundu!`)
+      } else {
+        toast.error('Gerçek kapak bulunamadı. Web veya Google Görseller bağlantısını kutucuğa yapıştırabilirsiniz.')
+      }
+    } catch {
+      toast.error('Kapak aranırken bir hata oluştu.')
+    } finally {
+      setIsSearchingCover((prev) => ({ ...prev, [level]: false }))
+    }
+  }
+
   // Dinamik Konu Odaklı Yerel Üretici (4 Sabit Tema & Konuya %100 Uyumlu + Tüm Gönderi Türleri İçin Çoklu Alternatif Desteği)
   function createFallbackPost(
     type: InstagramContentType,
@@ -1143,22 +1189,26 @@ export default function SocialStudio() {
             ortaokul: {
               ...chosen.ortaokul,
               highlightTag: 'ORTAOKUL & LGS',
-              imageUrl: buildBookCoverSvgDataUrl(
-                chosen.ortaokul.title,
-                chosen.ortaokul.author,
-                chosen.ortaokul.genre,
-                'ortaokul'
-              ),
+              imageUrl:
+                chosen.ortaokul.imageUrl ||
+                buildBookCoverSvgDataUrl(
+                  chosen.ortaokul.title,
+                  chosen.ortaokul.author,
+                  chosen.ortaokul.genre,
+                  'ortaokul'
+                ),
             },
             lise: {
               ...chosen.lise,
               highlightTag: 'LİSE & YKS',
-              imageUrl: buildBookCoverSvgDataUrl(
-                chosen.lise.title,
-                chosen.lise.author,
-                chosen.lise.genre,
-                'lise'
-              ),
+              imageUrl:
+                chosen.lise.imageUrl ||
+                buildBookCoverSvgDataUrl(
+                  chosen.lise.title,
+                  chosen.lise.author,
+                  chosen.lise.genre,
+                  'lise'
+                ),
             },
           },
         },
@@ -2761,6 +2811,7 @@ export default function SocialStudio() {
                           onChange={(e) => {
                             const nextTitle = e.target.value
                             const currentBook = activePost.storyData!.dualBookData!.ortaokul
+                            const isRealCover = currentBook.imageUrl && !currentBook.imageUrl.startsWith('data:image/svg')
                             handleUpdateActivePost({
                               ...activePost,
                               storyData: {
@@ -2770,12 +2821,14 @@ export default function SocialStudio() {
                                   ortaokul: {
                                     ...currentBook,
                                     title: nextTitle,
-                                    imageUrl: buildBookCoverSvgDataUrl(
-                                      nextTitle,
-                                      currentBook.author,
-                                      currentBook.genre,
-                                      'ortaokul'
-                                    ),
+                                    imageUrl: isRealCover
+                                      ? currentBook.imageUrl
+                                      : buildBookCoverSvgDataUrl(
+                                          nextTitle,
+                                          currentBook.author,
+                                          currentBook.genre,
+                                          'ortaokul'
+                                        ),
                                   },
                                 },
                               },
@@ -2791,6 +2844,7 @@ export default function SocialStudio() {
                             onChange={(e) => {
                               const nextAuthor = e.target.value
                               const currentBook = activePost.storyData!.dualBookData!.ortaokul
+                              const isRealCover = currentBook.imageUrl && !currentBook.imageUrl.startsWith('data:image/svg')
                               handleUpdateActivePost({
                                 ...activePost,
                                 storyData: {
@@ -2800,12 +2854,14 @@ export default function SocialStudio() {
                                     ortaokul: {
                                       ...currentBook,
                                       author: nextAuthor,
-                                      imageUrl: buildBookCoverSvgDataUrl(
-                                        currentBook.title,
-                                        nextAuthor,
-                                        currentBook.genre,
-                                        'ortaokul'
-                                      ),
+                                      imageUrl: isRealCover
+                                        ? currentBook.imageUrl
+                                        : buildBookCoverSvgDataUrl(
+                                            currentBook.title,
+                                            nextAuthor,
+                                            currentBook.genre,
+                                            'ortaokul'
+                                          ),
                                     },
                                   },
                                 },
@@ -2820,6 +2876,7 @@ export default function SocialStudio() {
                             onChange={(e) => {
                               const nextGenre = e.target.value
                               const currentBook = activePost.storyData!.dualBookData!.ortaokul
+                              const isRealCover = currentBook.imageUrl && !currentBook.imageUrl.startsWith('data:image/svg')
                               handleUpdateActivePost({
                                 ...activePost,
                                 storyData: {
@@ -2829,12 +2886,14 @@ export default function SocialStudio() {
                                     ortaokul: {
                                       ...currentBook,
                                       genre: nextGenre,
-                                      imageUrl: buildBookCoverSvgDataUrl(
-                                        currentBook.title,
-                                        currentBook.author,
-                                        nextGenre,
-                                        'ortaokul'
-                                      ),
+                                      imageUrl: isRealCover
+                                        ? currentBook.imageUrl
+                                        : buildBookCoverSvgDataUrl(
+                                            currentBook.title,
+                                            currentBook.author,
+                                            nextGenre,
+                                            'ortaokul'
+                                          ),
                                     },
                                   },
                                 },
@@ -2865,6 +2924,56 @@ export default function SocialStudio() {
                           }}
                           className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[11px] text-slate-300"
                         />
+                        {/* Gerçek Kapak Görseli ve Arama Butonu */}
+                        <div className="pt-1.5 border-t border-sky-500/20 flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-sky-300 font-semibold flex items-center gap-1">
+                              🖼️ Kitap Kapağı Görseli
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleAutoFindBookCover('ortaokul')}
+                              disabled={isSearchingCover.ortaokul}
+                              className="text-[10px] px-2 py-0.5 rounded bg-sky-500/25 hover:bg-sky-500/35 border border-sky-500/30 text-sky-200 font-semibold cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1"
+                            >
+                              {isSearchingCover.ortaokul ? '⏳ Aranıyor...' : '🔍 Gerçek Kapağı Bul'}
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {activePost.storyData.dualBookData.ortaokul.imageUrl && (
+                              <div className="w-8 h-11 shrink-0 rounded overflow-hidden border border-sky-500/40 bg-black/50">
+                                <img
+                                  src={activePost.storyData.dualBookData.ortaokul.imageUrl}
+                                  alt="Kapak"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            )}
+                            <input
+                              type="text"
+                              placeholder="Google Görseller veya web kapak URL'si yapıştırın"
+                              value={activePost.storyData.dualBookData.ortaokul.imageUrl || ''}
+                              onChange={(e) => {
+                                const newUrl = e.target.value
+                                const currentBook = activePost.storyData!.dualBookData!.ortaokul
+                                handleUpdateActivePost({
+                                  ...activePost,
+                                  storyData: {
+                                    ...activePost.storyData!,
+                                    dualBookData: {
+                                      ...activePost.storyData!.dualBookData!,
+                                      ortaokul: {
+                                        ...currentBook,
+                                        imageUrl: newUrl || buildBookCoverSvgDataUrl(currentBook.title, currentBook.author, currentBook.genre, 'ortaokul'),
+                                      },
+                                    },
+                                  },
+                                })
+                              }}
+                              className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] text-slate-300 font-mono"
+                            />
+                          </div>
+                        </div>
                       </div>
 
                       {/* Lise Kitabı */}
@@ -2879,6 +2988,7 @@ export default function SocialStudio() {
                           onChange={(e) => {
                             const nextTitle = e.target.value
                             const currentBook = activePost.storyData!.dualBookData!.lise
+                            const isRealCover = currentBook.imageUrl && !currentBook.imageUrl.startsWith('data:image/svg')
                             handleUpdateActivePost({
                               ...activePost,
                               storyData: {
@@ -2888,12 +2998,14 @@ export default function SocialStudio() {
                                   lise: {
                                     ...currentBook,
                                     title: nextTitle,
-                                    imageUrl: buildBookCoverSvgDataUrl(
-                                      nextTitle,
-                                      currentBook.author,
-                                      currentBook.genre,
-                                      'lise'
-                                    ),
+                                    imageUrl: isRealCover
+                                      ? currentBook.imageUrl
+                                      : buildBookCoverSvgDataUrl(
+                                          nextTitle,
+                                          currentBook.author,
+                                          currentBook.genre,
+                                          'lise'
+                                        ),
                                   },
                                 },
                               },
@@ -2909,6 +3021,7 @@ export default function SocialStudio() {
                             onChange={(e) => {
                               const nextAuthor = e.target.value
                               const currentBook = activePost.storyData!.dualBookData!.lise
+                              const isRealCover = currentBook.imageUrl && !currentBook.imageUrl.startsWith('data:image/svg')
                               handleUpdateActivePost({
                                 ...activePost,
                                 storyData: {
@@ -2918,12 +3031,14 @@ export default function SocialStudio() {
                                     lise: {
                                       ...currentBook,
                                       author: nextAuthor,
-                                      imageUrl: buildBookCoverSvgDataUrl(
-                                        currentBook.title,
-                                        nextAuthor,
-                                        currentBook.genre,
-                                        'lise'
-                                      ),
+                                      imageUrl: isRealCover
+                                        ? currentBook.imageUrl
+                                        : buildBookCoverSvgDataUrl(
+                                            currentBook.title,
+                                            nextAuthor,
+                                            currentBook.genre,
+                                            'lise'
+                                          ),
                                     },
                                   },
                                 },
@@ -2938,6 +3053,7 @@ export default function SocialStudio() {
                             onChange={(e) => {
                               const nextGenre = e.target.value
                               const currentBook = activePost.storyData!.dualBookData!.lise
+                              const isRealCover = currentBook.imageUrl && !currentBook.imageUrl.startsWith('data:image/svg')
                               handleUpdateActivePost({
                                 ...activePost,
                                 storyData: {
@@ -2947,12 +3063,14 @@ export default function SocialStudio() {
                                     lise: {
                                       ...currentBook,
                                       genre: nextGenre,
-                                      imageUrl: buildBookCoverSvgDataUrl(
-                                        currentBook.title,
-                                        currentBook.author,
-                                        nextGenre,
-                                        'lise'
-                                      ),
+                                      imageUrl: isRealCover
+                                        ? currentBook.imageUrl
+                                        : buildBookCoverSvgDataUrl(
+                                            currentBook.title,
+                                            currentBook.author,
+                                            nextGenre,
+                                            'lise'
+                                          ),
                                     },
                                   },
                                 },
@@ -2983,6 +3101,56 @@ export default function SocialStudio() {
                           }}
                           className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[11px] text-slate-300"
                         />
+                        {/* Gerçek Kapak Görseli ve Arama Butonu */}
+                        <div className="pt-1.5 border-t border-orange-500/20 flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-orange-300 font-semibold flex items-center gap-1">
+                              🖼️ Kitap Kapağı Görseli
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleAutoFindBookCover('lise')}
+                              disabled={isSearchingCover.lise}
+                              className="text-[10px] px-2 py-0.5 rounded bg-orange-500/25 hover:bg-orange-500/35 border border-orange-500/30 text-orange-200 font-semibold cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1"
+                            >
+                              {isSearchingCover.lise ? '⏳ Aranıyor...' : '🔍 Gerçek Kapağı Bul'}
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {activePost.storyData.dualBookData.lise.imageUrl && (
+                              <div className="w-8 h-11 shrink-0 rounded overflow-hidden border border-orange-500/40 bg-black/50">
+                                <img
+                                  src={activePost.storyData.dualBookData.lise.imageUrl}
+                                  alt="Kapak"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            )}
+                            <input
+                              type="text"
+                              placeholder="Google Görseller veya web kapak URL'si yapıştırın"
+                              value={activePost.storyData.dualBookData.lise.imageUrl || ''}
+                              onChange={(e) => {
+                                const newUrl = e.target.value
+                                const currentBook = activePost.storyData!.dualBookData!.lise
+                                handleUpdateActivePost({
+                                  ...activePost,
+                                  storyData: {
+                                    ...activePost.storyData!,
+                                    dualBookData: {
+                                      ...activePost.storyData!.dualBookData!,
+                                      lise: {
+                                        ...currentBook,
+                                        imageUrl: newUrl || buildBookCoverSvgDataUrl(currentBook.title, currentBook.author, currentBook.genre, 'lise'),
+                                      },
+                                    },
+                                  },
+                                })
+                              }}
+                              className="w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] text-slate-300 font-mono"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

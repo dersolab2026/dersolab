@@ -22,6 +22,7 @@ import type {
   XTweetItem,
 } from '@/types/social'
 import { generateSocialImage } from './imageGenerator'
+import { fetchRealBookCover } from './bookCovers'
 
 const ACRONYM_MAP: Record<string, string> = {
   ösym: 'ÖSYM',
@@ -265,7 +266,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Felsefi Masal & Zaman',
       whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
-      imageUrl: '/books/momo.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/id/8574580-L.jpg',
     },
     lise: {
       title: 'Simyacı',
@@ -273,7 +274,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Alegorik Roman',
       whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve derin anlama becerisi kazandırır.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
-      imageUrl: '/books/simyaci.jpg',
+      imageUrl: 'https://covers.openlibrary.org/b/id/7414780-L.jpg',
     },
   },
   {
@@ -283,6 +284,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Felsefi Öykü & İmgelem',
       whyRead: 'Soyut düşünme ve LGS paragraf sorularında ana fikir yakalama yeteneğini güçlendirir.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/12219639-L.jpg',
     },
     lise: {
       title: 'Beyaz Zambaklar Ülkesinde',
@@ -290,6 +292,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Düşünce & Azim Klasiği',
       whyRead: 'Çalışma disiplini, irade eğitimi ve hedefe odaklanma konusunda eşsiz bir başucu eseridir.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/10848805-L.jpg',
     },
   },
   {
@@ -299,6 +302,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Büyüme & Empati Romanı',
       whyRead: 'Duygusal zeka, söz varlığı ve uzun metinlerde kopmadan okuma alışkanlığı kazandırır.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/10413035-L.jpg',
     },
     lise: {
       title: 'Satranç',
@@ -306,6 +310,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Psikolojik Analiz & Novella',
       whyRead: 'Zihinsel strateji, odaklanma psikolojisi ve TYT Türkçe derin çıkarım sorularına hız katar.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/5548285-L.jpg',
     },
   },
   {
@@ -315,6 +320,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Otobiyografi & Azim Öyküsü',
       whyRead: 'Zorluklar karşısında pes etmeme bilinci ve güçlü anlatım tekniklerini kavratır.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/10314710-L.jpg',
     },
     lise: {
       title: 'Dönüşüm',
@@ -322,6 +328,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Modern Klasik & Metafor',
       whyRead: 'ÖSYM’nin çok sevdiği soyut ve felsefi paragraf metinlerini tek okumada çözme pratiği sağlar.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/12820198-L.jpg',
     },
   },
   {
@@ -331,6 +338,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Özgürlük & Başarı Alegorisi',
       whyRead: 'Kendi sınırlarını aşma cesareti ve sembolik metinleri yorumlama becerisi kazandırır.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/6522230-L.jpg',
     },
     lise: {
       title: 'Fahrenheit 451',
@@ -338,6 +346,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Distopya & Eleştirel Düşünce',
       whyRead: 'Okuma kültürü, eleştirel bakış açısı ve TYT-AYT düşünce yazısı analizinde fark yaratır.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/12993656-L.jpg',
     },
   },
   {
@@ -347,6 +356,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Dostluk & Sorumluluk Klasiği',
       whyRead: 'Olay örgüsü takibi, karakter analizi ve hızlı okuma pratiği için en etkili eserlerdendir.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/7819755-L.jpg',
     },
     lise: {
       title: 'Fareler ve İnsanlar',
@@ -354,6 +364,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Toplumcu Klasik Roman',
       whyRead: 'Hayaller, gerçeklik ve karakter tahlili üzerinden edebiyat ve paragraf yorum gücünü artırır.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/14319003-L.jpg',
     },
   },
   {
@@ -363,6 +374,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Doğa & Hayatta Kalma Macerası',
       whyRead: 'Betimleme gücü yüksek metinlerde dikkat toplama ve kelime hazinesini zenginleştirir.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/8236920-L.jpg',
     },
     lise: {
       title: 'Kürk Mantolu Madonna',
@@ -370,6 +382,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Türk Edebiyatı Başyapıtı',
       whyRead: 'AYT Edebiyat bireyin iç dünyasını esas alan eserler kazanımı ve psikolojik tahlil gücü sağlar.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/12762238-L.jpg',
     },
   },
   {
@@ -379,6 +392,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Okul & Dayanışma Romanı',
       whyRead: 'Akıcı diyalogları ve sıcak kurgusuyla okuma hızını ve anlam bütünlüğü kurmayı destekler.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/72344-L.jpg',
     },
     lise: {
       title: 'İnsan Ne İle Yaşar?',
@@ -386,6 +400,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Felsefi Hikayeler & Değerler',
       whyRead: 'Kısa ama derinlikli metinlerden ana düşünce ve yardımcı düşünce çıkarma hızını katlar.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/11725468-L.jpg',
     },
   },
   {
@@ -395,6 +410,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Macera & Keşif Klasiği',
       whyRead: 'Zamanla yarış kurgusu sayesinde okuma temposunu ve dikkat odaklanmasını güçlendirir.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/6976035-L.jpg',
     },
     lise: {
       title: 'Hayvan Çiftliği',
@@ -402,6 +418,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Alegorik & Politik Roman',
       whyRead: 'Dolaylı anlatım, ironi ve ÖSYM paragraf sorularındaki örtük anlamı yakalama becerisi katar.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/11261770-L.jpg',
     },
   },
   {
@@ -411,6 +428,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Modern Klasik & İmgelem',
       whyRead: 'Zengin betimlemeleri ve destansı anlatımıyla Türkçe söz varlığını ve yorum gücünü besler.',
       highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/6770435-L.jpg',
     },
     lise: {
       title: 'Dokuzuncu Hariciye Koğuşu',
@@ -418,6 +436,7 @@ export const CURATED_BOOK_PAIRS = [
       genre: 'Psikolojik Roman Klasiği',
       whyRead: 'AYT Edebiyat için temel eserlerden biri olup iç çözümleme ve derin paragraf analizi kazandırır.',
       highlightTag: 'LİSE & YKS (14-18 YAŞ)',
+      imageUrl: 'https://covers.openlibrary.org/b/id/10848805-L.jpg',
     },
   },
 ]
@@ -721,16 +740,32 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       normalizedStoryData.headline = 'Haftanın Kitap Önerileri'
       normalizedStoryData.subhead = 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik'
       normalizedStoryData.stickerQuestion = 'Bu hafta hangisini okuyacaksın? 📚'
+      let ortCover = (finalOrt.imageUrl && !finalOrt.imageUrl.startsWith('data:image/svg')) ? finalOrt.imageUrl : undefined
+      if (!ortCover) {
+        ortCover = (await fetchRealBookCover(finalOrt.title, finalOrt.author)) || safePair.ortaokul.imageUrl
+      }
+      if (!ortCover) {
+        ortCover = buildBookCoverSvgDataUrl(finalOrt.title, finalOrt.author, finalOrt.genre, 'ortaokul')
+      }
+
+      let lisCover = (finalLis.imageUrl && !finalLis.imageUrl.startsWith('data:image/svg')) ? finalLis.imageUrl : undefined
+      if (!lisCover) {
+        lisCover = (await fetchRealBookCover(finalLis.title, finalLis.author)) || safePair.lise.imageUrl
+      }
+      if (!lisCover) {
+        lisCover = buildBookCoverSvgDataUrl(finalLis.title, finalLis.author, finalLis.genre, 'lise')
+      }
+
       normalizedStoryData.dualBookData = {
         ortaokul: {
           ...finalOrt,
           highlightTag: 'ORTAOKUL & LGS',
-          imageUrl: buildBookCoverSvgDataUrl(finalOrt.title, finalOrt.author, finalOrt.genre, 'ortaokul'),
+          imageUrl: ortCover,
         },
         lise: {
           ...finalLis,
           highlightTag: 'LİSE & YKS',
-          imageUrl: buildBookCoverSvgDataUrl(finalLis.title, finalLis.author, finalLis.genre, 'lise'),
+          imageUrl: lisCover,
         },
       }
       normalizedStoryData.stickerOptions = [`📘 ${finalOrt.title}`, `📕 ${finalLis.title}`]
@@ -1611,7 +1646,7 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
             genre: 'Felsefi Masal & Zaman Macerası',
             whyRead: 'LGS yeni nesil paragraf sorularında zaman algısı ve dikkat süresini geliştirir.',
             highlightTag: 'ORTAOKUL & LGS (10-14 YAŞ)',
-            imageUrl: '/books/momo.jpg',
+            imageUrl: 'https://covers.openlibrary.org/b/id/8574580-L.jpg',
           },
           lise: {
             title: 'Simyacı',
@@ -1619,7 +1654,7 @@ function generateLocalWeeklyCalendar(request: WeeklyCalendarRequest): SocialPost
             genre: 'Alegorik Roman',
             whyRead: 'YKS maratonunda motivasyon, içsel yolculuk ve TYT derin anlama becerisi kazandırır.',
             highlightTag: 'LİSE & YKS (14-18 YAŞ)',
-            imageUrl: '/books/simyaci.jpg',
+            imageUrl: 'https://covers.openlibrary.org/b/id/7414780-L.jpg',
           },
         },
       },

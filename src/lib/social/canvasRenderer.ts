@@ -276,12 +276,20 @@ export function loadImageSafely(src?: string): Promise<HTMLImageElement | null> 
   if (!src) return Promise.resolve(null)
   return new Promise((resolve) => {
     const img = new Image()
-    if (!src.startsWith('data:') && !src.startsWith('blob:')) {
+    if (!src.startsWith('data:') && !src.startsWith('blob:') && !src.startsWith('/')) {
       img.crossOrigin = 'anonymous'
     }
     img.onload = () => resolve(img)
     img.onerror = () => {
-      // CORS hatası olursa null dön, çizim akışını bozma
+      // Eğer doğrudan yükleme CORS hatası verirse, sunucu proxy rotasını dene (Google Görseller / harici siteler için)
+      if (src.startsWith('http') && !src.includes('/api/admin/social/proxy-image')) {
+        const proxyImg = new Image()
+        proxyImg.crossOrigin = 'anonymous'
+        proxyImg.onload = () => resolve(proxyImg)
+        proxyImg.onerror = () => resolve(null)
+        proxyImg.src = `/api/admin/social/proxy-image?url=${encodeURIComponent(src)}`
+        return
+      }
       resolve(null)
     }
     img.src = src
