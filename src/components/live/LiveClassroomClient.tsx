@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Video,
@@ -113,6 +113,14 @@ export function LiveClassroomClient({
   const elapsedRemainderSeconds = elapsedSeconds % 60
   const formattedElapsed = `${String(elapsedMinutes).padStart(2, '0')}:${String(elapsedRemainderSeconds).padStart(2, '0')}`
 
+  const handleLeave = useCallback(() => {
+    if (apiRef.current) {
+      apiRef.current.dispose()
+      apiRef.current = null
+    }
+    router.push(isInstructor ? '/dashboard/instructor' : '/dashboard/student/bookings')
+  }, [isInstructor, router])
+
   // Load Jitsi Meet External API
   useEffect(() => {
     const initJitsi = () => {
@@ -198,15 +206,7 @@ export function LiveClassroomClient({
         apiRef.current = null
       }
     }
-  }, [roomName, currentUserName, isInstructor])
-
-  const handleLeave = () => {
-    if (apiRef.current) {
-      apiRef.current.dispose()
-      apiRef.current = null
-    }
-    router.push(isInstructor ? '/dashboard/instructor' : '/dashboard/student/bookings')
-  }
+  }, [roomName, currentUserName, isInstructor, handleLeave])
 
   return (
     <div className="fixed inset-0 z-50 bg-[#080B11] text-slate-100 flex flex-col overflow-hidden select-none">

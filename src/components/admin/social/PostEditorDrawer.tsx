@@ -107,7 +107,7 @@ export function PostEditorDrawer({
   function handleApplyHook(hook: HookVariation) {
     if (!post) return
 
-    let updated: SocialPostItem = {
+    const updated: SocialPostItem = {
       ...post,
       title: `${hook.title}: ${hook.hookText}`,
     }

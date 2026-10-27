@@ -242,7 +242,7 @@ function sanitizePostList(rawList: SocialPostItem[]): SocialPostItem[] {
     let cleanTitle = toTurkishTitleCase(post.title || '')
     let cleanTopicLabel = toTurkishTitleCase(post.topicLabel || '')
 
-    let nextStoryData = post.storyData ? { ...post.storyData } : undefined
+    const nextStoryData = post.storyData ? { ...post.storyData } : undefined
 
     if (nextStoryData) {
       // Eski demo_story_3 kaydında dayatılan anket varsa çıkartmasız ('none') yap

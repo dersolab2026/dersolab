@@ -33,6 +33,7 @@ export async function updateSession(request: NextRequest) {
   // Not: /demo-ders, /instructors, /kocluk ve /lab vitrin/dönüşüm sayfalarıdır; ziyaretçilere ve SEO'ya açıktır.
   const isProtectedContent =
     pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/admin') ||
     pathname.startsWith('/social') ||
     pathname.startsWith('/canli-ders') ||
     pathname.startsWith('/hesap-turu') ||

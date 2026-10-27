@@ -1,7 +1,21 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(req: Request) {
   try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 })
+    }
+
+    const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+    if (userRow?.role !== 'admin') {
+      return NextResponse.json({ error: 'Bu işlem yalnızca yöneticilere açıktır.' }, { status: 403 })
+    }
     const body = await req.json()
     const code = body.code?.trim()
 

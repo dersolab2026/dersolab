@@ -735,7 +735,7 @@ Yanıtını kesinlikle şu JSON formatında döndür:
     }))
 
     // Story kitap önerisi ise dualBookData kapak görsellerini hazırla ve sahte kitapları %100 engelle
-    let normalizedStoryData = parsed.storyData
+    const normalizedStoryData = parsed.storyData
       ? {
           ...parsed.storyData,
           headline: toTurkishTitleCase(parsed.storyData.headline || ''),
