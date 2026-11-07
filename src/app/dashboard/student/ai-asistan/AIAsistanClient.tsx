@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { DashboardPageShell } from '@/components/layout/DashboardPageShell'
 import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY, PIXEL_BUTTON_SECONDARY, PIXEL_INPUT, PIXEL_BADGE } from '@/lib/theme'
 import Link from 'next/link'
@@ -17,6 +17,11 @@ import {
   Trash2,
   BookMarked,
   ArrowRight,
+  FlaskConical,
+  GraduationCap,
+  Brain,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -25,6 +30,8 @@ import {
   toggleAiQuestionFavorite,
   deleteAiQuestion,
 } from '@/actions/ai-questions'
+import { getRecommendedLabForSubjectOrText } from '@/lib/exams/curriculum'
+import type { SpacedQuizQuestion } from '@/app/api/ai/spaced-quiz/route'
 
 const SUBJECTS = [
   'TYT Matematik',
@@ -84,7 +91,7 @@ function parseMarkdown(text: string): string {
 }
 
 export function AIAsistanClient() {
-  const [activeTab, setActiveTab] = useState<'solver' | 'history'>('solver')
+  const [activeTab, setActiveTab] = useState<'solver' | 'history' | 'quiz'>('solver')
   const [subject, setSubject] = useState('TYT Matematik')
   const [question, setQuestion] = useState('')
   const [imageBase64, setImageBase64] = useState<string | null>(null)
@@ -98,9 +105,21 @@ export function AIAsistanClient() {
   // Çözüm Geçmişi (Soru Defterim)
   const [history, setHistory] = useState<SavedSolution[]>([])
 
+  // Aralıklı Tekrar Mini Sınavı (Spaced Repetition Quiz)
+  const [quizQuestions, setQuizQuestions] = useState<SpacedQuizQuestion[]>([])
+  const [quizLoading, setQuizLoading] = useState(false)
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({})
+  const [quizSubmitted, setQuizSubmitted] = useState(false)
+
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const solutionRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Çözülen soruya göre dinamik L.A.B. simülasyonu ve eğitmen önerisi
+  const recommendedLab = useMemo(
+    () => getRecommendedLabForSubjectOrText(subject, `${question} ${solution}`),
+    [subject, question, solution],
+  )
 
   // Yerel hafızadan ve buluttan (Supabase) geçmişi yükle
   useEffect(() => {
@@ -307,6 +326,32 @@ export function AIAsistanClient() {
     await handleSolve(prompt)
   }
 
+  // 🧠 Aralıklı Tekrar Mini Sınavı Üret
+  const handleGenerateSpacedQuiz = async () => {
+    setQuizLoading(true)
+    setQuizSubmitted(false)
+    setQuizAnswers({})
+    try {
+      const recentQuestions = history.slice(0, 6).map((h) => ({
+        subject: h.subject,
+        question: h.question,
+      }))
+      const res = await fetch('/api/ai/spaced-quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, recentQuestions }),
+      })
+      const data = await res.json()
+      if (Array.isArray(data?.questions)) {
+        setQuizQuestions(data.questions)
+      }
+    } catch {
+      toast.error('Mini sınav oluşturulurken bir hata oluştu.')
+    } finally {
+      setQuizLoading(false)
+    }
+  }
+
   // Çözümü panoya kopyala
   const handleCopySolution = () => {
     if (!solution) return
@@ -318,15 +363,19 @@ export function AIAsistanClient() {
 
   const charCount = question.length
 
+  const quizCorrectCount = quizQuestions.reduce((acc, q) => {
+    return acc + (quizAnswers[q.id] === q.correctIndex ? 1 : 0)
+  }, 0)
+
   return (
     <DashboardPageShell
       title="AI Soru Asistanı & Soru Defterim"
-      description="Google Gemini ile LGS ve YKS müfredatında adım adım çözüm asistanı ve kişisel soru havuzun"
+      description="Google Gemini ile LGS ve YKS müfredatında adım adım çözüm asistanı, L.A.B. simülasyon köprüsü ve aralıklı tekrar sınavı"
     >
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Üst Sekmeler */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setActiveTab('solver')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all ${
@@ -354,11 +403,27 @@ export function AIAsistanClient() {
                 </span>
               )}
             </button>
+            <button
+              onClick={() => {
+                setActiveTab('quiz')
+                if (quizQuestions.length === 0 && !quizLoading) {
+                  handleGenerateSpacedQuiz()
+                }
+              }}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all ${
+                activeTab === 'quiz'
+                  ? 'bg-violet-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.35)]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Brain className="w-4 h-4" />
+              Mini Tekrar Testi
+            </button>
           </div>
 
           <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-400">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Gemini Flash 3.6 Aktif
+            Gemini 3.8 Flash Aktif
           </div>
         </div>
 
@@ -493,8 +558,8 @@ export function AIAsistanClient() {
 
             {/* Çözüm Kartı */}
             {solution && (
-              <div ref={solutionRef} className={`${PIXEL_CARD} p-6 relative`}>
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+              <div ref={solutionRef} className={`${PIXEL_CARD} p-6 relative space-y-6`}>
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">✨</span>
                     <h2 className="font-black text-slate-200 text-base">Adım Adım Çözüm</h2>
@@ -518,8 +583,52 @@ export function AIAsistanClient() {
                   dangerouslySetInnerHTML={{ __html: parseMarkdown(solution) }}
                 />
 
+                {/* 🔬 L.A.B. Simülasyon & Birebir Eğitmen Köprüsü */}
+                <div className="rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 p-4 sm:p-5 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md bg-cyan-400 text-slate-950 font-black text-[10px] tracking-wider">
+                        L.A.B. KÖPRÜSÜ
+                      </span>
+                      <span className="text-xs font-bold text-cyan-300">
+                        {recommendedLab.badge}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-slate-400">
+                      Ezberleme, Simüle Ederek Öğren
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm sm:text-base font-black text-white">
+                      {recommendedLab.moduleTitle}
+                    </h3>
+                    <p className="text-xs text-slate-300 mt-1">
+                      {recommendedLab.description}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                    <Link
+                      href={recommendedLab.href}
+                      className="px-4 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black text-xs flex items-center gap-1.5 transition-all shadow-[0_0_15px_rgba(34,211,238,0.25)]"
+                    >
+                      <FlaskConical className="w-3.5 h-3.5" />
+                      <span>{recommendedLab.branchName} Simülasyonunda Dene →</span>
+                    </Link>
+
+                    <Link
+                      href="/demo-ders"
+                      className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-all"
+                    >
+                      <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
+                      <span>20 Dk Ücretsiz Tanışma Dersinde Hocaya Sor</span>
+                    </Link>
+                  </div>
+                </div>
+
                 {/* Gelişmiş Aksiyonlar */}
-                <div className="mt-8 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+                <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
@@ -548,14 +657,14 @@ export function AIAsistanClient() {
                     href="/instructors"
                     className="text-xs font-bold text-emerald-400 hover:underline flex items-center gap-1"
                   >
-                    <span>Anlamadığın bir nokta mı var? Eğitmene Danış</span>
+                    <span>Onaylı {recommendedLab.marketplaceSubject} Eğitmenlerini Gör</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
             )}
           </>
-        ) : (
+        ) : activeTab === 'history' ? (
           /* Soru Defterim (Çözüm Geçmişi) */
           <div className="space-y-4">
             {history.length === 0 ? (
@@ -574,9 +683,19 @@ export function AIAsistanClient() {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs text-slate-400 px-1 font-semibold">
-                  <span>Kaydedilen {history.length} soru</span>
-                  <span>(Son çözümlerin en üsttedir)</span>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 px-1 font-semibold">
+                  <span>Kaydedilen {history.length} soru (Son çözümlerin en üsttedir)</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab('quiz')
+                      handleGenerateSpacedQuiz()
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs flex items-center gap-1.5"
+                  >
+                    <Brain className="w-3.5 h-3.5" />
+                    <span>Defterimden Mini Test Oluştur</span>
+                  </button>
                 </div>
 
                 {history.map((item) => (
@@ -641,6 +760,160 @@ export function AIAsistanClient() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Aralıklı Tekrar (Spaced Repetition) Mini Test Modülü */
+          <div className="space-y-4">
+            <div className={`${PIXEL_CARD} p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
+              <div>
+                <div className="flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-violet-400" />
+                  <h2 className="font-black text-white text-base">
+                    Aralıklı Tekrar (Unutma Eğrisi) Mini Sınavı
+                  </h2>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  Soru defterinde biriken veya seçtiğin branştaki kazanımları kalıcı hafızaya aktarmak için 3 özgün soruyla kendini sına.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleGenerateSpacedQuiz}
+                disabled={quizLoading}
+                className="px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-black text-xs flex items-center gap-2 shrink-0 cursor-pointer"
+              >
+                <RotateCw className={`w-4 h-4 ${quizLoading ? 'animate-spin' : ''}`} />
+                <span>{quizLoading ? 'Sorular Hazırlanıyor...' : 'Yeni Mini Test Üret'}</span>
+              </button>
+            </div>
+
+            {quizLoading ? (
+              <div className="p-12 rounded-2xl border border-white/10 bg-[#0E131F] text-center space-y-3">
+                <RotateCw className="w-8 h-8 text-violet-400 animate-spin mx-auto" />
+                <p className="text-sm font-bold text-white">
+                  Gemini Soru Defterindeki Kazanımları Analiz Ediyor...
+                </p>
+                <p className="text-xs text-slate-400">
+                  Sana özel 3 soruluk pekiştirme testi hazırlanıyor.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {quizQuestions.map((q, qIdx) => {
+                  const selected = quizAnswers[q.id]
+                  return (
+                    <div
+                      key={q.id}
+                      className="p-5 rounded-2xl border border-white/10 bg-[#0E131F] space-y-4"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="px-2.5 py-1 rounded-lg bg-violet-500/15 border border-violet-500/30 text-violet-300 text-xs font-bold">
+                          Soru {qIdx + 1} · {q.subject} ({q.topic})
+                        </span>
+                        {quizSubmitted && (
+                          <span
+                            className={`inline-flex items-center gap-1 text-xs font-black ${
+                              selected === q.correctIndex ? 'text-emerald-400' : 'text-red-400'
+                            }`}
+                          >
+                            {selected === q.correctIndex ? (
+                              <>
+                                <CheckCircle2 className="w-4 h-4" /> Doğru
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="w-4 h-4" /> Yanlış / Boş
+                              </>
+                            )}
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-sm font-bold text-slate-100 leading-relaxed">
+                        {q.questionText}
+                      </p>
+
+                      <div className="grid gap-2">
+                        {q.options.map((opt, optIdx) => {
+                          const isSelected = selected === optIdx
+                          const isCorrect = q.correctIndex === optIdx
+                          let btnStyle =
+                            'border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/10'
+                          if (quizSubmitted) {
+                            if (isCorrect) {
+                              btnStyle =
+                                'border-emerald-500/60 bg-emerald-500/20 text-emerald-200 font-black'
+                            } else if (isSelected && !isCorrect) {
+                              btnStyle = 'border-red-500/60 bg-red-500/20 text-red-200'
+                            }
+                          } else if (isSelected) {
+                            btnStyle =
+                              'border-violet-500 bg-violet-600/25 text-white font-black'
+                          }
+
+                          return (
+                            <button
+                              key={optIdx}
+                              type="button"
+                              disabled={quizSubmitted}
+                              onClick={() =>
+                                setQuizAnswers((prev) => ({ ...prev, [q.id]: optIdx }))
+                              }
+                              className={`w-full text-left px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm transition-all ${btnStyle}`}
+                            >
+                              {opt}
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      {quizSubmitted && (
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-white/10 text-xs text-slate-300 leading-relaxed">
+                          <span className="font-black text-emerald-400 block mb-1">
+                            💡 Çözüm Açıklaması:
+                          </span>
+                          {q.explanation}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+
+                {quizQuestions.length > 0 && (
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                    {!quizSubmitted ? (
+                      <button
+                        type="button"
+                        onClick={() => setQuizSubmitted(true)}
+                        className={`${PIXEL_BUTTON_PRIMARY} px-6 py-3 text-sm cursor-pointer`}
+                      >
+                        Testi Bitir ve Sonuçları Kontrol Et
+                      </button>
+                    ) : (
+                      <div className="flex flex-wrap items-center justify-between w-full gap-3 p-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/20">
+                        <div>
+                          <p className="text-sm font-black text-white">
+                            Sonuç: {quizCorrectCount} / {quizQuestions.length} Doğru!
+                          </p>
+                          <p className="text-xs text-slate-300">
+                            {quizCorrectCount === quizQuestions.length
+                              ? 'Harika! Bu kazanımları tam olarak pekiştirmişsin.'
+                              : 'Kaçırdığın soruların açıklamalarını inceleyip L.A.B. simülasyonunda tekrar yapabilirsin.'}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleGenerateSpacedQuiz}
+                          className="px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs"
+                        >
+                          Yeni 3 Soru Getir →
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

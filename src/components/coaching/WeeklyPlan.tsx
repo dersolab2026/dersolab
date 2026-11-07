@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Trash2, CalendarDays, Copy, Check, SkipForward } from 'lucide-react'
+import { Loader2, Trash2, CalendarDays, Copy, Check, SkipForward, Sparkles } from 'lucide-react'
 import { addPlanItem, deletePlanItem, setPlanItemStatus, copyPreviousWeek } from '@/actions/coaching-plan'
 import { useToast } from '@/components/ui/Toast'
 import {
   GUN_ADLARI, haftaninGunleri, planTutturma, type PlanItemProgress,
 } from '@/lib/coaching/plan-progress'
+import { getTopicsForSubject } from '@/lib/exams/curriculum'
 import { PIXEL_CARD, PIXEL_BUTTON_PRIMARY, PIXEL_INPUT } from '@/lib/theme'
 
 /**
@@ -47,6 +48,7 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
   const [isPending, startTransition] = useTransition()
   const [acik, setAcik] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [aiGenerating, setAiGenerating] = useState(false)
 
   const [gun, setGun] = useState('')
   const [saat, setSaat] = useState('')
@@ -58,6 +60,49 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
 
   const gunler = haftaninGunleri(planWeek)
   const tutturma = planTutturma(items)
+  const onerilenKonular = useMemo(() => getTopicsForSubject(ders), [ders])
+
+  async function aiTaslakOlustur() {
+    if (aiGenerating) return
+    setAiGenerating(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/ai/coaching-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subjects }),
+      })
+      const data = await res.json()
+      const draftItems = Array.isArray(data?.items) ? data.items : []
+      if (draftItems.length === 0) {
+        showToast('AI plan taslağı üretilemedi.')
+        return
+      }
+      startTransition(async () => {
+        for (const row of draftItems) {
+          const dayIdx = Math.max(0, Math.min(6, Number(row.dayIndex) || 0))
+          const matchedSubject = subjects.includes(row.subject) ? row.subject : (subjects[0] ?? row.subject)
+          await addPlanItem({
+            studentId,
+            planWeek,
+            planDate: gunler[dayIdx],
+            planTime: row.planTime || '17:00',
+            subject: matchedSubject,
+            topic: row.topic || '',
+            source: row.source || 'L.A.B. & Soru Bankası',
+            targetQuestions: Number(row.targetQuestions) || 30,
+            targetMinutes: Number(row.targetMinutes) || 50,
+          })
+        }
+        showToast('AI destekli haftalık çalışma planı oluşturuldu!')
+        router.refresh()
+      })
+    } catch {
+      showToast('AI plan oluşturulurken bağlantı hatası oluştu.')
+    } finally {
+      setAiGenerating(false)
+    }
+  }
 
   function ekle() {
     setError(null)
@@ -223,6 +268,15 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
               Satır Ekle
             </button>
           )}
+          <button
+            type="button"
+            onClick={aiTaslakOlustur}
+            disabled={isPending || aiGenerating}
+            className="flex items-center gap-1.5 rounded-xl border border-violet-500/30 bg-violet-500/15 hover:bg-violet-500/25 px-4 py-2 text-sm font-bold text-violet-200 transition-all disabled:opacity-50"
+          >
+            {aiGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-violet-300" />}
+            <span>{aiGenerating ? 'AI Planlıyor...' : 'AI ile Akıllı Plan Taslağı'}</span>
+          </button>
           {items.length === 0 && (
             <button type="button" onClick={kopyala} disabled={isPending}
               className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold text-slate-200">
@@ -254,8 +308,19 @@ export function WeeklyPlan({ studentId, planWeek, items, subjects, canEdit, onWe
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-slate-200">Konu</label>
-              <input value={konu} onChange={(e) => setKonu(e.target.value)} placeholder="Örn. Türev" className={PIXEL_INPUT} />
+              <label className="mb-1 block text-sm font-bold text-slate-200">Konu (MEB/ÖSYM Müfredatı)</label>
+              <input
+                list="meb-curriculum-topics"
+                value={konu}
+                onChange={(e) => setKonu(e.target.value)}
+                placeholder="Örn. Türev, Optik, Paragraf..."
+                className={PIXEL_INPUT}
+              />
+              <datalist id="meb-curriculum-topics">
+                {onerilenKonular.map((t) => (
+                  <option key={t} value={t} />
+                ))}
+              </datalist>
             </div>
             <div>
               <label className="mb-1 block text-sm font-bold text-slate-200">Kaynak</label>

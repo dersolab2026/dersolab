@@ -48,6 +48,11 @@ export const BLACKLISTED_BOOKS: string[] = [
   'satranc',
   'gece yarısı kütüphanesi',
   'gece yarisi kutuphanesi',
+  'ölü ozanlar derneği',
+  'olu ozanlar dernegi',
+  'dead poets society',
+  'yukarı bak',
+  'yukari bak',
 ]
 
 /**

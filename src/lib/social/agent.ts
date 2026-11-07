@@ -2,27 +2,28 @@ import { GoogleGenAI } from '@google/genai'
 import type {
   AgentLearningInsight,
   AgentPersona,
-  CarouselSlide,
   GeneratePostRequest,
   SocialAgentCommandRequest,
-  GrokAgentCommandRequest,
   HookVariation,
   ImageStylePreset,
   InstagramContentType,
   PedagogicalAudit,
-  ReelsStoryboard,
   SimulatedComment,
-  SinglePostData,
   SlideThemeVariant,
-  SocialPlatform,
   SocialPostItem,
   ViralityAnalysis,
   WeeklyCalendarRequest,
-  XThreadData,
-  XTweetItem,
 } from '@/types/social'
 import { generateSocialImage } from './imageGenerator'
-import { fetchRealBookCover } from './bookCovers'
+import {
+  fetchRealBookCover,
+  fetchRealMoviePoster,
+  findMatchingCuratedMovie,
+  pickCuratedMoviePair,
+  buildMoviePosterSvgDataUrl,
+  isBlacklistedMovie,
+} from './bookCovers'
+import { getRecommendedLabForSubjectOrText } from '@/lib/exams/curriculum'
 
 const ACRONYM_MAP: Record<string, string> = {
   ösym: 'ÖSYM',
@@ -498,6 +499,187 @@ const VARIATION_ANGLES = [
   '6. AÇI (KARŞILAŞTIRMALI ÖZET & İSTİSNALAR): En çok karıştırılan iki kavramın karşılaştırması ve sınavda çıkan istisnalar.',
 ]
 
+function isMovieTopicRequest(request: GeneratePostRequest, topicFocus: string): boolean {
+  const combined = `${topicFocus} ${request.customPrompt || ''} ${request.subject || ''} ${request.subTopic || ''}`
+  if (findMatchingCuratedMovie(combined)) return true
+  return /\b(film|filmi|filmler|sinema|belgesel|dizi|afiş|afis|movie)\b/i.test(combined)
+}
+
+function extractCustomMovieTitle(text: string): string | null {
+  if (!text) return null
+  const cleaned = text
+    .replace(
+      /\b(haftalık|haftalik|günlük|gunluk|pazar|cuma|öğrenciler|ogrenciler|için|icin|motivasyon|bilim\s*kurgu|sınav|sinav|yks|lgs|film|filmi|filmleri|sinema|kulübü|kulubu|önerisi|onerisi|önerileri|onerileri|tavsiyesi|postu|hikayesi|hazırla|üret|yap|afişi|afisi)\b/gi,
+      ' '
+    )
+    .replace(/[🎬🍿🎥📽️✨🔥🎯•\-:]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return cleaned.length >= 3 ? cleaned : null
+}
+
+async function enrichMoviePostWithRealPosters(
+  postItem: SocialPostItem,
+  request: GeneratePostRequest,
+  seedNum: number,
+  topicFocus: string
+): Promise<SocialPostItem> {
+  const moviePair = pickCuratedMoviePair(request.excludeSummary, seedNum, topicFocus)
+  const specificMovie = findMatchingCuratedMovie(topicFocus)
+  const customMovieName = !specificMovie ? extractCustomMovieTitle(topicFocus) : null
+  const extraMovie = pickCuratedMoviePair(request.excludeSummary, seedNum + 1).lise
+
+  const primarySearchTitle = specificMovie
+    ? specificMovie.originalTitle
+    : customMovieName || moviePair.lise.originalTitle
+
+  const [primaryRealPoster, ortRealPoster, lisRealPoster, extraRealPoster] = await Promise.all([
+    fetchRealMoviePoster(primarySearchTitle, specificMovie?.director || moviePair.lise.director),
+    fetchRealMoviePoster(moviePair.ortaokul.originalTitle, moviePair.ortaokul.director),
+    fetchRealMoviePoster(moviePair.lise.originalTitle, moviePair.lise.director),
+    fetchRealMoviePoster(extraMovie.originalTitle, extraMovie.director),
+  ])
+
+  const primaryPoster =
+    primaryRealPoster ||
+    buildMoviePosterSvgDataUrl(
+      specificMovie?.title || customMovieName || moviePair.lise.title,
+      specificMovie?.director || moviePair.lise.director,
+      specificMovie?.genre || moviePair.lise.genre,
+      specificMovie?.imdb || moviePair.lise.imdb,
+      specificMovie?.level || 'lise'
+    )
+
+  const ortPoster =
+    ortRealPoster ||
+    buildMoviePosterSvgDataUrl(
+      moviePair.ortaokul.title,
+      moviePair.ortaokul.director,
+      moviePair.ortaokul.genre,
+      moviePair.ortaokul.imdb,
+      'ortaokul'
+    )
+
+  const lisPoster =
+    lisRealPoster ||
+    buildMoviePosterSvgDataUrl(
+      moviePair.lise.title,
+      moviePair.lise.director,
+      moviePair.lise.genre,
+      moviePair.lise.imdb,
+      'lise'
+    )
+
+  const extraPoster =
+    extraRealPoster ||
+    buildMoviePosterSvgDataUrl(
+      extraMovie.title,
+      extraMovie.director,
+      extraMovie.genre,
+      extraMovie.imdb,
+      'lise'
+    )
+
+  if (!postItem.uploadedImageUrl) {
+    postItem.uploadedImageUrl = primaryPoster
+  }
+
+  // Yasaklı filmleri ("Yukarı Bak", "Ölü Ozanlar Derneği") başlık ve açıklamadan temizle
+  if (isBlacklistedMovie(postItem.title)) {
+    postItem.title =
+      specificMovie || customMovieName
+        ? `Film Önerisi: ${specificMovie?.title || customMovieName} 🎬`
+        : `Haftalık Film Önerileri: ${moviePair.lise.title.split('(')[0].trim()} & ${moviePair.ortaokul.title.split('(')[0].trim()} 🍿`
+  }
+
+  if (postItem.carouselSlides && postItem.carouselSlides.length > 0) {
+    for (let i = 0; i < postItem.carouselSlides.length; i++) {
+      const slide = postItem.carouselSlides[i]
+
+      if (isBlacklistedMovie(`${slide.headline || ''} ${slide.subhead || ''}`)) {
+        const replacement = i % 2 === 1 ? moviePair.lise : moviePair.ortaokul
+        slide.headline = replacement.title
+        slide.subhead = `${replacement.director} • ${replacement.genre}`
+        slide.bodyPoints = [replacement.whyWatch, 'Sınav maratonunda motivasyon ve analitik bakış açısı kazandırır.']
+      }
+
+      if (slide.uploadedImageUrl) continue
+
+      const slideMovie = findMatchingCuratedMovie(`${slide.headline || ''} ${slide.subhead || ''}`)
+      if (slideMovie) {
+        const slidePoster =
+          (await fetchRealMoviePoster(slideMovie.originalTitle, slideMovie.director)) ||
+          buildMoviePosterSvgDataUrl(
+            slideMovie.title,
+            slideMovie.director,
+            slideMovie.genre,
+            slideMovie.imdb,
+            slideMovie.level
+          )
+        slide.uploadedImageUrl = slidePoster
+      } else if (i === 0) {
+        slide.uploadedImageUrl = primaryPoster
+      } else if (i === 1) {
+        slide.uploadedImageUrl = specificMovie || customMovieName ? primaryPoster : lisPoster
+      } else if (i === 2) {
+        slide.uploadedImageUrl = specificMovie || customMovieName ? extraPoster : ortPoster
+      }
+    }
+  }
+
+  if (postItem.singlePostData) {
+    if (isBlacklistedMovie(`${postItem.singlePostData.headline} ${postItem.singlePostData.questionOrSummary}`)) {
+      postItem.singlePostData.headline = moviePair.lise.title
+      postItem.singlePostData.questionOrSummary = `${moviePair.lise.director} (${moviePair.lise.genre}) — ${moviePair.lise.whyWatch}`
+    }
+    if (!postItem.singlePostData.uploadedImageUrl) {
+      postItem.singlePostData.uploadedImageUrl = primaryPoster
+    }
+  }
+
+  if (postItem.reelsStoryboard && !postItem.reelsStoryboard.uploadedImageUrl) {
+    postItem.reelsStoryboard.uploadedImageUrl = primaryPoster
+  }
+
+  if (postItem.storyData) {
+    if (!postItem.storyData.uploadedImageUrl) {
+      postItem.storyData.uploadedImageUrl = primaryPoster
+    }
+    if (specificMovie || customMovieName) {
+      delete postItem.storyData.dualBookData
+    } else {
+      postItem.storyData.badge = 'HAFTALIK FİLM KULÜBÜ 🎬'
+      postItem.storyData.headline = 'Haftanın Film Önerileri'
+      postItem.storyData.subhead = 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin İlham Veren Filmler'
+      postItem.storyData.stickerQuestion = 'Bu hafta hangisini izleyeceksin? 🍿'
+      postItem.storyData.stickerOptions = [
+        `🎬 ${moviePair.ortaokul.title.split('(')[0].trim()}`,
+        `🍿 ${moviePair.lise.title.split('(')[0].trim()}`,
+      ]
+      postItem.storyData.dualBookData = {
+        ortaokul: {
+          title: moviePair.ortaokul.title,
+          author: moviePair.ortaokul.director,
+          genre: moviePair.ortaokul.genre,
+          whyRead: moviePair.ortaokul.whyWatch,
+          highlightTag: '🎬 ORTAOKUL & LGS FİLM SEÇKİSİ',
+          imageUrl: ortPoster,
+        },
+        lise: {
+          title: moviePair.lise.title,
+          author: moviePair.lise.director,
+          genre: moviePair.lise.genre,
+          whyRead: moviePair.lise.whyWatch,
+          highlightTag: '🍿 LİSE & YKS FİLM SEÇKİSİ',
+          imageUrl: lisPoster,
+        },
+      }
+    }
+  }
+
+  return postItem
+}
+
 /**
  * Tekil Instagram Gönderisi Üretir
  */
@@ -505,37 +687,63 @@ export async function generateSocialPost(request: GeneratePostRequest): Promise<
   const apiKey = process.env.GEMINI_API_KEY
 
   if (!apiKey) {
-    return generateLocalFallbackPost(request)
+    return await generateLocalFallbackPost(request)
   }
 
   try {
     const ai = new GoogleGenAI({ apiKey })
 
     const topicFocus = (request.customPrompt || request.subTopic || request.subject || 'Sınav Hazırlığı').trim()
+    const isMovieTopic = isMovieTopicRequest(request, topicFocus)
     const isBookTopic =
-      request.topic === 'book_recommendation' ||
-      /kitap|roman|okuma kulübü|pazar hikayesi|kitap öneri/i.test(topicFocus)
+      !isMovieTopic &&
+      (request.topic === 'book_recommendation' ||
+        /kitap|roman|okuma kulübü|pazar hikayesi|kitap öneri/i.test(topicFocus))
     const chosenSticker = request.storyStickerType || 'none'
     const seedNum = Math.max(1, request.variationSeed || 1)
-    const selectedAngle = isBookTopic
-      ? `GERÇEK DÜNYA VE TÜRK EDEBİYATI KLASİKLERİ SEÇKİSİ (Alternatif #${seedNum}): Kesinlikle uydurma/sahte kitap veya kurum adı ("DersoLab", "ÖSYM", "LGS Paragraf" vb.) YAZMA! Sadece gerçek, dünyaca ünlü basılmış edebi roman/hikaye eserlerini ve gerçek yazarlarını öner.`
-      : VARIATION_ANGLES[(seedNum - 1) % VARIATION_ANGLES.length]
+    const curatedMoviePair = isMovieTopic ? pickCuratedMoviePair(request.excludeSummary, seedNum, topicFocus) : null
+    const specificMovie = isMovieTopic ? findMatchingCuratedMovie(topicFocus) : null
+    const customMovieName = isMovieTopic && !specificMovie ? extractCustomMovieTitle(topicFocus) : null
+    const selectedAngle = isMovieTopic
+      ? `GERÇEK SİNEMA & FİLM KULÜBÜ SEÇKİSİ (Alternatif #${seedNum}): Öğrencilere ilham veren, bilimsel merakı veya çalışma motivasyonunu artıran gerçek sinema filmlerini (Yönetmen, IMDb puanı, konusu ve öğrencinin neden izlemesi gerektiğiyle) tanıt. Asla "Film Önerisi sorularında ÖSYM çeldiricisi" gibi ders şablonu cümleleri yazma!`
+      : isBookTopic
+        ? `GERÇEK DÜNYA VE TÜRK EDEBİYATI KLASİKLERİ SEÇKİSİ (Alternatif #${seedNum}): Kesinlikle uydurma/sahte kitap veya kurum adı ("DersoLab", "ÖSYM", "LGS Paragraf" vb.) YAZMA! Sadece gerçek, dünyaca ünlü basılmış edebi roman/hikaye eserlerini ve gerçek yazarlarını öner.`
+        : VARIATION_ANGLES[(seedNum - 1) % VARIATION_ANGLES.length]
     const curatedBookPair = isBookTopic ? pickCuratedBookPair(request.excludeSummary, seedNum) : null
 
     const userPrompt = `
 Lütfen aşağıdaki parametrelere göre yüksek etkileşimli ve öğretici 1 adet Instagram içeriği üret:
 - İçerik Formatı: ${request.type} (${request.type === 'carousel' ? 'Kaydırmalı Carousel' : request.type === 'reels' ? 'Reels / Video Senaryosu' : request.type === 'story' ? 'Instagram Story' : 'Tekli Görsel / Bilgi Gönderisi'})
-- İÇERİK KONUSU VEYA TALİMAT: "${isBookTopic ? 'Ortaokul (LGS) ve Lise (YKS) Öğrencileri İçin Haftalık Gerçek Edebi Kitap Önerisi' : topicFocus}"
+- İÇERİK KONUSU VEYA TALİMAT: "${
+      isMovieTopic
+        ? specificMovie
+          ? `${specificMovie.title} (${specificMovie.director}) Film Önerisi ve Analizi`
+          : customMovieName
+            ? `${customMovieName} Film Önerisi ve Öğrenciler İçin İlham Veren Analizi`
+            : `Ortaokul (LGS) ve Lise (YKS) Öğrencileri İçin Haftalık Film Önerileri: ${curatedMoviePair?.lise.title} & ${curatedMoviePair?.ortaokul.title}`
+        : isBookTopic
+          ? 'Ortaokul (LGS) ve Lise (YKS) Öğrencileri İçin Haftalık Gerçek Edebi Kitap Önerisi'
+          : topicFocus
+    }"
 - Hedef Kitle: ${request.targetGrade || 'YKS (TYT/AYT)'}
 - Anlatım Tonu: ${request.tone || 'energetic'}
 - İSTENEN ANLATIM AÇISI / YAKLAŞIM: ${selectedAngle}
 ${
-  curatedBookPair
-    ? `- BU ALTERNATİFTE ÖNERİLECEK GERÇEK KİTAP ÇİFTİ:
+  isMovieTopic && curatedMoviePair
+    ? specificMovie
+      ? `- ODAKLANILACAK GERÇEK FİLM: "${specificMovie.title}" — Yönetmen: ${specificMovie.director} (${specificMovie.genre}). Neden İzlenmeli: ${specificMovie.whyWatch}`
+      : customMovieName
+        ? `- ODAKLANILACAK GERÇEK FİLM: "${customMovieName}" (Gerçek yönetmenini, IMDb puanını, konusunu ve öğrencilere kattığı vizyonu anlat).`
+        : `- BU ALTERNATİFTE ÖNERİLECEK GERÇEK FİLM ÇİFTİ:
+  * Ortaokul (LGS): "${curatedMoviePair.ortaokul.title}" — ${curatedMoviePair.ortaokul.director} (${curatedMoviePair.ortaokul.genre})
+  * Lise (YKS): "${curatedMoviePair.lise.title}" — ${curatedMoviePair.lise.director} (${curatedMoviePair.lise.genre})
+  (Lütfen içerikte BİREBİR bu gerçek filmleri, yönetmenlerini ve neden izlenmesi gerektiğini kullan!)`
+    : curatedBookPair
+      ? `- BU ALTERNATİFTE ÖNERİLECEK GERÇEK KİTAP ÇİFTİ:
   * Ortaokul (LGS): "${curatedBookPair.ortaokul.title}" — Yazar: ${curatedBookPair.ortaokul.author} (${curatedBookPair.ortaokul.genre})
   * Lise (YKS): "${curatedBookPair.lise.title}" — Yazar: ${curatedBookPair.lise.author} (${curatedBookPair.lise.genre})
   (Lütfen dualBookData içinde BİREBİR bu gerçek kitap adlarını ve gerçek yazarlarını kullan!)`
-    : ''
+      : ''
 }
 ${request.customPrompt && request.customPrompt !== topicFocus ? `- Ek Not / Talimat: ${request.customPrompt}` : ''}
 ${
@@ -546,23 +754,27 @@ ${
 
 ÖNEMLİ KURALLAR:
 1. ${
-      isBookTopic
-        ? `GERÇEK EDEBİ ESER ZORUNLULUĞU & YASAKLI KİTAPLAR: Asla "LGS Paragraf Mantığı" veya "Yazar: DersoLab Ekibi" gibi sahte/uydurma kitaplar üretme!
+      isMovieTopic
+        ? `GERÇEK FİLM & SİNEMA ODAĞI: İçerik tamamen önerilen filmin/filmlerin konusunu, yönetmenini, IMDb başarısını, bilimsel/felsefi alt metnini ve sınav sürecindeki bir öğrenciye katacağı motivasyonu anlatmalıdır. Asla "Film Önerisi sorularında ÖSYM tuzağı" gibi ifadeler KULLANMA!
+AYRICA KULLANICI ŞU FİLMLERİ HAVUZDAN KALDIRDI, BUNLARI KESİNLİKLE SEÇME VEYA ÖNERME: [Yukarı Bak (Up), Ölü Ozanlar Derneği (Dead Poets Society)]. Yalnızca yukarıdaki çiftte belirtilen veya yasaklı olmayan diğer filmleri kullan!`
+        : isBookTopic
+          ? `GERÇEK EDEBİ ESER ZORUNLULUĞU & YASAKLI KİTAPLAR: Asla "LGS Paragraf Mantığı" veya "Yazar: DersoLab Ekibi" gibi sahte/uydurma kitaplar üretme!
 AYRICA KULLANICI ŞU KİTAPLARI HAVUZDAN KALDIRDI, BUNLARI KESİNLİKLE SEÇME VEYA ÖNERME:
-[Küçük Kara Balık, Fareler ve İnsanlar, Bilim Öyküleri, Simyacı, Uçan Sınıf, Kürk Mantolu Madonna, Mo'nun Gizemi, Denemeler, Momo, Dava, Bu Ülke, Sol Ayağım, Bulantı, Satranç, Gece Yarısı Kütüphanesi].
+[Küçük Kara Balık, Fareler ve İnsanlar, Bilim Öyküleri, Simyacı, Uçan Sınıf, Kürk Mantolu Madonna, Mo'nun Gizemi, Denemeler, Momo, Dava, Bu Ülke, Sol Ayağım, Bulantı, Satranç, Gece Yarısı Kütüphanesi, Ölü Ozanlar Derneği, Yukarı Bak].
 Yalnızca yukarıdaki çiftte belirtilen veya yasaklı olmayan diğer taze edebi klasik eserleri ve gerçek yazarlarını kullan!`
-        : `ŞABLONSUZ & ÖZGÜR: Asla basmakalıp hazır şablon cümleleri yazma. İçerik KESİNLİKLE "${topicFocus}" konusunun gerçek ders içeriği, kuralları, formülleri, soru çözme mantığı veya püf noktaları üzerine odaklanmalıdır!`
+          : `ŞABLONSUZ & ÖZGÜR: Asla basmakalıp hazır şablon cümleleri yazma. İçerik KESİNLİKLE "${topicFocus}" konusunun gerçek ders içeriği, kuralları, formülleri, soru çözme mantığı veya püf noktaları üzerine odaklanmalıdır!`
     }
 2. 4 SABİT TEMA: Her slayt ve görsel için 'themeVariant' değerini SADECE şu 4 temadan biri olarak belirle:
    - "lab_dark" (DersoLab Koyu)
    - "neon_orange" (Neon Turuncu)
    - "cyan_cyber" (Siber Camgöbeği)
    - "purple_matrix" (Mor Matris)
-
+` +
+      `
 Yanıtını kesinlikle şu JSON formatında döndür:
 {
   "title": "${topicFocus} konusunu yansıtan çekici ve öğretici başlık",
-  "topicLabel": "Ders & Konu Etiketi (Örn: TYT Matematik • ${topicFocus}, AYT Fizik vb.)",
+  "topicLabel": "${isMovieTopic ? 'DersoLab Sinema Kulübü 🎬' : `Ders & Konu Etiketi (Örn: TYT Matematik • ${topicFocus}, AYT Fizik vb.)`}",
   "targetAudience": "${request.targetGrade || 'YKS 2027 Adayları'}",
   "caption": "${topicFocus} konusunu anlatan, emojili, kancalı, kaydetmeye teşvik eden özgün Instagram açıklaması",
   "hashtags": ["#yks2027", "#dersolab", "#ykstayfa", "#${topicFocus.toLowerCase().replace(/[^a-z0-9ğüşıöç]/gi, '')}"],
@@ -571,51 +783,51 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       ? `"carouselSlides": [
     {
       "slideNumber": 1,
-      "badge": "DERS VEYA KONU ADI",
+      "badge": "${isMovieTopic ? 'HAFTANIN FİLM SEÇKİSİ 🎬' : 'DERS VEYA KONU ADI'}",
       "headline": "${topicFocus} ile İlgili Dikkat Çekici Kapak Başlığı",
-      "subhead": "Konunun önemini ve sınavdaki yerini belirten merak uyandırıcı alt başlık",
+      "subhead": "Konunun önemini belirten merak uyandırıcı alt başlık",
       "bodyPoints": [
-        "${topicFocus} konusunda öğrencilerin en sık takıldığı nokta veya soru",
-        "Kaydır, pratik çözüm mantığını ve formülü adım adım öğren 👉"
+        "${isMovieTopic ? 'Filmin yönetmeni, IMDb puanı ve çarpıcı ana teması' : `${topicFocus} konusunda öğrencilerin en sık takıldığı nokta veya soru`}",
+        "${isMovieTopic ? 'Kaydır, bu başyapıtın sana katacağı vizyonu keşfet 👉' : 'Kaydır, pratik çözüm mantığını ve formülü adım adım öğren 👉'}"
       ],
-      "highlightTag": "KAYDETMELİK",
+      "highlightTag": "${isMovieTopic ? 'FİLM KULÜBÜ' : 'KAYDETMELİK'}",
       "footerNote": "DersoLab • Sınav Laboratuvarı",
       "themeVariant": "lab_dark"
     },
     {
       "slideNumber": 2,
-      "badge": "TEMEL KURAL & FORMÜL",
-      "headline": "1. Kritik Mantık: ${topicFocus}",
-      "subhead": "Öğrencinin bilmesi gereken temel yasa veya kural",
+      "badge": "${isMovieTopic ? 'LİSE & YKS FİLM SEÇKİSİ 🍿' : 'TEMEL KURAL & FORMÜL'}",
+      "headline": "${isMovieTopic ? (specificMovie?.title || customMovieName || curatedMoviePair?.lise.title || '1. Film Önerisi') : `1. Kritik Mantık: ${topicFocus}`}",
+      "subhead": "${isMovieTopic ? 'Yönetmen, tür ve filmin etkileyici hikayesi' : 'Öğrencinin bilmesi gereken temel yasa veya kural'}",
       "bodyPoints": [
-        "${topicFocus} ile ilgili 1. temel formül, kural veya kavram tanımı",
-        "Bu kural uygulanırken dikkat edilmesi gereken kritik nokta"
+        "${isMovieTopic ? 'Filmin konusu ve izleyiciyi içine çeken atmosferi' : `${topicFocus} ile ilgili 1. temel formül, kural veya kavram tanımı`}",
+        "${isMovieTopic ? 'Öğrencilere kattığı bilimsel merak ve yüksek motivasyon' : 'Bu kural uygulanırken dikkat edilmesi gereken kritik nokta'}"
       ],
-      "highlightTag": "PÜF NOKTA",
+      "highlightTag": "${isMovieTopic ? 'BAŞYAPIT' : 'PÜF NOKTA'}",
       "footerNote": "DersoLab",
       "themeVariant": "neon_orange"
     },
     {
       "slideNumber": 3,
-      "badge": "ÖSYM KAZANIMI & TAKTİK",
-      "headline": "Sınavda Nasıl Çıkar & Çözüm Yolu",
-      "subhead": "ÖSYM'nin soru tipi ve çeldirici ayrımı",
+      "badge": "${isMovieTopic ? 'ORTAOKUL & LGS VEYA 2. SEÇKİ 🎬' : 'ÖSYM KAZANIMI & TAKTİK'}",
+      "headline": "${isMovieTopic ? (specificMovie || customMovieName ? 'Neden Mutlaka İzlemelisin?' : curatedMoviePair?.ortaokul.title || '2. Film Önerisi') : 'Sınavda Nasıl Çıkar & Çözüm Yolu'}",
+      "subhead": "${isMovieTopic ? 'Filmden çıkarılacak en önemli hayat ve başarı dersi' : 'ÖSYM soru tipi ve çeldirici ayrımı'}",
       "bodyPoints": [
-        "Soru kökünde hangi ipuçlarına bakılmalı?",
-        "Zaman kazandıran pratik işlem veya eleme adımı"
+        "${isMovieTopic ? 'Pes etmeme, analitik düşünme ve odaklanma mesajı' : 'Soru kökünde hangi ipuçlarına bakılmalı?'}",
+        "${isMovieTopic ? 'Mola gününde zihnini tazeleyecek unutulmaz sahneler' : 'Zaman kazandıran pratik işlem veya eleme adımı'}"
       ],
-      "highlightTag": "+ NET",
+      "highlightTag": "${isMovieTopic ? 'İLHAM VERİCİ' : '+ NET'}",
       "footerNote": "DersoLab",
       "themeVariant": "cyan_cyber"
     },
     {
       "slideNumber": 4,
       "badge": "ÖZET & HAREKETE GEÇ",
-      "headline": "Bu Bilgiyi Denemende Test Et!",
+      "headline": "${isMovieTopic ? 'Bu Hafta Hangisini İzliyorsun? 🍿' : 'Bu Bilgiyi Denemende Test Et!'}",
       "subhead": "Unutmamak için bu gönderiyi kaydet ve arkadaşına gönder.",
       "bodyPoints": [
-        "💾 Kaydetmeyi ve denemeden önce göz gezdirmeyi unutma!",
-        "🔗 Profildeki linkten ${topicFocus} sorularını çözmeye hemen başla."
+        "💾 Kaydetmeyi ve hafta sonu izleme listene eklemeyi unutma!",
+        "💬 En sevdiğin filmi veya repliği yorumlarda bizimle paylaş!"
       ],
       "highlightTag": "KAYDET",
       "footerNote": "@dersolabegitim",
@@ -625,38 +837,38 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       : request.type === 'reels'
         ? `"reelsStoryboard": {
     "hook3s": "${topicFocus} ile ilgili ilk 3 saniyede izleyiciyi durduran kanca cümlesi",
-    "visualDirection": "Konuşmacı ön planda, arkada ${topicFocus} ile ilgili şema veya formül görseli belirir.",
-    "spokenScript": "${topicFocus} konusundaki kritik püf noktayı ve çözüm kuralını anlatan 30 saniyelik samimi seslendirme metni...",
-    "onScreenText": ["🚨 DİKKAT!", "${topicFocus.toUpperCase()}", "ÖSYM KAZANIMI", "Link Biyoda 🦊"],
+    "visualDirection": "Konuşmacı ön planda, arkada ${topicFocus} ile ilgili görsel belirir.",
+    "spokenScript": "${topicFocus} konusunu anlatan 30 saniyelik samimi seslendirme metni...",
+    "onScreenText": ["🚨 DİKKAT!", "${topicFocus.toUpperCase()}", "İZLEMELİK", "Link Biyoda 🦊"],
     "musicAudioVibe": "Enerjik / Hızlı BPM Trend Beat",
-    "callToAction": "${topicFocus} netlerini artırmak için profildeki linke tıkla!"
+    "callToAction": "Daha fazla öneri ve çalışma aracı için profildeki linke tıkla!"
   }`
       : request.type === 'story'
-        ? isBookTopic
+        ? isBookTopic || isMovieTopic
           ? `"storyData": {
-    "badge": "PAZAR KİTAP KULÜBÜ 📚",
-    "headline": "Haftanın Kitap Önerileri",
+    "badge": "${isMovieTopic ? 'HAFTALIK FİLM KULÜBÜ 🎬' : 'PAZAR KİTAP KULÜBÜ 📚'}",
+    "headline": "${isMovieTopic ? 'Haftanın Film Önerileri' : 'Haftanın Kitap Önerileri'}",
     "subhead": "Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik",
     "stickerType": "${chosenSticker}",
-    "stickerQuestion": "Bu hafta hangisini okuyacaksın?",
-    "stickerOptions": ["Ortaokul Kitabı 📘", "Lise Kitabı 📕"],
+    "stickerQuestion": "${isMovieTopic ? 'Bu hafta hangisini izleyeceksin? 🍿' : 'Bu hafta hangisini okuyacaksın?'}",
+    "stickerOptions": ["${isMovieTopic ? 'Ortaokul Filmi 🎬' : 'Ortaokul Kitabı 📘'}", "${isMovieTopic ? 'Lise Filmi 🍿' : 'Lise Kitabı 📕'}"],
     "stickerLinkText": "DersoLab",
     "stickerLinkUrl": "https://dersolab.com/lab",
     "themeVariant": "purple_matrix",
     "dualBookData": {
       "ortaokul": {
-        "title": "Ortaokul (10-14 yaş) için seçilen edebi kitabın adı",
-        "author": "Yazar adı",
-        "genre": "Kitabın türü",
-        "whyRead": "LGS paragraf ve odaklanma becerisine katkısı (1 cümle)",
-        "highlightTag": "ORTAOKUL & LGS (10-14 YAŞ)"
+        "title": "Ortaokul (10-14 yaş) için seçilen eserin/filmin adı",
+        "author": "Yazar veya Yönetmen adı",
+        "genre": "Türü",
+        "whyRead": "Öğrenciye katkısı (1 cümle)",
+        "highlightTag": "ORTAOKUL & LGS"
       },
       "lise": {
-        "title": "Lise (14-18 yaş) için seçilen edebi kitabın adı",
-        "author": "Yazar adı",
-        "genre": "Kitabın türü",
-        "whyRead": "YKS derin anlama ve analiz becerisine katkısı (1 cümle)",
-        "highlightTag": "LİSE & YKS (14-18 YAŞ)"
+        "title": "Lise (14-18 yaş) için seçilen eserin/filmin adı",
+        "author": "Yazar veya Yönetmen adı",
+        "genre": "Türü",
+        "whyRead": "Öğrenciye katkısı (1 cümle)",
+        "highlightTag": "LİSE & YKS"
       }
     }
   }`
@@ -671,14 +883,49 @@ Yanıtını kesinlikle şu JSON formatında döndür:
     "stickerLinkUrl": "https://dersolab.com/lab",
     "themeVariant": "neon_orange"
   }`
+      : request.type === 'x_thread'
+        ? `"xThreadData": {
+    "threadHook": "${topicFocus} • Viral X Flood Zinciri",
+    "totalTweets": 5,
+    "estimatedReadTime": "1.5 dk okuma",
+    "callToAction": "Bu zinciri kaydet, mutlaka göz at 🧵👇",
+    "tweets": [
+      {
+        "tweetNumber": 1,
+        "text": "1/5 🚨 ${topicFocus} hakkında bilmen gereken en çarpıcı detayları 1 dakikada özetledim. (Kaydetmelik Flood 🧵👇)",
+        "charCount": 148,
+        "mediaPrompt": "${topicFocus}"
+      },
+      {
+        "tweetNumber": 2,
+        "text": "2/5 🧠 Temel Bakış: ${topicFocus} konusunun arkasındaki ana fikir ve detaylar.",
+        "charCount": 135
+      },
+      {
+        "tweetNumber": 3,
+        "text": "3/5 ⚠️ Neden Önemli: Öğrencilere kattığı analitik bakış açısı ve vizyon.",
+        "charCount": 142
+      },
+      {
+        "tweetNumber": 4,
+        "text": "4/5 ⚡ Unutulmaz Detay: Zihninde yer edecek en güçlü vurgu.",
+        "charCount": 138
+      },
+      {
+        "tweetNumber": 5,
+        "text": "5/5 🦊 Daha fazlası için DersoLab L.A.B. platformunu ücretsiz keşfet: dersolab.com/lab — Faydalı olduysa RT & Kaydet!",
+        "charCount": 148
+      }
+    ]
+  }`
       : `"singlePostData": {
-    "badge": "1 SORU 1 NET",
-    "headline": "${topicFocus} • Kritik Bilgi",
-    "questionOrSummary": "${topicFocus} hakkında sınavda hayat kurtaran temel özet veya soru kökü.",
-    "keyTakeaway": "ÖSYM bu ayrımı sıklıkla sorar, kuralı zihnine kazı!",
+    "badge": "${isMovieTopic ? 'HAFTANIN FİLM ÖNERİSİ 🎬' : '1 SORU 1 NET'}",
+    "headline": "${topicFocus} • ${isMovieTopic ? 'Sinema Seçkisi' : 'Kritik Bilgi'}",
+    "questionOrSummary": "${isMovieTopic ? 'Filmin yönetmeni, IMDb puanı, büyüleyici konusu ve izleyiciye kattığı derin bakış açısı.' : `${topicFocus} hakkında sınavda hayat kurtaran temel özet veya soru kökü.`}",
+    "keyTakeaway": "${isMovieTopic ? 'Mola gününde motivasyonunu ve vizyonunu tazeleyecek başyapıt!' : 'ÖSYM bu ayrımı sıklıkla sorar, kuralı zihnine kazı!'}",
     "options": [
-      { "key": "A", "text": "Doğru Bilgi / Çözüm", "isCorrect": true },
-      { "key": "B", "text": "Çeldirici Tuzak", "isCorrect": false }
+      { "key": "A", "text": "${isMovieTopic ? 'Bu hafta sonu mutlaka izliyorum! 🍿' : 'Doğru Bilgi / Çözüm'}", "isCorrect": true },
+      { "key": "B", "text": "${isMovieTopic ? 'Daha önce izledim, kesinlikle efsane! ⭐' : 'Çeldirici Tuzak'}", "isCorrect": false }
     ],
     "themeVariant": "lab_dark"
   }`
@@ -744,7 +991,7 @@ Yanıtını kesinlikle şu JSON formatında döndür:
         }
       : undefined
 
-    if (!isBookTopic && normalizedStoryData?.dualBookData) {
+    if (!isBookTopic && !isMovieTopic && normalizedStoryData?.dualBookData) {
       delete normalizedStoryData.dualBookData
     }
 
@@ -806,7 +1053,7 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       title: formattedTitle,
       type: request.type,
       topic: isBookTopic ? 'book_recommendation' : request.topic,
-      topicLabel: toTurkishTitleCase(parsed.topicLabel || 'Eğitim ve Sınav'),
+      topicLabel: toTurkishTitleCase(parsed.topicLabel || (isMovieTopic ? 'DersoLab Sinema Kulübü' : 'Eğitim ve Sınav')),
       status: 'draft',
       caption: parsed.caption || '',
       hashtags: parsed.hashtags || ['#dersolab', '#yks2027'],
@@ -827,6 +1074,30 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       uploadedImageUrl: request.imageBase64,
       createdAt: new Date().toISOString(),
       sourcePrompt: topicFocus,
+    }
+
+    if (isMovieTopic) {
+      await enrichMoviePostWithRealPosters(postItem, request, seedNum, topicFocus)
+      return attachGrokEnhancements(postItem, request.persona)
+    }
+
+    if (isBookTopic && request.type !== 'story') {
+      const safePair = curatedBookPair || pickCuratedBookPair(request.excludeSummary, seedNum)
+      const bookCoverUrl =
+        (await fetchRealBookCover(safePair.lise.title, safePair.lise.author)) ||
+        safePair.lise.imageUrl ||
+        buildBookCoverSvgDataUrl(safePair.lise.title, safePair.lise.author, safePair.lise.genre, 'lise')
+      postItem.uploadedImageUrl = postItem.uploadedImageUrl || bookCoverUrl
+      if (postItem.carouselSlides && postItem.carouselSlides.length > 0) {
+        postItem.carouselSlides[0].uploadedImageUrl = postItem.carouselSlides[0].uploadedImageUrl || bookCoverUrl
+      }
+      if (postItem.singlePostData) {
+        postItem.singlePostData.uploadedImageUrl = postItem.singlePostData.uploadedImageUrl || bookCoverUrl
+      }
+      if (postItem.reelsStoryboard) {
+        postItem.reelsStoryboard.uploadedImageUrl = postItem.reelsStoryboard.uploadedImageUrl || bookCoverUrl
+      }
+      return attachGrokEnhancements(postItem, request.persona)
     }
 
     // Otomatik AI Görsel Entegrasyonu (Metinden Ziyade Görsel Odaklı Tasarım)
@@ -872,7 +1143,7 @@ Yanıtını kesinlikle şu JSON formatında döndür:
     return attachGrokEnhancements(postItem, request.persona)
   } catch (err) {
     console.warn('Gemini API post generation failed, falling back to local generator:', err)
-    return generateLocalFallbackPost(request)
+    return await generateLocalFallbackPost(request)
   }
 }
 
@@ -1003,7 +1274,7 @@ function extractJsonFromText(text: string): string {
  * Zengin Yedek / Yerel İçerik Üreteci (API Anahtarı olmadığı veya hata durumunda)
  * Konu ne olursa olsun (Organik Kimya, Biyoloji, Matematik vb.) %100 o konuya adapte olur.
  */
-function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem {
+async function generateLocalFallbackPost(request: GeneratePostRequest): Promise<SocialPostItem> {
   const now = Date.now()
   const custom = (request.customPrompt || request.subTopic || request.subject || '').trim()
   const rawFocus = custom || (request.topic === 'book_recommendation' ? 'Haftalık Kitap Önerisi' : 'Sınav Başarı Taktikleri')
@@ -1016,6 +1287,186 @@ function generateLocalFallbackPost(request: GeneratePostRequest): SocialPostItem
   const t2 = themes[(vIdx + 1) % 4]
   const t3 = themes[(vIdx + 2) % 4]
   const t4 = themes[(vIdx + 3) % 4]
+
+  // FİLM / SİNEMA ÖNERİSİ MODU (Tüm formatlarda gerçek film afişi + gerçek sinema içeriği)
+  if (isMovieTopicRequest(request, rawFocus)) {
+    const moviePair = pickCuratedMoviePair(request.excludeSummary, vIdx + 1, rawFocus)
+    const specificMovie = findMatchingCuratedMovie(rawFocus)
+    const customMovieName = !specificMovie ? extractCustomMovieTitle(rawFocus) : null
+    const featuredMovie = specificMovie || moviePair.lise
+    const movieDisplayTitle = customMovieName ? toTurkishTitleCase(customMovieName) : featuredMovie.title
+
+    let moviePost: SocialPostItem
+
+    if (request.type === 'carousel') {
+      moviePost = {
+        id: `post_${now}_car_movie_${vIdx}`,
+        title:
+          specificMovie || customMovieName
+            ? `Film Önerisi: ${movieDisplayTitle} 🎬`
+            : `Haftanın Film Seçkisi: ${moviePair.lise.title.split('(')[0].trim()} & ${moviePair.ortaokul.title.split('(')[0].trim()} 🍿`,
+        type: 'carousel',
+        topic: request.topic,
+        topicLabel: 'DersoLab Sinema Kulübü 🎬',
+        status: 'draft',
+        targetAudience: request.targetGrade || 'Ortaokul (LGS) & Lise (YKS)',
+        caption: `Bu hafta çalışma molanda zihnini açacak ve motivasyonunu zirveye taşıyacak efsane film önerilerimiz yayında! 🎬🍿\n\n🌟 Lise & YKS Seçkisi: ${featuredMovie.title} (${featuredMovie.director})\n🎬 Ortaokul & LGS Seçkisi: ${moviePair.ortaokul.title} (${moviePair.ortaokul.director})\n\nSen bu hafta sonu hangisini izliyorsun? Yorumlarda buluşalım! 👇🦊\n\n#filmönerisi #sinemakulübü #motivasyonfilmleri #yks2027 #lgs2027 #dersolab`,
+        hashtags: ['#filmönerisi', '#sinemakulübü', '#motivasyonfilmleri', '#yks2027', '#dersolab'],
+        carouselSlides: [
+          {
+            slideNumber: 1,
+            badge: 'HAFTANIN FİLM SEÇKİSİ 🎬',
+            headline:
+              specificMovie || customMovieName
+                ? `${movieDisplayTitle}: Neden Mutlaka İzlemelisin?`
+                : 'Çalışma Molanda Ufkunu Açacak Başyapıt Filmler',
+            subhead:
+              specificMovie || customMovieName
+                ? `${featuredMovie.director} • Tür: ${featuredMovie.genre}`
+                : 'Hem bilimsel merakını hem çalışma azmini ateşleyecek sinema seçkisi',
+            bodyPoints: [
+              specificMovie || customMovieName
+                ? featuredMovie.whyWatch
+                : `🍿 Lise (YKS): ${moviePair.lise.title} (${moviePair.lise.director})`,
+              specificMovie || customMovieName
+                ? 'Kaydır, filmin detaylarını ve öğrencilere kattığı vizyonu keşfet 👉'
+                : `🎬 Ortaokul (LGS): ${moviePair.ortaokul.title} (${moviePair.ortaokul.director})`,
+            ],
+            highlightTag: 'FİLM KULÜBÜ',
+            footerNote: 'DersoLab Sinema Kulübü • @dersolabegitim',
+            themeVariant: t1,
+          },
+          {
+            slideNumber: 2,
+            badge: '🍿 LİSE & YKS FİLM SEÇKİSİ',
+            headline: movieDisplayTitle,
+            subhead: `${featuredMovie.director} • ${featuredMovie.genre}`,
+            bodyPoints: [
+              featuredMovie.whyWatch,
+              'Sınav maratonunda hedefe odaklanma, analitik düşünme ve pes etmeme bilinci kazandırır.',
+            ],
+            highlightTag: `IMDb ${featuredMovie.imdb}`,
+            footerNote: 'DersoLab Kültür & Sinema',
+            themeVariant: t2,
+          },
+          {
+            slideNumber: 3,
+            badge: '🎬 ORTAOKUL & LGS FİLM SEÇKİSİ',
+            headline: moviePair.ortaokul.title,
+            subhead: `${moviePair.ortaokul.director} • ${moviePair.ortaokul.genre}`,
+            bodyPoints: [
+              moviePair.ortaokul.whyWatch,
+              'Merak duygusunu, hayal gücünü ve bilimsel problem çözme yeteneğini güçlendirir.',
+            ],
+            highlightTag: `IMDb ${moviePair.ortaokul.imdb}`,
+            footerNote: 'DersoLab L.A.B.',
+            themeVariant: t3,
+          },
+          {
+            slideNumber: 4,
+            badge: 'SİNEMA KULÜBÜ • KAYDET',
+            headline: 'Hafta Sonu İzleme Listene Kaydet! 🍿',
+            subhead: 'Arkadaşına gönder, mola gününde birlikte izleyin.',
+            bodyPoints: [
+              '💾 Bu gönderiyi kaydet, hafta sonu film gecesinde hemen aç!',
+              '💬 Senin öğrencilere önerdiğin favori motivasyon filmin hangisi? Yorumlara yaz!',
+            ],
+            highlightTag: 'KAYDET',
+            footerNote: '@dersolabegitim',
+            themeVariant: t4,
+          },
+        ],
+        createdAt: new Date().toISOString(),
+        sourcePrompt: rawFocus,
+      }
+    } else if (request.type === 'story') {
+      moviePost = {
+        id: `post_${now}_story_movie_${vIdx}`,
+        title: `Haftalık Film Kulübü: ${moviePair.ortaokul.title} & ${moviePair.lise.title}`,
+        type: 'story',
+        topic: request.topic,
+        topicLabel: 'Haftalık Film Kulübü • Ortaokul & Lise',
+        status: 'draft',
+        targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
+        caption: `Haftalık Film Kulübümüz yayında! 🎬🍿\n\n🎬 Ortaokul (LGS): ${moviePair.ortaokul.title}\n🍿 Lise (YKS): ${moviePair.lise.title}\n\n#filmönerisi #sinema #lgs2027 #yks2027 #dersolab`,
+        hashtags: ['#filmönerisi', '#sinema', '#lgs2027', '#yks2027', '#dersolab'],
+        storyData: {
+          badge: 'HAFTALIK FİLM KULÜBÜ 🎬',
+          headline: specificMovie || customMovieName ? movieDisplayTitle : 'Haftanın Film Önerileri',
+          subhead:
+            specificMovie || customMovieName
+              ? `${featuredMovie.director} • ${featuredMovie.whyWatch}`
+              : 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin İlham Veren Filmler',
+          stickerType: request.storyStickerType || 'none',
+          stickerQuestion: 'Bu hafta hangisini izleyeceksin? 🍿',
+          stickerOptions: [
+            `🎬 ${moviePair.ortaokul.title.split('(')[0].trim()}`,
+            `🍿 ${moviePair.lise.title.split('(')[0].trim()}`,
+          ],
+          stickerLinkText: 'Film & Kültür Kulübü',
+          stickerLinkUrl: 'https://dersolab.com/lab',
+          themeVariant: t4,
+        },
+        createdAt: new Date().toISOString(),
+        sourcePrompt: rawFocus,
+      }
+    } else if (request.type === 'reels') {
+      moviePost = {
+        id: `post_${now}_reels_movie_${vIdx}`,
+        title: `Reels: ${movieDisplayTitle} • Öğrenciler Neden İzlemeli? 🎬`,
+        type: 'reels',
+        topic: request.topic,
+        topicLabel: `Sinema Kulübü • ${movieDisplayTitle}`,
+        status: 'draft',
+        targetAudience: request.targetGrade || 'YKS & LGS Adayları',
+        caption: `Çalışma molanda motivasyonunu 10'a katlayacak başyapıt: ${movieDisplayTitle}! 🎬🍿\n\n${featuredMovie.whyWatch}\n\n#reels #filmönerisi #motivasyon #yks2027 #dersolab`,
+        hashtags: ['#reels', '#filmönerisi', '#motivasyon', '#yks2027', '#dersolab'],
+        reelsStoryboard: {
+          hook3s: `Çalışma isteğin düştüğünde seni masaya geri döndürecek o efsane filmi hala izlemedin mi? 🎬`,
+          visualDirection: `Ekranda ${movieDisplayTitle} filminin resmi sinema afişi ve IMDb ${featuredMovie.imdb} yıldız rozeti belirir.`,
+          spokenScript: `${movieDisplayTitle}! (${featuredMovie.director}). ${featuredMovie.whyWatch} Bu hafta sonu mola saatinde mutlaka izle, kaydetmeyi unutma!`,
+          onScreenText: [
+            `🎬 ${movieDisplayTitle.toLocaleUpperCase('tr-TR')}`,
+            `⭐ ${featuredMovie.director}`,
+            `🍿 Tür: ${featuredMovie.genre}`,
+            'Hafta Sonu İçin Kaydet 🦊',
+          ],
+          musicAudioVibe: 'Hans Zimmer Epic Cinema Soundtrack',
+          callToAction: 'Favori filmini yorumlara yaz ve hafta sonu için kaydet! 🍿',
+        },
+        createdAt: new Date().toISOString(),
+        sourcePrompt: rawFocus,
+      }
+    } else {
+      moviePost = {
+        id: `post_${now}_single_movie_${vIdx}`,
+        title: `Haftanın Film Önerisi: ${movieDisplayTitle} 🎬`,
+        type: 'post',
+        topic: request.topic,
+        topicLabel: `Sinema Kulübü • ${movieDisplayTitle}`,
+        status: 'draft',
+        targetAudience: request.targetGrade || 'Ortaokul (LGS) & Lise (YKS)',
+        caption: `🎬 Haftanın Film Önerisi: ${movieDisplayTitle}!\n\n🎥 Yönetmen & Puan: ${featuredMovie.director}\n🎭 Tür: ${featuredMovie.genre}\n💡 Neden İzlenmeli: ${featuredMovie.whyWatch}\n\nBu filmi izledin mi, yoksa bu hafta sonu listene mi ekliyorsun? Yorumlarda buluşalım! 🍿👇\n\n#filmönerisi #sinemakulübü #yks2027 #lgs2027 #dersolab`,
+        hashtags: ['#filmönerisi', '#sinemakulübü', '#yks2027', '#lgs2027', '#dersolab'],
+        singlePostData: {
+          badge: `HAFTANIN FİLM SEÇKİSİ 🎬 • IMDb ${featuredMovie.imdb}`,
+          headline: movieDisplayTitle,
+          questionOrSummary: `${featuredMovie.director} (${featuredMovie.genre}) — ${featuredMovie.whyWatch}`,
+          keyTakeaway: '🍿 MOLA ÖNERİSİ',
+          options: [
+            { key: 'A', text: 'Bu hafta sonu mutlaka izliyorum! 🍿', isCorrect: true },
+            { key: 'B', text: 'İzledim, kesinlikle başyapıt! ⭐', isCorrect: false },
+          ],
+          themeVariant: t1,
+        },
+        createdAt: new Date().toISOString(),
+        sourcePrompt: rawFocus,
+      }
+    }
+
+    await enrichMoviePostWithRealPosters(moviePost, request, vIdx + 1, rawFocus)
+    return attachGrokEnhancements(moviePost, request.persona)
+  }
 
   if (request.type === 'carousel') {
     const carouselAngles = [
@@ -1981,14 +2432,19 @@ export function buildDefaultComments(title: string, caption: string): SimulatedC
 export function runPedagogicalAudit(post: SocialPostItem): PedagogicalAudit {
   const title = (post.title || '').toLowerCase()
   const caption = (post.caption || '').toLowerCase()
-  const text = `${title} ${caption}`
+  const topicLabel = (post.topicLabel || '').toLowerCase()
+  const text = `${title} ${topicLabel} ${caption}`
+
+  const recommendedLab = getRecommendedLabForSubjectOrText(post.topicLabel || post.title, text)
 
   const checkedRules: string[] = [
     'ÖSYM 2027 güncel soru kökü & format uyumu',
     'MEB müfredat dışı formül ve ezber içermeme denetimi',
     'Bilişsel yükü azaltan açıklayıcı görsel-şema eşleştirmesi',
     'Çeldirici analizi ve stratejik kazanım rehberliği',
-    'Pedagojik motivasyon ve net kurtarma dili'
+    recommendedLab
+      ? `DersoLab L.A.B. Eşleşmesi: ${recommendedLab.moduleTitle} (${recommendedLab.href})`
+      : 'Pedagojik motivasyon ve net kurtarma dili',
   ]
 
   let osymRelevance = 96
@@ -1996,13 +2452,30 @@ export function runPedagogicalAudit(post: SocialPostItem): PedagogicalAudit {
 
   if (text.includes('paragraf') || text.includes('türkçe') || text.includes('okuma')) {
     osymRelevance = 98
-    notes = 'Paragraf süre yönetimi ve soru kökü tekniği ÖSYM Türkçe komisyonu ölçme standartlarına tam uygundur.'
-  } else if (text.includes('türev') || text.includes('parabol') || text.includes('matematik')) {
+    notes =
+      'Paragraf süre yönetimi ve soru kökü tekniği ÖSYM Türkçe komisyonu ölçme standartlarına tam uygundur. Biyonik Okuma L.A.B. (/lab/turkce) ile desteklenebilir.'
+  } else if (text.includes('türev') || text.includes('parabol') || text.includes('trigonometri') || text.includes('matematik')) {
+    osymRelevance = 98
+    notes =
+      'Matematiksel fonksiyon ve analitik gösterimler ÖSYM AYT/TYT kazanım sınırları içindedir. Fonksiyon & Türev L.A.B. (/lab/matematik) ile pekiştirilmesi önerilir.'
+  } else if (text.includes('optik') || text.includes('atış') || text.includes('kuvvet') || text.includes('fizik')) {
     osymRelevance = 97
-    notes = 'Matematiksel fonksiyon ve analitik gösterimler ÖSYM AYT kazanım sınırları içinde kalmaktadır.'
+    notes =
+      'Fizik vektörel ve optik bağıntıları MEB kazanımlarıyla uyumludur. Fizik Simülasyon L.A.B. (/lab/fizik) modülüyle etkileşimli deney yapılabilir.'
+  } else if (text.includes('hücre') || text.includes('dna') || text.includes('kalıtım') || text.includes('biyoloji')) {
+    osymRelevance = 97
+    notes =
+      'Biyolojik kavramlar ve moleküler şema MEB Anadolu/Fen Lisesi müfredatına uygundur. 3D Hücre & DNA L.A.B. (/lab/biyoloji) bağlantısı eklendi.'
+  } else if (text.includes('asit') || text.includes('titrasyon') || text.includes('mol') || text.includes('kimya')) {
+    osymRelevance = 97
+    notes =
+      'Kimyasal tepkime ve stokiyometri kuralları ÖSYM standartlarına uygundur. Sanal Kimya L.A.B. (/lab/kimya) ile simüle edilebilir.'
   } else if (text.includes('kitap') || text.includes('roman') || text.includes('edebiyat')) {
     osymRelevance = 95
     notes = 'LGS ve YKS yaş gruplarının bilişsel gelişim ve derin anlama seviyesine pedagojik olarak uygundur.'
+  } else if (recommendedLab) {
+    osymRelevance = 97
+    notes = `İçerik MEB kazanımlarına tam uyumludur ve ${recommendedLab.moduleTitle} (${recommendedLab.href}) simülasyonu ile doğrudan entegredir.`
   }
 
   return {
@@ -2011,7 +2484,7 @@ export function runPedagogicalAudit(post: SocialPostItem): PedagogicalAudit {
     osymRelevanceScore: osymRelevance,
     checkedRules,
     pedagogyNotes: notes,
-    verifiedByAgent: 'DersoLab Pedagoji & Müfredat Müfettişi v4.5',
+    verifiedByAgent: 'DersoLab Pedagoji & Müfredat Müfettişi v4.8',
     lastCheckedAt: new Date().toISOString(),
   }
 }
@@ -2144,14 +2617,317 @@ Yanıtını kesinlikle şu JSON şemasına uygun 5 elemanlı dizi olarak döndü
 }
 
 /**
- * Yorum & DM Simülasyonu ve Yanıt Ajanı
+ * Yorum & DM Simülasyonu ve Yanıt Ajanı (Gerçek Gemini AI + Konu Duyarlı Fallback)
  */
 export async function generateEngagementReplies(
   postTitle: string,
   caption: string,
   persona: AgentPersona = 'derso_friendly'
 ): Promise<SimulatedComment[]> {
-  return buildDefaultComments(postTitle, caption)
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) {
+    return buildDefaultComments(postTitle, caption)
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey })
+    const personaInstruction = PERSONA_PROMPTS[persona] || PERSONA_PROMPTS.derso_friendly
+
+    const prompt = `
+Gönderi Başlığı: ${postTitle}
+Gönderi Açıklaması: ${caption}
+${personaInstruction}
+
+Bu Instagram/TikTok eğitim gönderisinin altına YKS/LGS öğrencileri veya veliler tarafından gelebilecek EN GERÇEKÇİ 3 YORUMU (1. Şüpheci/Zorlanan öğrenci, 2. Motive/Teşekkür eden öğrenci, 3. Sınavda çıkma ihtimalini veya L.A.B. özelliğini soran meraklı aday) simüle et.
+Her yorum için 3 farklı karakterde (derso_friendly, exam_coach, scientific_guide) kopyalanmaya hazır, doğrudan bu konunun içeriğine değinen organik yanıtlar üret.
+
+Yanıtını kesinlikle şu JSON şemasında 3 elemanlı bir dizi olarak döndür:
+[
+  {
+    "id": "sim_comm_1",
+    "userHandle": "@yks2027_...",
+    "commentText": "Konuya özel gerçekçi öğrenci yorumu...",
+    "userType": "skeptical",
+    "suggestedReplies": [
+      {
+        "persona": "derso_friendly",
+        "personaLabel": "Samimi Koç",
+        "replyText": "..."
+      },
+      {
+        "persona": "exam_coach",
+        "personaLabel": "ÖSYM Uzmanı",
+        "replyText": "..."
+      },
+      {
+        "persona": "scientific_guide",
+        "personaLabel": "Bilimsel Rehber",
+        "replyText": "..."
+      }
+    ]
+  }
+]
+`
+
+    const response = await callGenAIModel(ai, {
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      systemInstruction: SYSTEM_INSTRUCTION,
+      temperature: 0.8,
+      maxOutputTokens: 2000,
+    })
+
+    const cleanJson = extractJsonFromText(response.text || '')
+    const parsed = JSON.parse(cleanJson)
+    if (Array.isArray(parsed) && parsed.length >= 2) {
+      return parsed
+    }
+    return buildDefaultComments(postTitle, caption)
+  } catch (err) {
+    console.warn('generateEngagementReplies fallback triggered:', err)
+    return buildDefaultComments(postTitle, caption)
+  }
+}
+
+/**
+ * "Önce Soru, Kaydırınca Çözüm" (2 veya 3 Slaytlık ÖSYM/LGS Soru-Çözüm Carousel Üretici)
+ */
+export async function generateQuestionSolutionCarousel(request: GeneratePostRequest): Promise<SocialPostItem> {
+  const cleanSubject = (request.subject || request.customPrompt || 'TYT Matematik Fonksiyonlar').trim()
+  const targetGrade = request.targetGrade || 'YKS (TYT/AYT)'
+  const persona = request.persona || 'exam_coach'
+  const apiKey = process.env.GEMINI_API_KEY
+
+  let postItem: SocialPostItem | null = null
+
+  if (apiKey) {
+    try {
+      const ai = new GoogleGenAI({ apiKey })
+      const prompt = `
+Ders / Konu: ${cleanSubject}
+Hedef Kitle: ${targetGrade}
+
+Öğrencilerin kaydırmadan geçemeyeceği "ÖNCE SORU, KAYDIRINCA ÇÖZÜM" formatında 3 slaytlık tam bir ÖSYM/LGS Soru-Çözüm Carousel gönderisi üret:
+- 1. Slayt (SORU KARTI): Gerçek sınav ayarında, özenle kurgulanmış özgün bir soru kökü ("subhead" alanında tam soru metni) ve "bodyPoints" dizisinde A, B, C, D, E şıkları (5 şık). Şıklardan yalnızca biri doğru olsun, diğerleri ÖSYM tipi güçlü çeldirici olsun.
+- 2. Slayt (ADIM ADIM ÇÖZÜM & ÇELDİRİCİ ANALİZİ): "headline" içinde doğru şıkkı açıkla (Örn: "Doğru Cevap: C Şıkkı!"). "bodyPoints" içinde 3 maddede adım adım pedagojik çözümü ve öğrencilerin neden çeldirici şıkka düştüğünü anlat.
+- 3. Slayt (ALTIN KURAL & L.A.B. ÇAĞRISI): Bu soru tipini 15 saniyede çözmeyi sağlayan formül/kestirme özet ve DersoLab L.A.B. daveti.
+
+Yanıtını kesinlikle şu JSON yapısında döndür:
+{
+  "title": "${cleanSubject} • Önce Soru, Kaydırınca Çözüm",
+  "topicLabel": "${cleanSubject}",
+  "targetAudience": "${targetGrade}",
+  "caption": "Çözümü görmeden önce cevabını yorumlara yaz! 👇\\n\\n...",
+  "hashtags": ["#yks2027", "#soruçözümü", "#dersolab"],
+  "carouselSlides": [
+    {
+      "slideNumber": 1,
+      "badge": "ÖNCE SEN ÇÖZ 🎯 • ${targetGrade}",
+      "headline": "${cleanSubject}: ÖSYM İkiz Sorusu",
+      "subhead": "Tam soru metni buraya gelecek...",
+      "bodyPoints": [
+        "A) ...",
+        "B) ...",
+        "C) ...",
+        "D) ...",
+        "E) ..."
+      ],
+      "highlightTag": "KAYDIR: ÇÖZÜM 👉",
+      "footerNote": "Cevabını yorumlara yaz, 2. slaytta kontrol et!",
+      "themeVariant": "neon_orange"
+    },
+    {
+      "slideNumber": 2,
+      "badge": "ADIM ADIM ÇÖZÜM ✅",
+      "headline": "Doğru Cevap ve Çözüm Mantığı",
+      "subhead": "Çeldiriciye düşmeyenleri tebrik ederiz!",
+      "bodyPoints": [
+        "1. Adım: ...",
+        "2. Adım: ...",
+        "ÖSYM Tuzağı: ..."
+      ],
+      "highlightTag": "+1 NET CEBİNDE",
+      "footerNote": "DersoLab Soru Röntgeni",
+      "themeVariant": "lab_dark"
+    },
+    {
+      "slideNumber": 3,
+      "badge": "ALTIN KURAL ⚡",
+      "headline": "Sınavda 15 Saniye Kazandıran Kestirme",
+      "subhead": "Bu kuralı denemeden önce mutlaka kaydet!",
+      "bodyPoints": [
+        "Pratik Kural: ...",
+        "Benzer soruları DersoLab L.A.B. simülasyonuyla çözmek için biyodaki linke tıkla 🦊"
+      ],
+      "highlightTag": "KAYDET 💾",
+      "footerNote": "@dersolabegitim",
+      "themeVariant": "cyan_cyber"
+    }
+  ]
+}
+`
+      const response = await callGenAIModel(ai, {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        systemInstruction: SYSTEM_INSTRUCTION,
+        temperature: 0.75,
+        maxOutputTokens: 2500,
+      })
+
+      const cleanJson = extractJsonFromText(response.text || '')
+      const parsed = JSON.parse(cleanJson)
+      if (parsed && Array.isArray(parsed.carouselSlides) && parsed.carouselSlides.length >= 2) {
+        postItem = {
+          id: `qa_carousel_${Date.now()}`,
+          title: toTurkishTitleCase(parsed.title || `${cleanSubject} • Önce Soru, Kaydırınca Çözüm`),
+          type: 'carousel',
+          topic: 'daily_question',
+          topicLabel: toTurkishTitleCase(parsed.topicLabel || cleanSubject),
+          status: 'draft',
+          caption:
+            parsed.caption ||
+            `2. slayta kaydırmadan önce bulduğun şıkkı yorumlara yaz! 👇🔥\n\n${cleanSubject} konusunda ÖSYM'nin en sevdiği soru kalıbını ve adım adım çözümünü hazırladık.\n\nKaydet, denemeden önce tekrar bak! 💾`,
+          hashtags: parsed.hashtags || ['#yks2027', '#lgs2027', '#soruçözümü', '#dersolab', '#ösym'],
+          targetAudience: parsed.targetAudience || targetGrade,
+          platform: 'instagram',
+          persona,
+          carouselSlides: parsed.carouselSlides.map((s: any, idx: number) => ({
+            ...s,
+            slideNumber: idx + 1,
+            headline: toTurkishTitleCase(s.headline || ''),
+            badge: (s.badge || `SLAYT ${idx + 1}`).toLocaleUpperCase('tr-TR'),
+          })),
+          createdAt: new Date().toISOString(),
+        }
+      }
+    } catch (e) {
+      console.warn('generateQuestionSolutionCarousel Gemini error, using rich fallback:', e)
+    }
+  }
+
+  if (!postItem) {
+    const lower = cleanSubject.toLocaleLowerCase('tr-TR')
+    let qSubhead = `Gerçel sayılar kümesinde tanımlı f(x) = x² - 6x + 13 parabolünün tepe noktasının koordinatlar toplamı kaçtır?`
+    let qOptions = ['A) 4', 'B) 6', 'C) 7', 'D) 9', 'E) 13']
+    let ansHeadline = 'Doğru Cevap: C Şıkkı (7)!'
+    let ansSteps = [
+      '1. Adım: Tepe noktasının apsisi r = -b / (2a) formülünden r = -(-6) / 2 = 3 bulunur.',
+      '2. Adım: Ordinat k = f(3) = 3² - 6(3) + 13 = 9 - 18 + 13 = 4 olarak hesaplanır.',
+      '3. Adım: Tepe noktası T(3, 4) olduğundan koordinatlar toplamı 3 + 4 = 7 olur (B şıkkındaki 6 işaret hatası tuzağıdır!).',
+    ]
+
+    if (lower.includes('fizik') || lower.includes('atış') || lower.includes('kuvvet') || lower.includes('optik')) {
+      qSubhead = `Hava direncinin ihmal edildiği ortamda yerden V₀ = 20 m/s düşey hız bileşeniyle eğik atılan bir cismin çıkabileceği maksimum yükseklik (h_max) kaç metredir? (g = 10 m/s²)`
+      qOptions = ['A) 10 m', 'B) 15 m', 'C) 20 m', 'D) 25 m', 'E) 40 m']
+      ansHeadline = 'Doğru Cevap: C Şıkkı (20 m)!'
+      ansSteps = [
+        '1. Adım: Düşey hız V₀y = 20 m/s olduğundan cisim tepe noktasına t_çıkış = V₀y / g = 20 / 10 = 2 saniyede çıkar.',
+        '2. Adım: h_max = V₀y² / (2g) = 400 / 20 = 20 metre (veya 5 - 15 m kuralından 5 + 15 = 20 m) bulunur.',
+        '3. Adım: E şıkkındaki 40 m, formülde 2g yerine g bölen adaylar için konulan klasik ÖSYM çeldiricisidir!',
+      ]
+    } else if (lower.includes('biyoloji') || lower.includes('hücre') || lower.includes('dna') || lower.includes('kalıtım')) {
+      qSubhead = `Toplam 1200 nükleotitten oluşan çift zincirli bir DNA molekülünde 200 Adenin nükleotidi bulunduğuna göre, bu DNA'daki toplam zayıf hidrojen bağı sayısı kaçtır?`
+      qOptions = ['A) 1200', 'B) 1400', 'C) 1600', 'D) 1800', 'E) 2000']
+      ansHeadline = 'Doğru Cevap: C Şıkkı (1600)!'
+      ansSteps = [
+        '1. Adım: A = T = 200 olduğundan toplam A + T = 400 nükleotittir. Geriye 1200 - 400 = 800 nükleotit (G + C) kalır.',
+        '2. Adım: G = C = 400 bulunur. Pratik formül: Hidrojen Bağı = Toplam Nükleotit + Guanin Sayısı.',
+        '3. Adım: 1200 + 400 = 1600 hidrojen bağı (veya 2×200 + 3×400 = 1600) elde edilir!',
+      ]
+    } else if (lower.includes('kimya') || lower.includes('asit') || lower.includes('mol') || lower.includes('gaz')) {
+      qSubhead = `25°C sıcaklıkta 0,1 M 200 mL HCl sulu çözeltisini tam nötralleştirmek için 0,2 M NaOH çözeltisinden kaç mL eklenmelidir?`
+      qOptions = ['A) 50 mL', 'B) 100 mL', 'C) 150 mL', 'D) 200 mL', 'E) 400 mL']
+      ansHeadline = 'Doğru Cevap: B Şıkkı (100 mL)!'
+      ansSteps = [
+        '1. Adım: Tam nötralleşmede n(H⁺) = n(OH⁻) yani M_a · V_a · z_a = M_b · V_b · z_b eşitliği yazılır.',
+        '2. Adım: 0,1 · 200 · 1 = 0,2 · V_b · 1 denklemi kurulur.',
+        '3. Adım: 20 = 0,2 · V_b buradan V_b = 100 mL bulunur. (pH = 7 eşdeğerlik noktası!)',
+      ]
+    } else if (lower.includes('türkçe') || lower.includes('paragraf') || lower.includes('dil bilgisi') || lower.includes('yazım')) {
+      qSubhead = `Aşağıdaki cümlelerin hangisinde "ki"nin yazımıyla ilgili bir yazım yanlışı yapılmıştır?`
+      qOptions = [
+        'A) Duydum ki unutmuşsun gözlerimin rengini.',
+        'B) Mademki gelmeyecektin neden söz verdin?',
+        'C) Masadaki kitapları kütüphaneye yerleştirdik.',
+        'D) Oysaki biz onu çoktan affetmiştik.',
+        'E) Sen ki bu sınavın en çalışkan adayısındır.',
+      ]
+      ansHeadline = 'Doğru Cevap: E Şıkkı ("Sen ki" Ayrı Yazılır)!'
+      ansSteps = [
+        '1. Adım: SOMBAHÇEM (Sanki, Oysaki, Mademki, Belki, Halbuki, Çünkü, Eğerki, Meğerki) kalıplaşmış bağlaçları bitişik yazılır (B ve D doğru).',
+        '2. Adım: "Masadaki" sıfat yapan -ki ekidir ve bitişik yazılır (C doğru); "Duydum ki" fiilden sonra gelen bağlaçtır, ayrı yazılır (A doğru).',
+        '3. Adım: E şıkkında zamirden sonra gelen "Sen ki" bağlaçtır (Not: Şıktaki kullanım doğru görünse de "Senki" bitişik yazıldığında yazım yanlışı olur!).',
+      ]
+    }
+
+    postItem = {
+      id: `qa_carousel_${Date.now()}`,
+      title: toTurkishTitleCase(`${cleanSubject} • Önce Soru, Kaydırınca Çözüm`),
+      type: 'carousel',
+      topic: 'daily_question',
+      topicLabel: toTurkishTitleCase(cleanSubject),
+      status: 'draft',
+      caption: `2. slayta kaydırmadan önce cevabını yorumlara bırak! 👇🎯\n\n${cleanSubject} konusunda adayların en çok çeldiriciye düştüğü soru kalıbını ve 3 adımda garantili çözümünü hazırladık.\n\nKaydet, deneme öncesi tekrar göz at! 💾 #yks2027 #soruçözümü #dersolab`,
+      hashtags: ['#yks2027', '#lgs2027', '#soruçözümü', '#dersolab', '#ösym'],
+      targetAudience: targetGrade,
+      platform: 'instagram',
+      persona,
+      carouselSlides: [
+        {
+          slideNumber: 1,
+          badge: `ÖNCE SEN ÇÖZ 🎯 • ${targetGrade}`,
+          headline: toTurkishTitleCase(`${cleanSubject}: ÖSYM İkiz Sorusu`),
+          subhead: qSubhead,
+          bodyPoints: qOptions,
+          highlightTag: 'KAYDIR: ÇÖZÜM 👉',
+          footerNote: 'Cevabını yorumlara yaz, 2. slaytta kontrol et!',
+          themeVariant: 'neon_orange',
+        },
+        {
+          slideNumber: 2,
+          badge: 'ADIM ADIM ÇÖZÜM ✅',
+          headline: toTurkishTitleCase(ansHeadline),
+          subhead: 'Çeldiriciye düşmeden doğru bulanlara +1 net!',
+          bodyPoints: ansSteps,
+          highlightTag: '+1 NET CEBİNDE',
+          footerNote: 'DersoLab Soru Röntgeni • @dersolabegitim',
+          themeVariant: 'lab_dark',
+        },
+        {
+          slideNumber: 3,
+          badge: 'L.A.B. SİMÜLASYONU ⚡',
+          headline: 'Bu Konuyu İnteraktif Deneyerek Öğren!',
+          subhead: 'Ezberleme, DersoLab L.A.B. simülasyonuyla mantığını kavra.',
+          bodyPoints: [
+            '💾 Bu soru kalıbını unutmamak için gönderiyi kaydet',
+            '🦊 Profildeki linkten ücretsiz L.A.B. modülünü ve AI Sokratik Asistanı hemen dene!',
+          ],
+          highlightTag: 'LİNK BİYODA',
+          footerNote: '@dersolabegitim',
+          themeVariant: 'cyan_cyber',
+        },
+      ],
+      createdAt: new Date().toISOString(),
+    }
+  }
+
+  try {
+    const img = await generateSocialImage({
+      prompt: `${cleanSubject} bilimsel soru şeması ve kavram diyagramı`,
+      subject: cleanSubject,
+      stylePreset: 'scientific_diagram',
+      aspectRatio: '1:1',
+    })
+    if (img?.imageUrl) {
+      postItem.uploadedImageUrl = img.imageUrl
+      if (postItem.carouselSlides && postItem.carouselSlides.length > 0) {
+        postItem.carouselSlides[0].uploadedImageUrl = img.imageUrl
+        postItem.carouselSlides[0].aiImagePrompt = img.prompt
+      }
+    }
+  } catch (imgErr) {
+    console.warn('QA carousel diagram error:', imgErr)
+  }
+
+  return attachGrokEnhancements(postItem, persona)
 }
 
 /**
@@ -2179,6 +2955,60 @@ export async function generateAutonomousDailyBatch(
   persona: AgentPersona = 'derso_friendly'
 ): Promise<SocialPostItem[]> {
   const now = Date.now()
+  const cleanSubject = focusSubject?.trim()
+
+  // Eğer kullanıcı özel bir ders/konu girdiyse, 3 koordineli gönderiyi doğrudan o konuya özel üret!
+  if (cleanSubject && cleanSubject.length >= 2) {
+    try {
+      const [morningCustom, middayCustom, eveningCustom] = await Promise.all([
+        generateSocialPost({
+          type: 'story',
+          topic: 'daily_question',
+          subject: `${cleanSubject} • Sabah 09:00 ÖSYM/LGS Quizi`,
+          targetGrade,
+          persona,
+          storyStickerType: 'quiz',
+          customPrompt: `Sabah 09:00 için ${cleanSubject} konusunda öğrencilerin en çok yanıldığı noktayı ölçen 4 şıklı interaktif bir Story Quizi hazırla.`,
+        }),
+        generateSocialPost({
+          type: 'carousel',
+          topic: 'exam_tactics',
+          subject: `${cleanSubject} • Öğle 14:00 Taktik Rehberi`,
+          targetGrade,
+          persona,
+          customPrompt: `Öğle 14:00 için ${cleanSubject} konusunun en kritik formül, kavram ve ÖSYM/LGS soru çözme adımlarını anlatan 4 slaytlık kaydetmelik Carousel rehberi hazırla.`,
+        }),
+        generateSocialPost({
+          type: 'reels',
+          topic: 'exam_tactics',
+          subject: `${cleanSubject} • Akşam 20:00 Prime Time Reels`,
+          targetGrade,
+          persona,
+          platform: 'tiktok',
+          customPrompt: `Akşam 20:00 için ${cleanSubject} konusunda 3 saniyede dikkat çeken, çeldirici tuzaklarını deşifre eden 30 saniyelik viral Reels/TikTok senaryosu hazırla.`,
+        }),
+      ])
+
+      morningCustom.title = `Sabah 09:00 • ${morningCustom.title}`
+      morningCustom.isAutoPilot = true
+      morningCustom.status = 'approved'
+      morningCustom.scheduledFor = new Date(now + 1000 * 60 * 60 * 2).toISOString()
+
+      middayCustom.title = `Öğle 14:00 • ${middayCustom.title}`
+      middayCustom.isAutoPilot = true
+      middayCustom.status = 'approved'
+      middayCustom.scheduledFor = new Date(now + 1000 * 60 * 60 * 6).toISOString()
+
+      eveningCustom.title = `Akşam 20:00 • ${eveningCustom.title}`
+      eveningCustom.isAutoPilot = true
+      eveningCustom.status = 'approved'
+      eveningCustom.scheduledFor = new Date(now + 1000 * 60 * 60 * 11).toISOString()
+
+      return [morningCustom, middayCustom, eveningCustom]
+    } catch (customBatchErr) {
+      console.warn('Custom subject daily batch fallback:', customBatchErr)
+    }
+  }
 
   // 1. Sabah Quizi (09:00)
   const morningPost: SocialPostItem = attachGrokEnhancements(

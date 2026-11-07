@@ -691,11 +691,17 @@ export function LabHubView() {
 
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full md:w-auto">
             <Link
-              href="/instructors"
+              href="/demo-lessons"
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-slate-950 font-black text-xs sm:text-sm shadow-[0_0_25px_rgba(6,182,212,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Eğitmenleri Keşfet</span>
+              <span>Ücretsiz Tanışma Dersi Al</span>
               <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/marketplace"
+              className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold text-xs sm:text-sm transition-all flex items-center justify-center text-center"
+            >
+              <span>Eğitmenleri Keşfet</span>
             </Link>
           </div>
         </section>

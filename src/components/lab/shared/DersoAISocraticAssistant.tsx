@@ -1,16 +1,15 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   Bot,
   Sparkles,
   Send,
-  HelpCircle,
   Lightbulb,
   ChevronDown,
   ChevronUp,
   BrainCircuit,
-  RefreshCw,
+  RotateCcw,
 } from 'lucide-react'
 import { playClickSound, playSliderTick } from '@/lib/soundFx'
 
@@ -28,6 +27,20 @@ interface ChatMessage {
   timestamp: string
 }
 
+function renderFormattedText(text: string) {
+  const parts = text.split(/(\*\*.*?\*\*)/g)
+  return parts.map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={idx} className="font-black text-violet-200">
+          {part.slice(2, -2)}
+        </strong>
+      )
+    }
+    return <span key={idx}>{part}</span>
+  })
+}
+
 export function DersoAISocraticAssistant({
   branch,
   moduleTitle,
@@ -39,71 +52,94 @@ export function DersoAISocraticAssistant({
     'Günlük hayatta ve teknolojide bu prensip nerede kullanılır?',
   ],
 }: DersoAISocraticAssistantProps) {
+  const initialMessage: ChatMessage = {
+    id: 'init-1',
+    sender: 'ai',
+    text: `Merhaba! Ben DersoAI Sokratik Deney Koçun. 🧠\nŞu an **${moduleTitle}** simülasyonundaki parametrelerini canlı olarak izliyorum. Değerleri değiştirdikçe sonuçların neden öyle çıktığını birlikte keşfedelim!`,
+    timestamp: 'Şimdi',
+  }
+
   const [isOpen, setIsOpen] = useState(true)
   const [inputQuestion, setInputQuestion] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'init-1',
-      sender: 'ai',
-      text: `Merhaba! Ben DersoAI Sokratik Deney Asistanın. 🧠\nŞu an **${moduleTitle}** simülasyonundaki parametrelerini canlı olarak izliyorum. Değerleri değiştirdikçe sonuçların neden öyle çıktığını birlikte keşfedelim!`,
-      timestamp: 'Şimdi',
-    },
-  ])
+  const [messages, setMessages] = useState<ChatMessage[]>([initialMessage])
 
   // Generate dynamic live observation string based on currentState
   const liveObservationText = React.useMemo(() => {
-    const entries = Object.entries(currentState)
+    const entries = Object.entries(currentState || {})
     if (entries.length === 0) return 'Simülasyon başlatıldı, gözlem yapmaya hazırım.'
 
     const summary = entries
-      .slice(0, 4)
+      .slice(0, 5)
       .map(([k, v]) => `${k}: ${v}`)
       .join(' · ')
     return `Canlı Parametreler: [ ${summary} ]`
   }, [currentState])
 
-  const handleAskQuestion = (qText: string) => {
-    if (!qText.trim()) return
+  const handleResetChat = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    playClickSound()
+    setMessages([initialMessage])
+  }
+
+  const handleAskQuestion = async (qText: string) => {
+    if (!qText.trim() || isTyping) return
     playClickSound()
 
+    const nowTime = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
     const userMsg: ChatMessage = {
       id: `u-${Date.now()}`,
       sender: 'user',
-      text: qText,
-      timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+      text: qText.trim(),
+      timestamp: nowTime,
     }
 
-    setMessages((prev) => [...prev, userMsg])
+    const updatedMessages = [...messages, userMsg]
+    setMessages(updatedMessages)
     setInputQuestion('')
     setIsTyping(true)
 
-    // Socratic response generator based on question & context
-    setTimeout(() => {
-      let aiResponse = ''
-      const lower = qText.toLowerCase()
+    try {
+      const response = await fetch('/api/ai/lab-socratic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          branch,
+          moduleTitle,
+          currentState,
+          question: qText.trim(),
+          history: updatedMessages.slice(-5).map((m) => ({
+            sender: m.sender,
+            text: m.text,
+          })),
+        }),
+      })
 
-      if (lower.includes('neden') || lower.includes('mantık')) {
-        aiResponse = `Harika bir soru! 🧐 Doğadaki bu olayı tek bir formül ezberlemek yerine sebep-sonuç ilişkisiyle düşün:\n\nŞu anki değerlerin (${liveObservationText}) incelendiğinde; bağımsız değişkeni artırdığında sistem bunu dengelemek için tepki verir. Sence girdi parametresini 2 katına çıkardığında çıktının değişme oranı doğrusal mı yoksa karesiyle mi orantılı? Simülasyon slider'ını bir adım kaydırıp test etmeyi dene!`
-      } else if (lower.includes('lgs') || lower.includes('yks') || lower.includes('tuzak') || lower.includes('sınav')) {
-        aiResponse = `🎯 **ÖSYM & MEB Soru Tuzağı Uyarısı:**\nSınavlarda genellikle "özkütle", "kütle" ve "hacim" veya "sıcaklık" ile "basınç" kavramlarını karıştırmanı beklerler. Özellikle 'Madde miktarı sabit tutulduğunda' ifadesine dikkat et!\n\nSimülasyonda bir değişkeni sabit tutup diğerini değiştirirken grafiğin eğiminin sana hangi sabiti verdiğini fark ettin mi?`
-      } else if (lower.includes('2 kat') || lower.includes('değiştir') || lower.includes('nasıl')) {
-        aiResponse = `⚡ **Hızlı Çözüm Taktisi:**\nSonucun değerini 2 katına çıkarmak için formüldeki pay ve payda ilişkisine bakmalısın. Eğer parametre paydaysa (ters orantı), değeri yarıya indirmelisin; paydaysa (doğru orantı) iki katına çıkarmalısın. Şimdi ekrandaki slider ile bunu dene ve sonucu gözlemle!`
-      } else {
-        aiResponse = `Çok isabetli bir sorgulama! 💡 **${moduleTitle}** konusunda bu durum ${branch} biliminin temel korunum yasalarıyla açıklanır.\n\nEkrandaki canlı göstergeleri incelediğinde, enerjinin veya dengenin nasıl korunduğunu görüyorsun. Bir sonraki adımda diğer parametreyi uç değerlere çekersen sence sistem nasıl davranır?`
-      }
+      const data = await response.json()
+      const aiReplyText =
+        data?.reply ||
+        `Çok isabetli bir sorgulama! 💡 **${moduleTitle}** deneyinde şu anki parametrelerin (${liveObservationText}) üzerinden bir değişkeni sabit tutup diğerini değiştirdiğinde sistemin nasıl dengelendiğini gözlemle.`
 
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         sender: 'ai',
-        text: aiResponse,
+        text: aiReplyText,
         timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
       }
 
       setMessages((prev) => [...prev, aiMsg])
-      setIsTyping(false)
       playSliderTick(520)
-    }, 600)
+    } catch {
+      const fallbackMsg: ChatMessage = {
+        id: `ai-${Date.now()}`,
+        sender: 'ai',
+        text: `Harika bir soru! 🧐 **${moduleTitle}** simülasyonundaki canlı değerlerin (${liveObservationText}) incelendiğinde; bağımsız değişkeni artırdığında çıktının doğrusal mı yoksa karesiyle mi değiştiğini slider'ı bir adım kaydırarak test etmeyi dene!`,
+        timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+      }
+      setMessages((prev) => [...prev, fallbackMsg])
+    } finally {
+      setIsTyping(false)
+    }
   }
 
   return (
@@ -123,23 +159,38 @@ export function DersoAISocraticAssistant({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-black text-white">DersoAI Sokratik Deney Koçu</span>
+              <span className="px-1.5 py-0.5 rounded-md bg-violet-500/20 border border-violet-500/30 text-[10px] font-bold text-violet-300">
+                Gemini AI
+              </span>
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
             </div>
             <div className="text-[11px] text-slate-400 font-medium">
-              Canlı Değişkenleri Okuyan Akıllı Rehber
+              Canlı Değişkenleri Okuyan Akıllı Sokratik Rehber
             </div>
           </div>
         </div>
 
-        <button
-          type="button"
-          className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors"
-        >
-          {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-1.5">
+          {messages.length > 1 && (
+            <button
+              type="button"
+              onClick={handleResetChat}
+              title="Sohbeti Sıfırla"
+              className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800/70 transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+          )}
+          <button
+            type="button"
+            className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors"
+          >
+            {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Collapsible Content */}
@@ -154,7 +205,7 @@ export function DersoAISocraticAssistant({
           </div>
 
           {/* Chat Messages */}
-          <div className="space-y-3 max-h-56 overflow-y-auto pr-1 text-xs">
+          <div className="space-y-3 max-h-64 overflow-y-auto pr-1 text-xs">
             {messages.map((m) => (
               <div
                 key={m.id}
@@ -174,15 +225,15 @@ export function DersoAISocraticAssistant({
                       : 'bg-slate-950/80 border border-slate-800 text-slate-200 rounded-tl-none whitespace-pre-line'
                   }`}
                 >
-                  {m.text}
+                  {renderFormattedText(m.text)}
                 </div>
               </div>
             ))}
 
             {isTyping && (
-              <div className="flex items-center gap-2 text-slate-500 text-xs italic p-1">
+              <div className="flex items-center gap-2 text-slate-400 text-xs italic p-1">
                 <Sparkles className="w-3.5 h-3.5 animate-spin text-violet-400" />
-                <span>DersoAI düşünüyor ve simülasyon verilerini analiz ediyor...</span>
+                <span>DersoAI canlı simülasyon parametrelerini analiz ediyor...</span>
               </div>
             )}
           </div>
@@ -198,8 +249,9 @@ export function DersoAISocraticAssistant({
                 <button
                   key={idx}
                   type="button"
+                  disabled={isTyping}
                   onClick={() => handleAskQuestion(q)}
-                  className="text-[11px] bg-slate-950 hover:bg-violet-950/50 hover:border-violet-500/40 border border-slate-800 text-slate-300 hover:text-violet-200 px-2.5 py-1.5 rounded-lg transition-all text-left cursor-pointer"
+                  className="text-left text-[11px] px-2.5 py-1.5 rounded-xl bg-slate-950 hover:bg-violet-950/50 text-slate-300 hover:text-violet-200 border border-slate-800 hover:border-violet-500/40 transition-all disabled:opacity-50"
                 >
                   {q}
                 </button>
@@ -207,27 +259,29 @@ export function DersoAISocraticAssistant({
             </div>
           </div>
 
-          {/* Input Box */}
+          {/* Custom Question Input */}
           <form
             onSubmit={(e) => {
               e.preventDefault()
               handleAskQuestion(inputQuestion)
             }}
-            className="flex items-center gap-2 pt-2"
+            className="flex items-center gap-2 pt-1"
           >
             <input
               type="text"
-              placeholder="Simülasyon hakkında merak ettiğin bir soru sor..."
               value={inputQuestion}
               onChange={(e) => setInputQuestion(e.target.value)}
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-violet-500"
+              disabled={isTyping}
+              placeholder="Deneydeki değişkenler hakkında soru sor..."
+              className="flex-1 bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none disabled:opacity-50"
             />
             <button
               type="submit"
-              disabled={!inputQuestion.trim()}
-              className="p-2 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white transition-all cursor-pointer"
+              disabled={isTyping || !inputQuestion.trim()}
+              className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3.5 h-3.5" />
+              <span>Sor</span>
             </button>
           </form>
         </div>

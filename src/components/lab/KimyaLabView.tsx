@@ -35,6 +35,7 @@ import { ExamQuestionCard, type ExamQuestion } from './shared/ExamQuestionCard'
 import { LabReportModal, type MeasurementRow } from './shared/LabReportModal'
 import { LabSplitScreenModal } from './shared/LabSplitScreenModal'
 import { DersoAISocraticAssistant } from './shared/DersoAISocraticAssistant'
+import { LabTutorCTA } from './shared/LabTutorCTA'
 import { playClickSound } from '@/lib/soundFx'
 
 export type KimyaTabType =
@@ -441,6 +442,23 @@ export function KimyaLabView() {
                 'Sıcaklık (T)': '300 K',
                 'Mol Sayısı (n)': '1.0 mol',
               }}
+            />
+
+            {/* Uzman Eğitmen & Tanışma Dersi Dönüşüm Hunisi */}
+            <LabTutorCTA
+              branch="Kimya"
+              topicName={
+                activeTab === 'titration'
+                  ? 'Asit-Baz Titrasyonu ve pH'
+                  : activeTab === 'gas_laws'
+                  ? 'İdeal Gaz Yasaları ve Gazlar'
+                  : activeTab === 'periodic'
+                  ? 'Periyodik Tablo ve 3D Atom'
+                  : activeTab === 'equilibrium'
+                  ? 'Kimyasal Denge ve Tepkime Hızı'
+                  : 'Kimya Deneyleri'
+              }
+              gradeLevel={levelFilter === 'ortaokul' ? '8. Sınıf LGS' : '10-12. Sınıf YKS/AYT'}
             />
           </div>
         )}

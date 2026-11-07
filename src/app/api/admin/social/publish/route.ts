@@ -162,16 +162,33 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const igRes = instagramResult as { success?: boolean; mode?: string } | null
+    const ttRes = tiktokResult as { success?: boolean; mode?: string } | null
+    const directApiPublished = Boolean(
+      (igRes?.success && igRes?.mode === 'api') || (ttRes?.success && ttRes?.mode === 'api')
+    )
+
     return NextResponse.json({
       success: true,
+      directApiPublished,
       isStory,
       isPost: !isStory,
-      contentType: isStory ? 'story' : isActualReels ? 'reels' : imageUrls && imageUrls.length > 1 ? 'carousel' : 'post',
+      contentType: isStory
+        ? 'story'
+        : isActualReels
+          ? 'reels'
+          : contentType === 'x_thread'
+            ? 'x_thread'
+            : imageUrls && imageUrls.length > 1
+              ? 'carousel'
+              : 'post',
       instagram: instagramResult,
       tiktok: tiktokResult,
-      message: isStory
-        ? 'Tek tuşla Instagram Story ve TikTok Story olarak başarıyla hazırlandı ve paylaşıldı!'
-        : 'Tek tuşla Instagram ve TikTok gönderisi olarak başarıyla hazırlandı ve paylaşıldı!',
+      message: directApiPublished
+        ? 'Gönderi doğrudan resmi API üzerinden yayınlandı!'
+        : isStory
+          ? 'Tek tuşla Instagram Story ve TikTok Story olarak başarıyla hazırlandı!'
+          : 'Tek tuşla Instagram ve TikTok gönderisi olarak başarıyla hazırlandı!',
     })
   } catch (error: any) {
     console.error('Social media publish API error:', error)

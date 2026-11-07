@@ -15,6 +15,9 @@ import {
   ArrowRight,
   Volume2,
   VolumeX,
+  Maximize2,
+  Minimize2,
+  Tv,
 } from 'lucide-react'
 import { isSoundMuted, toggleSound, playClickSound } from '@/lib/soundFx'
 
@@ -99,10 +102,26 @@ export const BRANCHES = [
 
 export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
   const [muted, setMuted] = React.useState(false)
+  const [isFullscreen, setIsFullscreen] = React.useState(false)
 
   React.useEffect(() => {
     setMuted(isSoundMuted())
+
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+    document.addEventListener('fullscreenchange', handleFsChange)
+    return () => document.removeEventListener('fullscreenchange', handleFsChange)
   }, [])
+
+  const handleToggleFullscreen = () => {
+    playClickSound()
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {})
+    } else {
+      document.exitFullscreen().catch(() => {})
+    }
+  }
 
   const handleToggleSound = () => {
     const next = toggleSound()
@@ -181,8 +200,30 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
             })}
           </nav>
 
-          {/* Sound Toggle & Hesabımın Ana Sayfasına Dön (/dashboard) */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Presentation Mode / Akıllı Tahta, Sound Toggle & Panelime Dön */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Akıllı Tahta / Sınıf Sunum Modu */}
+            <button
+              type="button"
+              onClick={handleToggleFullscreen}
+              title={isFullscreen ? 'Tam Ekrandan Çık' : 'Akıllı Tahta / Tam Ekran Modu (MEB / Fatih Uyumlu)'}
+              className={`p-1.5 sm:p-2 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
+                isFullscreen
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-md'
+                  : 'bg-slate-900/60 text-slate-400 hover:text-white hover:bg-slate-800/80 border-slate-800'
+              }`}
+              aria-label="Akıllı Tahta Modu"
+            >
+              {isFullscreen ? (
+                <Minimize2 className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Tv className="w-4 h-4 text-cyan-400" />
+              )}
+              <span className="hidden md:inline text-[11px] font-bold">
+                {isFullscreen ? 'Tahtadan Çık' : 'Akıllı Tahta'}
+              </span>
+            </button>
+
             <button
               type="button"
               onClick={handleToggleSound}

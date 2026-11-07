@@ -8,7 +8,7 @@ const CSP = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' https://meet.jit.si https://8x8.vc${isDev ? " 'unsafe-eval' https://esm.sh" : ''}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${SUPABASE_ORIGIN} https://img.youtube.com https://*.googleusercontent.com https://lh3.googleusercontent.com https://meet.jit.si https://8x8.vc`,
+  `img-src 'self' data: blob: ${SUPABASE_ORIGIN} https://img.youtube.com https://*.googleusercontent.com https://lh3.googleusercontent.com https://meet.jit.si https://8x8.vc https://*.mzstatic.com https://upload.wikimedia.org https://covers.openlibrary.org`,
   `media-src 'self' ${SUPABASE_ORIGIN} blob:`,
   "font-src 'self' data:",
   `connect-src 'self' ${SUPABASE_ORIGIN} wss://nkqifjcyudvwfaehgtgp.supabase.co https://meet.jit.si https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc${isDev ? ' ws://localhost:* wss://localhost:*' : ''}`,

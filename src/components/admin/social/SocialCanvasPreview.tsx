@@ -44,12 +44,16 @@ export function SocialCanvasPreview({
       reelsStoryboard: post.reelsStoryboard,
       postTitle: post.title,
       postCaption: post.caption,
-      customImageUrl:
-        currentSlide?.uploadedImageUrl ||
-        post.uploadedImageUrl ||
-        post.storyData?.uploadedImageUrl ||
-        post.reelsStoryboard?.uploadedImageUrl,
-      themeVariant: currentSlide?.themeVariant,
+      customImageUrl: isCarousel
+        ? currentSlide?.uploadedImageUrl
+        : post.singlePostData?.uploadedImageUrl ||
+          post.storyData?.uploadedImageUrl ||
+          post.reelsStoryboard?.uploadedImageUrl ||
+          post.uploadedImageUrl,
+      themeVariant:
+        currentSlide?.themeVariant ||
+        post.singlePostData?.themeVariant ||
+        post.storyData?.themeVariant,
     })
       .catch((err) => {
         console.error('Canvas render hatası:', err)

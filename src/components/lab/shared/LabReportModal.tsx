@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { FileText, Printer, X, Check, School, User, Calendar } from 'lucide-react'
-import { playClickSound } from '@/lib/soundFx'
+import { FileText, Printer, X, Check, School, User, Calendar, Copy, Share2 } from 'lucide-react'
+import { playClickSound, playSuccessFanfare } from '@/lib/soundFx'
 
 export interface MeasurementRow {
   parameter: string
@@ -41,6 +41,7 @@ export function LabReportModal({
   const [conclusion, setConclusion] = useState(
     'Yapılan deneyde elde edilen veriler başlangıçtaki hipotezi doğrulamıştır. Değişkenler arasındaki matematiksel bağıntı formülle uyumludur.'
   )
+  const [isCopied, setIsCopied] = useState(false)
   const today = new Date().toLocaleDateString('tr-TR')
 
   if (!isOpen) return null
@@ -48,6 +49,33 @@ export function LabReportModal({
   const handlePrint = () => {
     playClickSound()
     window.print()
+  }
+
+  const handleCopyReport = () => {
+    playSuccessFanfare()
+    const summaryText = `📊 DERSOLAB BİLİMSEL DENEY PERFORMANS RAPORU
+Öğrenci: ${studentName || 'Öğrenci'} | Okul/Sınıf: ${schoolName || '-'} | Tarih: ${today}
+Branş: ${branch} — Deney: ${experimentTitle}
+
+🔬 1. BİLİMSEL DEĞİŞKENLER VE HİPOTEZ
+• Bağımsız Değişken: ${independentVar}
+• Bağımlı Değişken: ${dependentVar}
+• Sabit (Kontrol) Değişkenler: ${controlledVars}
+• Hipotez: "${hypothesis}"
+
+📈 2. CANLI SİMÜLASYON ÖLÇÜMLERİ
+${measurements.map((m) => `• ${m.parameter}: ${m.value} ${m.unit} (${m.description || '-'})`).join('\n')}
+
+📝 3. BULGULAR VE SONUÇ DEĞERLENDİRMESİ
+${conclusion}
+
+(DersoLab Akademi L.A.B. sistemi üzerinden üretilmiştir.)`
+
+    if (navigator?.clipboard) {
+      navigator.clipboard.writeText(summaryText)
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 3000)
+    }
   }
 
   return (
@@ -63,14 +91,38 @@ export function LabReportModal({
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={handleCopyReport}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                isCopied
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-md shadow-emerald-500/10'
+                  : 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700 hover:border-cyan-500/50'
+              }`}
+              title="Eğitmene WhatsApp'tan veya ödev panelinden iletmek için kopyala"
+            >
+              {isCopied ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  <span>Kopyalandı!</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4 text-cyan-400" />
+                  <span className="hidden sm:inline">Eğitmene Gönder (Kopyala)</span>
+                  <span className="sm:hidden">Kopyala</span>
+                </>
+              )}
+            </button>
+
             <button
               type="button"
               onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
             >
               <Printer className="w-4 h-4" />
-              <span>Yazdır / PDF Olarak Kaydet</span>
+              <span>Yazdır / PDF</span>
             </button>
             <button
               type="button"

@@ -9,6 +9,7 @@ const SAYFALAR: Kayit[] = [
   { yol: '/instructors', oncelik: 0.9, siklik: 'weekly' },
   { yol: '/kocluk', oncelik: 0.9, siklik: 'weekly' },
   { yol: '/demo-ders', oncelik: 0.9, siklik: 'monthly' },
+  { yol: '/hesaplama', oncelik: 0.9, siklik: 'weekly' },
   { yol: '/lab', oncelik: 0.85, siklik: 'weekly' },
   { yol: '/lab/matematik', oncelik: 0.75, siklik: 'monthly' },
   { yol: '/lab/fizik', oncelik: 0.75, siklik: 'monthly' },

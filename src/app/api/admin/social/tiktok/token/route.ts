@@ -23,9 +23,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Yetkilendirme kodu (code) bulunamadı.' }, { status: 400 })
     }
 
-    const clientKey = process.env.TIKTOK_CLIENT_KEY || 'sbawm5ipgpytsjdnp9'
-    const clientSecret = process.env.TIKTOK_CLIENT_SECRET || 'hdK7EownwWpHcpBXaBzSpYuSBPrJzgUi'
+    const clientKey = process.env.TIKTOK_CLIENT_KEY
+    const clientSecret = process.env.TIKTOK_CLIENT_SECRET
     const redirectUri = 'https://dersolab.com/admin/social'
+
+    if (!clientKey || !clientSecret) {
+      return NextResponse.json(
+        { error: 'Sunucu ortam değişkenlerinde TIKTOK_CLIENT_KEY veya TIKTOK_CLIENT_SECRET tanımlı değil.' },
+        { status: 503 }
+      )
+    }
 
     const postParams = new URLSearchParams({
       client_key: clientKey,

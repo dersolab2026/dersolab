@@ -47,6 +47,7 @@ const NAV_ITEMS: Record<string, { href: string; label: string; badge?: string }[
     { href: '/dashboard/student/ai-asistan', label: 'AI Soru Asistanı', badge: 'AI' },
     { href: '/dashboard/student/gunluk', label: 'Günlük & Ajanda' },
     { href: '/dashboard/student/netlerim', label: 'Net Takibi' },
+    { href: '/hesaplama', label: 'Hedef & Net Simülatörü', badge: 'Yeni' },
     { href: '/dashboard/student/kocluk-formu', label: 'Koçluk Formu' },
     { href: '/dashboard/student/homework', label: 'Ödevlerim' },
     { href: '/dashboard/student/packages', label: 'Kredi Paketleri' },

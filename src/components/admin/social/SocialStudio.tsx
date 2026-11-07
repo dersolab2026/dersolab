@@ -36,6 +36,7 @@ import {
   Video,
 } from 'lucide-react'
 import type {
+  AgentPersona,
   CarouselSlide,
   ContentTopic,
   HookVariation,
@@ -47,6 +48,7 @@ import type {
   SocialPostItem,
   StoryStickerType,
 } from '@/types/social'
+import { CURRICULUM_TOPICS } from '@/lib/exams/curriculum'
 import { SocialPhoneMockup } from './SocialPhoneMockup'
 import { PublishSuccessModal, type PublishResultData } from './PublishSuccessModal'
 import {
@@ -58,16 +60,20 @@ import {
 import {
   toTurkishTitleCase,
   buildBookCoverSvgDataUrl,
-  CURATED_BOOK_PAIRS,
   isFakeOrInvalidBook,
   pickCuratedBookPair,
 } from '@/lib/social/agent'
+import {
+  pickCuratedMoviePair,
+  findMatchingCuratedMovie,
+  buildMoviePosterSvgDataUrl,
+  isBlacklistedMovie,
+} from '@/lib/social/bookCovers'
 import {
   getPoolStats,
   pickNextBookPair,
   pickNextSingleBook,
   resetUsedPool,
-  markPairAsUsed,
   BOOK_POOL_EVENT,
 } from '@/lib/social/bookPoolManager'
 import {
@@ -254,42 +260,118 @@ function sanitizePostList(rawList: SocialPostItem[]): SocialPostItem[] {
       if (nextStoryData.dualBookData) {
         const rawOrt = nextStoryData.dualBookData.ortaokul
         const rawLis = nextStoryData.dualBookData.lise
-        const hasFakeBook = isFakeOrInvalidBook(rawOrt) || isFakeOrInvalidBook(rawLis)
-        const fallbackPair = pickCuratedBookPair('', postIdx + 1)
+        const isMovieStory = /film|sinema|belgesel|🎬|🍿/i.test(
+          `${post.title || ''} ${nextStoryData.badge || ''} ${nextStoryData.headline || ''} ${rawOrt?.highlightTag || ''}`
+        )
 
-        const safeOrt = hasFakeBook ? fallbackPair.ortaokul : rawOrt
-        const safeLis = hasFakeBook ? fallbackPair.lise : rawLis
+        if (isMovieStory) {
+          const movieFallback = pickCuratedMoviePair('', postIdx + 1)
+          const badOrt = !rawOrt || isBlacklistedMovie(rawOrt.title)
+          const badLis = !rawLis || isBlacklistedMovie(rawLis.title)
 
-        if (hasFakeBook) {
-          cleanTitle = `Haftalık Kitap Önerisi: ${safeOrt.title} & ${safeLis.title}`
-          cleanTopicLabel = 'Pazar Kitap Kulübü • 9:16 Story'
-          nextStoryData.badge = 'PAZAR KİTAP KULÜBÜ 📚'
-          nextStoryData.headline = 'Haftanın Kitap Önerileri'
-          nextStoryData.subhead = 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik'
-          nextStoryData.stickerQuestion = 'Bu hafta hangisini okuyacaksın? 📚'
+          const safeOrt = badOrt
+            ? {
+                title: movieFallback.ortaokul.title,
+                author: movieFallback.ortaokul.director,
+                genre: movieFallback.ortaokul.genre,
+                whyRead: movieFallback.ortaokul.whyWatch,
+                highlightTag: '🎬 ORTAOKUL & LGS FİLM SEÇKİSİ',
+                imageUrl: buildMoviePosterSvgDataUrl(
+                  movieFallback.ortaokul.title,
+                  movieFallback.ortaokul.director,
+                  movieFallback.ortaokul.genre,
+                  movieFallback.ortaokul.imdb,
+                  'ortaokul'
+                ),
+              }
+            : rawOrt
+
+          const safeLis = badLis
+            ? {
+                title: movieFallback.lise.title,
+                author: movieFallback.lise.director,
+                genre: movieFallback.lise.genre,
+                whyRead: movieFallback.lise.whyWatch,
+                highlightTag: '🍿 LİSE & YKS FİLM SEÇKİSİ',
+                imageUrl: buildMoviePosterSvgDataUrl(
+                  movieFallback.lise.title,
+                  movieFallback.lise.director,
+                  movieFallback.lise.genre,
+                  movieFallback.lise.imdb,
+                  'lise'
+                ),
+              }
+            : rawLis
+
+          if (badOrt || badLis) {
+            cleanTitle = `Haftalık Film Kulübü: ${safeOrt.title.split('(')[0].trim()} & ${safeLis.title.split('(')[0].trim()}`
+          }
+
+          nextStoryData.dualBookData = {
+            ortaokul: {
+              ...safeOrt,
+              highlightTag: '🎬 ORTAOKUL & LGS FİLM SEÇKİSİ',
+              imageUrl:
+                safeOrt.imageUrl ||
+                buildMoviePosterSvgDataUrl(safeOrt.title, safeOrt.author, safeOrt.genre, '8.1', 'ortaokul'),
+            },
+            lise: {
+              ...safeLis,
+              highlightTag: '🍿 LİSE & YKS FİLM SEÇKİSİ',
+              imageUrl:
+                safeLis.imageUrl ||
+                buildMoviePosterSvgDataUrl(safeLis.title, safeLis.author, safeLis.genre, '8.5', 'lise'),
+            },
+          }
+          nextStoryData.stickerOptions = [
+            `🎬 ${safeOrt.title.split('(')[0].trim()}`,
+            `🍿 ${safeLis.title.split('(')[0].trim()}`,
+          ]
+        } else {
+          const hasFakeBook = isFakeOrInvalidBook(rawOrt) || isFakeOrInvalidBook(rawLis)
+          const fallbackPair = pickCuratedBookPair('', postIdx + 1)
+
+          const safeOrt = hasFakeBook ? fallbackPair.ortaokul : rawOrt
+          const safeLis = hasFakeBook ? fallbackPair.lise : rawLis
+
+          if (hasFakeBook) {
+            cleanTitle = `Haftalık Kitap Önerisi: ${safeOrt.title} & ${safeLis.title}`
+            cleanTopicLabel = 'Pazar Kitap Kulübü • 9:16 Story'
+            nextStoryData.badge = 'PAZAR KİTAP KULÜBÜ 📚'
+            nextStoryData.headline = 'Haftanın Kitap Önerileri'
+            nextStoryData.subhead = 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik'
+            nextStoryData.stickerQuestion = 'Bu hafta hangisini okuyacaksın? 📚'
+          }
+
+          const useRealOrtCover = safeOrt.imageUrl && !safeOrt.imageUrl.startsWith('data:image/svg')
+          const useRealLisCover = safeLis.imageUrl && !safeLis.imageUrl.startsWith('data:image/svg')
+
+          nextStoryData.dualBookData = {
+            ortaokul: {
+              ...safeOrt,
+              highlightTag: 'ORTAOKUL & LGS',
+              imageUrl: useRealOrtCover
+                ? safeOrt.imageUrl
+                : fallbackPair.ortaokul.imageUrl ||
+                  buildBookCoverSvgDataUrl(safeOrt.title, safeOrt.author, safeOrt.genre, 'ortaokul'),
+            },
+            lise: {
+              ...safeLis,
+              highlightTag: 'LİSE & YKS',
+              imageUrl: useRealLisCover
+                ? safeLis.imageUrl
+                : fallbackPair.lise.imageUrl ||
+                  buildBookCoverSvgDataUrl(safeLis.title, safeLis.author, safeLis.genre, 'lise'),
+            },
+          }
+          nextStoryData.stickerOptions = [`📘 ${safeOrt.title}`, `📕 ${safeLis.title}`]
         }
-
-        const useRealOrtCover = safeOrt.imageUrl && !safeOrt.imageUrl.startsWith('data:image/svg')
-        const useRealLisCover = safeLis.imageUrl && !safeLis.imageUrl.startsWith('data:image/svg')
-
-        nextStoryData.dualBookData = {
-          ortaokul: {
-            ...safeOrt,
-            highlightTag: 'ORTAOKUL & LGS',
-            imageUrl: useRealOrtCover
-              ? safeOrt.imageUrl
-              : (fallbackPair.ortaokul.imageUrl || buildBookCoverSvgDataUrl(safeOrt.title, safeOrt.author, safeOrt.genre, 'ortaokul')),
-          },
-          lise: {
-            ...safeLis,
-            highlightTag: 'LİSE & YKS',
-            imageUrl: useRealLisCover
-              ? safeLis.imageUrl
-              : (fallbackPair.lise.imageUrl || buildBookCoverSvgDataUrl(safeLis.title, safeLis.author, safeLis.genre, 'lise')),
-          },
-        }
-        nextStoryData.stickerOptions = [`📘 ${safeOrt.title}`, `📕 ${safeLis.title}`]
       }
+    }
+
+    if (isBlacklistedMovie(cleanTitle)) {
+      const mPair = pickCuratedMoviePair('', postIdx + 1)
+      cleanTitle = `Haftanın Film Seçkisi: ${mPair.lise.title} 🎬`
     }
 
     return {
@@ -297,18 +379,23 @@ function sanitizePostList(rawList: SocialPostItem[]): SocialPostItem[] {
       title: cleanTitle,
       topicLabel: cleanTopicLabel,
       storyData: nextStoryData,
-      carouselSlides: post.carouselSlides?.map((slide) => {
-        const hasDensePoints = slide.bodyPoints && slide.bodyPoints.length > 0
-        const isMascot =
-          slide.uploadedImageUrl &&
-          (/(?:fox-mascot|fox-head|mascot-icon|zeki|maskot)/i.test(slide.uploadedImageUrl) ||
-            (slide.uploadedImageUrl.startsWith('data:image/svg') &&
-              slide.uploadedImageUrl.includes('mascotHalo')))
+      carouselSlides: post.carouselSlides?.map((slide, sIdx) => {
+        if (isBlacklistedMovie(`${slide.headline || ''} ${slide.subhead || ''}`)) {
+          const mPair = pickCuratedMoviePair('', postIdx + 1)
+          const replacement = sIdx % 2 === 1 ? mPair.lise : mPair.ortaokul
+          return {
+            ...slide,
+            headline: toTurkishTitleCase(replacement.title),
+            subhead: `${replacement.director} • ${replacement.genre}`,
+            bodyPoints: [replacement.whyWatch, 'Sınav maratonunda motivasyon ve analitik bakış açısı kazandırır.'],
+            badge: slide.badge ? slide.badge.toLocaleUpperCase('tr-TR') : undefined,
+          }
+        }
         return {
           ...slide,
           headline: toTurkishTitleCase(slide.headline || ''),
           badge: slide.badge ? slide.badge.toLocaleUpperCase('tr-TR') : undefined,
-          uploadedImageUrl: hasDensePoints && isMascot ? undefined : slide.uploadedImageUrl,
+          uploadedImageUrl: slide.uploadedImageUrl,
         }
       }),
       caption: post.caption ? post.caption.replace(/\uFFFD/g, '') : '',
@@ -326,6 +413,7 @@ export default function SocialStudio() {
   // Hızlı Yapay Zeka Üretim Alanı
   const [genType, setGenType] = useState<InstagramContentType>('carousel')
   const [genGrade, setGenGrade] = useState<'YKS (TYT/AYT)' | 'LGS' | 'Genel'>('YKS (TYT/AYT)')
+  const [genPersona, setGenPersona] = useState<AgentPersona>('derso_friendly')
   const [genSubject, setGenSubject] = useState<string>('')
   const [genStorySticker, setGenStorySticker] = useState<StoryStickerType>('none')
   const [isGenerating, setIsGenerating] = useState<boolean>(false)
@@ -573,7 +661,7 @@ export default function SocialStudio() {
           customPrompt: rawSubject || subjectToUse,
           targetGrade: gradeToUse,
           tone: 'energetic',
-          persona: 'derso_friendly',
+          persona: genPersona,
           storyStickerType: stickerToUse,
           excludeSummary,
           variationSeed: nextSeed,
@@ -701,7 +789,7 @@ export default function SocialStudio() {
           customPrompt: preservedPrompt,
           targetGrade: genGrade,
           tone: 'energetic',
-          persona: 'derso_friendly',
+          persona: genPersona,
           storyStickerType: currentSticker,
           excludeSummary,
           variationSeed: nextSeed,
@@ -772,7 +860,7 @@ export default function SocialStudio() {
           action: 'auto_pilot',
           targetGrade: genGrade,
           focusSubject: genSubject.trim() || undefined,
-          persona: 'derso_friendly',
+          persona: genPersona,
         }),
       })
       const data = await res.json()
@@ -808,7 +896,7 @@ export default function SocialStudio() {
           action: 'generate_weekly',
           targetGrade: genGrade,
           focusSubject: genSubject.trim() || undefined,
-          persona: 'derso_friendly',
+          persona: genPersona,
         }),
       })
       const data = await res.json()
@@ -1114,6 +1202,39 @@ export default function SocialStudio() {
     }
   }
 
+  async function handleFindActiveMovieOrBookPoster() {
+    const queryCandidate = (
+      customImagePrompt.trim() ||
+      (isCarousel ? currentSlide?.headline : '') ||
+      activePost.singlePostData?.headline ||
+      activePost.storyData?.headline ||
+      activePost.title ||
+      genSubject
+    ).trim()
+
+    if (!queryCandidate) {
+      toast.error('Lütfen görsel kutusuna veya başlığa film/kitap adını yazın.')
+      return
+    }
+
+    setIsGeneratingImage(true)
+    const toastId = toast.loading(`"${queryCandidate}" için resmi film afişi / eser kapağı aranıyor...`)
+    try {
+      const res = await fetch(`/api/admin/social/books/cover?title=${encodeURIComponent(queryCandidate)}`)
+      const data = await res.json()
+      if (data?.found && data?.imageUrl) {
+        applyImageUrlToActiveTarget(data.imageUrl)
+        toast.success('Resmi film afişi / eser kapağı başarıyla eklendi! 🎬', { id: toastId })
+      } else {
+        toast.error('Afiş veya kapak bulunamadı, film/kitap adını daha net yazarak tekrar deneyin.', { id: toastId })
+      }
+    } catch {
+      toast.error('Afiş aranırken bağlantı hatası oluştu.', { id: toastId })
+    } finally {
+      setIsGeneratingImage(false)
+    }
+  }
+
   async function handleAutoFindBookCover(level: 'ortaokul' | 'lise') {
     if (!activePost?.storyData?.dualBookData) return
     const currentBook = activePost.storyData.dualBookData[level]
@@ -1283,9 +1404,183 @@ export default function SocialStudio() {
     const rawPrompt = subject.trim() || 'ÖSYM Net Artırma Stratejisi'
     const title = toTurkishTitleCase(rawPrompt)
     const id = `post_${Date.now()}`
-    const isBook = topic === 'book_recommendation' || /kitap|okuma|roman/i.test(title)
+    const isMovie =
+      Boolean(findMatchingCuratedMovie(rawPrompt)) ||
+      /\b(film|filmi|sinema|belgesel|dizi|afiş|afis|movie)\b/i.test(rawPrompt)
+    const isBook = !isMovie && (topic === 'book_recommendation' || /kitap|okuma|roman/i.test(title))
     const themes: SlideThemeVariant[] = ['lab_dark', 'neon_orange', 'cyan_cyber', 'purple_matrix']
     const primaryTheme = themes[variationSeed % themes.length]
+
+    if (isMovie) {
+      const moviePair = pickCuratedMoviePair(excludeSummary, variationSeed, rawPrompt)
+      const specificMovie = findMatchingCuratedMovie(rawPrompt)
+      const featured = specificMovie || moviePair.lise
+      const ortPoster = buildMoviePosterSvgDataUrl(
+        moviePair.ortaokul.title,
+        moviePair.ortaokul.director,
+        moviePair.ortaokul.genre,
+        moviePair.ortaokul.imdb,
+        'ortaokul'
+      )
+      const lisPoster = buildMoviePosterSvgDataUrl(
+        featured.title,
+        featured.director,
+        featured.genre,
+        featured.imdb,
+        'lise'
+      )
+
+      if (type === 'story') {
+        return {
+          id,
+          title: `Haftalık Film Kulübü: ${moviePair.ortaokul.title} & ${moviePair.lise.title}`,
+          type: 'story',
+          topic,
+          topicLabel: 'DersoLab Sinema Kulübü • 9:16 Story',
+          sourcePrompt: rawPrompt,
+          status: 'draft',
+          targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
+          caption: `Haftalık Film Kulübümüz yayında! 🎬🍿\n\n🎬 Ortaokul (LGS): ${moviePair.ortaokul.title} (${moviePair.ortaokul.director})\n🍿 Lise (YKS): ${moviePair.lise.title} (${moviePair.lise.director})\n\n#filmönerisi #sinemakulübü #lgs2027 #yks2027 #dersolab`,
+          hashtags: ['#filmönerisi', '#sinemakulübü', '#lgs2027', '#yks2027', '#dersolab'],
+          uploadedImageUrl: lisPoster,
+          storyData: {
+            badge: 'HAFTALIK FİLM KULÜBÜ 🎬',
+            headline: 'Haftanın Film Önerileri',
+            subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin İlham Veren Filmler',
+            stickerType: storyStickerType,
+            stickerQuestion: 'Bu hafta hangisini izleyeceksin? 🍿',
+            stickerOptions: [
+              `🎬 ${moviePair.ortaokul.title.split('(')[0].trim()}`,
+              `🍿 ${moviePair.lise.title.split('(')[0].trim()}`,
+            ],
+            stickerLinkText: 'Sinema & Kültür Kulübü',
+            stickerLinkUrl: 'https://dersolab.com/lab',
+            themeVariant: primaryTheme,
+            uploadedImageUrl: lisPoster,
+            dualBookData: {
+              ortaokul: {
+                title: moviePair.ortaokul.title,
+                author: moviePair.ortaokul.director,
+                genre: moviePair.ortaokul.genre,
+                whyRead: moviePair.ortaokul.whyWatch,
+                highlightTag: '🎬 ORTAOKUL & LGS FİLM SEÇKİSİ',
+                imageUrl: ortPoster,
+              },
+              lise: {
+                title: moviePair.lise.title,
+                author: moviePair.lise.director,
+                genre: moviePair.lise.genre,
+                whyRead: moviePair.lise.whyWatch,
+                highlightTag: '🍿 LİSE & YKS FİLM SEÇKİSİ',
+                imageUrl: lisPoster,
+              },
+            },
+          },
+          createdAt: new Date().toISOString(),
+        }
+      }
+
+      if (type === 'carousel') {
+        return {
+          id,
+          title: `Film Önerisi: ${featured.title} 🎬`,
+          type: 'carousel',
+          topic,
+          topicLabel: 'DersoLab Sinema Kulübü 🎬',
+          sourcePrompt: rawPrompt,
+          status: 'draft',
+          targetAudience: grade,
+          uploadedImageUrl: lisPoster,
+          caption: `Çalışma molanda ufkunu açacak efsane film önerilerimiz! 🎬🍿\n\n🌟 ${featured.title} (${featured.director})\n🎬 ${moviePair.ortaokul.title} (${moviePair.ortaokul.director})\n\n#filmönerisi #sinemakulübü #yks2027 #lgs2027 #dersolab`,
+          hashtags: ['#filmönerisi', '#sinemakulübü', '#yks2027', '#lgs2027', '#dersolab'],
+          carouselSlides: [
+            {
+              slideNumber: 1,
+              badge: 'HAFTANIN FİLM SEÇKİSİ 🎬',
+              headline: `${featured.title}: Neden Mutlaka İzlemelisin?`,
+              subhead: `${featured.director} • Tür: ${featured.genre}`,
+              bodyPoints: [
+                featured.whyWatch,
+                'Kaydır, filmin detaylarını ve öğrencilere kattığı vizyonu keşfet 👉',
+              ],
+              highlightTag: 'FİLM KULÜBÜ',
+              footerNote: 'DersoLab Sinema Kulübü • @dersolabegitim',
+              themeVariant: themes[variationSeed % 4],
+              uploadedImageUrl: lisPoster,
+            },
+            {
+              slideNumber: 2,
+              badge: '🍿 LİSE & YKS FİLM SEÇKİSİ',
+              headline: featured.title,
+              subhead: `${featured.director} • ${featured.genre}`,
+              bodyPoints: [
+                featured.whyWatch,
+                'Sınav maratonunda hedefe odaklanma ve analitik düşünme bilinci kazandırır.',
+              ],
+              highlightTag: `IMDb ${featured.imdb}`,
+              footerNote: 'DersoLab Kültür & Sinema',
+              themeVariant: themes[(variationSeed + 1) % 4],
+              uploadedImageUrl: lisPoster,
+            },
+            {
+              slideNumber: 3,
+              badge: '🎬 ORTAOKUL & LGS FİLM SEÇKİSİ',
+              headline: moviePair.ortaokul.title,
+              subhead: `${moviePair.ortaokul.director} • ${moviePair.ortaokul.genre}`,
+              bodyPoints: [
+                moviePair.ortaokul.whyWatch,
+                'Merak duygusunu ve bilimsel problem çözme yeteneğini güçlendirir.',
+              ],
+              highlightTag: `IMDb ${moviePair.ortaokul.imdb}`,
+              footerNote: 'DersoLab L.A.B.',
+              themeVariant: themes[(variationSeed + 2) % 4],
+              uploadedImageUrl: ortPoster,
+            },
+            {
+              slideNumber: 4,
+              badge: 'SİNEMA KULÜBÜ • KAYDET',
+              headline: 'Hafta Sonu İzleme Listene Kaydet! 🍿',
+              subhead: 'Arkadaşına gönder, mola gününde birlikte izleyin.',
+              bodyPoints: [
+                '💾 Bu gönderiyi kaydet, hafta sonu film gecesinde hemen aç!',
+                '💬 Senin favori motivasyon filmin hangisi? Yorumlara yaz!',
+              ],
+              highlightTag: 'KAYDET',
+              footerNote: '@dersolabegitim',
+              themeVariant: themes[(variationSeed + 3) % 4],
+            },
+          ],
+          createdAt: new Date().toISOString(),
+        }
+      }
+
+      return {
+        id,
+        title: `Haftanın Film Önerisi: ${featured.title} 🎬`,
+        type: 'post',
+        topic,
+        topicLabel: 'DersoLab Sinema Kulübü 🎬',
+        sourcePrompt: rawPrompt,
+        status: 'draft',
+        targetAudience: grade,
+        uploadedImageUrl: lisPoster,
+        caption: `🎬 Haftanın Film Önerisi: ${featured.title}!\n\n🎥 ${featured.director}\n💡 ${featured.whyWatch}\n\n#filmönerisi #sinemakulübü #yks2027 #dersolab`,
+        hashtags: ['#filmönerisi', '#sinemakulübü', '#yks2027', '#dersolab'],
+        singlePostData: {
+          badge: `HAFTANIN FİLM SEÇKİSİ 🎬 • IMDb ${featured.imdb}`,
+          headline: featured.title,
+          questionOrSummary: `${featured.director} (${featured.genre}) — ${featured.whyWatch}`,
+          keyTakeaway: '🍿 MOLA ÖNERİSİ',
+          options: [
+            { key: 'A', text: 'Bu hafta sonu mutlaka izliyorum! 🍿', isCorrect: true },
+            { key: 'B', text: 'İzledim, kesinlikle başyapıt! ⭐', isCorrect: false },
+          ],
+          themeVariant: primaryTheme,
+          uploadedImageUrl: lisPoster,
+        },
+        createdAt: new Date().toISOString(),
+      }
+    }
 
     if (isBook && type === 'story') {
       const chosen = pickCuratedBookPair(excludeSummary, variationSeed)
@@ -1770,113 +2065,45 @@ export default function SocialStudio() {
     toast.success('Türkçe seslendirme (TTS) başlatıldı!')
   }
 
-  // ÖZELLİK 1: 2 Slaytlı "Önce Soru, Kaydırınca Çözüm" Mini-Carousel Üretici
-  function handleGenerateQuestionSolutionCarousel() {
-    const rawSubject = genSubject.trim() || 'Paragrafta Ana Düşünce ve Çeldirici Eleme'
+  // ÖZELLİK 1: "Önce Soru, Kaydırınca Çözüm" (Gerçek AI + Bilimsel Diyagramlı ÖSYM/LGS Soru-Çözüm Carousel Üretici)
+  async function handleGenerateQuestionSolutionCarousel() {
+    const rawSubject = genSubject.trim() || 'TYT Matematik Parabol ve Tepe Noktası'
     const cleanTopic = toTurkishTitleCase(rawSubject)
-    const nextSeed = variationSeedRef.current + 1
-    variationSeedRef.current = nextSeed
+    setIsBatchLoading(true)
+    const toastId = toast.loading(`"${cleanTopic}" için ÖSYM/LGS Soru + Çözüm Carousel ve bilimsel şema üretiliyor...`)
 
-    const qaBank = [
-      {
-        badge: `${genGrade} • ÖSYM PROVA SORUSU`,
-        questionTitle: `${cleanTopic}: Bu Soruyu 40 Saniyede Çözebilir Misin?`,
-        questionSub: 'Önce kendi cevabını yorumlara yaz, sonra çözümü görmek için sola kaydır 👉',
-        options: [
-          `Soru: ${cleanTopic} kapsamında verilen öncüllerden hangisi her koşulda kesinlikle doğrudur?`,
-          'A) Yalnız I  •  B) Yalnız II  •  C) I ve II',
-          'D) II ve III (Doğru Cevap Adayı)  •  E) I, II ve III',
-        ],
-        solutionTitle: 'Adım Adım Çözüm & Çeldirici Analizi ✅',
-        solutionSub: 'Öğrencilerin %78’i C şıkkındaki sınır değer tuzağına düşüyor!',
-        solutionSteps: [
-          '1. Adım: Soru kökündeki "kesinlikle doğrudur" ifadesi uç değerlerin de sağlanmasını zorunlu kılar.',
-          '2. Adım: I. öncül sınır değerde sağlansa bile negatif/istisnai durumda bozulduğu için elenir (Çeldirici!).',
-          '3. Adım: II ve III. öncüller tanım kümesinin tamamında sağlandığı için doğru yanıt D seçeneğidir.',
-        ],
-      },
-      {
-        badge: `${genGrade} • 1 SORU 1 NET`,
-        questionTitle: `${cleanTopic}: Sınavda Çıkarsa Eleyici Olacak Soru!`,
-        questionSub: 'Çoğu kişinin B ve E şıkkı arasında kaldığı o soru kalıbı • Kaydır ve Çözümü Gör 👉',
-        options: [
-          `Soru: ${cleanTopic} kurallarına göre aşağıdaki ifadelerden hangisinde kavram yanılgısı vardır?`,
-          'A) Temel bağıntı doğrudan korunur  •  B) Birim dönüşümü sabit kalır',
-          'C) Oran-orantı modeli uygulanır  •  D) Sınır koşulu denetlenir  •  E) İstisna durumu hariç tutulur',
-        ],
-        solutionTitle: 'Doğru Cevap: B Şıkkı • Neden Yanıltıcı? 🎯',
-        solutionSub: 'ÖSYM’nin en sevdiği "birim ve işaret" çeldiricisini yakala!',
-        solutionSteps: [
-          '1. Adım: A, C, D ve E şıkları konunun çekirdek kazanımıyla birebir örtüşmektedir.',
-          '2. Adım: B şıkkında verilen "birim dönüşümü sabit kalır" ifadesi boyut analizi yapıldığında yanlıştır.',
-          '3. Adım: Net Kurtaran Taktik: İşlemi bitirmeden önce birim ve işaret kontrolü yapmayı alışkanlık haline getir!',
-        ],
-      },
-      {
-        badge: `${genGrade} • DERECE SORUSU`,
-        questionTitle: `${cleanTopic}: İlk Bakışta Kolay Görünüyor Ama...`,
-        questionSub: 'Bakalım çeldiriciye düşmeden doğru şıkkı bulabilecek misin? Sola kaydır 👉',
-        options: [
-          `Soru: ${cleanTopic} ile ilgili I, II ve III numaralı yargılardan hangilerine ulaşılabilir?`,
-          'A) Yalnız I  •  B) Yalnız III  •  C) I ve III',
-          'D) II ve III  •  E) I, II ve III',
-        ],
-        solutionTitle: 'Çözüm & ÖSYM Tuzak Rehberi (Cevap: C) 🧠',
-        solutionSub: 'II. öncüldeki "tümü / tamamı" genellemesi klasik bir ÖSYM çeldiricisidir!',
-        solutionSteps: [
-          '1. Adım: I. yargı verilen temel ilkenin doğrudan sonucudur (+).',
-          '2. Adım: II. yargıdaki aşırı genelleme ("her zaman tüm durumlarda") tek bir aksi örnekle çürütülür (-).',
-          '3. Adım: III. yargı neden-sonuç ilişkisini doğru kurduğu için cevap C (I ve III) olur.',
-        ],
-      },
-    ]
+    try {
+      const res = await fetch('/api/admin/social/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate_qa_carousel',
+          type: 'carousel',
+          topic: 'daily_question',
+          subject: cleanTopic,
+          customPrompt: rawSubject,
+          targetGrade: genGrade,
+          persona: genPersona,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.item) {
+        throw new Error(data.error || 'Soru-Çözüm gönderisi üretilemedi.')
+      }
 
-    const chosen = qaBank[nextSeed % qaBank.length]
-    const themes: SlideThemeVariant[] = ['neon_orange', 'lab_dark', 'cyan_cyber', 'purple_matrix']
-
-    const qaPost: SocialPostItem = {
-      id: `post_qa_${Date.now()}`,
-      title: chosen.questionTitle,
-      type: 'carousel',
-      topic: 'exam_tactics',
-      topicLabel: `${genGrade} • Soru + Çözüm (2 Slayt)`,
-      sourcePrompt: rawSubject,
-      status: 'draft',
-      targetAudience: genGrade,
-      caption: `❓ Önce Soru, Kaydırınca Çözüm! (${cleanTopic}) 🦊🎯\n\nKaydırmadan önce bulduğun şıkkı yorumlara yaz, sonra 2. slayttaki çeldirici analizini kontrol et! 👇\n\n💾 Sınav öncesi tekrar etmek için kaydetmeyi unutma!\n\n#1soru1net #yks2027 #lgs2027 #dersolab #soruçözüm`,
-      hashtags: ['#1soru1net', '#yks2027', '#lgs2027', '#dersolab', '#soruçözüm'],
-      carouselSlides: [
-        {
-          slideNumber: 1,
-          badge: chosen.badge,
-          headline: chosen.questionTitle,
-          subhead: chosen.questionSub,
-          bodyPoints: chosen.options,
-          highlightTag: '1. SLAYT: SORU ❓',
-          footerNote: 'Cevabını Yorumlara Yaz • Çözüm İçin Kaydır 👉',
-          themeVariant: themes[nextSeed % 4],
-        },
-        {
-          slideNumber: 2,
-          badge: '2. SLAYT • ADIM ADIM ÇÖZÜM & ÇELDİRİCİ ANALİZİ',
-          headline: chosen.solutionTitle,
-          subhead: chosen.solutionSub,
-          bodyPoints: chosen.solutionSteps,
-          highlightTag: '2. SLAYT: ÇÖZÜM ✅',
-          footerNote: 'DersoLab L.A.B. • @dersolabegitim',
-          themeVariant: themes[(nextSeed + 1) % 4],
-        },
-      ],
-      createdAt: new Date().toISOString(),
+      const qaPost: SocialPostItem = sanitizePostList([data.item])[0]
+      const updated = [qaPost, ...posts.filter((p) => p.id !== qaPost.id)]
+      savePosts(updated)
+      setActivePostId(qaPost.id)
+      setActiveSlideIndex(0)
+      setGenType('carousel')
+      upsertSocialPostToDb(qaPost).catch(() => {})
+      toast.success('Önce Soru, Kaydırınca Çözüm Carousel ve şeması hazırlandı!', { id: toastId })
+    } catch (err: any) {
+      toast.error(err?.message || 'Soru-Çözüm üretilirken hata oluştu.', { id: toastId })
+    } finally {
+      setIsBatchLoading(false)
     }
-
-    const updated = [qaPost, ...posts]
-    savePosts(updated)
-    setActivePostId(qaPost.id)
-    setActiveSlideIndex(0)
-    setGenType('carousel')
-    upsertSocialPostToDb(qaPost).catch(() => {})
-    toast.success('2 Slaytlı "Önce Soru, Kaydırınca Çözüm" gönderisi oluşturuldu!')
   }
 
   // ÖZELLİK 2: YKS 2027 & LGS 2027 Otomatik Canlı Geri Sayım (Countdown) Şablonu
@@ -2195,6 +2422,50 @@ export default function SocialStudio() {
         </button>
       </div>
 
+      {/* HIZLI İÇERİK & TAKVİM KUYRUĞU ŞERİDİ (Üretilen tüm gönderiler arasında 1-tıkla geçiş) */}
+      <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 pt-3">
+        <div className="rounded-2xl border border-white/10 bg-[#0B0F19]/90 px-3.5 py-2.5 flex items-center gap-2 overflow-x-auto custom-scrollbar">
+          <span className="text-[11px] font-bold text-slate-400 shrink-0 flex items-center gap-1.5 pr-1 border-r border-white/10">
+            <Layers className="w-3.5 h-3.5 text-orange-400" />
+            <span>İçerik Kuyruğu ({posts.length}):</span>
+          </span>
+          {posts.slice(0, 12).map((p, idx) => {
+            const isSelected = p.id === activePost.id
+            const badgeIcon =
+              p.type === 'carousel'
+                ? '📸'
+                : p.type === 'story'
+                  ? '📱'
+                  : p.type === 'reels'
+                    ? '🎬'
+                    : p.type === 'x_thread'
+                      ? '𝕏'
+                      : '📝'
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => {
+                  setActivePostId(p.id)
+                  setActiveSlideIndex(0)
+                }}
+                className={`px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all border cursor-pointer ${
+                  isSelected
+                    ? 'bg-orange-500/20 border-orange-500 text-white shadow-xs'
+                    : 'bg-white/5 hover:bg-white/10 border-white/5 text-slate-300 hover:text-white'
+                }`}
+              >
+                <span>{badgeIcon}</span>
+                <span className="max-w-[165px] truncate">{p.title || `Gönderi ${idx + 1}`}</span>
+                {p.status === 'published' && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" title="Yayınlandı" />
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* ANA GÖVDE: 2 KOLONLU STÜDYO (SOL: EDİTÖR / SAĞ: CANLI INSTAGRAM) */}
       <main className="max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* SOL KOLON: HIZLI YAPAY ZEKA ÜRETİCİSİ, DÜZENLEYİCİ VE BÜYÜME ARAÇLARI */}
@@ -2219,8 +2490,8 @@ export default function SocialStudio() {
               </span>
             </div>
 
-            {/* Format Seçimi (4 Kart) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3.5">
+            {/* Format Seçimi (5 Kart: Carousel, Tekli Post, Story, Reels & TikTok, X Flood) */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-3.5">
               <button
                 type="button"
                 onClick={() => setGenType('carousel')}
@@ -2276,6 +2547,46 @@ export default function SocialStudio() {
                 <div className="text-xs font-bold text-white">Reels & TikTok</div>
                 <div className="text-[10px] text-slate-400">Video Senaryosu</div>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setGenType('x_thread')}
+                className={`p-2.5 rounded-xl border text-left transition-all col-span-2 sm:col-span-1 ${
+                  genType === 'x_thread'
+                    ? 'border-orange-500/80 bg-orange-500/10 shadow-sm shadow-orange-500/20'
+                    : 'border-white/5 bg-white/5 hover:bg-white/10 text-slate-300'
+                }`}
+              >
+                <MessageSquare className={`w-4 h-4 mb-1 ${genType === 'x_thread' ? 'text-orange-400' : 'text-slate-400'}`} />
+                <div className="text-xs font-bold text-white">𝕏 Flood</div>
+                <div className="text-[10px] text-slate-400">5 Tweet Zinciri</div>
+              </button>
+            </div>
+
+            {/* AI Persona (Anlatım Karakteri) Seçici */}
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/10">
+              <span className="text-[11px] font-semibold text-slate-300">AI Koç Karakteri (Persona):</span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {[
+                  { id: 'derso_friendly', label: '🦊 Samimi Koç' },
+                  { id: 'exam_coach', label: '🕵️ ÖSYM Uzmanı' },
+                  { id: 'scientific_guide', label: '🔬 Bilimsel Rehber' },
+                  { id: 'direct_punchy', label: '⚡ Net & Tavizsiz' },
+                ].map((pItem) => (
+                  <button
+                    key={pItem.id}
+                    type="button"
+                    onClick={() => setGenPersona(pItem.id as AgentPersona)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                      genPersona === pItem.id
+                        ? 'bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 shadow-xs'
+                        : 'bg-black/30 text-slate-400 hover:text-white border border-white/5'
+                    }`}
+                  >
+                    {pItem.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Story seçildiğinde İsteğe Bağlı Çıkartma Tercihi (Varsayılan: Çıkartma Yok) */}
@@ -2289,6 +2600,8 @@ export default function SocialStudio() {
                     { id: 'none', label: '✨ Çıkartma Yok (Saf Görsel)' },
                     { id: 'poll', label: '📊 İkili Anket (Poll)' },
                     { id: 'quiz', label: '❓ Çoktan Seçmeli Test (Quiz)' },
+                    { id: 'countdown', label: '⏳ Geri Sayım (Countdown)' },
+                    { id: 'question_box', label: '💬 Soru Kutusu' },
                     { id: 'link', label: '🔗 Bağlantı (Link)' },
                   ].map((st) => (
                     <button
@@ -2323,7 +2636,8 @@ export default function SocialStudio() {
 
                 <input
                   type="text"
-                  placeholder="İstediğin konuyu yaz (örn: Kitap Önerisi, Trigonometri, Paragraf Hızı, Hücre Zarı)..."
+                  list="dersolab-curriculum-datalist"
+                  placeholder="İstediğin konuyu yaz veya MEB kazanımlarından seç (örn: Trigonometri, Hücre Zarı, Optik)..."
                   value={genSubject}
                   onChange={(e) => setGenSubject(e.target.value)}
                   onKeyDown={(e) => {
@@ -2334,6 +2648,11 @@ export default function SocialStudio() {
                   }}
                   className="flex-1 px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-orange-500"
                 />
+                <datalist id="dersolab-curriculum-datalist">
+                  {Object.entries(CURRICULUM_TOPICS).flatMap(([subj, topics]) =>
+                    topics.map((t) => <option key={`${subj}-${t}`} value={`${subj} - ${t}`} />)
+                  )}
+                </datalist>
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
@@ -2367,6 +2686,38 @@ export default function SocialStudio() {
                   <span>{isRegenerating ? 'Yenileniyor...' : 'Yeniden Dene'}</span>
                 </button>
               </div>
+            </div>
+
+            {/* 1-Tık DersoLab L.A.B. Simülasyon & Kampanya Kısayol Çipleri */}
+            <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+              <span className="text-[10px] font-bold text-slate-400 mr-1">🔬 L.A.B. Kısayolları:</span>
+              {[
+                { label: '🎯 Eğik Atış & Optik L.A.B.', subject: 'TYT-AYT Fizik - Atışlar ve Optik Prizma Simülasyonu' },
+                { label: '🧬 3D Hücre & DNA L.A.B.', subject: 'AYT Biyoloji - DNA Çift Sarmalı ve Hücre Bölünmesi' },
+                { label: '⚗️ Titrasyon & pH L.A.B.', subject: 'AYT Kimya - Asit Baz Titrasyonu ve pH Dengesi' },
+                { label: '📐 Türev & Parabol L.A.B.', subject: 'AYT Matematik - Türev Geometrik Yorumu ve Parabol Teğeti' },
+                { label: '⚡ Biyonik Okuma L.A.B.', subject: 'TYT Türkçe - Biyonik Hızlı Okuma ile Paragrafta Süre Yönetimi' },
+                { label: '📚 Pazar Kitap Kulübü', subject: 'Haftalık Kitap Önerisi', forceStory: true },
+                { label: '🎬 Haftalık Film Kulübü', subject: 'Haftalık Film Önerisi' },
+              ].map((chip) => (
+                <button
+                  key={chip.label}
+                  type="button"
+                  disabled={isGenerating || isBatchLoading}
+                  onClick={() => {
+                    setGenSubject(chip.subject)
+                    if (chip.forceStory) {
+                      setGenType('story')
+                      handleGeneratePost({ type: 'story', subject: chip.subject, topic: 'book_recommendation' })
+                    } else {
+                      handleGeneratePost({ subject: chip.subject })
+                    }
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-orange-500/15 border border-white/10 hover:border-orange-500/40 text-[10px] font-semibold text-slate-300 hover:text-orange-200 transition-all cursor-pointer"
+                >
+                  {chip.label}
+                </button>
+              ))}
             </div>
 
             {/* Otonom Günlük Paket (3 Post), 7 Günlük Haftalık Takvim, 2 Slayt Soru+Çözüm ve Canlı Geri Sayım Hızlı Butonları */}
@@ -2426,7 +2777,9 @@ export default function SocialStudio() {
                       ? '📱 Story (9:16)'
                       : activePost.type === 'reels'
                         ? '🎬 Reels'
-                        : '📝 Tekli Post'}
+                        : activePost.type === 'x_thread'
+                          ? '𝕏 Flood / Zincir'
+                          : '📝 Tekli Post'}
                 </span>
               </div>
 
@@ -2866,6 +3219,12 @@ export default function SocialStudio() {
                       </option>
                       <option value="quiz" className="bg-neutral-900">
                         ❓ Çoktan Seçmeli Test (Quiz)
+                      </option>
+                      <option value="countdown" className="bg-neutral-900">
+                        ⏳ Canlı Geri Sayım (Countdown)
+                      </option>
+                      <option value="question_box" className="bg-neutral-900">
+                        💬 Soru Kutusu (Question Box)
                       </option>
                       <option value="link" className="bg-neutral-900">
                         🔗 Bağlantı Çıkartması (Link)
@@ -3625,6 +3984,78 @@ export default function SocialStudio() {
               </div>
             )}
 
+            {/* 5. X / TWITTER FLOOD (TWEET ZİNCİRİ) EDİTÖRÜ */}
+            {activePost.type === 'x_thread' && (
+              <div className="border border-white/10 rounded-xl p-3.5 bg-black/30 flex flex-col gap-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-bold text-sky-400">𝕏 Flood / Tweet Zinciri Editörü</div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currentTweets = activePost.xThreadData?.tweets || []
+                      const nextNum = currentTweets.length + 1
+                      handleUpdateActivePost({
+                        ...activePost,
+                        xThreadData: {
+                          threadHook: activePost.xThreadData?.threadHook || activePost.title,
+                          totalTweets: nextNum,
+                          estimatedReadTime: activePost.xThreadData?.estimatedReadTime || '1.5 dk',
+                          callToAction: activePost.xThreadData?.callToAction || 'Kaydet & RT!',
+                          tweets: [
+                            ...currentTweets,
+                            {
+                              tweetNumber: nextNum,
+                              text: `${nextNum}/${nextNum} Yeni flood tweet maddesi...`,
+                              charCount: 40,
+                            },
+                          ],
+                        },
+                      })
+                    }}
+                    className="text-[10px] font-bold text-sky-400 hover:text-sky-300"
+                  >
+                    + Tweet Ekle
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  {(activePost.xThreadData?.tweets || []).map((tw, twIdx) => (
+                    <div key={twIdx} className="p-2.5 rounded-lg bg-white/[0.03] border border-white/10 flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between text-[10px] text-slate-400">
+                        <span className="font-bold text-sky-300">{twIdx + 1}. Tweet</span>
+                        <span>{tw.text.length}/280 karakter</span>
+                      </div>
+                      <textarea
+                        rows={2}
+                        value={tw.text}
+                        onChange={(e) => {
+                          const updatedTweets = [...(activePost.xThreadData?.tweets || [])]
+                          updatedTweets[twIdx] = {
+                            ...tw,
+                            text: e.target.value,
+                            charCount: e.target.value.length,
+                          }
+                          handleUpdateActivePost({
+                            ...activePost,
+                            xThreadData: {
+                              ...(activePost.xThreadData || {
+                                threadHook: activePost.title,
+                                totalTweets: updatedTweets.length,
+                                estimatedReadTime: '1.5 dk',
+                                callToAction: 'Kaydet & RT!',
+                              }),
+                              tweets: updatedTweets,
+                            },
+                          })
+                        }}
+                        className="w-full px-2.5 py-1.5 rounded bg-black/40 border border-white/10 text-xs text-white"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* GÖRSEL & İLLÜSTRASYON STÜDYOSU (AI ŞEMA / MASKOT ÜRET VEYA GÖRSEL YÜKLE) */}
             <div className="border border-white/10 rounded-xl p-3.5 bg-gradient-to-br from-cyan-500/5 via-purple-500/5 to-transparent flex flex-col gap-2.5">
               <div className="flex items-center justify-between">
@@ -3691,6 +4122,17 @@ export default function SocialStudio() {
                   )}
                 </button>
 
+                <button
+                  type="button"
+                  disabled={isGeneratingImage}
+                  onClick={handleFindActiveMovieOrBookPoster}
+                  title="Yazılan film veya kitap adına göre resmi sinema afişini / eser kapağını otomatik bulur ve ekler"
+                  className="py-1.5 px-3 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/35 text-amber-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  <Film className="w-3.5 h-3.5 text-amber-400" />
+                  <span>🎬 Film Afişi / Kapak Bul</span>
+                </button>
+
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -3714,12 +4156,13 @@ export default function SocialStudio() {
               <label className="text-[11px] font-semibold text-slate-400 block mb-1.5">
                 DersoLab Renk & Atmosfer Teması:
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 {[
                   { id: 'lab_dark', label: 'DersoLab Koyu', color: 'bg-slate-900 border-sky-500' },
                   { id: 'neon_orange', label: 'Neon Turuncu', color: 'bg-orange-950 border-orange-500' },
                   { id: 'cyan_cyber', label: 'Siber Mavi', color: 'bg-cyan-950 border-cyan-400' },
                   { id: 'purple_matrix', label: 'Mor Gece', color: 'bg-purple-950 border-purple-500' },
+                  { id: 'emerald_glow', label: 'Zümrüt Siber', color: 'bg-emerald-950 border-emerald-400' },
                 ].map((th) => (
                   <button
                     key={th.id}

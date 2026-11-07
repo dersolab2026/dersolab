@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { LineChart, ListFilter } from 'lucide-react'
+import Link from 'next/link'
+import { LineChart, ListFilter, FlaskConical } from 'lucide-react'
 import type { ExamResultEntry } from '@/actions/exam-results'
 import { ERROR_TYPE_LABELS, ERROR_TYPE_PRESCRIPTION, type ErrorTypeCounts } from '@/lib/exams/error-types'
 import {
@@ -12,6 +13,7 @@ import {
 } from '@/lib/exams/structure'
 import { degerlendir, toplamHedefNet, DURUM_RENK } from '@/lib/exams/targets'
 import { zorlukUyarisi } from '@/lib/exams/publishers'
+import { getRecommendedLabForSubjectOrText } from '@/lib/exams/curriculum'
 import { PIXEL_CARD } from '@/lib/theme'
 
 /**
@@ -254,18 +256,15 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
             Ders ders durumun — {secililer.length} denemenin ortalaması
           </p>
           {dersDurumu.map((d) => {
-            // Renk SIRALAMAYA degil MUTLAK basariya gore. Siralamaya gore
-            // renklendirince dort dersin ikisi zorunlu olarak "zayif" oluyordu;
-            // 20 sorunun 20'sini dogru yapan bir ders bile sonuncuysa turuncu
-            // gorunurdu. Esikler: %65 ustu guclu, %40 alti zayif, arasi orta.
             const guclu = d.oran >= 0.65
             const zayif = d.oran < 0.40
+            const labRec = getRecommendedLabForSubjectOrText(d.ad)
             return (
-              <div key={d.ad} className="flex items-center gap-3">
-                <span className="w-40 shrink-0 truncate text-sm font-bold text-slate-200" title={d.ad}>
+              <div key={d.ad} className="flex flex-wrap sm:flex-nowrap items-center gap-3">
+                <span className="w-36 sm:w-40 shrink-0 truncate text-sm font-bold text-slate-200" title={d.ad}>
                   {d.ad}
                 </span>
-                <div className="h-6 flex-1 overflow-hidden rounded-md border border-white/5 bg-white">
+                <div className="h-6 flex-1 min-w-[120px] overflow-hidden rounded-md border border-white/5 bg-white">
                   <div
                     className="h-full transition-all"
                     style={{
@@ -274,16 +273,23 @@ export function ExamAnalysis({ entries, targetNets = [] }: ExamAnalysisProps) {
                     }}
                   />
                 </div>
-                <span className="w-24 shrink-0 text-right text-sm font-bold tabular-nums text-slate-200">
+                <span className="w-20 shrink-0 text-right text-sm font-bold tabular-nums text-slate-200">
                   {d.ortalamaNet.toFixed(1)}/{d.soru}
                 </span>
+                <Link
+                  href={labRec.href}
+                  title={`${labRec.branchName}: ${labRec.moduleTitle}`}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 text-[11px] font-bold shrink-0 transition-all"
+                >
+                  <FlaskConical className="h-3 w-3" />
+                  <span>L.A.B.</span>
+                </Link>
               </div>
             )
           })}
           <p className="pt-1 text-xs font-semibold text-slate-400">
             Sayı, o dersteki ortalama netinin dersin kendi soru sayısına oranı.
-            Yeşil: %65 ve üstü · Gri: %40–65 · Turuncu: %40 altı. Dersler en
-            yüksekten en düşüğe sıralı.
+            Yeşil: %65 ve üstü · Gri: %40–65 · Turuncu: %40 altı. Her dersin yanındaki L.A.B. butonuyla ilgili simülasyonda pratik yapabilirsin.
           </p>
         </div>
       )}
@@ -369,11 +375,8 @@ function NetGrafigi({ noktalar, enYuksek, hedefNet }: { noktalar: Nokta[]; enYuk
   const cizimG = G - solBosluk - sagBosluk
   const cizimY = Y - ustBosluk - altBosluk
 
-  // Ekseni verinin kendisine gore olcekle; tavan hep toplam soru sayisi olursa
-  // dusuk netlerde egri duz bir cizgi gibi gorunuyor ve degisim okunmuyor.
   const netler = noktalar.map((n) => n.net)
   const enBuyukNet = Math.max(...netler)
-  // Hedef cizgisi grafigin disinda kalmasin diye tavan hedefi de kapsiyor.
   const gerekli = Math.max(enBuyukNet, hedefNet ?? 0)
   const tavan = Math.max(5, Math.min(enYuksek, Math.ceil((gerekli * 1.15) / 5) * 5))
 

@@ -4,6 +4,7 @@ import {
   generateAutonomousDailyBatch,
   generateEngagementReplies,
   generateHookMatrix,
+  generateQuestionSolutionCarousel,
   generateSocialPost,
   generateWeeklyCalendar,
   generateXThread,
@@ -82,6 +83,12 @@ export async function POST(request: NextRequest) {
     if (action === 'generate_x_thread') {
       const threadPost = await generateXThread(body as GeneratePostRequest)
       return NextResponse.json({ success: true, item: threadPost })
+    }
+
+    // 5b. Önce Soru, Kaydırınca Çözüm (2-3 Slaytlık Soru-Çözüm Carousel)
+    if (action === 'generate_qa_carousel') {
+      const qaPost = await generateQuestionSolutionCarousel(body as GeneratePostRequest)
+      return NextResponse.json({ success: true, item: qaPost })
     }
 
     // 6. Haftalık Takvim

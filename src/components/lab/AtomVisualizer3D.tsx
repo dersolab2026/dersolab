@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { RotateCw, Lock, Unlock } from 'lucide-react'
 
 interface AtomVisualizer3DProps {
   elementSymbol: string
@@ -17,6 +18,8 @@ export function AtomVisualizer3D({
   colorHex = '#10B981',
 }: AtomVisualizer3DProps) {
   const mountRef = useRef<HTMLDivElement>(null)
+  const [touchInteract, setTouchInteract] = useState(false)
+  const rotationRef = useRef({ x: 0, y: 0, isDragging: false, prevX: 0, prevY: 0 })
 
   useEffect(() => {
     const container = mountRef.current
@@ -33,7 +36,7 @@ export function AtomVisualizer3D({
     camera.position.z = 22
 
     // Renderer
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' })
     renderer.setSize(width, height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     container.appendChild(renderer.domElement)
@@ -45,6 +48,10 @@ export function AtomVisualizer3D({
     const pointLight = new THREE.PointLight(colorHex, 3, 50)
     pointLight.position.set(5, 5, 8)
     scene.add(pointLight)
+
+    // Master Group for User Rotation
+    const masterGroup = new THREE.Group()
+    scene.add(masterGroup)
 
     // Nucleus Group
     const nucleusGroup = new THREE.Group()
@@ -90,10 +97,9 @@ export function AtomVisualizer3D({
       nucleusGroup.add(sphere)
     }
 
-    scene.add(nucleusGroup)
+    masterGroup.add(nucleusGroup)
 
     // Electron Shells (Orbits)
-    // Determine shell count from atomic number: 1 shell (H, He), 2 (Li-Ne), 3 (Na-Ar), 4+
     let shellCount = 1
     if (atomicNumber > 2) shellCount = 2
     if (atomicNumber > 10) shellCount = 3
@@ -108,6 +114,9 @@ export function AtomVisualizer3D({
       emissive: 0x38bdf8,
       emissiveIntensity: 0.9,
     })
+
+    const orbitGeometries: THREE.BufferGeometry[] = []
+    const orbitMaterials: THREE.Material[] = []
 
     // Predefined orbit tilt rotations
     const tilts = [
@@ -128,11 +137,13 @@ export function AtomVisualizer3D({
       }
 
       const orbitGeo = new THREE.BufferGeometry().setFromPoints(orbitPoints)
+      orbitGeometries.push(orbitGeo)
       const orbitMat = new THREE.LineBasicMaterial({
         color: 0x64748b,
         transparent: true,
         opacity: 0.35,
       })
+      orbitMaterials.push(orbitMat)
       const ring = new THREE.LineLoop(orbitGeo, orbitMat)
 
       const tiltAxis = tilts[s % tilts.length]
@@ -157,7 +168,34 @@ export function AtomVisualizer3D({
       }
     }
 
-    scene.add(orbitsGroup)
+    masterGroup.add(orbitsGroup)
+
+    // Drag Interaction (Mouse & Touch)
+    const onPointerDown = (e: PointerEvent) => {
+      rotationRef.current.isDragging = true
+      rotationRef.current.prevX = e.clientX
+      rotationRef.current.prevY = e.clientY
+    }
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!rotationRef.current.isDragging) return
+      const deltaX = e.clientX - rotationRef.current.prevX
+      const deltaY = e.clientY - rotationRef.current.prevY
+      rotationRef.current.prevX = e.clientX
+      rotationRef.current.prevY = e.clientY
+
+      rotationRef.current.y += deltaX * 0.008
+      rotationRef.current.x += deltaY * 0.008
+    }
+
+    const onPointerUp = () => {
+      rotationRef.current.isDragging = false
+    }
+
+    const domElement = renderer.domElement
+    domElement.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('pointermove', onPointerMove)
+    window.addEventListener('pointerup', onPointerUp)
 
     // Animation Loop
     let animationFrameId: number
@@ -167,6 +205,10 @@ export function AtomVisualizer3D({
       animationFrameId = requestAnimationFrame(animate)
       const delta = clock.getDelta()
       const time = clock.getElapsedTime()
+
+      // User drag orientation
+      masterGroup.rotation.y = rotationRef.current.y
+      masterGroup.rotation.x = rotationRef.current.x
 
       // Rotate nucleus
       nucleusGroup.rotation.y += delta * 0.8
@@ -208,25 +250,69 @@ export function AtomVisualizer3D({
 
     window.addEventListener('resize', handleResize)
 
+    // Comprehensive Resource Disposal
     return () => {
       window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(animationFrameId)
+
+      domElement.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('pointerup', onPointerUp)
+
       if (container && renderer.domElement) {
         container.removeChild(renderer.domElement)
       }
+
+      // Geometries
+      coreGeometry.dispose()
+      subSphereGeo.dispose()
+      electronGeo.dispose()
+      orbitGeometries.forEach((g) => g.dispose())
+
+      // Materials
+      coreMaterial.dispose()
+      subMaterialProton.dispose()
+      subMaterialNeutron.dispose()
+      electronMat.dispose()
+      orbitMaterials.forEach((m) => m.dispose())
+
       renderer.dispose()
     }
   }, [atomicNumber, colorHex])
 
   return (
     <div className="relative w-full h-[280px] flex items-center justify-center rounded-2xl bg-gradient-to-b from-slate-900/60 to-slate-950/80 border border-slate-800/80 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.8)]">
-      {/* 3D Canvas Mount */}
-      <div ref={mountRef} className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing" />
+      {/* 3D Canvas Mount with touch-action control */}
+      <div
+        ref={mountRef}
+        className={`absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing ${
+          touchInteract ? 'touch-none' : 'touch-pan-y'
+        }`}
+      />
 
       {/* Floating Atom Overlay Info */}
       <div className="absolute top-3 left-3 pointer-events-none flex flex-col">
         <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Canlı 3D Model</span>
-        <span className="text-xs font-semibold text-white/90">{elementName} ({elementSymbol})</span>
+        <span className="text-xs font-semibold text-white/90">
+          {elementName} ({elementSymbol})
+        </span>
+      </div>
+
+      {/* Touch / Drag Lock Toggle for Mobile */}
+      <div className="absolute top-3 right-3 flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setTouchInteract((prev) => !prev)}
+          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all cursor-pointer ${
+            touchInteract
+              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-md shadow-cyan-500/20'
+              : 'bg-slate-900/80 text-slate-400 border-slate-700 hover:text-white'
+          }`}
+          title={touchInteract ? 'Dokunarak döndürme aktif (Sayfa kaymaz)' : 'Sayfayı kaydırmak serbest (Döndürmek için açın)'}
+        >
+          {touchInteract ? <Unlock className="w-3 h-3 text-cyan-400" /> : <Lock className="w-3 h-3 text-slate-400" />}
+          <span>{touchInteract ? '3D Döndür' : 'Kaydırma Modu'}</span>
+        </button>
       </div>
 
       <div className="absolute bottom-3 right-3 pointer-events-none flex items-center gap-2 bg-slate-950/70 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 text-[10px] text-slate-300">

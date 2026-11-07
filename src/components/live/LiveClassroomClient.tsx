@@ -10,8 +10,10 @@ import {
   X,
   ExternalLink,
   Columns2,
+  PenTool,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { SharedWhiteboardPanel, type WhiteboardStroke } from './SharedWhiteboardPanel'
 
 interface LiveClassroomClientProps {
   bookingId: string
@@ -45,8 +47,6 @@ export function LiveClassroomClient({
   currentUserName,
   isInstructor,
   otherPersonName,
-  startTime,
-  endTime,
   topicNote,
   meetLink,
 }: LiveClassroomClientProps) {
@@ -57,6 +57,10 @@ export function LiveClassroomClient({
   const [loading, setLoading] = useState(true)
   const [labModalOpen, setLabModalOpen] = useState(false)
   const [activeSplitLabUrl, setActiveSplitLabUrl] = useState<string | null>(null)
+  const [whiteboardOpen, setWhiteboardOpen] = useState(false)
+  const [strokes, setStrokes] = useState<WhiteboardStroke[]>([])
+  const [whiteboardBg, setWhiteboardBg] = useState<string | null>(null)
+  const [gridMode, setGridMode] = useState<'dots' | 'axes' | 'blank'>('dots')
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
 
   // Safe unique room name
@@ -70,7 +74,7 @@ export function LiveClassroomClient({
     return () => clearInterval(timer)
   }, [])
 
-  // Supabase Realtime: Eğitmen ve öğrenci arasında L.A.B. simülasyonu senkronizasyonu
+  // Supabase Realtime: Eğitmen ve öğrenci arasında L.A.B. simülasyonu ve Soru Tahtası senkronizasyonu
   useEffect(() => {
     try {
       const supabase = createClient()
@@ -82,7 +86,31 @@ export function LiveClassroomClient({
         .on('broadcast', { event: 'lab-sync' }, ({ payload }) => {
           if (payload && typeof payload.url !== 'undefined') {
             setActiveSplitLabUrl(payload.url)
+            if (payload.url) setWhiteboardOpen(false)
           }
+        })
+        .on('broadcast', { event: 'wb-toggle' }, ({ payload }) => {
+          if (payload && typeof payload.open === 'boolean') {
+            setWhiteboardOpen(payload.open)
+            if (payload.open) setActiveSplitLabUrl(null)
+          }
+        })
+        .on('broadcast', { event: 'wb-stroke' }, ({ payload }) => {
+          if (payload?.stroke) {
+            setStrokes((prev) => [...prev, payload.stroke])
+          }
+        })
+        .on('broadcast', { event: 'wb-undo' }, () => {
+          setStrokes((prev) => prev.slice(0, -1))
+        })
+        .on('broadcast', { event: 'wb-clear' }, () => {
+          setStrokes([])
+        })
+        .on('broadcast', { event: 'wb-bg' }, ({ payload }) => {
+          setWhiteboardBg(payload?.dataUrl ?? null)
+        })
+        .on('broadcast', { event: 'wb-grid' }, ({ payload }) => {
+          if (payload?.mode) setGridMode(payload.mode)
         })
         .subscribe()
 
@@ -99,6 +127,7 @@ export function LiveClassroomClient({
 
   const selectSplitLab = (url: string | null) => {
     setActiveSplitLabUrl(url)
+    if (url) setWhiteboardOpen(false)
     setLabModalOpen(false)
     if (channelRef.current) {
       channelRef.current.send({
@@ -107,6 +136,63 @@ export function LiveClassroomClient({
         payload: { url },
       })
     }
+  }
+
+  const toggleWhiteboard = (open: boolean) => {
+    setWhiteboardOpen(open)
+    if (open) setActiveSplitLabUrl(null)
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'wb-toggle',
+        payload: { open },
+      })
+    }
+  }
+
+  const handleAddStroke = (stroke: WhiteboardStroke) => {
+    setStrokes((prev) => [...prev, stroke])
+    channelRef.current?.send({
+      type: 'broadcast',
+      event: 'wb-stroke',
+      payload: { stroke },
+    })
+  }
+
+  const handleUndoStroke = () => {
+    setStrokes((prev) => prev.slice(0, -1))
+    channelRef.current?.send({
+      type: 'broadcast',
+      event: 'wb-undo',
+      payload: {},
+    })
+  }
+
+  const handleClearBoard = () => {
+    setStrokes([])
+    channelRef.current?.send({
+      type: 'broadcast',
+      event: 'wb-clear',
+      payload: {},
+    })
+  }
+
+  const handleChangeBgImage = (dataUrl: string | null) => {
+    setWhiteboardBg(dataUrl)
+    channelRef.current?.send({
+      type: 'broadcast',
+      event: 'wb-bg',
+      payload: { dataUrl },
+    })
+  }
+
+  const handleChangeGridMode = (mode: 'dots' | 'axes' | 'blank') => {
+    setGridMode(mode)
+    channelRef.current?.send({
+      type: 'broadcast',
+      event: 'wb-grid',
+      payload: { mode },
+    })
   }
 
   const elapsedMinutes = Math.floor(elapsedSeconds / 60)
@@ -208,6 +294,8 @@ export function LiveClassroomClient({
     }
   }, [roomName, currentUserName, isInstructor, handleLeave])
 
+  const hasSplitScreen = Boolean(activeSplitLabUrl || whiteboardOpen)
+
   return (
     <div className="fixed inset-0 z-50 bg-[#080B11] text-slate-100 flex flex-col overflow-hidden select-none">
       {/* Top Bar Header */}
@@ -234,7 +322,7 @@ export function LiveClassroomClient({
         </div>
 
         {/* Sayaç ve Araçlar */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           {/* Seans Süresi */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 font-mono text-xs font-bold text-emerald-400">
             <Clock className="w-3.5 h-3.5" />
@@ -254,6 +342,22 @@ export function LiveClassroomClient({
               <span>Google Meet</span>
             </a>
           )}
+
+          {/* Ortak Soru & Çizim Tahtası Butonu */}
+          <button
+            onClick={() => toggleWhiteboard(!whiteboardOpen)}
+            className={`px-3 py-1.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 ${
+              whiteboardOpen
+                ? 'bg-amber-500/25 border-amber-400/50 text-amber-200'
+                : 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-300'
+            }`}
+            title="Soru fotoğrafı yansıt ve ortak çizim tahtasında çöz"
+          >
+            <PenTool className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">
+              {whiteboardOpen ? 'Tahtayı Kapat' : 'Ortak Soru Tahtası'}
+            </span>
+          </button>
 
           {/* L.A.B. Hızlı Simülasyon Butonu */}
           <button
@@ -293,10 +397,16 @@ export function LiveClassroomClient({
         </div>
       </header>
 
-      {/* Main Content Area (Video + Optional Split-Screen L.A.B.) */}
+      {/* Main Content Area (Video + Optional Split-Screen L.A.B. or Whiteboard) */}
       <div className="flex-1 flex flex-col lg:flex-row relative w-full h-full bg-[#0B0F19] overflow-hidden">
         {/* Video Area */}
-        <div className={`relative h-full transition-all duration-300 ${activeSplitLabUrl ? 'w-full lg:w-1/2 h-1/2 lg:h-full border-b lg:border-b-0 lg:border-r border-white/10' : 'w-full'}`}>
+        <div
+          className={`relative h-full transition-all duration-300 ${
+            hasSplitScreen
+              ? 'w-full lg:w-1/2 h-1/2 lg:h-full border-b lg:border-b-0 lg:border-r border-white/10'
+              : 'w-full'
+          }`}
+        >
           {loading && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0B0F19] text-center p-4">
               <div className="w-16 h-16 rounded-3xl bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-4 animate-pulse shadow-[0_0_30px_rgba(249,115,22,0.3)]">
@@ -312,8 +422,25 @@ export function LiveClassroomClient({
           <div ref={jitsiContainerRef} className="w-full h-full" />
         </div>
 
+        {/* Split-Screen Whiteboard Area */}
+        {whiteboardOpen && (
+          <div className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col bg-[#080B11]">
+            <SharedWhiteboardPanel
+              strokes={strokes}
+              bgImage={whiteboardBg}
+              gridMode={gridMode}
+              onAddStroke={handleAddStroke}
+              onUndoStroke={handleUndoStroke}
+              onClearBoard={handleClearBoard}
+              onChangeBgImage={handleChangeBgImage}
+              onChangeGridMode={handleChangeGridMode}
+              onClose={() => toggleWhiteboard(false)}
+            />
+          </div>
+        )}
+
         {/* Split-Screen L.A.B. Area */}
-        {activeSplitLabUrl && (
+        {activeSplitLabUrl && !whiteboardOpen && (
           <div className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col bg-[#080B11]">
             <div className="h-9 px-3 bg-[#101624] border-b border-white/10 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2 text-cyan-300 font-bold">

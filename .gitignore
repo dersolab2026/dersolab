@@ -64,3 +64,8 @@ extract-texts.js
 extracted_texts.txt
 find-tdk-errors.js
 refactor_emails.js
+
+/scratch/
+patch_*.js
+update_anatomy.js
+scripts/send-social-plan-email.mjs

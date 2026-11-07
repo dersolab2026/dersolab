@@ -406,6 +406,123 @@ function drawStorySticker(
     return cursorY + cardH + 30
   }
 
+  if (stickerType === 'countdown') {
+    const cardH = 225
+    ctx.save()
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'
+    ctx.shadowBlur = 24
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.95)'
+    roundRect(ctx, 80, cursorY, cardW, cardH, 28)
+    ctx.fill()
+    ctx.strokeStyle = '#f97316'
+    ctx.lineWidth = 2
+    ctx.stroke()
+    ctx.restore()
+
+    ctx.fillStyle = '#fb923c'
+    ctx.font = '800 18px Inter, system-ui, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('⏳ CANLI GERİ SAYIM SAYACI', width / 2, cursorY + 40)
+
+    ctx.fillStyle = '#ffffff'
+    drawFittedSingleLine(
+      ctx,
+      story.stickerQuestion || 'YKS & LGS Büyük Deneme Kampı Başlıyor!',
+      width / 2,
+      cursorY + 76,
+      cardW - 60,
+      25,
+      16,
+      'bold',
+      'center'
+    )
+
+    const units = [
+      { val: '02', label: 'GÜN' },
+      { val: '14', label: 'SAAT' },
+      { val: '45', label: 'DAKİKA' },
+      { val: '00', label: 'SANİYE' },
+    ]
+    const boxW = 140
+    const boxH = 92
+    const gap = 22
+    const totalW = units.length * boxW + (units.length - 1) * gap
+    let startX = (width - totalW) / 2
+    const boxY = cursorY + 104
+
+    units.forEach((u) => {
+      ctx.fillStyle = 'rgba(249, 115, 22, 0.14)'
+      roundRect(ctx, startX, boxY, boxW, boxH, 16)
+      ctx.fill()
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.45)'
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+
+      ctx.font = '900 38px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.textAlign = 'center'
+      ctx.fillText(u.val, startX + boxW / 2, boxY + 50)
+
+      ctx.font = '700 14px Inter, system-ui, sans-serif'
+      ctx.fillStyle = '#fdba74'
+      ctx.fillText(u.label, startX + boxW / 2, boxY + 76)
+
+      startX += boxW + gap
+    })
+    ctx.textAlign = 'left'
+    return cursorY + cardH + 30
+  }
+
+  if (stickerType === 'question_box') {
+    const cardH = 210
+    ctx.save()
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'
+    ctx.shadowBlur = 24
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
+    roundRect(ctx, 80, cursorY, cardW, cardH, 28)
+    ctx.fill()
+    ctx.restore()
+
+    ctx.fillStyle = '#0f172a'
+    drawFittedSingleLine(
+      ctx,
+      story.stickerQuestion || 'Hangi konuda netlerin takıldı? Bize yaz 👇',
+      width / 2,
+      cursorY + 62,
+      cardW - 60,
+      25,
+      16,
+      'bold',
+      'center'
+    )
+
+    const inputX = 115
+    const inputY = cursorY + 96
+    const inputW = cardW - 70
+    const inputH = 80
+    ctx.fillStyle = '#f1f5f9'
+    roundRect(ctx, inputX, inputY, inputW, inputH, 18)
+    ctx.fill()
+    ctx.strokeStyle = '#cbd5e1'
+    ctx.lineWidth = 1.5
+    ctx.stroke()
+
+    ctx.font = '500 22px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#64748b'
+    ctx.textAlign = 'left'
+    ctx.fillText('Yanıtını veya sorunu buraya yaz...', inputX + 26, inputY + 48)
+
+    ctx.fillStyle = '#f97316'
+    roundRect(ctx, inputX + inputW - 66, inputY + 14, 52, 52, 14)
+    ctx.fill()
+    ctx.font = '24px "Apple Color Emoji", "Segoe UI Emoji", sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('🚀', inputX + inputW - 40, inputY + 48)
+    ctx.textAlign = 'left'
+
+    return cursorY + cardH + 30
+  }
+
   // Link Çıkartması
   const cardH = 100
   ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
@@ -436,6 +553,9 @@ function drawSingleBookCard(
 ) {
   const isOrtaokul = level === 'ortaokul'
   const pad = 24
+  const isMovieCard = /film|sinema|belgesel|yönetmen|imdb|🎬|🍿/i.test(
+    `${book.highlightTag || ''} ${book.genre || ''} ${book.author || ''}`
+  )
 
   const cardBg = isOrtaokul ? 'rgba(6, 182, 212, 0.08)' : 'rgba(249, 115, 22, 0.08)'
   const cardBorder = isOrtaokul ? 'rgba(6, 182, 212, 0.45)' : 'rgba(249, 115, 22, 0.5)'
@@ -444,7 +564,13 @@ function drawSingleBookCard(
   const authorColor = isOrtaokul ? '#38bdf8' : '#fb923c'
   const boxBg = isOrtaokul ? 'rgba(6, 182, 212, 0.12)' : 'rgba(249, 115, 22, 0.12)'
   const boxBorder = isOrtaokul ? 'rgba(6, 182, 212, 0.28)' : 'rgba(249, 115, 22, 0.28)'
-  const defaultTag = isOrtaokul ? '📘 ORTAOKUL & LGS SEÇKİSİ' : '📕 LİSE & YKS SEÇKİSİ'
+  const defaultTag = isMovieCard
+    ? isOrtaokul
+      ? '🎬 ORTAOKUL & LGS FİLM SEÇKİSİ'
+      : '🍿 LİSE & YKS FİLM SEÇKİSİ'
+    : isOrtaokul
+      ? '📘 ORTAOKUL & LGS SEÇKİSİ'
+      : '📕 LİSE & YKS SEÇKİSİ'
 
   ctx.save()
   // Dış kart çerçevesi ve taşma kilidi
@@ -483,7 +609,7 @@ function drawSingleBookCard(
     roundRect(ctx, imgX, imgY, imgW, imgH, 16)
     ctx.stroke()
   } else {
-    // Kitap kapağı yüklenmediyse şık bir fallback kitap ikonu kutusu çiz
+    // Kitap kapağı / Film afişi yüklenmediyse şık bir fallback ikonu kutusu çiz
     ctx.save()
     roundRect(ctx, imgX, imgY, imgW, imgH, 16)
     ctx.fillStyle = isOrtaokul ? 'rgba(6, 182, 212, 0.2)' : 'rgba(249, 115, 22, 0.2)'
@@ -494,7 +620,7 @@ function drawSingleBookCard(
 
     ctx.font = '54px "Apple Color Emoji", "Segoe UI Emoji", sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText('📖', imgX + imgW / 2, imgY + imgH / 2 + 18)
+    ctx.fillText(isMovieCard ? '🎬' : '📖', imgX + imgW / 2, imgY + imgH / 2 + 18)
     ctx.textAlign = 'left'
     ctx.restore()
   }
@@ -504,7 +630,14 @@ function drawSingleBookCard(
 
   // 1. Üst Seviye Etiketi (Dinamik genişlikli pill)
   const rawTag = book.highlightTag || defaultTag
-  const tagText = rawTag.startsWith('📘') || rawTag.startsWith('📕') ? rawTag : `${isOrtaokul ? '📘' : '📕'} ${rawTag}`
+  const hasLeadingEmoji =
+    rawTag.startsWith('📘') ||
+    rawTag.startsWith('📕') ||
+    rawTag.startsWith('🎬') ||
+    rawTag.startsWith('🍿')
+  const tagText = hasLeadingEmoji
+    ? rawTag
+    : `${isMovieCard ? (isOrtaokul ? '🎬' : '🍿') : isOrtaokul ? '📘' : '📕'} ${rawTag}`
   ctx.font = '800 14px Inter, system-ui, sans-serif'
   const pillW = Math.min(rightW, Math.max(200, ctx.measureText(tagText).width + 30))
   const pillH = 34
@@ -516,7 +649,7 @@ function drawSingleBookCard(
   ctx.fillStyle = '#ffffff'
   drawFittedSingleLine(ctx, tagText, rightX + 14, pillY + 22, pillW - 24, 14, 11, '800', 'left')
 
-  // 2. Kitap Adı (1 veya 2 satır dinamik yükseklik)
+  // 2. Kitap / Film Adı (1 veya 2 satır dinamik yükseklik)
   ctx.font = 'bold 32px Inter, system-ui, sans-serif'
   let titleLines = getWrappedLines(ctx, book.title, rightW, 2)
   let titleFontSize = 32
@@ -535,10 +668,12 @@ function drawSingleBookCard(
   })
   const afterTitleY = titleFirstBaseline + (titleLines.length - 1) * titleLineH
 
-  // 3. Yazar ve Tür Satırları
+  // 3. Yazar / Yönetmen ve Tür Satırları
   const authorY = afterTitleY + 30
   ctx.fillStyle = authorColor
-  drawFittedSingleLine(ctx, `Yazar: ${book.author}`, rightX, authorY, rightW, 21, 15, '600', 'left')
+  const creatorPrefix = isMovieCard ? 'Yönetmen' : 'Yazar'
+  const cleanAuthor = book.author.replace(/^(Yazar|Yönetmen):\s*/i, '')
+  drawFittedSingleLine(ctx, `${creatorPrefix}: ${cleanAuthor}`, rightX, authorY, rightW, 21, 15, '600', 'left')
 
   const genreY = authorY + 26
   if (book.genre) {
@@ -546,7 +681,7 @@ function drawSingleBookCard(
     drawFittedSingleLine(ctx, `Tür: ${book.genre}`, rightX, genreY, rightW, 17, 13, '500', 'left')
   }
 
-  // 4. "NEDEN OKUNMALI?" Insight Kutusu
+  // 4. "NEDEN OKUNMALI / İZLENMELİ?" Insight Kutusu
   const boxBottom = cardY + cardH - pad
   const boxY = Math.max(genreY + 18, cardY + 235)
   const boxH = Math.max(90, boxBottom - boxY)
@@ -565,10 +700,10 @@ function drawSingleBookCard(
   ctx.lineWidth = 1
   ctx.stroke()
 
-  // Kutu içi mini başlık: 💡 NEDEN OKUNMALI?
+  // Kutu içi mini başlık
   ctx.font = '800 13px Inter, system-ui, sans-serif'
   ctx.fillStyle = isOrtaokul ? '#38bdf8' : '#fb923c'
-  ctx.fillText('💡 NEDEN OKUNMALI?', rightX + 16, boxY + 24)
+  ctx.fillText(isMovieCard ? '🍿 NEDEN İZLENMELİ?' : '💡 NEDEN OKUNMALI?', rightX + 16, boxY + 24)
 
   const whyText =
     book.whyRead ||
@@ -644,10 +779,17 @@ function drawDualBookStoryCards(
   ctx.textAlign = 'left'
 
   // Metin Alanı
+  const isMovieDualStory = /film|sinema|belgesel|🎬|🍿/i.test(
+    `${story.badge || ''} ${story.headline || ''} ${ortaokul.highlightTag || ''}`
+  )
   const textX = iconX + iconSize + 20
   ctx.font = '900 22px Inter, system-ui, sans-serif'
   ctx.fillStyle = '#ffffff'
-  ctx.fillText('BU HAFTA HANGİSİNİ OKUYACAKSIN?', textX, ctaY + 54)
+  ctx.fillText(
+    isMovieDualStory ? 'BU HAFTA HANGİSİNİ İZLEYECEKSİN?' : 'BU HAFTA HANGİSİNİ OKUYACAKSIN?',
+    textX,
+    ctaY + 54
+  )
 
   ctx.font = '500 17px Inter, system-ui, sans-serif'
   ctx.fillStyle = 'rgba(226, 232, 240, 0.85)'
@@ -747,8 +889,12 @@ export async function renderSlideToCanvas(
   const loadedLogo =
     preloadedImages?.logo !== undefined ? preloadedImages.logo : await loadImageSafely('/fox-head.png')
 
+  const hasPoints = Boolean(isCarousel && currentSlide?.bodyPoints && currentSlide.bodyPoints.length > 0)
+  const hasOptions = Boolean(singlePost?.options && singlePost.options.length > 0)
+  const isDualBookStory = Boolean(isStory && storyData?.dualBookData)
+
   const rawImageUrl = isCarousel
-    ? currentSlide?.uploadedImageUrl || (activeSlideIndex === 0 ? customImageUrl : undefined)
+    ? currentSlide?.uploadedImageUrl || (activeSlideIndex === 0 && !hasPoints ? customImageUrl : undefined)
     : isReels
       ? reelsStoryboard?.uploadedImageUrl || customImageUrl
       : singlePost?.uploadedImageUrl || storyData?.uploadedImageUrl || customImageUrl
@@ -824,52 +970,147 @@ export async function renderSlideToCanvas(
   ctx.stroke()
 
   // 6. İÇERİK ALANI
-  let cursorY = headerDividerY + 28
-  const isMascotAsset = Boolean(
-    effectiveImageUrl &&
-      (/(?:fox-mascot|fox-head|mascot-icon|zeki|maskot)/i.test(effectiveImageUrl) ||
-        (effectiveImageUrl.startsWith('data:image/svg') && effectiveImageUrl.includes('mascotHalo')))
-  )
-  const hasPoints = Boolean(isCarousel && currentSlide?.bodyPoints && currentSlide.bodyPoints.length > 0)
-  const hasOptions = Boolean(singlePost?.options && singlePost.options.length > 0)
-  // Carousel kapak veya içerik slaytlarında maddeler (bodyPoints) varken görsel kutusu maddeleri ve başlığı ezeceğinden görsel çizilmez.
-  // Yalnızca maddesiz slaytlarda (tam sayfa diyagram/infografik slaytı) veya single/story post ise görsel çizilir.
+  let cursorY = headerDividerY + 24
+  const isHeaderIconOnly = Boolean(effectiveImageUrl && /\/fox-head\.png$/i.test(effectiveImageUrl))
+  // Carousel slaytlarında kullanıcı slayta özel görsel/diyagram atadıysa veya slayt maddesizse görseli çiz;
+  // hem görsel hem maddeler varsa kompakt yerleşim kullanarak taşmayı önle.
   const hasImage =
     Boolean(loadedImage) &&
-    !isMascotAsset &&
-    (!isCarousel || !hasPoints || !currentSlide?.bodyPoints || currentSlide.bodyPoints.length <= 1)
+    !isHeaderIconOnly &&
+    !isDualBookStory &&
+    (!isCarousel || Boolean(currentSlide?.uploadedImageUrl) || !hasPoints)
 
   // YÜKLENEN / ÜRETİLEN GÖRSEL VARSA ÇİZ
   if (hasImage && loadedImage) {
+    const isVerticalPoster = loadedImage.height > loadedImage.width * 1.12
     const imgBoxW = width - 160
-    const imgBoxH = isStory ? 520 : isReels ? 420 : hasPoints || hasOptions ? 275 : 350
+    const imgBoxH = isVerticalPoster
+      ? isStory
+        ? 580
+        : isReels
+          ? 450
+          : hasPoints
+            ? 345
+            : hasOptions
+              ? 360
+              : 460
+      : isStory
+        ? 500
+        : isReels
+          ? 400
+          : hasPoints
+            ? 236
+            : hasOptions
+              ? 265
+              : 350
 
     ctx.save()
     roundRect(ctx, 80, cursorY, imgBoxW, imgBoxH, 22)
     ctx.clip()
 
-    const isSquareOrDiagram = Math.abs(loadedImage.width - loadedImage.height) < 120
-    const ratio = isSquareOrDiagram
-      ? Math.min(imgBoxW / loadedImage.width, (imgBoxH - 16) / loadedImage.height)
-      : Math.max(imgBoxW / loadedImage.width, imgBoxH / loadedImage.height)
-
-    const centerShiftX = (imgBoxW - loadedImage.width * ratio) / 2
-    const centerShiftY = (imgBoxH - loadedImage.height * ratio) / 2
-
     ctx.fillStyle = '#05070c'
     ctx.fillRect(80, cursorY, imgBoxW, imgBoxH)
 
-    ctx.drawImage(
-      loadedImage,
-      0,
-      0,
-      loadedImage.width,
-      loadedImage.height,
-      80 + centerShiftX,
-      cursorY + centerShiftY,
-      loadedImage.width * ratio,
-      loadedImage.height * ratio
-    )
+    if (isVerticalPoster) {
+      // 1. Atmosferik bulanık/koyu arka plan dolgusu (dikey 2:3 film afişi veya kitap kapağı için)
+      const bgCoverRatio = Math.max(imgBoxW / loadedImage.width, imgBoxH / loadedImage.height) * 1.1
+      const bgW = loadedImage.width * bgCoverRatio
+      const bgH = loadedImage.height * bgCoverRatio
+      const bgX = 80 + (imgBoxW - bgW) / 2
+      const bgY = cursorY + (imgBoxH - bgH) / 2
+
+      ctx.save()
+      ctx.globalAlpha = 0.22
+      ctx.drawImage(loadedImage, 0, 0, loadedImage.width, loadedImage.height, bgX, bgY, bgW, bgH)
+      ctx.restore()
+
+      // Sinematik radyal spot ışığı ve koyu vinyet
+      const spotGrad = ctx.createRadialGradient(
+        80 + imgBoxW / 2,
+        cursorY + imgBoxH / 2,
+        40,
+        80 + imgBoxW / 2,
+        cursorY + imgBoxH / 2,
+        imgBoxW * 0.65
+      )
+      spotGrad.addColorStop(0, 'rgba(15, 23, 42, 0.35)')
+      spotGrad.addColorStop(1, 'rgba(3, 7, 18, 0.88)')
+      ctx.fillStyle = spotGrad
+      ctx.fillRect(80, cursorY, imgBoxW, imgBoxH)
+
+      // 2. Dikey 2:3 Afişi / Kapağı hiç kırpmadan (100% tam boy) ortada sergile
+      const fitRatio = Math.min((imgBoxW - 80) / loadedImage.width, (imgBoxH - 28) / loadedImage.height)
+      const posterW = Math.round(loadedImage.width * fitRatio)
+      const posterH = Math.round(loadedImage.height * fitRatio)
+      const posterX = Math.round(80 + (imgBoxW - posterW) / 2)
+      const posterY = Math.round(cursorY + (imgBoxH - posterH) / 2)
+
+      ctx.save()
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)'
+      ctx.shadowBlur = 28
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 10
+      roundRect(ctx, posterX, posterY, posterW, posterH, 14)
+      ctx.fillStyle = '#090d16'
+      ctx.fill()
+      ctx.clip()
+      ctx.drawImage(
+        loadedImage,
+        0,
+        0,
+        loadedImage.width,
+        loadedImage.height,
+        posterX,
+        posterY,
+        posterW,
+        posterH
+      )
+      ctx.restore()
+
+      // Afiş iç altın/neon çerçevesi
+      ctx.strokeStyle = theme.accentColor
+      ctx.lineWidth = 2
+      roundRect(ctx, posterX, posterY, posterW, posterH, 14)
+      ctx.stroke()
+
+      // Sağ üst köşeye "🎬 RESMİ AFİŞ" veya "📚 ESER KAPAĞI" rozeti
+      const isMovieContext = /film|sinema|belgesel|dizi|imdb|yönetmen|🎬|🍿/i.test(
+        `${currentSlide?.badge || ''} ${currentSlide?.headline || ''} ${singlePost?.badge || ''} ${singlePost?.headline || ''} ${storyData?.badge || ''} ${postTitle || ''}`
+      )
+      const cornerLabel = isMovieContext ? '🎬 RESMİ FİLM AFİŞİ' : '📚 ORİJİNAL KAPAK'
+      ctx.font = '800 14px Inter, system-ui, sans-serif'
+      const cPillW = ctx.measureText(cornerLabel).width + 26
+      const cPillX = 80 + imgBoxW - cPillW - 18
+      const cPillY = cursorY + 16
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'
+      roundRect(ctx, cPillX, cPillY, cPillW, 32, 10)
+      ctx.fill()
+      ctx.strokeStyle = theme.accentColor
+      ctx.lineWidth = 1.2
+      ctx.stroke()
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(cornerLabel, cPillX + 13, cPillY + 21)
+    } else {
+      const isSquareOrDiagram = Math.abs(loadedImage.width - loadedImage.height) < 120
+      const ratio = isSquareOrDiagram
+        ? Math.min(imgBoxW / loadedImage.width, (imgBoxH - 12) / loadedImage.height)
+        : Math.max(imgBoxW / loadedImage.width, imgBoxH / loadedImage.height)
+
+      const centerShiftX = (imgBoxW - loadedImage.width * ratio) / 2
+      const centerShiftY = (imgBoxH - loadedImage.height * ratio) / 2
+
+      ctx.drawImage(
+        loadedImage,
+        0,
+        0,
+        loadedImage.width,
+        loadedImage.height,
+        80 + centerShiftX,
+        cursorY + centerShiftY,
+        loadedImage.width * ratio,
+        loadedImage.height * ratio
+      )
+    }
     ctx.restore()
 
     ctx.strokeStyle = theme.accentColor
@@ -877,7 +1118,7 @@ export async function renderSlideToCanvas(
     roundRect(ctx, 80, cursorY, imgBoxW, imgBoxH, 22)
     ctx.stroke()
 
-    cursorY += imgBoxH + 20
+    cursorY += imgBoxH + (hasPoints ? 14 : 20)
   }
 
   // ROZET & VURGU ETİKETİ
@@ -920,7 +1161,7 @@ export async function renderSlideToCanvas(
     ctx.fillText(highlightTag, tagX + 16, badgeY + 25)
   }
 
-  cursorY += badgeH + 20
+  cursorY += badgeH + (hasImage && hasPoints ? 14 : 20)
 
   // BAŞLIK
   const rawHeadline =
@@ -931,9 +1172,28 @@ export async function renderSlideToCanvas(
     'Sınavda Başarıyı Getiren Strateji'
   const headline = toTurkishTitleCase(rawHeadline)
 
-  const isDualBookStory = Boolean(isStory && storyData?.dualBookData)
-  const headlineFontSize = isDualBookStory ? 38 : hasImage ? (isStory || isReels ? 46 : 42) : isStory || isReels ? 56 : 50
-  const headlineLineHeight = isDualBookStory ? 46 : hasImage ? (isStory || isReels ? 58 : 52) : isStory || isReels ? 68 : 62
+  const headlineFontSize = isDualBookStory
+    ? 38
+    : hasImage
+      ? isStory || isReels
+        ? 46
+        : hasPoints
+          ? 38
+          : 42
+      : isStory || isReels
+        ? 56
+        : 50
+  const headlineLineHeight = isDualBookStory
+    ? 46
+    : hasImage
+      ? isStory || isReels
+        ? 58
+        : hasPoints
+          ? 46
+          : 52
+      : isStory || isReels
+        ? 68
+        : 62
 
   cursorY += Math.round(headlineFontSize * 0.85)
   ctx.font = `900 ${headlineFontSize}px Inter, system-ui, sans-serif`
@@ -947,15 +1207,15 @@ export async function renderSlideToCanvas(
     storyData?.subhead ||
     (postCaption && !isReels ? postCaption.split('\n')[0].slice(0, 100) : '')
   if (subhead) {
-    const subheadFontSize = isDualBookStory ? 20 : hasImage ? 23 : 26
-    const subheadLineHeight = isDualBookStory ? 28 : hasImage ? 32 : 36
-    cursorY += (isDualBookStory ? 8 : 12) + Math.round(subheadFontSize * 0.85)
+    const subheadFontSize = isDualBookStory ? 20 : hasImage ? (hasPoints ? 21 : 23) : 26
+    const subheadLineHeight = isDualBookStory ? 28 : hasImage ? (hasPoints ? 28 : 32) : 36
+    cursorY += (isDualBookStory || (hasImage && hasPoints) ? 8 : 12) + Math.round(subheadFontSize * 0.85)
     ctx.font = `500 ${subheadFontSize}px Inter, system-ui, sans-serif`
     ctx.fillStyle = 'rgba(226, 232, 240, 0.85)'
     cursorY = wrapText(ctx, subhead, 80, cursorY, width - 160, subheadLineHeight, 2)
   }
 
-  cursorY += isDualBookStory ? 16 : 22
+  cursorY += isDualBookStory || (hasImage && hasPoints) ? 14 : 22
 
   const safeContentBottom = height - 130
   const availableSpace = safeContentBottom - cursorY
@@ -1275,7 +1535,8 @@ export async function generateAllPostMediaFiles(
         totalSlides: total,
         currentSlide: slide,
         postTitle: post.title,
-        customImageUrl: post.uploadedImageUrl,
+        customImageUrl: slide.uploadedImageUrl || (i === 0 ? post.uploadedImageUrl : undefined),
+        themeVariant: slide.themeVariant,
       })
       exportedFiles.push({
         filename: `dersolab_slayt_${i + 1}.jpg`,

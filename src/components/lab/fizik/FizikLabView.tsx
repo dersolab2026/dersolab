@@ -33,6 +33,7 @@ import { ExamQuestionCard, type ExamQuestion } from '../shared/ExamQuestionCard'
 import { LabReportModal, type MeasurementRow } from '../shared/LabReportModal'
 import { LabSplitScreenModal, type SplitStateScenario } from '../shared/LabSplitScreenModal'
 import { DersoAISocraticAssistant } from '../shared/DersoAISocraticAssistant'
+import { LabTutorCTA } from '../shared/LabTutorCTA'
 import { playClickSound } from '@/lib/soundFx'
 
 export type FizikTabType =
@@ -510,6 +511,23 @@ export function FizikLabView() {
                 'Kaldırma Kuvveti (Fk)': '1.0 N',
                 'Sıvı Basıncı (P)': '2500 Pa',
               }}
+            />
+
+            {/* 4. Uzman Eğitmen & Tanışma Dersi Dönüşüm Hunisi */}
+            <LabTutorCTA
+              branch="Fizik"
+              topicName={
+                activeTab === 'buoyancy'
+                  ? 'Kaldırma Kuvveti & Sıvı Basıncı'
+                  : activeTab === 'circuits'
+                  ? 'Elektrik Devreleri & Ohm Yasası'
+                  : activeTab === 'optics'
+                  ? 'Mercekler ve Işık Kırılması'
+                  : activeTab === 'newton'
+                  ? 'Newton Dinamik Yasaları'
+                  : 'Fizik Deneyleri'
+              }
+              gradeLevel={levelFilter === 'ortaokul' ? '8. Sınıf LGS' : '9-12. Sınıf YKS/AYT'}
             />
           </div>
         )}

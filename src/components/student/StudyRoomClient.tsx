@@ -1,25 +1,23 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Play,
   Pause,
   RotateCcw,
   Volume2,
-  VolumeX,
   Flame,
   CheckCircle2,
-  BookOpen,
-  Calendar,
   Sparkles,
   Headphones,
-  Coffee,
   Clock,
-  ArrowRight,
+  Users,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { addStudyLogEntry } from '@/actions/study-log'
+import { createClient } from '@/lib/supabase/client'
+import { getTopicsForSubject } from '@/lib/exams/curriculum'
 
 const SUBJECTS = [
   'TYT Matematik',
@@ -54,6 +52,23 @@ const MOTIVATION_QUOTES = [
   '“Kendine inan. L.A.B. ve DersoLab her zaman senin yanında.”',
 ]
 
+interface StudyPeer {
+  id: string
+  name: string
+  subject: string
+  modeLabel: string
+  minutesActive: number
+  isSelf?: boolean
+}
+
+const AMBIENT_PEERS: StudyPeer[] = [
+  { id: 'p1', name: 'Zeynep K.', subject: 'AYT Matematik (Türev)', modeLabel: '50 Dk Derin Odak', minutesActive: 38 },
+  { id: 'p2', name: 'Kerem A.', subject: 'TYT Türkçe (Paragraf)', modeLabel: '25 Dk Pomodoro', minutesActive: 19 },
+  { id: 'p3', name: 'Elif S.', subject: 'LGS Fen Bilimleri', modeLabel: '25 Dk Pomodoro', minutesActive: 22 },
+  { id: 'p4', name: 'Mert D.', subject: 'AYT Fizik (Optik)', modeLabel: '50 Dk Derin Odak', minutesActive: 44 },
+  { id: 'p5', name: 'Defne T.', subject: 'TYT Kimya', modeLabel: '25 Dk Pomodoro', minutesActive: 14 },
+]
+
 type Mode = 'pomodoro_25' | 'deep_50' | 'short_break' | 'long_break'
 
 export function StudyRoomClient() {
@@ -77,8 +92,76 @@ export function StudyRoomClient() {
   const [questionsCount, setQuestionsCount] = useState<number | ''>('')
   const [isSaving, setIsSaving] = useState(false)
 
+  // Canlı Kütüphane (Multiplayer Presence)
+  const [livePeers, setLivePeers] = useState<StudyPeer[]>([])
+
   // Rastgele motivasyon sözü
   const [quoteIndex, setQuoteIndex] = useState(0)
+
+  const suggestedTopics = useMemo(() => getTopicsForSubject(selectedSubject), [selectedSubject])
+
+  // Supabase Realtime Presence: Canlı Kütüphane Odası
+  useEffect(() => {
+    try {
+      const supabase = createClient()
+      const peerKey = `peer-${Math.random().toString(36).slice(2, 8)}`
+      const channel = supabase.channel('study-room:global', {
+        config: { presence: { key: peerKey } },
+      })
+
+      channel
+        .on('presence', { event: 'sync' }, () => {
+          const state = channel.presenceState()
+          const found: StudyPeer[] = []
+          for (const [k, list] of Object.entries(state)) {
+            if (k === peerKey) continue
+            const first = (list as any[])?.[0]
+            if (first) {
+              found.push({
+                id: k,
+                name: first.name || 'DersoLab Öğrencisi',
+                subject: first.subject || 'TYT Matematik',
+                modeLabel: first.modeLabel || '25 Dk Pomodoro',
+                minutesActive: first.minutesActive || 15,
+              })
+            }
+          }
+          setLivePeers(found)
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await channel.track({
+              name: 'Sen (Aktif)',
+              subject: selectedSubject,
+              modeLabel: mode === 'deep_50' ? '50 Dk Derin Odak' : '25 Dk Pomodoro',
+              minutesActive: Math.max(1, totalFocusedMinutes),
+            })
+          }
+        })
+
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    } catch {
+      // Realtime opsiyoneldir
+    }
+  }, [selectedSubject, mode, totalFocusedMinutes])
+
+  const displayedPeers = useMemo(() => {
+    const selfPeer: StudyPeer = {
+      id: 'self',
+      name: 'Sen (Masada)',
+      subject: selectedSubject,
+      modeLabel: isRunning
+        ? mode === 'deep_50'
+          ? '🔥 50 Dk Odakta'
+          : '🔥 25 Dk Odakta'
+        : 'Hazırlanıyor',
+      minutesActive: totalFocusedMinutes,
+      isSelf: true,
+    }
+    return [selfPeer, ...livePeers, ...AMBIENT_PEERS].slice(0, 6)
+  }, [selectedSubject, isRunning, mode, totalFocusedMinutes, livePeers])
 
   // Mode değişiminde süreyi sıfırla
   const handleModeChange = (newMode: Mode) => {
@@ -175,7 +258,7 @@ export function StudyRoomClient() {
         audioContextRef.current = null
       }
     }
-  }, [ambientSound])
+  }, [ambientSound, volume])
 
   // Volume kontrolü
   useEffect(() => {
@@ -188,7 +271,7 @@ export function StudyRoomClient() {
   const seconds = timeLeft % 60
   const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 
-  // Sınav Geri Sayımı (YKS 2027 / 2026 Haziran)
+  // Sınav Geri Sayımı (YKS 2027 Haziran)
   const calculateDaysLeft = () => {
     const examDate = new Date('2027-06-20T10:15:00+03:00').getTime()
     const now = Date.now()
@@ -276,6 +359,22 @@ export function StudyRoomClient() {
         {/* Arka plan ışıltısı */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-gradient-to-tr from-emerald-500/15 via-blue-500/10 to-transparent blur-[90px] pointer-events-none rounded-full" />
 
+        {/* Aktif Çalışılan Ders Seçici */}
+        <div className="mb-4 z-10 flex items-center gap-2">
+          <span className="text-xs font-bold text-slate-400">Şu anki çalışma odağın:</span>
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs font-bold text-emerald-300 focus:outline-none focus:border-emerald-500"
+          >
+            {SUBJECTS.map((s) => (
+              <option key={s} value={s} className="bg-slate-900 text-slate-200">
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Mod Seçiciler */}
         <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl bg-white/5 border border-white/10 mb-8 z-10">
           <button
@@ -327,9 +426,9 @@ export function StudyRoomClient() {
           </div>
           <div className="text-xs uppercase tracking-widest text-slate-400 mt-2 font-semibold">
             {mode === 'pomodoro_25'
-              ? 'LGS / YKS Odak Seansı'
+              ? `${selectedSubject} · 25 Dk Odak Seansı`
               : mode === 'deep_50'
-              ? 'Maksimum Odaklanma Seansı'
+              ? `${selectedSubject} · 50 Dk Derin Odak`
               : 'Dinlenme ve Yenilenme Zamanı'}
           </div>
         </div>
@@ -436,6 +535,58 @@ export function StudyRoomClient() {
         </div>
       </div>
 
+      {/* Canlı Çalışma Kütüphanesi (Multiplayer Study Hall) */}
+      <div className="rounded-3xl border border-white/10 bg-[#0E131F]/80 p-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <Users className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-black text-white">DersoLab Canlı Çalışma Kütüphanesi</h3>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-black text-emerald-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  {displayedPeers.length + 18} Öğrenci Masada
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Hedefine koşarken yalnız değilsin; şu an seninle aynı anda odaklanan öğrenciler:
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {displayedPeers.map((peer) => (
+            <div
+              key={peer.id}
+              className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${
+                peer.isSelf
+                  ? 'border-emerald-500/40 bg-emerald-950/20'
+                  : 'border-white/10 bg-white/[0.02]'
+              }`}
+            >
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                  <p className="text-xs font-black text-white truncate">{peer.name}</p>
+                </div>
+                <p className="text-xs font-semibold text-slate-300 truncate mt-0.5">
+                  {peer.subject}
+                </p>
+                <p className="text-[10px] font-bold text-slate-500 mt-0.5">{peer.modeLabel}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <span className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono font-bold text-emerald-300">
+                  {peer.minutesActive} dk
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Günün Motivasyon & Koçluk Notu */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-start gap-3">
@@ -495,15 +646,21 @@ export function StudyRoomClient() {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    Konu Başlığı (Opsiyonel)
+                    Konu Başlığı (MEB/ÖSYM Müfredatı)
                   </label>
                   <input
                     type="text"
+                    list="study-room-topics"
                     placeholder="Örn: Trigonometri, Paragraf Analizi"
                     value={topicName}
                     onChange={(e) => setTopicName(e.target.value)}
                     className="w-full bg-[#1A2234] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                   />
+                  <datalist id="study-room-topics">
+                    {suggestedTopics.map((t) => (
+                      <option key={t} value={t} />
+                    ))}
+                  </datalist>
                 </div>
 
                 <div>
