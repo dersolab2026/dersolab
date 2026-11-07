@@ -6,7 +6,11 @@
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "mobile:sync": "npx cap sync android",
+    "mobile:apk": "npx cap sync android && cd android && .\\gradlew.bat assembleDebug",
+    "mobile:release-apk": "npx cap sync android && cd android && .\\gradlew.bat assembleRelease",
+    "mobile:aab": "npx cap sync android && cd android && .\\gradlew.bat bundleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

@@ -1,75 +1,62 @@
-# DersoLab Android Uygulaması (Capacitor)
+# DersoLab Android Uygulaması (Capacitor 8.5 + Native WebRTC)
 
-Bu proje, `dersolab.com`'u native bir Android sarmalayıcı (Capacitor) içinde
-gösterir. Uygulama ayrı bir kod tabanı değildir — WebView doğrudan canlı
-siteyi yükler (`capacitor.config.ts` → `server.url`), yani sitede olan her
-şey uygulamada da otomatik olarak vardır. Yeni bir Vercel deploy'u yaptığında
-uygulamayı yeniden build etmene bile gerek yok, WebView her açılışta canlı
-siteyi çeker.
+Bu proje, `https://dersolab.com` platformunu (Öğrenci, Veli, Eğitmen, Admin, 3D L.A.B., Canlı Ders Odası ve AI Soru Asistanı) native Android uygulamasında (`com.dersolab.app`) çalıştırır ve Google Play Store yayınına hazır imzalı `.aab` ile `.apk` paketleri üretir.
 
-## Gereken kurulum (senin bilgisayarında)
+---
 
-Bu geliştirme ortamında Java/Android SDK kurulu değil, bu yüzden native APK'yı
-buradan derleyemiyorum. Yapman gerekenler:
+## 🛠️ Bağlı Araçlar ve Ortam Yapılandırması
 
-1. [Android Studio](https://developer.android.com/studio) indir ve kur
-   (JDK + Android SDK + emülatörü otomatik kurar).
-2. Bu repoyu kendi bilgisayarına çek / güncelle.
-3. `npm install` çalıştır (Capacitor paketleri `package.json`'da zaten mevcut).
+Bu çalışma ortamında tüm mobil derleme ve yayın araçları kurulmuş ve birbirine bağlanmıştır:
 
-## Projeyi açma ve çalıştırma
+- **Android CLI (`android.exe`):** `v1.1.16717390` (`C:\Users\egeme\AppData\AndroidCLI\android.exe`)
+- **Android SDK (`local.properties`):** `C:\Users\egeme\AppData\Local\Android\Sdk` (API 36 & 37, Build-Tools 36.0.0)
+- **Java JDK 21 (`gradle.properties`):** `C:/Program Files/Microsoft/jdk-21.0.12.101-hotspot`
+- **Üretim İmza Anahtarı (Keystore):** `android/app/dersolab-release-key.jks` (`alias: dersolab`, 2048-bit RSA, 10.000 gün geçerli — güvenlik için `.gitignore` kapsamındadır)
+- **İzinler (`AndroidManifest.xml`):**
+  - `INTERNET`, `ACCESS_NETWORK_STATE` (Canlı platform ve çevrimdışı durum tespiti)
+  - `CAMERA`, `RECORD_AUDIO`, `MODIFY_AUDIO_SETTINGS` (Canlı Ders Odası WebRTC kamera/mikrofon ve AI Soru Çözümü fotoğraf çekimi)
 
-```bash
-npx cap open android
-```
+---
 
-Bu, Android Studio'yu `android/` klasörüyle açar. İlk açılışta Gradle
-senkronizasyonu biraz sürebilir. Sonra:
+## 🚀 Tek Komutla Derleme ve Paketleme (`package.json`)
 
-- Üstteki **Run ▶** butonuna basarak bir emülatörde veya USB ile bağlı
-  gerçek bir telefonda çalıştırabilirsin.
-- Telefonda test etmek için telefonunda "Geliştirici Seçenekleri" →
-  "USB hata ayıklama" açık olmalı.
-
-## Config/kod değiştiğinde
-
-`capacitor.config.ts`, ikon/splash görselleri veya native plugin (örn.
-`@capacitor/browser`) eklenince şunu çalıştır:
+Proje kök dizininde aşağıdaki komutları doğrudan çalıştırabilirsin:
 
 ```bash
-npx cap sync android
+# 1. Web/Capacitor ayarlarını Android projesine senkronize et
+npm run mobile:sync
+
+# 2. Google Play Console'a yüklenecek İmzalı Release Bundle (.aab) üret
+npm run mobile:aab
+
+# 3. Doğrudan telefona kurulabilir İmzalı Release APK (.apk) üret
+npm run mobile:release-apk
+
+# 4. Hızlı test için Debug APK (.apk) üret
+npm run mobile:apk
 ```
 
-Sadece sitenin kendi kodu (React/Next.js sayfaları) değiştiğinde **hiçbir
-şey yapmana gerek yok** — WebView zaten canlı `dersolab.com`'u yüklüyor,
-Vercel'e deploy ettiğin an uygulamada da görünür.
+---
 
-## İkon/Splash'i değiştirmek istersen
+## 📦 Üretilen Çıktı Dosyaları (Play Store & Kurulum)
 
-Kaynak görseller `resources/icon.png` (1024×1024) ve `resources/splash.png`
-(2732×2732) — fox mascot logosu, krem (#F4F1E8) arka plan üzerinde. Değiştirmek
-istersen bu iki dosyayı güncelleyip şunu çalıştır:
+Derleme tamamlandığında dosyalar şu konumlarda hazır olur:
+
+1. **Google Play Store Paketi (`.aab`):**
+   - `android/app/build/outputs/bundle/release/app-release.aab`
+   - Google Play Console → **Üretim (Production) / Kapalı Test** → **Yeni sürüm oluştur** ekranına doğrudan bu `.aab` dosyasını yükleyebilirsin.
+
+2. **Doğrudan Kurulabilir Üretim Paketi (`.apk`):**
+   - `android/app/build/outputs/apk/release/app-release.apk`
+   - Android telefonlara doğrudan gönderip kurmak veya `adb install` ile yüklemek için kullanılır.
+
+---
+
+## 🎨 İkon ve Splash Görsellerini Güncelleme
+
+Kaynak görseller `resources/icon.png` (1024×1024) ve `resources/splash.png` (2732×2732) içindedir. Güncellemek istersen:
 
 ```bash
 npx @capacitor/assets generate --android
-npx cap sync android
+npm run mobile:sync
 ```
-
-## Bilinen riskler / dikkat edilmesi gerekenler
-
-- **Google Takvim bağlama (OAuth)**: Google, embedded WebView içinde OAuth
-  ekranı açılmasını engelliyor ("disallowed_useragent" hatası). Bunun için
-  `ConnectGoogleCalendarButton` bileşeni native ortamda linke tıklanınca
-  akışı sistem tarayıcısında (`@capacitor/browser` ile Chrome Custom Tabs)
-  açacak şekilde güncellendi. **Bu, gerçek bir Android cihaz/emülatörde
-  henüz test edilmedi** — Android Studio kurulunca ilk test edilmesi
-  gereken akış bu olmalı (Ayarlar → Google Takvimini Bağla).
-- **Shopier ödeme akışı**: checkout dış domain'e (`shopier.com`)
-  yönlendiriyor, bu `capacitor.config.ts` → `server.allowNavigation`
-  listesine eklendi, WebView içinde doğrudan açılabilmeli. Bu da gerçek
-  cihazda bir kez test edilmeli.
-- **Play Store yayını**: Google Play, bir "remote URL" WebView sarmalayıcısını
-  yayınlamak için imzalı bir `.aab` (Android App Bundle) ister. Android
-  Studio'dan **Build → Generate Signed Bundle / APK** ile üretilir; imzalama
-  anahtarını (keystore) güvenli bir yerde sakla, kaybedersen uygulamayı
-  güncelleyemezsin.
