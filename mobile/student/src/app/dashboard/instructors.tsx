@@ -106,56 +106,30 @@ export default function InstructorsScreen() {
         }
       }
 
-      // 2. Onaylı eğitmenleri çek
-      // Önce instructor_profiles view'ı dene
-      const { data: viewData, error: viewError } = await supabase
-        .from('instructor_profiles')
-        .select('*');
+      // 2. Onaylı eğitmenleri RPC ile çek (Web ile %100 aynı güvenli fonksiyon)
+      const { data: rpcData, error: rpcError } = await supabase.rpc(
+        'get_instructor_profiles',
+        { p_subject: null }
+      );
 
-      if (!viewError && viewData && viewData.length > 0) {
-        const formatted: InstructorItem[] = viewData.map((item: any) => ({
-          id: item.id || item.user_id,
-          name: item.name || 'Eğitmen',
-          avatar_url: item.avatar_url,
-          bio: item.bio,
-          subjects: Array.isArray(item.subjects) ? item.subjects : [],
-          lesson_price: item.lesson_price,
-          rating: item.rating || 5.0,
-          total_reviews: item.total_reviews || 0,
-          completed_lesson_count: item.completed_lesson_count || 12,
-        }));
+      if (!rpcError && Array.isArray(rpcData) && rpcData.length > 0) {
+        const formatted: InstructorItem[] = rpcData
+          .filter(
+            (item: any) =>
+              Array.isArray(item.subjects) &&
+              item.subjects.length > 0 &&
+              item.name !== 'QA Eğitmen'
+          )
+          .map((item: any) => ({
+            id: item.id || item.user_id,
+            name: item.name || 'Eğitmen',
+            avatar_url: item.avatar_url || null,
+            bio: item.bio || null,
+            subjects: item.subjects,
+            lesson_price: item.lesson_price ?? 0,
+            completed_lesson_count: item.completed_lesson_count ?? 0,
+          }));
         setInstructors(formatted);
-      } else {
-        // Fallback: instructors tablosundan çek
-        const { data: rawInstructors } = await supabase
-          .from('instructors')
-          .select('user_id, bio, subjects, lesson_price');
-
-        if (rawInstructors && rawInstructors.length > 0) {
-          const userIds = rawInstructors.map((i) => i.user_id);
-          const { data: userData } = await supabase
-            .from('users')
-            .select('id, name, avatar_url')
-            .in('id', userIds);
-
-          const nameMap = new Map((userData ?? []).map((u) => [u.id, u]));
-
-          const formatted: InstructorItem[] = rawInstructors.map((item) => {
-            const u = nameMap.get(item.user_id);
-            return {
-              id: item.user_id,
-              name: u?.name || 'Uzman Eğitmen',
-              avatar_url: u?.avatar_url || null,
-              bio: item.bio,
-              subjects: Array.isArray(item.subjects) ? item.subjects : [],
-              lesson_price: item.lesson_price,
-              rating: 5.0,
-              total_reviews: 4,
-              completed_lesson_count: 8,
-            };
-          });
-          setInstructors(formatted);
-        }
       }
     } catch (err) {
       console.error('Eğitmen yükleme hatası:', err);
@@ -214,7 +188,8 @@ export default function InstructorsScreen() {
           {
             text: 'Kredi Satın Al ⚡',
             onPress: () => {
-              WebBrowser.openBrowserAsync('https://dersolab.com/dashboard/student/packages');
+              setBookingModalVisible(false);
+              router.push('/dashboard/packages' as any);
             },
           },
         ]
@@ -248,15 +223,20 @@ export default function InstructorsScreen() {
         .select('id')
         .single();
 
-      if (bookingErr) throw bookingErr;
+      if (bookingErr) {
+        const ham = bookingErr.message || '';
+        if (ham.includes('bookings_egitmen_cakisma')) {
+          throw new Error('Bu saat az önce başka bir öğrenci tarafından alındı. Lütfen başka bir saat seç.');
+        } else if (ham.includes('bookings_ogrenci_cakisma')) {
+          throw new Error('Aynı saatte zaten planlanmış bir dersin var. Lütfen başka bir saat seç.');
+        } else if (ham.includes('credit_balance')) {
+          throw new Error('Kredin bu ders için yetmiyor. Bakiyeni kontrol et.');
+        }
+        throw bookingErr;
+      }
 
-      // 2. Krediyi düşür
+      // Veritabanı trigger'ı krediyi otomatik düşürür; yerel state'i güncelle
       const newCredit = Math.max(0, creditBalance - 1);
-      await supabase
-        .from('students')
-        .update({ credit_balance: newCredit })
-        .eq('user_id', currentUserId);
-
       setCreditBalance(newCredit);
       setBookingModalVisible(false);
 
@@ -285,14 +265,18 @@ export default function InstructorsScreen() {
       {/* Üst Bar */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <View>
+          <View style={{ flex: 1, marginRight: 10 }}>
             <Text style={styles.title}>Eğitmen Bul & Ders Al</Text>
             <Text style={styles.subtitle}>Alanında uzman eğitmenlerden birebir ders</Text>
           </View>
-          <View style={styles.creditBadge}>
-            <Ionicons name="flash" size={14} color="#f59e0b" style={{ marginRight: 4 }} />
+          <TouchableOpacity
+            style={styles.creditBadge}
+            onPress={() => router.push('/dashboard/packages' as any)}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="flash" size={13} color="#f59e0b" style={{ marginRight: 4 }} />
             <Text style={styles.creditBadgeText}>{creditBalance} Kredi</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Arama Çubuğu */}
@@ -387,12 +371,12 @@ export default function InstructorsScreen() {
                     </View>
 
                     <View style={styles.ratingRow}>
-                      <Ionicons name="star" size={14} color="#f59e0b" />
-                      <Text style={styles.ratingText}>
-                        {inst.rating?.toFixed(1) || '5.0'}
-                      </Text>
+                      <Ionicons name="shield-checkmark" size={14} color="#10b981" />
                       <Text style={styles.reviewsText}>
-                        ({inst.completed_lesson_count || 10}+ tamamlanan ders)
+                        Onaylı DersoLab Eğitmeni
+                        {inst.completed_lesson_count && inst.completed_lesson_count > 0
+                          ? ` • ${inst.completed_lesson_count} ders`
+                          : ''}
                       </Text>
                     </View>
                   </View>
@@ -558,7 +542,7 @@ export default function InstructorsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#030712',
+    backgroundColor: '#0a0a0a',
   },
   header: {
     paddingHorizontal: 20,

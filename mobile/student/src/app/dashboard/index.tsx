@@ -10,6 +10,7 @@ import {
   Linking,
   RefreshControl,
   Platform,
+  Image,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -199,18 +200,39 @@ export default function DashboardHome() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00e5ff" />
         }
       >
-        {/* Top Header */}
+        {/* Top Header (Web Fox Mascot & Student Orange Theme) */}
         <View style={styles.header}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.greeting}>Merhaba, {studentName} 👋</Text>
-            <Text style={styles.subtitle}>Bugünkü hedeflerine ve derslerine göz at.</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 14,
+                backgroundColor: 'rgba(249, 115, 22, 0.14)',
+                borderWidth: 1,
+                borderColor: 'rgba(249, 115, 22, 0.35)',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 12,
+              }}
+            >
+              <Image
+                source={require('../../../assets/fox-mascot.png')}
+                style={{ width: 32, height: 32 }}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.greeting}>Merhaba, {studentName} 👋</Text>
+              <Text style={styles.subtitle}>Bugünkü hedeflerine ve derslerine göz at.</Text>
+            </View>
           </View>
           <TouchableOpacity
             onPress={() => router.push('/dashboard/profile' as any)}
             style={styles.profileBtn}
             activeOpacity={0.8}
           >
-            <Ionicons name="person-circle-outline" size={38} color="#00e5ff" />
+            <Ionicons name="person-circle-outline" size={38} color="#fb923c" />
           </TouchableOpacity>
         </View>
 
@@ -222,15 +244,19 @@ export default function DashboardHome() {
             onPress={() => router.push('/dashboard/lab' as any)}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#00e5ff18', '#3b82f60a']} style={styles.quickRowGradient}>
-              <View style={[styles.quickRowIcon, { backgroundColor: '#00e5ff22' }]}>
-                <Ionicons name="flask" size={24} color="#00e5ff" />
+            <LinearGradient colors={['rgba(249,115,22,0.14)', 'rgba(245,158,11,0.04)']} style={styles.quickRowGradient}>
+              <View style={[styles.quickRowIcon, { backgroundColor: 'rgba(249, 115, 22, 0.18)', borderWidth: 1, borderColor: 'rgba(249, 115, 22, 0.35)' }]}>
+                <Image
+                  source={require('../../../assets/fox-head.png')}
+                  style={{ width: 24, height: 24 }}
+                  resizeMode="contain"
+                />
               </View>
               <View style={styles.quickRowTextWrap}>
-                <Text style={styles.quickRowTitle}>L.A.B. Deney Merkezi</Text>
+                <Text style={styles.quickRowTitle}>L.A.B. 3D Deney Merkezi</Text>
                 <Text style={styles.quickRowSub}>7 Branş: Fizik, Kimya, Biyo, Mat, İngilizce, Türkçe, Sosyal</Text>
               </View>
-              <Ionicons name="chevron-forward" size={18} color="#00e5ff" />
+              <Ionicons name="chevron-forward" size={18} color="#fb923c" />
             </LinearGradient>
           </TouchableOpacity>
 
@@ -240,15 +266,19 @@ export default function DashboardHome() {
             onPress={() => router.push('/dashboard/ai' as any)}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#ec489918', '#f43f5e0a']} style={styles.quickRowGradient}>
-              <View style={[styles.quickRowIcon, { backgroundColor: '#ec489922' }]}>
-                <Ionicons name="hardware-chip" size={24} color="#ec4899" />
+            <LinearGradient colors={['rgba(245,158,11,0.14)', 'rgba(249,115,22,0.04)']} style={styles.quickRowGradient}>
+              <View style={[styles.quickRowIcon, { backgroundColor: 'rgba(245, 158, 11, 0.18)', borderWidth: 1, borderColor: 'rgba(245, 158, 11, 0.35)' }]}>
+                <Image
+                  source={require('../../../assets/fox-mascot.png')}
+                  style={{ width: 26, height: 26 }}
+                  resizeMode="contain"
+                />
               </View>
               <View style={styles.quickRowTextWrap}>
                 <Text style={styles.quickRowTitle}>DersoAI Soru Asistanı</Text>
                 <Text style={styles.quickRowSub}>Fotoğraf çek veya soru yaz, anında adım adım çözüme ulaş</Text>
               </View>
-              <Ionicons name="chevron-forward" size={18} color="#ec4899" />
+              <Ionicons name="chevron-forward" size={18} color="#f59e0b" />
             </LinearGradient>
           </TouchableOpacity>
 
@@ -459,7 +489,7 @@ export default function DashboardHome() {
                   borderColor: 'rgba(0, 229, 255, 0.4)',
                 },
               ]}
-              onPress={() => WebBrowser.openBrowserAsync('https://dersolab.com/dashboard/student/packages')}
+              onPress={() => router.push('/dashboard/packages' as any)}
             >
               <Ionicons name="card-outline" size={16} color="#00e5ff" style={{ marginRight: 6 }} />
               <Text style={[styles.findInstructorFullBtnText, { color: '#00e5ff' }]}>Kredi Al</Text>
@@ -555,11 +585,11 @@ export default function DashboardHome() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#030712',
+    backgroundColor: '#0a0a0a',
   },
   content: {
     padding: 12,
-    paddingTop: Platform.OS === 'android' ? 28 : 12,
+    paddingTop: 12,
     paddingBottom: 40,
   },
   header: {

@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+  Image,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import * as Linking from 'expo-linking';
-import * as WebBrowser from 'expo-web-browser';
+import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import Checkbox from 'expo-checkbox';
 import { supabase } from '@/lib/supabase';
 
-WebBrowser.maybeCompleteAuthSession();
+type SelectedRole = 'student' | 'parent' | 'instructor';
 
 const GRADES = [5, 6, 7, 8, 9, 10, 11, 12];
 const MEZUN_GRADE = 13;
@@ -21,18 +33,37 @@ const TRACK_LABELS: Record<string, string> = {
   dil: 'Dil',
 };
 
-export default function RegisterScreen() {
+const SUBJECT_OPTIONS = [
+  'Matematik',
+  'Geometri',
+  'Fizik',
+  'Kimya',
+  'Biyoloji',
+  'Türkçe & Edebiyat',
+  'Tarih',
+  'Coğrafya',
+  'LGS Genel Mentörlük',
+  'YKS Koçluk',
+];
+
+export default function UnifiedRegisterScreen() {
   const router = useRouter();
-  
+
+  const [role, setRole] = useState<SelectedRole>('student');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  
+
+  // Öğrenci alanları
   const [schoolName, setSchoolName] = useState('');
   const [grade, setGrade] = useState('');
   const [track, setTrack] = useState('');
-  
+
+  // Eğitmen alanları
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -40,125 +71,113 @@ export default function RegisterScreen() {
   const gradeNumber = grade ? Number(grade) : undefined;
   const isLise = gradeNumber !== undefined && gradeNumber >= 9;
 
+  const toggleSubject = (subject: string) => {
+    if (selectedSubjects.includes(subject)) {
+      setSelectedSubjects(selectedSubjects.filter((s) => s !== subject));
+    } else {
+      setSelectedSubjects([...selectedSubjects, subject]);
+    }
+  };
+
   const handleRegister = async () => {
     setErrorMsg('');
 
     if (!termsAccepted) {
-      setErrorMsg('Devam etmek için Kullanım Şartları’nı kabul etmelisin.');
+      setErrorMsg('Devam etmek için Kullanım Şartları ve Gizlilik Politikasını onaylamalısınız.');
       return;
     }
-    if (!name || !email || !password || !passwordConfirm || !schoolName || !grade) {
-      setErrorMsg('Lütfen tüm zorunlu alanları doldurunuz.');
+    if (!name.trim() || !email.trim() || !password || !passwordConfirm) {
+      setErrorMsg('Lütfen ad soyad, e-posta ve şifre alanlarını doldurunuz.');
       return;
     }
-    if (isLise && !track) {
-      setErrorMsg('Lütfen alanınızı seçiniz.');
+    if (password.length < 6) {
+      setErrorMsg('Şifreniz en az 6 karakter olmalıdır.');
       return;
     }
     if (password !== passwordConfirm) {
-      setErrorMsg('Şifreler eşleşmiyor.');
+      setErrorMsg('Şifreler birbiriyle eşleşmiyor.');
       return;
     }
-    
-    setLoading(true);
-    
-    // Auth kayıt
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: name,
-          school_name: schoolName,
-          grade: grade,
-          track: track || null,
-          role: 'student'
-        }
+
+    if (role === 'student') {
+      if (!schoolName.trim() || !grade) {
+        setErrorMsg('Lütfen okul adı ve sınıfınızı seçiniz.');
+        return;
       }
-    });
-    
-    setLoading(false);
-    
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      alert('Kayıt başarılı! Lütfen e-postanızı onaylayın veya giriş yapın.');
-      router.replace('/login');
+      if (isLise && !track) {
+        setErrorMsg('Lütfen alanınızı seçiniz.');
+        return;
+      }
+    } else if (role === 'instructor' && selectedSubjects.length === 0) {
+      setErrorMsg('Lütfen en az bir uzmanlık branşı seçiniz.');
+      return;
     }
-  };
 
-  const handleGoogleRegister = async () => {
+    setLoading(true);
+
     try {
-      setLoading(true);
-      setErrorMsg('');
-      const redirectUrl = Linking.createURL('/');
+      const metadata: Record<string, any> = {
+        name: name.trim(),
+        full_name: name.trim(),
+        role,
+        phone: phone.trim() || null,
+        terms_version: '2026-08-07',
+      };
 
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl,
-          skipBrowserRedirect: Platform.OS !== 'web',
-        },
+      if (role === 'student') {
+        metadata.school_name = schoolName.trim();
+        metadata.grade = grade;
+        metadata.track = track || null;
+      } else if (role === 'instructor') {
+        metadata.subjects = selectedSubjects;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { data: metadata },
       });
+
+      setLoading(false);
 
       if (error) {
         setErrorMsg(error.message);
-        setLoading(false);
         return;
       }
 
-      if (Platform.OS === 'web') {
-        if (data?.url) {
-          window.location.href = data.url;
-        }
-      } else {
-        if (data?.url) {
-          const res = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
-          if (res.type === 'success' && res.url) {
-            const hash = res.url.includes('#') ? res.url.split('#')[1] : res.url.split('?')[1];
-            if (hash) {
-              const params = new URLSearchParams(hash);
-              const access_token = params.get('access_token');
-              const refresh_token = params.get('refresh_token');
+      const targetRoute = role === 'parent' ? '/parent' : role === 'instructor' ? '/instructor' : '/dashboard';
 
-              if (access_token && refresh_token) {
-                const { error: sessionErr } = await supabase.auth.setSession({
-                  access_token,
-                  refresh_token,
-                });
-                if (sessionErr) {
-                  setErrorMsg(sessionErr.message);
-                } else {
-                  router.replace('/dashboard');
-                }
-              }
-            }
-          }
-        }
+      if (data.session) {
+        router.replace(targetRoute as any);
+      } else {
+        Alert.alert(
+          'Kayıt Başarılı!',
+          'Hesabınız oluşturuldu. E-posta adresinizi doğruladıktan sonra giriş yapabilirsiniz.',
+          [{ text: 'Giriş Yap', onPress: () => router.replace('/login') }]
+        );
       }
-    } catch (e: any) {
-      setErrorMsg(e?.message || 'Google ile kayıt açılamadı.');
-    } finally {
+    } catch (err: any) {
       setLoading(false);
+      setErrorMsg(err?.message || 'Kayıt sırasında bir hata oluştu.');
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.content}
       >
         <View style={styles.header}>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => {
               if (router.canGoBack()) {
                 router.back();
               } else {
                 router.replace('/');
               }
-            }} 
+            }}
             style={styles.backButton}
           >
             <Text style={styles.backButtonText}>← Geri</Text>
@@ -166,8 +185,57 @@ export default function RegisterScreen() {
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <Image
+              source={require('../../assets/fox-mascot.png')}
+              style={{ width: 42, height: 42, marginRight: 10 }}
+              resizeMode="contain"
+            />
+            <Text style={{ fontSize: 26, fontWeight: '900', color: '#ffffff', letterSpacing: -0.8 }}>
+              Derso
+              <Text
+                style={{
+                  color:
+                    role === 'parent'
+                      ? '#34d399'
+                      : role === 'instructor'
+                      ? '#60a5fa'
+                      : '#fb923c',
+                }}
+              >
+                Lab
+              </Text>
+            </Text>
+          </View>
           <Text style={styles.title}>Hesap Oluştur</Text>
-          <Text style={styles.subtitle}>Geleceğin eğitim platformuna ilk adımı at.</Text>
+          <Text style={styles.subtitle}>Rolünü seç ve DersoLab dünyasına katıl.</Text>
+
+          {/* 3'lü Rol Seçici */}
+          <View style={styles.roleSelectorRow}>
+            <TouchableOpacity
+              style={[styles.roleTab, role === 'student' && styles.roleTabStudentActive]}
+              onPress={() => setRole('student')}
+            >
+              <Ionicons name="school" size={16} color={role === 'student' ? '#030712' : '#94a3b8'} />
+              <Text style={[styles.roleTabText, role === 'student' && styles.roleTabTextActiveDark]}>Öğrenci</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.roleTab, role === 'parent' && styles.roleTabParentActive]}
+              onPress={() => setRole('parent')}
+            >
+              <Ionicons name="shield-checkmark" size={16} color={role === 'parent' ? '#030712' : '#94a3b8'} />
+              <Text style={[styles.roleTabText, role === 'parent' && styles.roleTabTextActiveDark]}>Veli</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.roleTab, role === 'instructor' && styles.roleTabInstructorActive]}
+              onPress={() => setRole('instructor')}
+            >
+              <Ionicons name="easel" size={16} color={role === 'instructor' ? '#ffffff' : '#94a3b8'} />
+              <Text style={[styles.roleTabText, role === 'instructor' && { color: '#ffffff', fontWeight: '800' }]}>Eğitmen</Text>
+            </TouchableOpacity>
+          </View>
 
           {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
 
@@ -176,7 +244,7 @@ export default function RegisterScreen() {
             <Text style={styles.label}>Ad Soyad</Text>
             <TextInput
               style={styles.input}
-              placeholder="Adın Soyadın"
+              placeholder="Adınız Soyadınız"
               placeholderTextColor="#475569"
               value={name}
               onChangeText={setName}
@@ -188,7 +256,7 @@ export default function RegisterScreen() {
             <Text style={styles.label}>E-Posta Adresi</Text>
             <TextInput
               style={styles.input}
-              placeholder="ornek@ogrenci.com"
+              placeholder="ornek@dersolab.com"
               placeholderTextColor="#475569"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -196,6 +264,21 @@ export default function RegisterScreen() {
               onChangeText={setEmail}
             />
           </View>
+
+          {/* Telefon (Veli ve Eğitmen için) */}
+          {(role === 'parent' || role === 'instructor') && (
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Telefon Numarası</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="05XX XXX XX XX"
+                placeholderTextColor="#475569"
+                keyboardType="phone-pad"
+                value={phone}
+                onChangeText={setPhone}
+              />
+            </View>
+          )}
 
           {/* Şifre */}
           <View style={styles.inputGroup}>
@@ -210,7 +293,7 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Şifre (Tekrar) */}
+          {/* Şifre Tekrar */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Şifre (Tekrar)</Text>
             <TextInput
@@ -223,81 +306,105 @@ export default function RegisterScreen() {
             />
           </View>
 
-          {/* Okul Adı */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Okul Adı</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Okulunun Adı"
-              placeholderTextColor="#475569"
-              value={schoolName}
-              onChangeText={setSchoolName}
-            />
-          </View>
+          {/* ÖĞRENCİ ALANLARI */}
+          {role === 'student' && (
+            <>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Okul Adı</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Okulunun Adı"
+                  placeholderTextColor="#475569"
+                  value={schoolName}
+                  onChangeText={setSchoolName}
+                />
+              </View>
 
-          {/* Sınıf Seçimi */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Sınıf</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={grade}
-                onValueChange={(itemValue) => {
-                  setGrade(itemValue);
-                  setTrack(''); // Sınıf değiştiğinde alanı sıfırla
-                }}
-                style={[styles.picker, Platform.OS === 'web' && { backgroundColor: 'transparent', outline: 'none' } as any]}
-                dropdownIconColor="#fff"
-              >
-                <Picker.Item label="Seçiniz..." value="" color={Platform.OS === 'ios' ? '#fff' : '#000'} />
-                {GRADES.map((g) => (
-                  <Picker.Item key={g} label={`${g}. Sınıf`} value={g.toString()} color={Platform.OS === 'ios' ? '#fff' : '#000'} />
-                ))}
-                <Picker.Item label="Mezun" value={MEZUN_GRADE.toString()} color={Platform.OS === 'ios' ? '#fff' : '#000'} />
-              </Picker>
-            </View>
-          </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Sınıf</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={grade}
+                    onValueChange={(itemValue) => {
+                      setGrade(itemValue);
+                      setTrack('');
+                    }}
+                    style={styles.picker}
+                    dropdownIconColor="#fff"
+                  >
+                    <Picker.Item label="Seçiniz..." value="" color="#000" />
+                    {GRADES.map((g) => (
+                      <Picker.Item key={g} label={`${g}. Sınıf`} value={g.toString()} color="#000" />
+                    ))}
+                    <Picker.Item label="Mezun" value={MEZUN_GRADE.toString()} color="#000" />
+                  </Picker>
+                </View>
+              </View>
 
-          {/* Alan Seçimi (Sadece 9. Sınıf ve Üzeri) */}
-          {isLise && (
+              {isLise && (
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Alan</Text>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={track}
+                      onValueChange={(itemValue) => setTrack(itemValue)}
+                      style={styles.picker}
+                      dropdownIconColor="#fff"
+                    >
+                      <Picker.Item label="Seçiniz..." value="" color="#000" />
+                      {Object.keys(TRACK_LABELS).map((t) => (
+                        <Picker.Item key={t} label={TRACK_LABELS[t]} value={t} color="#000" />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+              )}
+            </>
+          )}
+
+          {/* EĞİTMEN ALANLARI */}
+          {role === 'instructor' && (
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Alan</Text>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={track}
-                  onValueChange={(itemValue) => setTrack(itemValue)}
-                  style={[styles.picker, Platform.OS === 'web' && { backgroundColor: 'transparent', outline: 'none' } as any]}
-                  dropdownIconColor="#fff"
-                >
-                  <Picker.Item label="Seçiniz..." value="" color={Platform.OS === 'ios' ? '#fff' : '#000'} />
-                  {Object.keys(TRACK_LABELS).map((t) => (
-                    <Picker.Item key={t} label={TRACK_LABELS[t]} value={t} color={Platform.OS === 'ios' ? '#fff' : '#000'} />
-                  ))}
-                </Picker>
+              <Text style={styles.label}>Uzmanlık Branşlarınız</Text>
+              <View style={styles.subjectChipsWrap}>
+                {SUBJECT_OPTIONS.map((subj) => {
+                  const active = selectedSubjects.includes(subj);
+                  return (
+                    <TouchableOpacity
+                      key={subj}
+                      style={[styles.subjectChip, active && styles.subjectChipActive]}
+                      onPress={() => toggleSubject(subj)}
+                    >
+                      <Text style={[styles.subjectChipText, active && styles.subjectChipTextActive]}>
+                        {subj}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
           )}
 
-          {/* Sözleşme Checkbox */}
-          <TouchableOpacity 
-            style={styles.checkboxContainer} 
+          {/* Sözleşme */}
+          <TouchableOpacity
+            style={styles.checkboxContainer}
             activeOpacity={0.8}
             onPress={() => setTermsAccepted(!termsAccepted)}
           >
             <Checkbox
               value={termsAccepted}
               onValueChange={setTermsAccepted}
-              color={termsAccepted ? '#4f46e5' : undefined}
+              color={termsAccepted ? '#f59e0b' : undefined}
               style={styles.checkbox}
             />
             <Text style={styles.checkboxLabel}>
-              Kullanım Şartları'nı okudum ve kabul ediyorum. Gizlilik Politikası'nı gördüm.
+              Kullanım Şartları ve Gizlilik Politikasını okudum, kabul ediyorum.
             </Text>
           </TouchableOpacity>
 
-          {/* Kayıt Butonu */}
-          <TouchableOpacity 
-            style={styles.primaryButton} 
-            activeOpacity={0.8}
+          <TouchableOpacity
+            style={styles.primaryButton}
+            activeOpacity={0.85}
             onPress={handleRegister}
             disabled={loading}
           >
@@ -310,26 +417,10 @@ export default function RegisterScreen() {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.primaryButtonText}>Ücretsiz Kayıt Ol</Text>
+                <Text style={styles.primaryButtonText}>Hesap Oluştur</Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
-
-          <View style={styles.dividerContainer}>
-            <View style={styles.divider} />
-            <Text style={styles.dividerText}>veya</Text>
-            <View style={styles.divider} />
-          </View>
-
-          {/* Google Butonu */}
-          <TouchableOpacity 
-            style={styles.googleButton} 
-            activeOpacity={0.8}
-            onPress={handleGoogleRegister}
-          >
-            <Text style={styles.googleButtonText}>Google ile Kayıt Ol</Text>
-          </TouchableOpacity>
-
         </ScrollView>
 
         <View style={styles.footer}>
@@ -340,76 +431,55 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </Link>
         </View>
-
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: { flex: 1, backgroundColor: '#030712' },
+  content: { flex: 1 },
+  header: { marginTop: 10, marginBottom: 10, paddingHorizontal: 24 },
+  backButton: { padding: 8, alignSelf: 'flex-start' },
+  backButtonText: { color: '#94a3b8', fontSize: 16, fontWeight: '600' },
+  scrollContainer: { flexGrow: 1, paddingHorizontal: 24, paddingBottom: 40 },
+  title: { fontSize: 30, fontWeight: '900', color: '#ffffff', marginBottom: 6, letterSpacing: -1 },
+  subtitle: { fontSize: 15, color: '#94a3b8', marginBottom: 20 },
+  roleSelectorRow: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 16,
+    padding: 5,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    gap: 6,
+  },
+  roleTab: {
     flex: 1,
-    backgroundColor: '#030712',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 12,
   },
-  content: {
-    flex: 1,
-  },
-  header: {
-    marginTop: 10,
-    marginBottom: 10,
-    paddingHorizontal: 24,
-  },
-  backButton: {
-    padding: 8,
-    alignSelf: 'flex-start',
-  },
-  backButtonText: {
-    color: '#94a3b8',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: '#ffffff',
-    marginBottom: 8,
-    letterSpacing: -1,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#94a3b8',
-    marginBottom: 32,
-    fontWeight: '300',
-  },
-  errorText: {
-    color: '#ef4444',
-    marginBottom: 16,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    color: '#cbd5e1',
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
-    marginLeft: 4,
-  },
+  roleTabStudentActive: { backgroundColor: '#f59e0b' },
+  roleTabParentActive: { backgroundColor: '#10b981' },
+  roleTabInstructorActive: { backgroundColor: '#4f46e5' },
+  roleTabText: { color: '#94a3b8', fontSize: 13, fontWeight: '700' },
+  roleTabTextActiveDark: { color: '#030712', fontWeight: '800' },
+  errorText: { color: '#ef4444', marginBottom: 16, fontSize: 14, fontWeight: '500' },
+  inputGroup: { marginBottom: 18 },
+  label: { color: '#cbd5e1', fontSize: 14, fontWeight: '600', marginBottom: 8, marginLeft: 4 },
   input: {
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
     borderRadius: 16,
-    padding: 16,
+    padding: 15,
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 15,
   },
   pickerContainer: {
     backgroundColor: 'rgba(255,255,255,0.03)',
@@ -418,81 +488,43 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
   },
-  picker: {
-    color: '#ffffff',
-    height: 55,
+  picker: { color: '#ffffff', height: 55 },
+  subjectChipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  subjectChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
+  subjectChipActive: {
+    backgroundColor: 'rgba(79, 70, 229, 0.25)',
+    borderColor: '#818cf8',
+  },
+  subjectChipText: { color: '#94a3b8', fontSize: 13, fontWeight: '600' },
+  subjectChipTextActive: { color: '#ffffff', fontWeight: '800' },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
-    marginTop: 8,
+    marginTop: 6,
     backgroundColor: 'rgba(255,255,255,0.02)',
     padding: 12,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.05)',
   },
-  checkbox: {
-    marginRight: 12,
-    borderColor: '#475569',
-  },
-  checkboxLabel: {
-    color: '#94a3b8',
-    fontSize: 13,
-    flex: 1,
-    lineHeight: 20,
-  },
+  checkbox: { marginRight: 12, borderColor: '#475569' },
+  checkboxLabel: { color: '#94a3b8', fontSize: 13, flex: 1, lineHeight: 19 },
   primaryButton: {
     width: '100%',
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#e11d48',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
     elevation: 8,
   },
-  primaryButtonGradient: {
-    paddingVertical: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButtonText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 24,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  dividerText: {
-    color: '#64748b',
-    paddingHorizontal: 16,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  googleButton: {
-    backgroundColor: '#ffffff',
-    paddingVertical: 18,
-    borderRadius: 16,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  googleButtonText: {
-    color: '#0f172a',
-    fontSize: 16,
-    fontWeight: '700',
-  },
+  primaryButtonGradient: { paddingVertical: 18, alignItems: 'center', justifyContent: 'center' },
+  primaryButtonText: { color: '#ffffff', fontSize: 17, fontWeight: '800' },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -501,13 +533,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     backgroundColor: '#030712',
   },
-  footerText: {
-    color: '#94a3b8',
-    fontSize: 15,
-  },
-  footerLink: {
-    color: '#f59e0b',
-    fontSize: 15,
-    fontWeight: '700',
-  },
+  footerText: { color: '#94a3b8', fontSize: 15 },
+  footerLink: { color: '#f59e0b', fontSize: 15, fontWeight: '700' },
 });

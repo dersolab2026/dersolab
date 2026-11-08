@@ -1,19 +1,19 @@
 {
   "expo": {
-    "name": "DersoLab Öğrenci",
-    "slug": "dersolab-student",
-    "version": "1.0.0",
+    "name": "DersoLab",
+    "slug": "dersolab",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "dersolabstudent",
+    "scheme": "dersolab",
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.dersolab.student"
+      "bundleIdentifier": "com.dersolab.app"
     },
     "android": {
-      "package": "com.dersolab.student",
-      "versionCode": 1,
+      "package": "com.dersolab.app",
+      "versionCode": 3,
       "adaptiveIcon": {
         "backgroundColor": "#030712",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -23,6 +23,7 @@
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
         "android.permission.READ_EXTERNAL_STORAGE"
       ],
       "predictiveBackGestureEnabled": false
@@ -43,8 +44,7 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": false
     },
     "extra": {
       "router": {},

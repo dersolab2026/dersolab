@@ -4,14 +4,14 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Platform,
   useWindowDimensions,
   ScrollView,
+  Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Slot, useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 
 export default function StudentDashboardLayout() {
   const router = useRouter();
@@ -30,15 +30,16 @@ export default function StudentDashboardLayout() {
     activeIcon: keyof typeof Ionicons.glyphMap;
     color: string;
   }[] = [
-    { id: 'home', label: 'Ana Sayfa', path: '/dashboard', icon: 'home-outline', activeIcon: 'home', color: '#00e5ff' },
-    { id: 'instructors', label: 'Eğitmenler', path: '/dashboard/instructors', icon: 'search-outline', activeIcon: 'search', color: '#38bdf8' },
-    { id: 'lessons', label: 'Derslerim', path: '/dashboard/lessons', icon: 'videocam-outline', activeIcon: 'videocam', color: '#6366f1' },
-    { id: 'lab', label: 'L.A.B.', path: '/dashboard/lab', icon: 'flask-outline', activeIcon: 'flask', color: '#a855f7' },
-    { id: 'ai', label: 'AI Soru', path: '/dashboard/ai', icon: 'hardware-chip-outline', activeIcon: 'hardware-chip', color: '#ec4899' },
-    { id: 'homework', label: 'Ödevlerim', path: '/dashboard/homework', icon: 'school-outline', activeIcon: 'school', color: '#06b6d4' },
-    { id: 'netlerim', label: 'Netlerim', path: '/dashboard/netlerim', icon: 'trending-up-outline', activeIcon: 'trending-up', color: '#10b981' },
-    { id: 'diary', label: 'Günlük', path: '/dashboard/diary', icon: 'calendar-outline', activeIcon: 'calendar', color: '#f59e0b' },
-    { id: 'profile', label: 'Profil', path: '/dashboard/profile', icon: 'person-outline', activeIcon: 'person', color: '#94a3b8' },
+    { id: 'home', label: 'Genel Bakış', path: '/dashboard', icon: 'home-outline', activeIcon: 'home', color: '#f97316' },
+    { id: 'packages', label: 'Kredi Paketleri', path: '/dashboard/packages', icon: 'wallet-outline', activeIcon: 'wallet', color: '#f97316' },
+    { id: 'instructors', label: 'Eğitmenler', path: '/dashboard/instructors', icon: 'search-outline', activeIcon: 'search', color: '#f97316' },
+    { id: 'lessons', label: 'Derslerim', path: '/dashboard/lessons', icon: 'videocam-outline', activeIcon: 'videocam', color: '#f97316' },
+    { id: 'lab', label: 'L.A.B. Deneyleri', path: '/dashboard/lab', icon: 'cube-outline', activeIcon: 'cube', color: '#f97316' },
+    { id: 'ai', label: 'AI Soru Asistanı', path: '/dashboard/ai', icon: 'sparkles-outline', activeIcon: 'sparkles', color: '#f97316' },
+    { id: 'homework', label: 'Ödevlerim', path: '/dashboard/homework', icon: 'school-outline', activeIcon: 'school', color: '#f97316' },
+    { id: 'netlerim', label: 'Net & Puan', path: '/dashboard/netlerim', icon: 'trending-up-outline', activeIcon: 'trending-up', color: '#f97316' },
+    { id: 'diary', label: 'Günlük & Ajanda', path: '/dashboard/diary', icon: 'calendar-outline', activeIcon: 'calendar', color: '#f97316' },
+    { id: 'profile', label: 'Profil & Kod', path: '/dashboard/profile', icon: 'person-outline', activeIcon: 'person', color: '#f97316' },
   ];
 
   const checkIsActive = (itemPath: string) => {
@@ -49,22 +50,32 @@ export default function StudentDashboardLayout() {
   };
 
   return (
-    <SafeAreaView style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer} edges={['top', 'bottom']}>
       <View style={styles.mainLayout}>
-        {/* SOL PANEL (KOMPAKT & ŞIK SOL MENÜ) */}
+        {/* SOL PANEL (WEB DASHBOARDNAV İLE BİREBİR TİLKİ MASKOTLU SOL MENÜ) */}
         <View style={[styles.sidebar, { width: sidebarWidth }]}>
-          {/* Logo / Brand Header */}
-          <View style={styles.brandContainer}>
-            <LinearGradient colors={['#00e5ff', '#3b82f6']} style={styles.brandIconBox}>
-              <Ionicons name="flask" size={18} color="#030712" />
-            </LinearGradient>
+          {/* Logo / Fox Mascot Header */}
+          <TouchableOpacity
+            style={styles.brandContainer}
+            onPress={() => router.push('/dashboard' as any)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.brandIconBox}>
+              <Image
+                source={require('../../../assets/fox-head.png')}
+                style={{ width: 26, height: 26 }}
+                resizeMode="contain"
+              />
+            </View>
             {isExpanded && (
               <View style={{ marginLeft: 10 }}>
-                <Text style={styles.brandTitle}>DersoLab</Text>
-                <Text style={styles.brandSubtitle}>Öğrenci</Text>
+                <Text style={styles.brandTitle}>
+                  Derso<Text style={{ color: '#fb923c' }}>Lab</Text>
+                </Text>
+                <Text style={styles.brandSubtitle}>Öğrenci Paneli</Text>
               </View>
             )}
-          </View>
+          </TouchableOpacity>
 
           {/* Menü Butonları Listesi */}
           <ScrollView
@@ -110,8 +121,24 @@ export default function StudentDashboardLayout() {
             })}
           </ScrollView>
 
-          {/* Alt Sabit Kısım */}
+          {/* Alt Sabit Kısım: Rol Değiştir / Ana Ekran */}
           <View style={styles.sidebarFooter}>
+            <TouchableOpacity
+              onPress={() => router.replace('/')}
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 10,
+                backgroundColor: 'rgba(245, 158, 11, 0.14)',
+                borderWidth: 1,
+                borderColor: 'rgba(245, 158, 11, 0.35)',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 6,
+              }}
+            >
+              <Ionicons name="swap-horizontal" size={18} color="#f59e0b" />
+            </TouchableOpacity>
             <View style={styles.onlineDot} />
           </View>
         </View>
@@ -128,17 +155,17 @@ export default function StudentDashboardLayout() {
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    backgroundColor: '#030712',
+    backgroundColor: '#0a0a0a',
   },
   mainLayout: {
     flex: 1,
     flexDirection: 'row',
   },
   sidebar: {
-    backgroundColor: '#070c18',
+    backgroundColor: '#0a0a0a',
     borderRightWidth: 1,
-    borderRightColor: '#1e293b',
-    paddingTop: Platform.OS === 'android' ? 36 : 10,
+    borderRightColor: 'rgba(255, 255, 255, 0.10)',
+    paddingTop: 12,
     paddingBottom: 10,
     alignItems: 'center',
     zIndex: 50,
@@ -147,16 +174,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#1e293b',
+    borderBottomColor: 'rgba(255, 255, 255, 0.10)',
     marginBottom: 8,
     flexDirection: 'row',
     justifyContent: 'center',
     width: '100%',
   },
   brandIconBox: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: 'rgba(249, 115, 22, 0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(249, 115, 22, 0.40)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -167,7 +197,7 @@ const styles = StyleSheet.create({
   },
   brandSubtitle: {
     fontSize: 10,
-    color: '#00e5ff',
+    color: '#fb923c',
     fontWeight: '700',
   },
   navItemsList: {
@@ -203,7 +233,7 @@ const styles = StyleSheet.create({
   sidebarFooter: {
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#1e293b',
+    borderTopColor: 'rgba(255, 255, 255, 0.10)',
     alignItems: 'center',
     width: '100%',
   },
@@ -215,6 +245,6 @@ const styles = StyleSheet.create({
   },
   screenContentArea: {
     flex: 1,
-    backgroundColor: '#030712',
+    backgroundColor: '#0a0a0a',
   },
 });

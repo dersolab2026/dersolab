@@ -3,15 +3,17 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   TextInput,
   Platform,
+  ActivityIndicator,
+  Image,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { askLabSocraticCoach } from '@/lib/gemini';
 
 type Branch = 'fizik' | 'kimya' | 'biyoloji' | 'matematik' | 'ingilizce' | 'turkce' | 'sosyal';
 
@@ -57,6 +59,62 @@ export default function LabScreen() {
 
   // Sosyal / Tarih State
   const [timelinePeriod, setTimelinePeriod] = useState<'kurtulus' | 'osmanli' | 'ilk_cag'>('kurtulus');
+
+  // Sokratik AI Deney Koçu State
+  const [socraticQuestion, setSocraticQuestion] = useState('');
+  const [socraticReply, setSocraticReply] = useState('');
+  const [socraticLoading, setSocraticLoading] = useState(false);
+
+  const handleAskSocratic = async (customPrompt?: string) => {
+    const q = (customPrompt || socraticQuestion).trim();
+    if (!q || socraticLoading) return;
+    setSocraticLoading(true);
+    try {
+      const expMap: Record<Branch, { title: string; params: Record<string, string | number> }> = {
+        fizik: {
+          title: 'Optik Kırılma & Makara Simülatörü',
+          params: { gelmeAcisi: `${refractionAngle}°`, n1: medium1Index, n2: medium2Index, makaraTipi: pulleyType, yukN: pulleyWeight },
+        },
+        kimya: {
+          title: 'Element & pH Titrasyon Laboratuvarı',
+          params: { atomNo: atomicNumber, pH: phValue },
+        },
+        biyoloji: {
+          title: 'Hücre Organelleri & Biyolojik Sistemler',
+          params: { seciliOrganel: selectedOrganelle },
+        },
+        matematik: {
+          title: 'Parabol & Fonksiyon Analizi',
+          params: { a: paramA, b: paramB, c: paramC },
+        },
+        ingilizce: {
+          title: 'MEB LGS/YKS Kelime Kartları',
+          params: { sinif: englishGrade },
+        },
+        turkce: {
+          title: 'TDK Yazım Kuralları & Edebi Sanatlar',
+          params: { bolum: turkishTab },
+        },
+        sosyal: {
+          title: 'İnkılap Tarihi Kronoloji Şeridi',
+          params: { donem: timelinePeriod },
+        },
+      };
+      const currentExp = expMap[selectedBranch];
+      const answer = await askLabSocraticCoach({
+        branch: selectedBranch.toUpperCase(),
+        moduleTitle: currentExp.title,
+        question: q,
+        currentState: currentExp.params,
+      });
+      setSocraticReply(answer);
+      if (!customPrompt) setSocraticQuestion('');
+    } catch {
+      setSocraticReply('Şu anda AI laboratuvar koçuna ulaşılamadı, lütfen tekrar dene.');
+    } finally {
+      setSocraticLoading(false);
+    }
+  };
 
   // Fizik Snell Hesaplaması
   const theta1Rad = (refractionAngle * Math.PI) / 180;
@@ -141,17 +199,32 @@ export default function LabScreen() {
   const activeWord = activeGradeWords[currentWordIdx % activeGradeWords.length];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="light" />
       
-      {/* Top Header */}
+      {/* Top Header (Web BranchNavHeader İle Birebir Tilki Maskotlu) */}
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
-          <LinearGradient colors={['#00e5ff', '#3b82f6']} style={styles.headerIcon}>
-            <Ionicons name="flask" size={20} color="#030712" />
-          </LinearGradient>
+          <View
+            style={[
+              styles.headerIcon,
+              {
+                backgroundColor: 'rgba(249, 115, 22, 0.16)',
+                borderWidth: 1,
+                borderColor: 'rgba(249, 115, 22, 0.40)',
+              },
+            ]}
+          >
+            <Image
+              source={require('../../../assets/fox-head.png')}
+              style={{ width: 26, height: 26 }}
+              resizeMode="contain"
+            />
+          </View>
           <View>
-            <Text style={styles.headerTitle}>DersoLab L.A.B.</Text>
+            <Text style={styles.headerTitle}>
+              Derso<Text style={{ color: '#fb923c' }}>Lab</Text> L.A.B.
+            </Text>
             <Text style={styles.headerSubtitle}>7 Branş İnteraktif Deney & Simülasyon Merkezi</Text>
           </View>
         </View>
@@ -761,20 +834,100 @@ export default function LabScreen() {
           </View>
         )}
 
+        {/* ==================== SOKRATİK AI DENEY KOÇU ==================== */}
+        <View style={[styles.card, { marginTop: 18, borderColor: 'rgba(249, 115, 22, 0.35)' }]}>
+          <View style={styles.cardHeader}>
+            <Image
+              source={require('../../../assets/fox-head.png')}
+              style={{ width: 22, height: 22 }}
+              resizeMode="contain"
+            />
+            <Text style={styles.cardTitle}>DersoAI Sokratik Deney Koçu</Text>
+          </View>
+          <Text style={styles.cardDescription}>
+            Bu deneydeki parametrelerin neden böyle sonuç verdiğini veya sınavda nasıl sorulacağını AI Koçuna sor:
+          </Text>
+
+          <View style={styles.pillRowWrap}>
+            {[
+              'Bu deneyin sınavdaki en önemli püf noktası nedir?',
+              'Parametreleri değiştirince sonuç neden böyle değişti?',
+              'Bana bu deneyle ilgili 1 yeni nesil soru sor!',
+            ].map((q, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={[styles.pillBtn, { paddingVertical: 7, paddingHorizontal: 12 }]}
+                onPress={() => handleAskSocratic(q)}
+              >
+                <Text style={[styles.pillText, { color: '#38bdf8', fontSize: 11 }]}>{q}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+            <TextInput
+              style={{
+                flex: 1,
+                backgroundColor: '#1e293b',
+                borderRadius: 12,
+                paddingHorizontal: 14,
+                paddingVertical: 10,
+                color: '#ffffff',
+                fontSize: 13,
+                borderWidth: 1,
+                borderColor: '#334155',
+              }}
+              placeholder="Deney hakkında merak ettiğini yaz..."
+              placeholderTextColor="#64748b"
+              value={socraticQuestion}
+              onChangeText={setSocraticQuestion}
+            />
+            <TouchableOpacity
+              onPress={() => handleAskSocratic()}
+              disabled={socraticLoading || !socraticQuestion.trim()}
+              style={{
+                backgroundColor: '#00e5ff',
+                borderRadius: 12,
+                paddingHorizontal: 16,
+                justifyContent: 'center',
+                alignItems: 'center',
+                opacity: socraticLoading || !socraticQuestion.trim() ? 0.5 : 1,
+              }}
+            >
+              {socraticLoading ? (
+                <ActivityIndicator size="small" color="#030712" />
+              ) : (
+                <Ionicons name="send" size={16} color="#030712" />
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {socraticReply ? (
+            <View style={[styles.resultBox, { borderColor: 'rgba(0, 229, 255, 0.35)' }]}>
+              <Text style={{ color: '#00e5ff', fontSize: 11, fontWeight: '900', marginBottom: 4 }}>
+                DERSOAI KOÇ YANITI
+              </Text>
+              <Text style={{ color: '#e2e8f0', fontSize: 13, lineHeight: 20 }}>
+                {socraticReply}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+
         <View style={{ height: 100 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#030712',
+    backgroundColor: '#0a0a0a',
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'android' ? 40 : 16,
+    paddingTop: 12,
     paddingBottom: 12,
   },
   headerTitleRow: {

@@ -3,14 +3,31 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
+async function resolveTargetRouteForSession(userId: string, metaRole?: string): Promise<'/dashboard' | '/parent' | '/instructor'> {
+  try {
+    const { data: userRow } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle();
+
+    const role = userRow?.role || metaRole || 'student';
+    if (role === 'parent') return '/parent';
+    if (role === 'instructor') return '/instructor';
+    return '/dashboard';
+  } catch {
+    if (metaRole === 'parent') return '/parent';
+    if (metaRole === 'instructor') return '/instructor';
+    return '/dashboard';
+  }
+}
+
 export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // A small delay to let the layout mount fully before triggering redirects
-    // which avoids 'Attempted to navigate before mounting' in Expo Router
     const timeout = setTimeout(() => setIsReady(true), 100);
     return () => clearTimeout(timeout);
   }, []);
@@ -18,22 +35,30 @@ export default function RootLayout() {
   useEffect(() => {
     if (!isReady) return;
 
-    // Check active session immediately
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const inAuthGroup = segments[0] === 'dashboard';
-      if (session && !inAuthGroup) {
-        router.replace('/dashboard');
-      } else if (!session && inAuthGroup) {
-        router.replace('/');
+    const firstSegment = segments[0] as string | undefined;
+    const inRoleArea =
+      firstSegment === 'dashboard' ||
+      firstSegment === 'parent' ||
+      firstSegment === 'instructor';
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session && !inRoleArea) {
+        const target = await resolveTargetRouteForSession(
+          session.user.id,
+          session.user.user_metadata?.role
+        );
+        router.replace(target as any);
       }
     });
 
-    // Listen for auth events (like completing OAuth)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      const inAuthGroup = segments[0] === 'dashboard';
-      if (event === 'SIGNED_IN' && session && !inAuthGroup) {
-        router.replace('/dashboard');
-      } else if (event === 'SIGNED_OUT' && inAuthGroup) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session && !inRoleArea) {
+        const target = await resolveTargetRouteForSession(
+          session.user.id,
+          session.user.user_metadata?.role
+        );
+        router.replace(target as any);
+      } else if (event === 'SIGNED_OUT' && inRoleArea) {
         router.replace('/');
       }
     });
@@ -42,14 +67,17 @@ export default function RootLayout() {
       subscription.unsubscribe();
     };
   }, [isReady, segments]);
+
   return (
     <>
       <StatusBar style="light" />
-      <Stack screenOptions={{ 
-        headerShown: false,
-        contentStyle: { backgroundColor: '#0a0a0a' }
-      }}>
-        <Stack.Screen name="index" options={{ title: 'Ana Sayfa' }} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: '#0a0a0a' },
+        }}
+      >
+        <Stack.Screen name="index" options={{ title: 'DersoLab' }} />
       </Stack>
     </>
   );

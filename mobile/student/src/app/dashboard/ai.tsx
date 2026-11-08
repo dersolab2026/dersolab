@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Image, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -6,7 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { supabase } from '@/lib/supabase';
+import { solveAcademicQuestion } from '@/lib/gemini';
 
 const SUBJECTS = [
   'TYT Matematik',
@@ -43,6 +43,38 @@ export default function AiScreen() {
   const [loading, setLoading] = useState(false);
   const [solution, setSolution] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [savedQuestions, setSavedQuestions] = useState<Array<{
+    id: string;
+    subject: string;
+    question: string;
+    solution: string;
+    date: string;
+  }>>([]);
+
+  useEffect(() => {
+    loadSavedQuestions();
+  }, []);
+
+  const loadSavedQuestions = async () => {
+    try {
+      const savedRaw = await AsyncStorage.getItem('dersolab_saved_questions');
+      if (savedRaw) {
+        setSavedQuestions(JSON.parse(savedRaw));
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleDeleteSavedQuestion = async (id: string) => {
+    try {
+      const next = savedQuestions.filter((q) => q.id !== id);
+      setSavedQuestions(next);
+      await AsyncStorage.setItem('dersolab_saved_questions', JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+  };
 
   const pickImage = async () => {
     try {
@@ -104,22 +136,9 @@ export default function AiScreen() {
     setLoading(true);
     setErrorMsg('');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
       const prompt = `Lütfen şu sorunun temel mantığını, kavramlarını ve çözüm yöntemini kullanarak yeni, orijinal ve benzer bir soru üret ve adım adım ayrıntılı çözümünü ver:\n\nOrijinal Soru: ${question}\n\nKonu: ${subject}`;
-      const res = await fetch('https://dersolab.com/api/ai/solve', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
-        },
-        body: JSON.stringify({
-          question: prompt,
-          subject: subject,
-        })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Benzer soru üretilemedi.');
-      setSolution(data.solution);
+      const answer = await solveAcademicQuestion({ question: prompt, subject });
+      setSolution(answer);
       setQuestion(`[Yeni Nesil Benzer Soru - ${subject}]`);
       setImageUri(null);
     } catch (err: any) {
@@ -142,7 +161,8 @@ export default function AiScreen() {
       };
       list.unshift(newItem);
       await AsyncStorage.setItem('dersolab_saved_questions', JSON.stringify(list));
-      Alert.alert('Harika!', 'Soru ve detaylı çözümü arşivinize kaydedildi.');
+      setSavedQuestions(list);
+      Alert.alert('Harika!', 'Soru ve detaylı çözümü Soru Defterinize kaydedildi.');
     } catch (e) {
       Alert.alert('Hata', 'Soru kaydedilirken bir hata oluştu.');
     }
@@ -165,29 +185,12 @@ export default function AiScreen() {
     setLoading(true);
 
     try {
-      // Get current auth session to send the token
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const res = await fetch('https://dersolab.com/api/ai/solve', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
-        },
-        body: JSON.stringify({
-          question: trimmed,
-          subject: subject,
-          imageBase64: imageUri?.startsWith('data:image') ? imageUri : undefined,
-        })
+      const answer = await solveAcademicQuestion({
+        question: trimmed,
+        subject,
+        imageBase64: imageUri?.startsWith('data:image') ? imageUri : undefined,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Çözüm oluşturulurken bir hata oluştu.');
-      }
-
-      setSolution(data.solution);
+      setSolution(answer);
     } catch (err: any) {
       setErrorMsg(err.message || 'Bağlantı hatası.');
     } finally {
@@ -204,10 +207,27 @@ export default function AiScreen() {
         
         <View style={styles.header}>
           <View style={styles.titleRow}>
-            <Ionicons name="hardware-chip-outline" size={28} color="#00e5ff" />
+            <View
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: 12,
+                backgroundColor: 'rgba(249, 115, 22, 0.16)',
+                borderWidth: 1,
+                borderColor: 'rgba(249, 115, 22, 0.40)',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Image
+                source={require('../../../assets/fox-mascot.png')}
+                style={{ width: 30, height: 30 }}
+                resizeMode="contain"
+              />
+            </View>
             <Text style={styles.title}>AI Soru Asistanı</Text>
           </View>
-          <Text style={styles.subtitle}>Gemini ile güçlendirilmiş adım adım çözüm asistanı</Text>
+          <Text style={styles.subtitle}>DersoLab Tilki Koçu & Gemini ile adım adım çözüm asistanı</Text>
         </View>
 
         <View style={styles.badgesContainer}>
@@ -295,7 +315,7 @@ export default function AiScreen() {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={loading || (!question.trim() && !imageUri) ? ['#334155', '#475569'] : ['#3b82f6', '#8b5cf6']}
+              colors={loading || (!question.trim() && !imageUri) ? ['#334155', '#475569'] : ['#f97316', '#ea580c']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.solveBtnGradient}
@@ -315,8 +335,12 @@ export default function AiScreen() {
         {solution ? (
           <View style={styles.solutionCard}>
             <View style={styles.solutionHeader}>
-              <Ionicons name="bulb-outline" size={20} color="#f59e0b" />
-              <Text style={styles.solutionTitle}>Çözüm</Text>
+              <Image
+                source={require('../../../assets/fox-head.png')}
+                style={{ width: 22, height: 22 }}
+                resizeMode="contain"
+              />
+              <Text style={styles.solutionTitle}>DersoAI Çözümü</Text>
             </View>
             <Text style={styles.solutionText}>{solution}</Text>
             
@@ -342,6 +366,44 @@ export default function AiScreen() {
           </Text>
         </View>
 
+        {savedQuestions.length > 0 && (
+          <View style={[styles.card, { marginTop: 20 }]}>
+            <View style={styles.solutionHeader}>
+              <Ionicons name="bookmark" size={18} color="#f59e0b" />
+              <Text style={styles.solutionTitle}>Soru Defterim ({savedQuestions.length})</Text>
+            </View>
+            {savedQuestions.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={{
+                  backgroundColor: 'rgba(15, 23, 42, 0.7)',
+                  borderRadius: 12,
+                  padding: 14,
+                  marginBottom: 10,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.08)',
+                }}
+                onPress={() => {
+                  setSubject(item.subject);
+                  setQuestion(item.question);
+                  setSolution(item.solution);
+                }}
+                activeOpacity={0.8}
+              >
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <Text style={{ color: '#00e5ff', fontSize: 12, fontWeight: '800' }}>{item.subject} • {item.date}</Text>
+                  <TouchableOpacity onPress={() => handleDeleteSavedQuestion(item.id)}>
+                    <Ionicons name="trash-outline" size={16} color="#ef4444" />
+                  </TouchableOpacity>
+                </View>
+                <Text style={{ color: '#f8fafc', fontSize: 13, fontWeight: '600' }} numberOfLines={2}>
+                  {item.question}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         <View style={{ height: 100 }} />
       </ScrollView>
     </KeyboardAvoidingView>
@@ -351,7 +413,7 @@ export default function AiScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#030712',
+    backgroundColor: '#0a0a0a',
   },
   scrollContent: {
     padding: 20,

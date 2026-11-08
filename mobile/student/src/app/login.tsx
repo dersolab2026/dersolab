@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -16,17 +17,34 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  const routeByUserRole = async (userId: string, metaRole?: string) => {
+    const { data: userRow } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle();
+
+    const role = userRow?.role || metaRole || 'student';
+    if (role === 'parent') {
+      router.replace('/parent' as any);
+    } else if (role === 'instructor') {
+      router.replace('/instructor' as any);
+    } else {
+      router.replace('/dashboard' as any);
+    }
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
       setErrorMsg('Lütfen e-posta ve şifrenizi giriniz.');
       return;
     }
-    
+
     setLoading(true);
     setErrorMsg('');
-    
+
     const { data: signInData, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     });
 
@@ -37,23 +55,11 @@ export default function LoginScreen() {
     }
 
     if (signInData.user) {
-      const { data: userRow } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', signInData.user.id)
-        .single();
-
-      if (userRow?.role && userRow.role !== 'student' && userRow.role !== 'admin') {
-        await supabase.auth.signOut();
-        setLoading(false);
-        const roleName = userRow.role === 'instructor' ? 'Eğitmen' : 'Veli';
-        setErrorMsg(`Bu uygulama sadece Öğrenciler içindir. Giriş yaptığınız hesap bir ${roleName} hesabıdır.`);
-        return;
-      }
+      await routeByUserRole(signInData.user.id, signInData.user.user_metadata?.role);
+    } else {
+      router.replace('/dashboard' as any);
     }
-
     setLoading(false);
-    router.replace('/dashboard');
   };
 
   const handleGoogleLogin = async () => {
@@ -91,14 +97,14 @@ export default function LoginScreen() {
               const refresh_token = params.get('refresh_token');
 
               if (access_token && refresh_token) {
-                const { error: sessionErr } = await supabase.auth.setSession({
+                const { data: sessionData, error: sessionErr } = await supabase.auth.setSession({
                   access_token,
                   refresh_token,
                 });
                 if (sessionErr) {
                   setErrorMsg(sessionErr.message);
-                } else {
-                  router.replace('/dashboard');
+                } else if (sessionData.user) {
+                  await routeByUserRole(sessionData.user.id, sessionData.user.user_metadata?.role);
                 }
               }
             }
@@ -115,21 +121,20 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.content}
       >
-        
-        {/* Üst Kısım: Geri Butonu ve Başlık */}
+        {/* Üst Kısım: Geri Butonu */}
         <View style={styles.header}>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => {
               if (router.canGoBack()) {
                 router.back();
               } else {
                 router.replace('/');
               }
-            }} 
+            }}
             style={styles.backButton}
           >
             <Text style={styles.backButtonText}>← Geri</Text>
@@ -137,8 +142,20 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.formContainer}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+            <Image
+              source={require('../../assets/fox-mascot.png')}
+              style={{ width: 44, height: 44, marginRight: 10 }}
+              resizeMode="contain"
+            />
+            <Text style={{ fontSize: 28, fontWeight: '900', color: '#ffffff', letterSpacing: -0.8 }}>
+              Derso<Text style={{ color: '#fb923c' }}>Lab</Text>
+            </Text>
+          </View>
           <Text style={styles.title}>Hoş Geldin!</Text>
-          <Text style={styles.subtitle}>Derslerine kaldığın yerden devam et.</Text>
+          <Text style={styles.subtitle}>
+            Öğrenci, Veli veya Eğitmen hesabınla giriş yap; sistem seni otomatik olarak paneline yönlendirir.
+          </Text>
 
           {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
 
@@ -146,7 +163,7 @@ export default function LoginScreen() {
             <Text style={styles.label}>E-Posta Adresi</Text>
             <TextInput
               style={styles.input}
-              placeholder="ornek@ogrenci.com"
+              placeholder="ornek@dersolab.com"
               placeholderTextColor="#475569"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -167,18 +184,14 @@ export default function LoginScreen() {
             />
           </View>
 
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.primaryButton} 
+          <TouchableOpacity
+            style={styles.primaryButton}
             activeOpacity={0.8}
             onPress={handleLogin}
             disabled={loading}
           >
             <LinearGradient
-              colors={['#4f46e5', '#e11d48']}
+              colors={['#f97316', '#ea580c']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.primaryButtonGradient}
@@ -197,8 +210,8 @@ export default function LoginScreen() {
             <View style={styles.divider} />
           </View>
 
-          <TouchableOpacity 
-            style={styles.googleButton} 
+          <TouchableOpacity
+            style={styles.googleButton}
             activeOpacity={0.8}
             onPress={handleGoogleLogin}
           >
@@ -214,7 +227,6 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </Link>
         </View>
-
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -223,7 +235,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#030712',
+    backgroundColor: '#0a0a0a',
   },
   content: {
     flex: 1,
@@ -233,7 +245,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginTop: 10,
-    marginBottom: 40,
+    marginBottom: 20,
   },
   backButton: {
     padding: 8,
@@ -256,10 +268,10 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#94a3b8',
-    marginBottom: 32,
-    fontWeight: '300',
+    marginBottom: 28,
+    lineHeight: 22,
   },
   errorText: {
     color: '#ef4444',
@@ -286,19 +298,11 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 32,
-  },
-  forgotPasswordText: {
-    color: '#a5b4fc',
-    fontSize: 14,
-    fontWeight: '600',
-  },
   primaryButton: {
     width: '100%',
     borderRadius: 16,
     overflow: 'hidden',
+    marginTop: 8,
     shadowColor: '#4f46e5',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,

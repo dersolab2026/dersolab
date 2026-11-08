@@ -32,6 +32,8 @@ export default function ProfileScreen() {
 
   // Notifications State
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [guardianCode, setGuardianCode] = useState<string>('');
+  const [generatingCode, setGeneratingCode] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -75,11 +77,62 @@ export default function ProfileScreen() {
           profile: profileData || null,
         });
         setNewName(profileData?.name || authUser?.user_metadata?.full_name || '');
+
+        // Aktif veli bağlantı kodunu getir veya yoksa üret
+        const { data: codeData } = await supabase
+          .from('guardian_link_codes')
+          .select('code, expires_at')
+          .eq('student_id', authUser.id)
+          .is('used_at', null)
+          .gt('expires_at', new Date().toISOString())
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (codeData?.code) {
+          setGuardianCode(codeData.code);
+        } else {
+          const { data: newCode } = await supabase
+            .from('guardian_link_codes')
+            .insert({ student_id: authUser.id })
+            .select('code')
+            .maybeSingle();
+          if (newCode?.code) setGuardianCode(newCode.code);
+        }
       }
     } catch (err) {
       console.error('loadUser error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateNewGuardianCode = async () => {
+    if (!user?.id || generatingCode) return;
+    setGeneratingCode(true);
+    try {
+      await supabase
+        .from('guardian_link_codes')
+        .delete()
+        .eq('student_id', user.id)
+        .is('used_at', null);
+
+      const { data, error } = await supabase
+        .from('guardian_link_codes')
+        .insert({ student_id: user.id })
+        .select('code')
+        .single();
+
+      if (error || !data?.code) {
+        Alert.alert('Hata', 'Yeni veli kodu oluşturulamadı.');
+      } else {
+        setGuardianCode(data.code);
+        Alert.alert('Yeni Kod Üretildi', `Yeni 7 günlük veli bağlantı kodunuz: ${data.code}`);
+      }
+    } catch {
+      Alert.alert('Hata', 'Kod oluşturulurken bir sorun oluştu.');
+    } finally {
+      setGeneratingCode(false);
     }
   };
 
@@ -169,7 +222,7 @@ export default function ProfileScreen() {
   const studentName = user?.profile?.name || user?.user_metadata?.full_name || 'Öğrenci';
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>Profil</Text>
@@ -208,16 +261,25 @@ export default function ProfileScreen() {
 
         {/* Veli Bağlantı Bilgisi */}
         <View style={styles.parentLinkCard}>
-          <View style={styles.parentLinkHeader}>
-            <Ionicons name="link-outline" size={20} color="#38bdf8" />
-            <Text style={styles.parentLinkTitle}>Veli Bağlantı Kodu</Text>
+          <View style={[styles.parentLinkHeader, { justifyContent: 'space-between' }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Ionicons name="link-outline" size={20} color="#38bdf8" />
+              <Text style={styles.parentLinkTitle}>Veli Bağlantı Kodu (8 Haneli)</Text>
+            </View>
+            {user?.id && (
+              <TouchableOpacity onPress={handleGenerateNewGuardianCode} disabled={generatingCode}>
+                <Text style={{ color: '#00e5ff', fontSize: 12, fontWeight: '700' }}>
+                  {generatingCode ? 'Üretiliyor...' : 'Yeni Kod Üret'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
           <Text style={styles.parentLinkDesc}>
-            Velinizin sizin ders ve ödev durumunuzu takip edebilmesi için veli uygulamasında bu kodu kullanabilirsiniz:
+            Velinizin Veli Paneli'nden ders, deneme ve ödev durumunuzu takip edebilmesi için bu 8 haneli tek kullanımlık kodu paylaşabilirsiniz:
           </Text>
           <View style={styles.parentLinkCodeBox}>
             <Text style={styles.parentLinkCodeText} selectable={true}>
-              {user?.id ? user.id.slice(0, 8).toUpperCase() : 'DERSOLAB'}
+              {guardianCode || (user?.id ? user.id.slice(0, 8).toUpperCase() : 'GİRİŞ YAPIN')}
             </Text>
           </View>
         </View>
@@ -297,12 +359,12 @@ export default function ProfileScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#030712' },
+  safeArea: { flex: 1, backgroundColor: '#0a0a0a' },
   container: { padding: 20, paddingTop: 20 },
   header: { marginBottom: 24 },
   title: { fontSize: 28, fontWeight: '900', color: '#ffffff', letterSpacing: -0.5 },

@@ -24,7 +24,7 @@ type HomeworkItem = {
   title: string;
   description: string | null;
   due_date: string | null;
-  status: 'pending' | 'submitted' | 'completed';
+  status: 'pending' | 'assigned' | 'submitted' | 'completed' | 'graded';
   instructor_id: string;
   instructor_name?: string;
   submission_note?: string | null;
@@ -146,11 +146,11 @@ export default function HomeworkScreen() {
     }
   };
 
-  const pendingList = homeworks.filter((h) => h.status === 'pending');
-  const completedList = homeworks.filter((h) => h.status === 'submitted' || h.status === 'completed');
+  const pendingList = homeworks.filter((h) => h.status === 'pending' || h.status === 'assigned');
+  const completedList = homeworks.filter((h) => h.status === 'submitted' || h.status === 'completed' || h.status === 'graded');
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="light" />
 
       {/* Header */}
@@ -334,18 +334,18 @@ export default function HomeworkScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#030712',
+    backgroundColor: '#0a0a0a',
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'android' ? 40 : 16,
+    paddingTop: 12,
     paddingBottom: 12,
   },
   headerTitleRow: {

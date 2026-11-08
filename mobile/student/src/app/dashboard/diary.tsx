@@ -652,11 +652,11 @@ export default function DiaryScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#030712',
+    backgroundColor: '#0a0a0a',
   },
   container: {
     padding: 20,
-    paddingTop: Platform.OS === 'android' ? 40 : 10,
+    paddingTop: 10,
   },
   header: {
     marginBottom: 20,

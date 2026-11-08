@@ -57,9 +57,16 @@ const FALLBACK_QUIZ: SpacedQuizQuestion[] = [
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    let user = null
+    const authHeader = request.headers.get('authorization')
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7)
+      const { data } = await supabase.auth.getUser(token)
+      user = data.user
+    } else {
+      const { data } = await supabase.auth.getUser()
+      user = data.user
+    }
 
     if (!user) {
       return NextResponse.json({ error: 'Lütfen giriş yapın.' }, { status: 401 })
