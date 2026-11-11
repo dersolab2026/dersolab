@@ -5,8 +5,10 @@ import type {
   ReelsStoryboard,
   SlideThemeVariant,
   SocialPostItem,
+  SpotlightCardData,
 } from '@/types/social'
 import { toTurkishTitleCase } from './agent'
+import { findMatchingSpotlight } from './spotlightData'
 
 export interface RenderSlideOptions {
   isStory?: boolean
@@ -17,6 +19,7 @@ export interface RenderSlideOptions {
   currentSlide?: CarouselSlide | null
   singlePost?: SinglePostData | null
   storyData?: StoryData | null
+  spotlightData?: SpotlightCardData | null
   reelsStoryboard?: ReelsStoryboard | null
   postTitle?: string
   postCaption?: string
@@ -800,6 +803,344 @@ function drawDualBookStoryCards(
 }
 
 /**
+ * DersoLab Spotlight Kartı (Haftanın Motivasyonu / Bilim İnsanları, Haftanın Filmi ve Kitap Kulübü)
+ * Referans tasarım şablonuna %100 sadık kalarak 1080p çizim yapar.
+ */
+function drawSpotlightCard(
+  ctx: CanvasRenderingContext2D,
+  spotlight: SpotlightCardData,
+  width: number,
+  height: number,
+  isStory: boolean,
+  isReels: boolean,
+  loadedImg?: HTMLImageElement | null
+) {
+  const isVertical = isStory || isReels
+
+  // 1. Arka Plan: Derin Gece Mavisi / Siyah Gradyan
+  const bg = ctx.createLinearGradient(0, 0, width, height)
+  bg.addColorStop(0, '#070b14')
+  bg.addColorStop(0.5, '#0a101f')
+  bg.addColorStop(1, '#050810')
+  ctx.fillStyle = bg
+  ctx.fillRect(0, 0, width, height)
+
+  // Üst ortam ışığı (Portre ve filigranın arkasında yumuşak cyan ışıma)
+  const glowY = isVertical ? height * 0.23 : height * 0.2
+  const ambient = ctx.createRadialGradient(
+    width / 2,
+    glowY,
+    30,
+    width / 2,
+    glowY,
+    isVertical ? 540 : 390
+  )
+  ambient.addColorStop(0, 'rgba(56, 189, 248, 0.09)')
+  ambient.addColorStop(1, 'transparent')
+  ctx.fillStyle = ambient
+  ctx.fillRect(0, 0, width, height)
+
+  // 2. Üst Header: DersoLab Logo ve Kategori Rozeti
+  const headerY = isVertical ? 155 : 62
+  const headerBaseline = isVertical ? headerY + 36 : headerY + 30
+
+  // "DersoLab" Logo
+  ctx.font = `900 ${isVertical ? 42 : 36}px Inter, system-ui, sans-serif`
+  ctx.fillStyle = '#ffffff'
+  ctx.fillText('Derso', 80, headerBaseline)
+  const dersoW = ctx.measureText('Derso').width
+  ctx.fillStyle = '#38bdf8'
+  ctx.fillText('Lab', 80 + dersoW, headerBaseline)
+
+  // Sağ Kategori Hapı (Örn: "HAFTANIN MOTİVASYONU", "HAFTANIN FİLMİ", "HAFTANIN KİTABI")
+  const catText = (spotlight.categoryPill || 'HAFTANIN MOTİVASYONU').toLocaleUpperCase('tr-TR')
+  ctx.font = `800 ${isVertical ? 16 : 14}px Inter, system-ui, sans-serif`
+  const catW = ctx.measureText(catText).width + (isVertical ? 36 : 28)
+  const catH = isVertical ? 38 : 32
+  const catX = width - 80 - catW
+  const catY = headerY
+
+  ctx.fillStyle = 'rgba(30, 58, 138, 0.45)'
+  roundRect(ctx, catX, catY, catW, catH, Math.round(catH / 2))
+  ctx.fill()
+  ctx.strokeStyle = '#2563eb'
+  ctx.lineWidth = 1.5
+  ctx.stroke()
+  ctx.fillStyle = '#93c5fd'
+  ctx.textAlign = 'center'
+  ctx.fillText(catText, catX + catW / 2, catY + (isVertical ? 24 : 21))
+  ctx.textAlign = 'left'
+
+  // 3. Portre Çerçevesi & Arkasındaki Dev Filigran Harfleri
+  const imgW = isVertical ? 430 : 310
+  const imgH = isVertical ? 550 : 380
+  const imgX = (width - imgW) / 2
+  const imgY = isVertical ? 242 : 120
+
+  // Portrenin arkasındaki 2 dev filigran harf (Örn: R F, A E, U P, S P)
+  const letters = spotlight.watermarkLetters || ['D', 'L']
+  const l1 = letters[0] || 'D'
+  const l2 = letters[1] || 'L'
+
+  ctx.font = `900 ${isVertical ? 310 : 220}px Inter, system-ui, sans-serif`
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.075)'
+  ctx.textAlign = 'center'
+  const monoY = imgY + imgH / 2 + (isVertical ? 105 : 75)
+  const leftMonoX = imgX / 2
+  const rightMonoX = imgX + imgW + (width - (imgX + imgW)) / 2
+  ctx.fillText(l1, leftMonoX, monoY)
+  ctx.fillText(l2, rightMonoX, monoY)
+  ctx.textAlign = 'left'
+
+  // Portre Dış Parlama & Çerçeve
+  const frameRadius = isVertical ? 32 : 24
+  ctx.save()
+  ctx.shadowColor = 'rgba(56, 189, 248, 0.38)'
+  ctx.shadowBlur = 32
+  ctx.shadowOffsetX = 0
+  ctx.shadowOffsetY = 4
+  roundRect(ctx, imgX, imgY, imgW, imgH, frameRadius)
+  ctx.fillStyle = '#080d19'
+  ctx.fill()
+  ctx.restore()
+
+  ctx.save()
+  roundRect(ctx, imgX, imgY, imgW, imgH, frameRadius)
+  ctx.clip()
+
+  if (loadedImg && loadedImg.width > 0) {
+    const r = Math.max(imgW / loadedImg.width, imgH / loadedImg.height)
+    const sw = imgW / r
+    const sh = imgH / r
+    const sx = (loadedImg.width - sw) / 2
+    const sy = (loadedImg.height - sh) / 2
+    ctx.drawImage(loadedImg, sx, sy, sw, sh, imgX, imgY, imgW, imgH)
+  } else {
+    // Görsel henüz yüklenmediyse şık estetik fallback
+    const grad = ctx.createLinearGradient(imgX, imgY, imgX + imgW, imgY + imgH)
+    grad.addColorStop(0, '#0f172a')
+    grad.addColorStop(1, '#0369a1')
+    ctx.fillStyle = grad
+    ctx.fillRect(imgX, imgY, imgW, imgH)
+
+    ctx.font = `${isVertical ? 72 : 56}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`
+    ctx.textAlign = 'center'
+    const icon = spotlight.category === 'movie' ? '🎬' : spotlight.category === 'book' ? '📖' : '⚡'
+    ctx.fillText(icon, imgX + imgW / 2, imgY + imgH / 2 + 22)
+    ctx.textAlign = 'left'
+  }
+  ctx.restore()
+
+  // Portre Çerçeve Konturu (Neon Cyan)
+  ctx.strokeStyle = '#38bdf8'
+  ctx.lineWidth = 2.5
+  roundRect(ctx, imgX, imgY, imgW, imgH, frameRadius)
+  ctx.stroke()
+
+  // 4. Alt Dev İçerik Kartı (Hero Card)
+  const cardX = 60
+  const cardW = width - 120 // 960
+  const cardY = isVertical ? 822 : 530
+  const cardH = isVertical ? 928 : 745
+  const cardRadius = isVertical ? 36 : 28
+
+  ctx.save()
+  roundRect(ctx, cardX, cardY, cardW, cardH, cardRadius)
+  ctx.fillStyle = 'rgba(12, 19, 34, 0.95)'
+  ctx.fill()
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)'
+  ctx.lineWidth = 1.5
+  ctx.stroke()
+  ctx.clip()
+
+  // Kart İçi İçerikler
+  const padX = isVertical ? 48 : 42
+  const textX = cardX + padX
+  const textW = cardW - padX * 2
+  let cursor = cardY + (isVertical ? 50 : 38)
+
+  // Başlık & Puan / Rozet
+  const titleText = spotlight.title
+  const hasRating = Boolean(spotlight.ratingOrBadge)
+  let ratingW = 0
+  if (hasRating && spotlight.ratingOrBadge) {
+    ctx.font = `bold ${isVertical ? 22 : 18}px Inter, system-ui, sans-serif`
+    ratingW = ctx.measureText(spotlight.ratingOrBadge).width + 32
+    const ratingH = isVertical ? 42 : 36
+    const ratingX = textX + textW - ratingW
+    const ratingY = cursor - 6
+
+    ctx.fillStyle = 'rgba(245, 158, 11, 0.15)'
+    roundRect(ctx, ratingX, ratingY, ratingW, ratingH, 12)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.5)'
+    ctx.lineWidth = 1.5
+    ctx.stroke()
+    ctx.fillStyle = '#fbbf24'
+    ctx.textAlign = 'center'
+    ctx.fillText(
+      spotlight.ratingOrBadge,
+      ratingX + ratingW / 2,
+      ratingY + (isVertical ? 28 : 24)
+    )
+    ctx.textAlign = 'left'
+  }
+
+  // Başlık Metni
+  ctx.font = `900 ${isVertical ? 50 : 38}px Inter, system-ui, sans-serif`
+  ctx.fillStyle = '#ffffff'
+  const titleAvailW = hasRating ? textW - ratingW - 20 : textW
+  cursor = wrapText(
+    ctx,
+    titleText,
+    textX,
+    cursor + (isVertical ? 36 : 28),
+    titleAvailW,
+    isVertical ? 54 : 42,
+    1
+  )
+
+  // Alt Başlık (Parantez içi unvan / yıl)
+  ctx.font = `500 ${isVertical ? 25 : 20}px Inter, system-ui, sans-serif`
+  ctx.fillStyle = '#94a3b8'
+  cursor += isVertical ? 10 : 8
+  cursor = wrapText(
+    ctx,
+    spotlight.subtitle,
+    textX,
+    cursor + (isVertical ? 20 : 16),
+    textW,
+    isVertical ? 32 : 24,
+    1
+  )
+
+  cursor += isVertical ? 26 : 18
+
+  // Cyan Vurgulu Söz (Quote)
+  ctx.font = `bold ${isVertical ? 28 : 22}px Inter, system-ui, sans-serif`
+  ctx.fillStyle = '#38bdf8'
+  const quoteLineH = isVertical ? 38 : 30
+  const quote1 = spotlight.quote.startsWith('“') ? spotlight.quote : `“${spotlight.quote}”`
+  cursor = wrapText(
+    ctx,
+    quote1,
+    textX,
+    cursor + (isVertical ? 22 : 18),
+    textW,
+    quoteLineH,
+    2
+  )
+
+  if (spotlight.quoteSecondary) {
+    cursor += isVertical ? 8 : 6
+    const quote2 = spotlight.quoteSecondary.startsWith('“')
+      ? spotlight.quoteSecondary
+      : `“${spotlight.quoteSecondary}”`
+    cursor = wrapText(
+      ctx,
+      quote2,
+      textX,
+      cursor + (isVertical ? 22 : 18),
+      textW,
+      quoteLineH,
+      2
+    )
+  }
+
+  cursor += isVertical ? 24 : 16
+
+  // Pedagojik Açıklama & Ders
+  ctx.font = `400 ${isVertical ? 23 : 18}px Inter, system-ui, sans-serif`
+  ctx.fillStyle = '#cbd5e1'
+  const expLineH = isVertical ? 34 : 26
+  cursor = wrapText(
+    ctx,
+    spotlight.explanation,
+    textX,
+    cursor + (isVertical ? 20 : 16),
+    textW,
+    expLineH,
+    isVertical ? 4 : 3
+  )
+
+  cursor += isVertical ? 28 : 20
+
+  // 4 Renkli Rozetler (Yeşil, Mavi, Mor, Kırmızı)
+  if (spotlight.badges && spotlight.badges.length > 0) {
+    const badgeH = isVertical ? 38 : 32
+    const badgeRadius = 10
+    ctx.font = `bold ${isVertical ? 17 : 14}px Inter, system-ui, sans-serif`
+    let badgeCursorX = textX
+
+    const COLOR_THEMES: Record<string, { bg: string; border: string; text: string }> = {
+      green: {
+        bg: 'rgba(16, 185, 129, 0.12)',
+        border: 'rgba(16, 185, 129, 0.55)',
+        text: '#34d399',
+      },
+      blue: {
+        bg: 'rgba(14, 165, 233, 0.12)',
+        border: 'rgba(14, 165, 233, 0.55)',
+        text: '#38bdf8',
+      },
+      purple: {
+        bg: 'rgba(168, 85, 247, 0.12)',
+        border: 'rgba(168, 85, 247, 0.55)',
+        text: '#c084fc',
+      },
+      rose: {
+        bg: 'rgba(244, 63, 94, 0.12)',
+        border: 'rgba(244, 63, 94, 0.55)',
+        text: '#fb7185',
+      },
+      amber: {
+        bg: 'rgba(245, 158, 11, 0.12)',
+        border: 'rgba(245, 158, 11, 0.55)',
+        text: '#fbbf24',
+      },
+    }
+
+    spotlight.badges.forEach((b) => {
+      const palette = COLOR_THEMES[b.color] || COLOR_THEMES.blue
+      const w = ctx.measureText(b.text).width + (isVertical ? 30 : 24)
+
+      // Taşıyorsa alt satıra geç
+      if (badgeCursorX + w > textX + textW) {
+        badgeCursorX = textX
+        cursor += badgeH + 8
+      }
+
+      ctx.fillStyle = palette.bg
+      roundRect(ctx, badgeCursorX, cursor, w, badgeH, badgeRadius)
+      ctx.fill()
+      ctx.strokeStyle = palette.border
+      ctx.lineWidth = 1.2
+      ctx.stroke()
+      ctx.fillStyle = palette.text
+      ctx.textAlign = 'center'
+      ctx.fillText(b.text, badgeCursorX + w / 2, cursor + (isVertical ? 25 : 21))
+      ctx.textAlign = 'left'
+
+      badgeCursorX += w + (isVertical ? 12 : 8)
+    })
+  }
+
+  // Kart Alt Satırı (Footer)
+  const footerBaseline = cardY + cardH - (isVertical ? 34 : 26)
+  ctx.font = `bold ${isVertical ? 21 : 16}px Inter, system-ui, sans-serif`
+  ctx.fillStyle = '#2dd4bf'
+  ctx.fillText(spotlight.footerClub || 'DersoLab Rehberlik Kulübü', textX, footerBaseline)
+
+  ctx.font = `500 ${isVertical ? 19 : 15}px Inter, system-ui, sans-serif`
+  ctx.fillStyle = '#64748b'
+  ctx.textAlign = 'right'
+  ctx.fillText(spotlight.footerCredit || 'DersoLab 2026', textX + textW, footerBaseline)
+  ctx.textAlign = 'left'
+
+  ctx.restore()
+}
+
+/**
  * Belirli bir slaytı veya gönderiyi verilen Canvas üzerine 1080p tam çözünürlükte çizer
  */
 export async function renderSlideToCanvas(
@@ -818,6 +1159,7 @@ export async function renderSlideToCanvas(
     currentSlide,
     singlePost,
     storyData,
+    spotlightData,
     reelsStoryboard,
     postTitle,
     postCaption,
@@ -831,6 +1173,24 @@ export async function renderSlideToCanvas(
   const height = isStory || isReels ? 1920 : 1350
   canvas.width = width
   canvas.height = height
+
+  // 0. SPOTLIGHT KARTI TESPİTİ (Haftanın Motivasyonu / Bilim İnsanları, Haftanın Filmi veya Kitap Kulübü)
+  const effectiveSpotlight: SpotlightCardData | null =
+    spotlightData ||
+    storyData?.spotlightData ||
+    singlePost?.spotlightData ||
+    (isCarousel ? null : findMatchingSpotlight(postTitle || postCaption || ''))
+
+  if (effectiveSpotlight) {
+    const rawSpotlightImg = effectiveSpotlight.imageUrl || customImageUrl
+    const loadedSpotlightImg =
+      preloadedImages?.mainImage !== undefined
+        ? preloadedImages.mainImage
+        : await loadImageSafely(rawSpotlightImg)
+
+    drawSpotlightCard(ctx, effectiveSpotlight, width, height, isStory, isReels, loadedSpotlightImg)
+    return
+  }
 
   // Tema seçimi
   const themeKey = (
@@ -1548,6 +1908,7 @@ export async function generateAllPostMediaFiles(
     const dataUrl = await exportSlideDataUrl({
       isStory: true,
       storyData: post.storyData,
+      spotlightData: post.spotlightData || post.storyData?.spotlightData,
       postTitle: post.title,
       postCaption: post.caption,
       customImageUrl: post.storyData?.uploadedImageUrl || post.uploadedImageUrl,
@@ -1561,6 +1922,7 @@ export async function generateAllPostMediaFiles(
     const dataUrl = await exportSlideDataUrl({
       isReels: true,
       reelsStoryboard: post.reelsStoryboard,
+      spotlightData: post.spotlightData,
       postTitle: post.title,
       postCaption: post.caption,
       customImageUrl: post.reelsStoryboard?.uploadedImageUrl || post.uploadedImageUrl,
@@ -1582,6 +1944,7 @@ export async function generateAllPostMediaFiles(
       isCarousel: false,
       isStory: false,
       singlePost: post.singlePostData,
+      spotlightData: post.spotlightData || post.singlePostData?.spotlightData,
       postTitle: post.title,
       postCaption: post.caption,
       customImageUrl: post.uploadedImageUrl,

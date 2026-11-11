@@ -46,8 +46,17 @@ import type {
   SimulatedComment,
   SlideThemeVariant,
   SocialPostItem,
+  SpotlightCardData,
   StoryStickerType,
 } from '@/types/social'
+import {
+  createSpotlightSocialPost,
+  findMatchingSpotlight,
+  getCuratedSpotlight,
+  CURATED_MOTIVATION_SPOTLIGHTS,
+  CURATED_MOVIE_SPOTLIGHTS,
+  CURATED_BOOK_SPOTLIGHTS,
+} from '@/lib/social/spotlightData'
 import { CURRICULUM_TOPICS } from '@/lib/exams/curriculum'
 import { SocialPhoneMockup } from './SocialPhoneMockup'
 import { PublishSuccessModal, type PublishResultData } from './PublishSuccessModal'
@@ -86,6 +95,9 @@ import { toast } from 'sonner'
 const STORAGE_KEY = 'dersolab_social_posts_v8'
 
 const INITIAL_DEMO_POSTS: SocialPostItem[] = [
+  createSpotlightSocialPost(CURATED_MOTIVATION_SPOTLIGHTS[0], 'story'),
+  createSpotlightSocialPost(CURATED_MOVIE_SPOTLIGHTS[0], 'story'),
+  createSpotlightSocialPost(CURATED_BOOK_SPOTLIGHTS[0], 'story'),
   {
     id: 'demo_carousel_1',
     title: 'Paragrafta Süre Yetiştiremeyenlerin Yaptığı 3 Hata',
@@ -1404,6 +1416,22 @@ export default function SocialStudio() {
     const rawPrompt = subject.trim() || 'ÖSYM Net Artırma Stratejisi'
     const title = toTurkishTitleCase(rawPrompt)
     const id = `post_${Date.now()}`
+
+    // 0. SPOTLIGHT KARTI MODU (Motivasyon / Ünlüler / Bilim İnsanları)
+    const isMotivation =
+      topic === 'motivation' ||
+      /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|feynman|einstein|cahit arf|curie|marie curie|tesla|sancar|aziz sancar|turing|aurelius)\b/i.test(rawPrompt)
+
+    const matchedSpotlight = findMatchingSpotlight(rawPrompt)
+    if (matchedSpotlight || isMotivation) {
+      const chosen = matchedSpotlight || getCuratedSpotlight('motivation', variationSeed)
+      return {
+        ...createSpotlightSocialPost(chosen, type === 'story' ? 'story' : 'post'),
+        id,
+        sourcePrompt: rawPrompt,
+      }
+    }
+
     const isMovie =
       Boolean(findMatchingCuratedMovie(rawPrompt)) ||
       /\b(film|filmi|sinema|belgesel|dizi|afiş|afis|movie)\b/i.test(rawPrompt)
@@ -1412,6 +1440,14 @@ export default function SocialStudio() {
     const primaryTheme = themes[variationSeed % themes.length]
 
     if (isMovie) {
+      if (type === 'post') {
+        const matchedMovieSpotlight = findMatchingSpotlight(rawPrompt) || getCuratedSpotlight('movie', variationSeed)
+        return {
+          ...createSpotlightSocialPost(matchedMovieSpotlight, 'post'),
+          id,
+          sourcePrompt: rawPrompt,
+        }
+      }
       const moviePair = pickCuratedMoviePair(excludeSummary, variationSeed, rawPrompt)
       const specificMovie = findMatchingCuratedMovie(rawPrompt)
       const featured = specificMovie || moviePair.lise
@@ -1579,6 +1615,15 @@ export default function SocialStudio() {
           uploadedImageUrl: lisPoster,
         },
         createdAt: new Date().toISOString(),
+      }
+    }
+
+    if (isBook && type === 'post') {
+      const matchedBookSpotlight = findMatchingSpotlight(rawPrompt) || getCuratedSpotlight('book', variationSeed)
+      return {
+        ...createSpotlightSocialPost(matchedBookSpotlight, 'post'),
+        id,
+        sourcePrompt: rawPrompt,
       }
     }
 
@@ -2209,6 +2254,26 @@ export default function SocialStudio() {
     toast.success(`${examName}'ye ${daysLeft} Gün Kaldı geri sayım şablonu oluşturuldu!`)
   }
 
+  // Spotlight Özel Post Oluşturucu (Motivasyon / Film / Kitap)
+  function handleGenerateSpotlight(category: 'motivation' | 'movie' | 'book') {
+    const nextSeed = variationSeedRef.current + 1
+    variationSeedRef.current = nextSeed
+    const item = getCuratedSpotlight(category, nextSeed)
+    const newPost = createSpotlightSocialPost(item, genType === 'story' ? 'story' : 'post')
+    const updated = [newPost, ...posts.filter((p) => p.id !== newPost.id)]
+    savePosts(updated)
+    setActivePostId(newPost.id)
+    setActiveSlideIndex(0)
+    upsertSocialPostToDb(newPost).catch(() => {})
+    const catLabel =
+      category === 'motivation'
+        ? 'Haftanın Motivasyonu'
+        : category === 'movie'
+          ? 'Haftanın Filmi'
+          : 'Haftanın Kitabı'
+    toast.success(`✨ ${catLabel} postu (${item.title}) başarıyla oluşturuldu!`)
+  }
+
   // Açıklamayı Panoya Kopyala
   function handleCopyCaption() {
     const fullText = `${activePost.caption}\n\n${activePost.hashtags.map((h) => (h.startsWith('#') ? h : `#${h}`)).join(' ')}`
@@ -2302,16 +2367,20 @@ export default function SocialStudio() {
   const isReels = activePost.type === 'reels'
   const isPost = activePost.type === 'post'
   const currentSlide = isCarousel ? activePost.carouselSlides?.[activeSlideIndex] : null
+  const activeSpotlight = activePost.spotlightData || activePost.singlePostData?.spotlightData || activePost.storyData?.spotlightData || null
+  const hasSpotlight = Boolean(activeSpotlight)
 
-  const activeTargetImageUrl = isCarousel
-    ? currentSlide?.uploadedImageUrl
-    : isPost
-      ? activePost.singlePostData?.uploadedImageUrl || activePost.uploadedImageUrl
-      : isStory
-        ? activePost.storyData?.uploadedImageUrl || activePost.uploadedImageUrl
-        : isReels
-          ? activePost.reelsStoryboard?.uploadedImageUrl || activePost.uploadedImageUrl
-          : activePost.uploadedImageUrl
+  const activeTargetImageUrl = activeSpotlight?.imageUrl
+    ? activeSpotlight.imageUrl
+    : isCarousel
+      ? currentSlide?.uploadedImageUrl
+      : isPost
+        ? activePost.singlePostData?.uploadedImageUrl || activePost.uploadedImageUrl
+        : isStory
+          ? activePost.storyData?.uploadedImageUrl || activePost.uploadedImageUrl
+          : isReels
+            ? activePost.reelsStoryboard?.uploadedImageUrl || activePost.uploadedImageUrl
+            : activePost.uploadedImageUrl
 
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col font-sans pb-16">
@@ -2762,6 +2831,37 @@ export default function SocialStudio() {
                 <span>📅 7 Günlük Haftalık Takvim Üret</span>
               </button>
             </div>
+
+            {/* Özel Spotlight Kültür & Motivasyon Butonları */}
+            <div className="mt-2.5 pt-2.5 border-t border-cyan-500/20 grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button
+                type="button"
+                disabled={isBatchLoading || isGenerating}
+                onClick={() => handleGenerateSpotlight('motivation')}
+                className="py-2.5 px-3 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-200 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                <span className="text-sm">💡</span>
+                <span>Haftanın Motivasyonu (Ünlüler)</span>
+              </button>
+              <button
+                type="button"
+                disabled={isBatchLoading || isGenerating}
+                onClick={() => handleGenerateSpotlight('movie')}
+                className="py-2.5 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-200 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                <span className="text-sm">🎬</span>
+                <span>Haftanın Filmi (Sinema Kulübü)</span>
+              </button>
+              <button
+                type="button"
+                disabled={isBatchLoading || isGenerating}
+                onClick={() => handleGenerateSpotlight('book')}
+                className="py-2.5 px-3 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/40 text-pink-200 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                <span className="text-sm">📚</span>
+                <span>Haftanın Kitabı (Kitap Kulübü)</span>
+              </button>
+            </div>
           </div>
 
           {/* KART 2: CANLI GÖNDERİ DÜZENLEYİCİ */}
@@ -3005,8 +3105,262 @@ export default function SocialStudio() {
               </div>
             )}
 
+            {/* 1.5 SPOTLIGHT KART DÜZENLEME (Motivasyon / Film / Kitap) */}
+            {hasSpotlight && activeSpotlight && (
+              <div className="border border-cyan-500/30 rounded-xl p-3.5 bg-cyan-950/20 backdrop-blur-md flex flex-col gap-3 shadow-lg shadow-cyan-950/30">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                    <span>✨</span>
+                    <span>Spotlight Kartı ({activeSpotlight.categoryPill || 'Öne Çıkan'}) Düzenle</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-cyan-400/80 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
+                    {activeSpotlight.category === 'motivation' ? '💡 Motivasyon' : activeSpotlight.category === 'movie' ? '🎬 Film' : '📚 Kitap'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-300 block mb-1">Kategori Rozeti (Üst Sağ)</label>
+                    <input
+                      type="text"
+                      value={activeSpotlight.categoryPill || ''}
+                      onChange={(e) => {
+                        const updated: SpotlightCardData = { ...activeSpotlight, categoryPill: e.target.value }
+                        handleUpdateActivePost({
+                          ...activePost,
+                          spotlightData: updated,
+                          singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, spotlightData: updated } : undefined,
+                          storyData: activePost.storyData ? { ...activePost.storyData, spotlightData: updated } : undefined,
+                        })
+                      }}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-white focus:outline-hidden focus:border-cyan-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-300 block mb-1">Filigran Baş Harfleri (2 Harf)</label>
+                    <input
+                      type="text"
+                      maxLength={3}
+                      value={activeSpotlight.watermarkLetters?.join(' ') || ''}
+                      onChange={(e) => {
+                        const parts = e.target.value.trim().toUpperCase().split(/\s*|\s+/).filter(Boolean)
+                        const updated: SpotlightCardData = { ...activeSpotlight, watermarkLetters: [parts[0] || '', parts[1] || ''] }
+                        handleUpdateActivePost({
+                          ...activePost,
+                          spotlightData: updated,
+                          singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, spotlightData: updated } : undefined,
+                          storyData: activePost.storyData ? { ...activePost.storyData, spotlightData: updated } : undefined,
+                        })
+                      }}
+                      placeholder="Örn: R F"
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-white font-mono focus:outline-hidden focus:border-cyan-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-300 block mb-1">Kişi / Eser Başlığı</label>
+                    <input
+                      type="text"
+                      value={activeSpotlight.title || ''}
+                      onChange={(e) => {
+                        const updated: SpotlightCardData = { ...activeSpotlight, title: e.target.value }
+                        handleUpdateActivePost({
+                          ...activePost,
+                          title: `${activeSpotlight.categoryPill}: ${e.target.value}`,
+                          spotlightData: updated,
+                          singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, headline: e.target.value, spotlightData: updated } : undefined,
+                          storyData: activePost.storyData ? { ...activePost.storyData, headline: e.target.value, spotlightData: updated } : undefined,
+                        })
+                      }}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-white font-bold focus:outline-hidden focus:border-cyan-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-300 block mb-1">Alt Başlık (Ünvan / Yönetmen / Yıl)</label>
+                    <input
+                      type="text"
+                      value={activeSpotlight.subtitle || ''}
+                      onChange={(e) => {
+                        const updated: SpotlightCardData = { ...activeSpotlight, subtitle: e.target.value }
+                        handleUpdateActivePost({
+                          ...activePost,
+                          spotlightData: updated,
+                          singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, questionOrSummary: e.target.value, spotlightData: updated } : undefined,
+                          storyData: activePost.storyData ? { ...activePost.storyData, subhead: e.target.value, spotlightData: updated } : undefined,
+                        })
+                      }}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-white focus:outline-hidden focus:border-cyan-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-300 block mb-1">Puan veya Ek Rozet (İsteğe Bağlı)</label>
+                    <input
+                      type="text"
+                      value={activeSpotlight.ratingOrBadge || ''}
+                      placeholder="Örn: ⭐ 8.3 / 10"
+                      onChange={(e) => {
+                        const updated: SpotlightCardData = { ...activeSpotlight, ratingOrBadge: e.target.value }
+                        handleUpdateActivePost({
+                          ...activePost,
+                          spotlightData: updated,
+                          singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, spotlightData: updated } : undefined,
+                          storyData: activePost.storyData ? { ...activePost.storyData, spotlightData: updated } : undefined,
+                        })
+                      }}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-amber-300 focus:outline-hidden focus:border-cyan-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-300 block mb-1">Portre / Görsel URL</label>
+                    <input
+                      type="text"
+                      value={activeSpotlight.imageUrl || ''}
+                      placeholder="Örn: /spotlight/feynman_portrait.jpg"
+                      onChange={(e) => {
+                        const updated: SpotlightCardData = { ...activeSpotlight, imageUrl: e.target.value }
+                        handleUpdateActivePost({
+                          ...activePost,
+                          uploadedImageUrl: e.target.value,
+                          spotlightData: updated,
+                          singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, uploadedImageUrl: e.target.value, spotlightData: updated } : undefined,
+                          storyData: activePost.storyData ? { ...activePost.storyData, uploadedImageUrl: e.target.value, spotlightData: updated } : undefined,
+                        })
+                      }}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-white focus:outline-hidden focus:border-cyan-400"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-300 block mb-1">Ana Alıntı Söz (Mavi Tırnak İçi)</label>
+                  <textarea
+                    rows={2}
+                    value={activeSpotlight.quote || ''}
+                    onChange={(e) => {
+                      const updated: SpotlightCardData = { ...activeSpotlight, quote: e.target.value }
+                      handleUpdateActivePost({
+                        ...activePost,
+                        spotlightData: updated,
+                        singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, keyTakeaway: e.target.value, spotlightData: updated } : undefined,
+                        storyData: activePost.storyData ? { ...activePost.storyData, spotlightData: updated } : undefined,
+                      })
+                    }}
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-cyan-200 focus:outline-hidden focus:border-cyan-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-300 block mb-1">İkinci Alıntı / Replik (İsteğe Bağlı)</label>
+                  <input
+                    type="text"
+                    value={activeSpotlight.quoteSecondary || ''}
+                    placeholder="İkinci alıntı satırı..."
+                    onChange={(e) => {
+                      const updated: SpotlightCardData = { ...activeSpotlight, quoteSecondary: e.target.value }
+                      handleUpdateActivePost({
+                        ...activePost,
+                        spotlightData: updated,
+                        singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, spotlightData: updated } : undefined,
+                        storyData: activePost.storyData ? { ...activePost.storyData, spotlightData: updated } : undefined,
+                      })
+                    }}
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-cyan-300 focus:outline-hidden focus:border-cyan-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-300 block mb-1">Öğrenciye İlham Veren Açıklama Metni</label>
+                  <textarea
+                    rows={3}
+                    value={activeSpotlight.explanation || ''}
+                    onChange={(e) => {
+                      const updated: SpotlightCardData = { ...activeSpotlight, explanation: e.target.value }
+                      handleUpdateActivePost({
+                        ...activePost,
+                        spotlightData: updated,
+                        singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, spotlightData: updated } : undefined,
+                        storyData: activePost.storyData ? { ...activePost.storyData, spotlightData: updated } : undefined,
+                      })
+                    }}
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-slate-200 focus:outline-hidden focus:border-cyan-400"
+                  />
+                </div>
+
+                {/* 4 Renkli Rozet */}
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-300 block mb-1.5">Alt Rozetler (4 Renk: Yeşil, Mavi, Mor, Kırmızı)</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {(activeSpotlight.badges || []).map((b, bIdx) => (
+                      <div key={bIdx} className="flex flex-col gap-1">
+                        <span className="text-[9px] font-mono text-slate-400 capitalize">Rozet {bIdx + 1} ({b.color})</span>
+                        <input
+                          type="text"
+                          value={b.text}
+                          onChange={(e) => {
+                            const nextBadges = [...(activeSpotlight.badges || [])]
+                            nextBadges[bIdx] = { ...b, text: e.target.value }
+                            const updated: SpotlightCardData = { ...activeSpotlight, badges: nextBadges }
+                            handleUpdateActivePost({
+                              ...activePost,
+                              spotlightData: updated,
+                              singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, spotlightData: updated } : undefined,
+                              storyData: activePost.storyData ? { ...activePost.storyData, spotlightData: updated } : undefined,
+                            })
+                          }}
+                          className="w-full px-2 py-1 rounded-md bg-black/40 border border-white/10 text-xs text-white"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Alt Bilgi (Footer) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 border-t border-white/10">
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-300 block mb-1">Sol Alt Kulüp İsmi</label>
+                    <input
+                      type="text"
+                      value={activeSpotlight.footerClub || ''}
+                      onChange={(e) => {
+                        const updated: SpotlightCardData = { ...activeSpotlight, footerClub: e.target.value }
+                        handleUpdateActivePost({
+                          ...activePost,
+                          spotlightData: updated,
+                          singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, spotlightData: updated } : undefined,
+                          storyData: activePost.storyData ? { ...activePost.storyData, spotlightData: updated } : undefined,
+                        })
+                      }}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-teal-300 focus:outline-hidden focus:border-cyan-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-300 block mb-1">Sağ Alt İntaç / Yıl / Yönetmen</label>
+                    <input
+                      type="text"
+                      value={activeSpotlight.footerCredit || ''}
+                      onChange={(e) => {
+                        const updated: SpotlightCardData = { ...activeSpotlight, footerCredit: e.target.value }
+                        handleUpdateActivePost({
+                          ...activePost,
+                          spotlightData: updated,
+                          singlePostData: activePost.singlePostData ? { ...activePost.singlePostData, spotlightData: updated } : undefined,
+                          storyData: activePost.storyData ? { ...activePost.storyData, spotlightData: updated } : undefined,
+                        })
+                      }}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-slate-400 focus:outline-hidden focus:border-cyan-400"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* 2. TEKLİ POST (SINGLE POST) ALANLARI */}
-            {isPost && activePost.singlePostData && (
+            {isPost && activePost.singlePostData && !hasSpotlight && (
               <div className="border border-white/10 rounded-xl p-3.5 bg-black/30 flex flex-col gap-2.5">
                 <div className="text-xs font-bold text-orange-400">Tekli Gönderi (1 Soru 1 Net / Hap Bilgi) Ayarları</div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -3171,7 +3525,7 @@ export default function SocialStudio() {
             )}
 
             {/* 3. STORY ALANLARI */}
-            {isStory && activePost.storyData && (
+            {isStory && activePost.storyData && !hasSpotlight && (
               <div className="border border-white/10 rounded-xl p-3.5 bg-black/30 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <div className="text-xs font-bold text-orange-400">Story (9:16) İçerik ve Çıkartma Ayarları</div>

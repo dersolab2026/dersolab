@@ -41,6 +41,10 @@ export function SocialCanvasPreview({
       currentSlide,
       singlePost: post.singlePostData,
       storyData: post.storyData,
+      spotlightData:
+        post.spotlightData ||
+        post.storyData?.spotlightData ||
+        post.singlePostData?.spotlightData,
       reelsStoryboard: post.reelsStoryboard,
       postTitle: post.title,
       postCaption: post.caption,

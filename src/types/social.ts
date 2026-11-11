@@ -19,6 +19,7 @@ export type ContentTopic =
   | 'daily_question'
   | 'weekly_plan'
   | 'book_recommendation'
+  | 'movie_recommendation'
   | 'custom'
 
 export type PostStatus = 'draft' | 'approved' | 'scheduled' | 'published'
@@ -61,6 +62,28 @@ export interface SinglePostData {
   options?: { key: string; text: string; isCorrect?: boolean }[]
   themeVariant: SlideThemeVariant
   uploadedImageUrl?: string
+  spotlightData?: SpotlightCardData
+}
+
+export interface SpotlightBadge {
+  text: string
+  color: 'green' | 'blue' | 'purple' | 'rose' | 'amber'
+}
+
+export interface SpotlightCardData {
+  category: 'motivation' | 'movie' | 'book'
+  categoryPill: string // "HAFTANIN MOTİVASYONU" | "HAFTANIN FİLMİ" | "HAFTANIN KİTABI"
+  watermarkLetters: [string, string] // e.g. ["R", "F"], ["A", "E"], ["U", "P"], ["S", "P"]
+  title: string // "Richard Feynman", "Yukarı Bak", "Şeker Portakalı"
+  subtitle: string // "(Teorik Fizikçi & Nobel Ödülü)", "(Up, 2009)"
+  ratingOrBadge?: string // e.g. "⭐ 8.3 / 10" or "⭐ 4.8 / 5"
+  quote: string // Cyan highlight quote
+  quoteSecondary?: string // Optional second quote (e.g. film second punchline)
+  explanation: string // Deep educational & inspirational takeaway for students
+  badges: SpotlightBadge[] // 4 colorful pills (green, blue, purple, rose)
+  footerClub: string // "DersoLab Rehberlik Kulübü" | "DersoLab Sinema Kulübü" | "DersoLab Kitap Kulübü"
+  footerCredit: string // "DersoLab 2026" | "Yönetmen: ..." | "Yazar: ..."
+  imageUrl?: string
 }
 
 export interface DualBookItem {
@@ -89,6 +112,7 @@ export interface StoryData {
   themeVariant: SlideThemeVariant
   uploadedImageUrl?: string
   dualBookData?: DualBookData
+  spotlightData?: SpotlightCardData
 }
 
 export interface ReelsStoryboard {
@@ -187,6 +211,7 @@ export interface SocialPostItem {
   carouselSlides?: CarouselSlide[]
   singlePostData?: SinglePostData
   storyData?: StoryData
+  spotlightData?: SpotlightCardData
   reelsStoryboard?: ReelsStoryboard
   uploadedImageUrl?: string
   scheduledFor?: string | null

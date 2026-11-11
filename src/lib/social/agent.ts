@@ -24,6 +24,11 @@ import {
   isBlacklistedMovie,
 } from './bookCovers'
 import { getRecommendedLabForSubjectOrText } from '@/lib/exams/curriculum'
+import {
+  createSpotlightSocialPost,
+  findMatchingSpotlight,
+  getCuratedSpotlight,
+} from './spotlightData'
 
 const ACRONYM_MAP: Record<string, string> = {
   ösym: 'ÖSYM',
@@ -699,16 +704,21 @@ export async function generateSocialPost(request: GeneratePostRequest): Promise<
       !isMovieTopic &&
       (request.topic === 'book_recommendation' ||
         /kitap|roman|okuma kulübü|pazar hikayesi|kitap öneri/i.test(topicFocus))
+    const isMotivationTopic =
+      request.topic === 'motivation' ||
+      /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|feynman|einstein|cahit arf|curie|marie curie|tesla|sancar|aziz sancar|turing|aurelius)\b/i.test(topicFocus)
     const chosenSticker = request.storyStickerType || 'none'
     const seedNum = Math.max(1, request.variationSeed || 1)
     const curatedMoviePair = isMovieTopic ? pickCuratedMoviePair(request.excludeSummary, seedNum, topicFocus) : null
     const specificMovie = isMovieTopic ? findMatchingCuratedMovie(topicFocus) : null
     const customMovieName = isMovieTopic && !specificMovie ? extractCustomMovieTitle(topicFocus) : null
-    const selectedAngle = isMovieTopic
-      ? `GERÇEK SİNEMA & FİLM KULÜBÜ SEÇKİSİ (Alternatif #${seedNum}): Öğrencilere ilham veren, bilimsel merakı veya çalışma motivasyonunu artıran gerçek sinema filmlerini (Yönetmen, IMDb puanı, konusu ve öğrencinin neden izlemesi gerektiğiyle) tanıt. Asla "Film Önerisi sorularında ÖSYM çeldiricisi" gibi ders şablonu cümleleri yazma!`
-      : isBookTopic
-        ? `GERÇEK DÜNYA VE TÜRK EDEBİYATI KLASİKLERİ SEÇKİSİ (Alternatif #${seedNum}): Kesinlikle uydurma/sahte kitap veya kurum adı ("DersoLab", "ÖSYM", "LGS Paragraf" vb.) YAZMA! Sadece gerçek, dünyaca ünlü basılmış edebi roman/hikaye eserlerini ve gerçek yazarlarını öner.`
-        : VARIATION_ANGLES[(seedNum - 1) % VARIATION_ANGLES.length]
+    const selectedAngle = isMotivationTopic
+      ? `GERÇEK BİLİM İNSANI / ÜNLÜ & FİLOZOF MOTİVASYON SEÇKİSİ (Alternatif #${seedNum}): Richard Feynman, Albert Einstein, Cahit Arf, Marie Curie vb. gibi gerçek bilim insanlarının ve düşünürlerin hayatından öğrencilere rehberlik edecek gerçek sözünü ve derin felsefesini anlat.`
+      : isMovieTopic
+        ? `GERÇEK SİNEMA & FİLM KULÜBÜ SEÇKİSİ (Alternatif #${seedNum}): Öğrencilere ilham veren, bilimsel merakı veya çalışma motivasyonunu artıran gerçek sinema filmlerini (Yönetmen, IMDb puanı, konusu ve öğrencinin neden izlemesi gerektiğiyle) tanıt. Asla "Film Önerisi sorularında ÖSYM çeldiricisi" gibi ders şablonu cümleleri yazma!`
+        : isBookTopic
+          ? `GERÇEK DÜNYA VE TÜRK EDEBİYATI KLASİKLERİ SEÇKİSİ (Alternatif #${seedNum}): Kesinlikle uydurma/sahte kitap veya kurum adı ("DersoLab", "ÖSYM", "LGS Paragraf" vb.) YAZMA! Sadece gerçek, dünyaca ünlü basılmış edebi roman/hikaye eserlerini ve gerçek yazarlarını öner.`
+          : VARIATION_ANGLES[(seedNum - 1) % VARIATION_ANGLES.length]
     const curatedBookPair = isBookTopic ? pickCuratedBookPair(request.excludeSummary, seedNum) : null
 
     const userPrompt = `
@@ -929,6 +939,29 @@ Yanıtını kesinlikle şu JSON formatında döndür:
     ],
     "themeVariant": "lab_dark"
   }`
+  }${
+    isMotivationTopic || (isMovieTopic && request.type !== 'carousel') || (isBookTopic && request.type === 'post')
+      ? `,
+  "spotlightData": {
+    "category": "${isMotivationTopic ? 'motivation' : isMovieTopic ? 'movie' : 'book'}",
+    "categoryPill": "${isMotivationTopic ? 'HAFTANIN MOTİVASYONU' : isMovieTopic ? 'HAFTANIN FİLMİ' : 'HAFTANIN KİTABI'}",
+    "watermarkLetters": ["A", "B"],
+    "title": "${isMotivationTopic ? 'Kişi Adı' : isMovieTopic ? 'Film Adı' : 'Kitap Adı'}",
+    "subtitle": "(Ünvan / Yönetmen / Yıl)",
+    "ratingOrBadge": "${isMovieTopic ? '⭐ 8.3 / 10' : isBookTopic ? '⭐ 4.8 / 5' : ''}",
+    "quote": "“Ana alıntı söz...”",
+    "quoteSecondary": "İkinci replik veya vurgu (isteğe bağlı)",
+    "explanation": "Öğrenciye ilham veren, çalışma azmini ve merakını pekiştiren samimi açıklama paragrafı.",
+    "badges": [
+      { "text": "Rozet 1", "color": "green" },
+      { "text": "Rozet 2", "color": "blue" },
+      { "text": "Rozet 3", "color": "purple" },
+      { "text": "Rozet 4", "color": "rose" }
+    ],
+    "footerClub": "${isMovieTopic ? 'DersoLab Sinema Kulübü' : isBookTopic ? 'DersoLab Kitap Kulübü' : 'DersoLab Rehberlik Kulübü'}",
+    "footerCredit": "DersoLab 2026"
+  }`
+      : ''
   }
 }
 `
@@ -1074,6 +1107,42 @@ Yanıtını kesinlikle şu JSON formatında döndür:
       uploadedImageUrl: request.imageBase64,
       createdAt: new Date().toISOString(),
       sourcePrompt: topicFocus,
+    }
+
+    const matchedSpotlight = findMatchingSpotlight(topicFocus) || findMatchingSpotlight(formattedTitle)
+    let spotlightToAttach = parsed.spotlightData || null
+
+    if (!spotlightToAttach && isMotivationTopic) {
+      spotlightToAttach = matchedSpotlight || getCuratedSpotlight('motivation', seedNum)
+    } else if (!spotlightToAttach && isMovieTopic && request.type === 'post') {
+      spotlightToAttach = matchedSpotlight || getCuratedSpotlight('movie', seedNum)
+    } else if (!spotlightToAttach && isBookTopic && request.type === 'post') {
+      spotlightToAttach = matchedSpotlight || getCuratedSpotlight('book', seedNum)
+    }
+
+    if (spotlightToAttach) {
+      if (matchedSpotlight?.imageUrl && !spotlightToAttach.imageUrl) {
+        spotlightToAttach.imageUrl = matchedSpotlight.imageUrl
+      }
+      postItem.spotlightData = spotlightToAttach
+      if (spotlightToAttach.imageUrl) {
+        postItem.uploadedImageUrl = spotlightToAttach.imageUrl
+      }
+      if (postItem.storyData) {
+        postItem.storyData.spotlightData = spotlightToAttach
+        if (spotlightToAttach.imageUrl) {
+          postItem.storyData.uploadedImageUrl = spotlightToAttach.imageUrl
+        }
+      }
+      if (postItem.singlePostData) {
+        postItem.singlePostData.spotlightData = spotlightToAttach
+        if (spotlightToAttach.imageUrl) {
+          postItem.singlePostData.uploadedImageUrl = spotlightToAttach.imageUrl
+        }
+      }
+      if (isMotivationTopic) {
+        return attachGrokEnhancements(postItem, request.persona)
+      }
     }
 
     if (isMovieTopic) {
@@ -1288,6 +1357,20 @@ async function generateLocalFallbackPost(request: GeneratePostRequest): Promise<
   const t3 = themes[(vIdx + 2) % 4]
   const t4 = themes[(vIdx + 3) % 4]
 
+  // 0. SPOTLIGHT KARTI MODU (Motivasyon / Ünlüler / Bilim İnsanları / Film / Kitap)
+  const isMotivationTopic =
+    request.topic === 'motivation' ||
+    /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|feynman|einstein|cahit arf|curie|marie curie|tesla|sancar|aziz sancar|turing|aurelius)\b/i.test(rawFocus)
+
+  const matchedAnySpotlight = findMatchingSpotlight(rawFocus)
+
+  if (matchedAnySpotlight || isMotivationTopic) {
+    const spotlightItem = matchedAnySpotlight || getCuratedSpotlight('motivation', vIdx)
+    const postType = request.type === 'story' ? 'story' : 'post'
+    const spotlightPost = createSpotlightSocialPost(spotlightItem, postType)
+    return attachGrokEnhancements(spotlightPost, request.persona)
+  }
+
   // FİLM / SİNEMA ÖNERİSİ MODU (Tüm formatlarda gerçek film afişi + gerçek sinema içeriği)
   if (isMovieTopicRequest(request, rawFocus)) {
     const moviePair = pickCuratedMoviePair(request.excludeSummary, vIdx + 1, rawFocus)
@@ -1438,30 +1521,9 @@ async function generateLocalFallbackPost(request: GeneratePostRequest): Promise<
         sourcePrompt: rawFocus,
       }
     } else {
-      moviePost = {
-        id: `post_${now}_single_movie_${vIdx}`,
-        title: `Haftanın Film Önerisi: ${movieDisplayTitle} 🎬`,
-        type: 'post',
-        topic: request.topic,
-        topicLabel: `Sinema Kulübü • ${movieDisplayTitle}`,
-        status: 'draft',
-        targetAudience: request.targetGrade || 'Ortaokul (LGS) & Lise (YKS)',
-        caption: `🎬 Haftanın Film Önerisi: ${movieDisplayTitle}!\n\n🎥 Yönetmen & Puan: ${featuredMovie.director}\n🎭 Tür: ${featuredMovie.genre}\n💡 Neden İzlenmeli: ${featuredMovie.whyWatch}\n\nBu filmi izledin mi, yoksa bu hafta sonu listene mi ekliyorsun? Yorumlarda buluşalım! 🍿👇\n\n#filmönerisi #sinemakulübü #yks2027 #lgs2027 #dersolab`,
-        hashtags: ['#filmönerisi', '#sinemakulübü', '#yks2027', '#lgs2027', '#dersolab'],
-        singlePostData: {
-          badge: `HAFTANIN FİLM SEÇKİSİ 🎬 • IMDb ${featuredMovie.imdb}`,
-          headline: movieDisplayTitle,
-          questionOrSummary: `${featuredMovie.director} (${featuredMovie.genre}) — ${featuredMovie.whyWatch}`,
-          keyTakeaway: '🍿 MOLA ÖNERİSİ',
-          options: [
-            { key: 'A', text: 'Bu hafta sonu mutlaka izliyorum! 🍿', isCorrect: true },
-            { key: 'B', text: 'İzledim, kesinlikle başyapıt! ⭐', isCorrect: false },
-          ],
-          themeVariant: t1,
-        },
-        createdAt: new Date().toISOString(),
-        sourcePrompt: rawFocus,
-      }
+      const matchedMovieSpotlight = findMatchingSpotlight(rawFocus) || getCuratedSpotlight('movie', vIdx)
+      const movieSpotlightPost = createSpotlightSocialPost(matchedMovieSpotlight, 'post')
+      return attachGrokEnhancements(movieSpotlightPost, request.persona)
     }
 
     await enrichMoviePostWithRealPosters(moviePost, request, vIdx + 1, rawFocus)
@@ -1866,6 +1928,18 @@ async function generateLocalFallbackPost(request: GeneratePostRequest): Promise<
       sourcePrompt: rawFocus,
     }
     return attachGrokEnhancements(xItem, request.persona)
+  }
+
+  // Kitap Kulübü Tekli Gönderi (Spotlight Kartı)
+  const isBookTopicFallback =
+    request.topic === 'book_recommendation' ||
+    (request.customPrompt && /kitap|pazar|roman|okuma|edebiyat/i.test(request.customPrompt)) ||
+    (request.subject && /kitap|pazar|roman|okuma|edebiyat/i.test(request.subject))
+
+  if (isBookTopicFallback) {
+    const matchedBookSpotlight = findMatchingSpotlight(rawFocus) || getCuratedSpotlight('book', vIdx)
+    const bookSpotlightPost = createSpotlightSocialPost(matchedBookSpotlight, 'post')
+    return attachGrokEnhancements(bookSpotlightPost, request.persona)
   }
 
   // Single post (Tekli Post - 4 farklı alternatif açısı)
