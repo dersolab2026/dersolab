@@ -194,6 +194,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     ],
     footerClub: 'DersoLab Sinema Kulübü',
     footerCredit: 'Yönetmen: Gabriele Muccino • Will Smith',
+    imageUrl: '/spotlight/umudunu_kaybetme.jpg',
   },
   {
     category: 'movie',
@@ -213,6 +214,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     ],
     footerClub: 'DersoLab Sinema Kulübü',
     footerCredit: 'Yönetmen: Ron Howard',
+    imageUrl: '/spotlight/akil_oyunlari.jpg',
   },
   {
     category: 'movie',
@@ -232,6 +234,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     ],
     footerClub: 'DersoLab Sinema Kulübü',
     footerCredit: 'Yönetmen: Aamir Khan • Darsheel Safary',
+    imageUrl: '/spotlight/her_cocuk_ozeldir.jpg',
   },
   {
     category: 'movie',
@@ -251,6 +254,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     ],
     footerClub: 'DersoLab Sinema Kulübü',
     footerCredit: 'Yönetmen: Damien Chazelle',
+    imageUrl: '/spotlight/whiplash.jpg',
   },
   {
     category: 'movie',
@@ -270,6 +274,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     ],
     footerClub: 'DersoLab Sinema Kulübü',
     footerCredit: 'Yönetmen: John Lee Hancock',
+    imageUrl: '/spotlight/kor_nokta.jpg',
   },
   {
     category: 'movie',
@@ -289,6 +294,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     ],
     footerClub: 'DersoLab Sinema Kulübü',
     footerCredit: 'Yönetmen: Tom Hooper',
+    imageUrl: '/spotlight/kralin_konusmasi.jpg',
   },
   {
     category: 'movie',
@@ -309,6 +315,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     ],
     footerClub: 'DersoLab Sinema Kulübü',
     footerCredit: 'Yönetmen: Rajkumar Hirani • Aamir Khan',
+    imageUrl: '/spotlight/3_idiots.jpg',
   },
 ]
 
@@ -490,6 +497,25 @@ export function findMatchingSpotlight(text: string): SpotlightCardData | null {
   return null
 }
 
+export const BLACKLISTED_MOTIVATION_FIGURES: string[] = [
+  'einstein',
+  'albert einstein',
+  'tesla',
+  'nikola tesla',
+  'curie',
+  'marie curie',
+  'cahit arf',
+  'arf',
+  'feynman',
+  'richard feynman',
+]
+
+export function isBlacklistedFigure(name: string): boolean {
+  if (!name) return false
+  const q = name.toLocaleLowerCase('tr-TR')
+  return BLACKLISTED_MOTIVATION_FIGURES.some((bad) => q.includes(bad))
+}
+
 /**
  * SpotlightCardData'dan tam teşekküllü SocialPostItem üretir
  */
@@ -497,8 +523,19 @@ export function createSpotlightSocialPost(
   spotlight: SpotlightCardData,
   contentType: InstagramContentType = 'story'
 ): SocialPostItem {
-  const isMotivation = spotlight.category === 'motivation'
-  const isMovie = spotlight.category === 'movie'
+  let safeSpotlight = { ...spotlight }
+  if (!safeSpotlight.imageUrl) {
+    const matched = findMatchingSpotlight(safeSpotlight.title)
+    if (matched?.imageUrl) {
+      safeSpotlight.imageUrl = matched.imageUrl
+    } else {
+      const fallback = getCuratedSpotlight(safeSpotlight.category, 0)
+      safeSpotlight.imageUrl = fallback.imageUrl
+    }
+  }
+
+  const isMotivation = safeSpotlight.category === 'motivation'
+  const isMovie = safeSpotlight.category === 'movie'
 
   const topic = isMotivation
     ? 'motivation'
@@ -512,38 +549,38 @@ export function createSpotlightSocialPost(
       ? ['#haftaninfilmi', '#sinemakulübü', '#dersolab', '#filmönerisi', '#motivasyon']
       : ['#haftaninkitabi', '#kitapkulübü', '#dersolab', '#kitapönerisi', '#edebiyat']
 
-  const caption = `${spotlight.categoryPill} • ${spotlight.title} ✨\n\n${spotlight.quote}\n${spotlight.quoteSecondary ? `${spotlight.quoteSecondary}\n` : ''}\n${spotlight.explanation}\n\n💡 Bu haftaki çalışma planında kendine bir soluklanma alanı aç ve ilham al!\n\n${hashtags.join(' ')}`
+  const caption = `${safeSpotlight.categoryPill} • ${safeSpotlight.title} ✨\n\n${safeSpotlight.quote}\n${safeSpotlight.quoteSecondary ? `${safeSpotlight.quoteSecondary}\n` : ''}\n${safeSpotlight.explanation}\n\n💡 Bu haftaki çalışma planında kendine bir soluklanma alanı aç ve ilham al!\n\n${hashtags.join(' ')}`
 
   return {
-    id: `spotlight_${spotlight.category}_${Date.now()}`,
-    title: `${spotlight.categoryPill}: ${spotlight.title}`,
+    id: `spotlight_${safeSpotlight.category}_${Date.now()}`,
+    title: `${safeSpotlight.categoryPill}: ${safeSpotlight.title}`,
     type: contentType,
     topic,
-    topicLabel: spotlight.categoryPill,
+    topicLabel: safeSpotlight.categoryPill,
     status: 'draft',
     targetAudience: 'YKS (TYT/AYT) & LGS',
     caption,
     hashtags,
-    spotlightData: spotlight,
+    spotlightData: safeSpotlight,
     storyData: {
-      badge: spotlight.categoryPill,
-      headline: spotlight.title,
-      subhead: spotlight.subtitle,
+      badge: safeSpotlight.categoryPill,
+      headline: safeSpotlight.title,
+      subhead: safeSpotlight.subtitle,
       stickerType: 'none',
       themeVariant: 'lab_dark',
-      uploadedImageUrl: spotlight.imageUrl,
-      spotlightData: spotlight,
+      uploadedImageUrl: safeSpotlight.imageUrl,
+      spotlightData: safeSpotlight,
     },
     singlePostData: {
-      badge: spotlight.categoryPill,
-      headline: spotlight.title,
-      questionOrSummary: spotlight.subtitle,
-      keyTakeaway: spotlight.quote,
+      badge: safeSpotlight.categoryPill,
+      headline: safeSpotlight.title,
+      questionOrSummary: safeSpotlight.subtitle,
+      keyTakeaway: safeSpotlight.quote,
       themeVariant: 'lab_dark',
-      uploadedImageUrl: spotlight.imageUrl,
-      spotlightData: spotlight,
+      uploadedImageUrl: safeSpotlight.imageUrl,
+      spotlightData: safeSpotlight,
     },
-    uploadedImageUrl: spotlight.imageUrl,
+    uploadedImageUrl: safeSpotlight.imageUrl,
     createdAt: new Date().toISOString(),
   }
 }

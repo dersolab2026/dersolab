@@ -53,6 +53,7 @@ import {
   createSpotlightSocialPost,
   findMatchingSpotlight,
   getCuratedSpotlight,
+  isBlacklistedFigure,
   CURATED_MOTIVATION_SPOTLIGHTS,
   CURATED_MOVIE_SPOTLIGHTS,
   CURATED_BOOK_SPOTLIGHTS,
@@ -83,6 +84,7 @@ import {
   pickNextBookPair,
   pickNextSingleBook,
   resetUsedPool,
+  isBlacklistedBook,
   BOOK_POOL_EVENT,
 } from '@/lib/social/bookPoolManager'
 import {
@@ -259,6 +261,65 @@ function sanitizePostList(rawList: SocialPostItem[]): SocialPostItem[] {
   return rawList.map((post: SocialPostItem, postIdx: number) => {
     let cleanTitle = toTurkishTitleCase(post.title || '')
     let cleanTopicLabel = toTurkishTitleCase(post.topicLabel || '')
+
+    // 0. Spotlight Kartı kontrolü & görsel / kara liste onarımı
+    let nextSpotlight: SpotlightCardData | null =
+      post.spotlightData ||
+      post.singlePostData?.spotlightData ||
+      post.storyData?.spotlightData ||
+      (post.type === 'carousel' ? null : findMatchingSpotlight(cleanTitle))
+
+    if (nextSpotlight) {
+      // 1. Kara listedeki figür, film veya kitap mı?
+      const isBadFigure = isBlacklistedFigure(nextSpotlight.title) || isBlacklistedFigure(cleanTitle)
+      const isBadMovie = isBlacklistedMovie(nextSpotlight.title) || isBlacklistedMovie(cleanTitle)
+      const isBadBook = isBlacklistedBook(nextSpotlight.title) || isBlacklistedBook(cleanTitle)
+
+      if (isBadFigure || isBadMovie || isBadBook) {
+        const replacementCat = nextSpotlight.category || (isBadFigure ? 'motivation' : isBadMovie ? 'movie' : 'book')
+        const fresh = getCuratedSpotlight(replacementCat, postIdx + 1)
+        return {
+          ...createSpotlightSocialPost(fresh, post.type),
+          id: post.id,
+        }
+      }
+
+      // 2. Görseli eksikse en güncel havuzdan tamamla
+      if (!nextSpotlight.imageUrl) {
+        const matched = findMatchingSpotlight(nextSpotlight.title)
+        if (matched?.imageUrl) {
+          nextSpotlight = { ...nextSpotlight, imageUrl: matched.imageUrl }
+        } else {
+          const fallback = getCuratedSpotlight(nextSpotlight.category, postIdx)
+          nextSpotlight = { ...nextSpotlight, imageUrl: fallback.imageUrl }
+        }
+      }
+
+      const safeImageUrl = nextSpotlight.imageUrl || post.uploadedImageUrl
+
+      return {
+        ...post,
+        title: cleanTitle,
+        topicLabel: cleanTopicLabel,
+        spotlightData: nextSpotlight,
+        uploadedImageUrl: safeImageUrl,
+        storyData: post.storyData
+          ? {
+              ...post.storyData,
+              uploadedImageUrl: safeImageUrl,
+              spotlightData: nextSpotlight,
+            }
+          : undefined,
+        singlePostData: post.singlePostData
+          ? {
+              ...post.singlePostData,
+              uploadedImageUrl: safeImageUrl,
+              spotlightData: nextSpotlight,
+            }
+          : undefined,
+        caption: post.caption ? post.caption.replace(/\uFFFD/g, '') : '',
+      }
+    }
 
     const nextStoryData = post.storyData ? { ...post.storyData } : undefined
 
@@ -647,9 +708,18 @@ export default function SocialStudio() {
     const typeToUse = customOptions?.type || genType
     const rawSubject = (customOptions?.subject ?? genSubject).trim()
     const subjectToUse = rawSubject ? toTurkishTitleCase(rawSubject) : ''
-    const isBookQuery = /kitap|roman|okuma|pazar|hikaye öneri/i.test(rawSubject)
+    const isMovieQuery = /film|sinema|movie|belgesel/i.test(rawSubject)
+    const isBookQuery = /kitap|roman|okuma|pazar|hikaye/i.test(rawSubject)
+    const isMotivationQuery = /motivasyon|ünlü|unlu|bilim insanı|fizikçi|nobel|özlü söz/i.test(rawSubject)
     const topicToUse: ContentTopic =
-      customOptions?.topic || (isBookQuery ? 'book_recommendation' : 'custom')
+      customOptions?.topic ||
+      (isMovieQuery
+        ? 'movie_recommendation'
+        : isBookQuery
+          ? 'book_recommendation'
+          : isMotivationQuery
+            ? 'motivation'
+            : 'custom')
     const gradeToUse = customOptions?.targetGrade || genGrade
     const stickerToUse: StoryStickerType =
       customOptions?.storyStickerType ?? (typeToUse === 'story' ? genStorySticker : 'none')
@@ -1420,7 +1490,7 @@ export default function SocialStudio() {
     // 0. SPOTLIGHT KARTI MODU (Motivasyon / Ünlüler / Bilim İnsanları)
     const isMotivation =
       topic === 'motivation' ||
-      /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|feynman|einstein|cahit arf|curie|marie curie|tesla|sancar|aziz sancar|turing|aurelius)\b/i.test(rawPrompt)
+      /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|sancar|aziz sancar|turing|aurelius|hawking|sagan|newton|sinan|ali kuscu)\b/i.test(rawPrompt)
 
     const matchedSpotlight = findMatchingSpotlight(rawPrompt)
     if (matchedSpotlight || isMotivation) {
@@ -1440,10 +1510,10 @@ export default function SocialStudio() {
     const primaryTheme = themes[variationSeed % themes.length]
 
     if (isMovie) {
-      if (type === 'post') {
+      if (type === 'post' || type === 'story') {
         const matchedMovieSpotlight = findMatchingSpotlight(rawPrompt) || getCuratedSpotlight('movie', variationSeed)
         return {
-          ...createSpotlightSocialPost(matchedMovieSpotlight, 'post'),
+          ...createSpotlightSocialPost(matchedMovieSpotlight, type === 'story' ? 'story' : 'post'),
           id,
           sourcePrompt: rawPrompt,
         }
@@ -1465,56 +1535,6 @@ export default function SocialStudio() {
         featured.imdb,
         'lise'
       )
-
-      if (type === 'story') {
-        return {
-          id,
-          title: `Haftalık Film Kulübü: ${moviePair.ortaokul.title} & ${moviePair.lise.title}`,
-          type: 'story',
-          topic,
-          topicLabel: 'DersoLab Sinema Kulübü • 9:16 Story',
-          sourcePrompt: rawPrompt,
-          status: 'draft',
-          targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
-          caption: `Haftalık Film Kulübümüz yayında! 🎬🍿\n\n🎬 Ortaokul (LGS): ${moviePair.ortaokul.title} (${moviePair.ortaokul.director})\n🍿 Lise (YKS): ${moviePair.lise.title} (${moviePair.lise.director})\n\n#filmönerisi #sinemakulübü #lgs2027 #yks2027 #dersolab`,
-          hashtags: ['#filmönerisi', '#sinemakulübü', '#lgs2027', '#yks2027', '#dersolab'],
-          uploadedImageUrl: lisPoster,
-          storyData: {
-            badge: 'HAFTALIK FİLM KULÜBÜ 🎬',
-            headline: 'Haftanın Film Önerileri',
-            subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin İlham Veren Filmler',
-            stickerType: storyStickerType,
-            stickerQuestion: 'Bu hafta hangisini izleyeceksin? 🍿',
-            stickerOptions: [
-              `🎬 ${moviePair.ortaokul.title.split('(')[0].trim()}`,
-              `🍿 ${moviePair.lise.title.split('(')[0].trim()}`,
-            ],
-            stickerLinkText: 'Sinema & Kültür Kulübü',
-            stickerLinkUrl: 'https://dersolab.com/lab',
-            themeVariant: primaryTheme,
-            uploadedImageUrl: lisPoster,
-            dualBookData: {
-              ortaokul: {
-                title: moviePair.ortaokul.title,
-                author: moviePair.ortaokul.director,
-                genre: moviePair.ortaokul.genre,
-                whyRead: moviePair.ortaokul.whyWatch,
-                highlightTag: '🎬 ORTAOKUL & LGS FİLM SEÇKİSİ',
-                imageUrl: ortPoster,
-              },
-              lise: {
-                title: moviePair.lise.title,
-                author: moviePair.lise.director,
-                genre: moviePair.lise.genre,
-                whyRead: moviePair.lise.whyWatch,
-                highlightTag: '🍿 LİSE & YKS FİLM SEÇKİSİ',
-                imageUrl: lisPoster,
-              },
-            },
-          },
-          createdAt: new Date().toISOString(),
-        }
-      }
 
       if (type === 'carousel') {
         return {
@@ -1618,69 +1638,12 @@ export default function SocialStudio() {
       }
     }
 
-    if (isBook && type === 'post') {
+    if (isBook && (type === 'post' || type === 'story')) {
       const matchedBookSpotlight = findMatchingSpotlight(rawPrompt) || getCuratedSpotlight('book', variationSeed)
       return {
-        ...createSpotlightSocialPost(matchedBookSpotlight, 'post'),
+        ...createSpotlightSocialPost(matchedBookSpotlight, type === 'story' ? 'story' : 'post'),
         id,
         sourcePrompt: rawPrompt,
-      }
-    }
-
-    if (isBook && type === 'story') {
-      const chosen = pickCuratedBookPair(excludeSummary, variationSeed)
-
-      return {
-        id,
-        title: `Pazar Hikayesi: ${chosen.ortaokul.title} & ${chosen.lise.title}`,
-        type: 'story',
-        topic: 'book_recommendation',
-        topicLabel: 'Pazar Kitap Kulübü • 9:16 Story',
-        sourcePrompt: rawPrompt,
-        status: 'draft',
-        targetAudience: 'Ortaokul (LGS) & Lise (YKS)',
-        caption: `Pazar Kitap Kulübümüzde bu haftanın seçkisi! 📚🦊\n\n📘 Ortaokul (LGS): ${chosen.ortaokul.title} - ${chosen.ortaokul.author}\n📕 Lise (YKS): ${chosen.lise.title} - ${chosen.lise.author}\n\nParagraf hızını ve derin analiz yeteneğini geliştirmek için bu hafta mutlaka listene ekle! 👇\n\n#pazarkitabı #kitaponerisi #lgs2027 #yks2027 #dersolab`,
-        hashtags: ['#pazarkitabı', '#kitaponerisi', '#lgs2027', '#yks2027', '#dersolab'],
-        storyData: {
-          badge: 'PAZAR KİTAP KULÜBÜ 📚',
-          headline: 'Haftanın Kitap Önerileri',
-          subhead: 'Hem Ortaokul (LGS) Hem Lise (YKS) İçin Seçtik',
-          stickerType: storyStickerType,
-          stickerQuestion: 'Bu hafta hangisini okuyacaksın? 📚',
-          stickerOptions: [`📘 ${chosen.ortaokul.title}`, `📕 ${chosen.lise.title}`],
-          stickerLinkText: 'Kitap Listesi & İpuçları',
-          stickerLinkUrl: 'https://dersolab.com/lab',
-          themeVariant: (['purple_matrix', 'lab_dark', 'cyan_cyber', 'neon_orange'] as SlideThemeVariant[])[
-            variationSeed % 4
-          ],
-          dualBookData: {
-            ortaokul: {
-              ...chosen.ortaokul,
-              highlightTag: 'ORTAOKUL & LGS',
-              imageUrl:
-                chosen.ortaokul.imageUrl ||
-                buildBookCoverSvgDataUrl(
-                  chosen.ortaokul.title,
-                  chosen.ortaokul.author,
-                  chosen.ortaokul.genre,
-                  'ortaokul'
-                ),
-            },
-            lise: {
-              ...chosen.lise,
-              highlightTag: 'LİSE & YKS',
-              imageUrl:
-                chosen.lise.imageUrl ||
-                buildBookCoverSvgDataUrl(
-                  chosen.lise.title,
-                  chosen.lise.author,
-                  chosen.lise.genre,
-                  'lise'
-                ),
-            },
-          },
-        },
-        createdAt: new Date().toISOString(),
       }
     }
 
@@ -3233,6 +3196,18 @@ export default function SocialStudio() {
                       }}
                       className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-white focus:outline-hidden focus:border-cyan-400"
                     />
+                    {activeSpotlight.imageUrl && (
+                      <div className="mt-1.5 flex items-center gap-2">
+                        <img
+                          src={activeSpotlight.imageUrl}
+                          alt={activeSpotlight.title}
+                          className="w-10 h-14 object-cover rounded-md border border-cyan-500/40 shadow-sm"
+                        />
+                        <span className="text-[10px] text-cyan-300 font-mono truncate">
+                          {activeSpotlight.imageUrl}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

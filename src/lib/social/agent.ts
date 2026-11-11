@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai'
 import type {
   AgentLearningInsight,
   AgentPersona,
+  ContentTopic,
   GeneratePostRequest,
   SocialAgentCommandRequest,
   HookVariation,
@@ -706,14 +707,24 @@ export async function generateSocialPost(request: GeneratePostRequest): Promise<
         /kitap|roman|okuma kulübü|pazar hikayesi|kitap öneri/i.test(topicFocus))
     const isMotivationTopic =
       request.topic === 'motivation' ||
-      /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|feynman|einstein|cahit arf|curie|marie curie|tesla|sancar|aziz sancar|turing|aurelius)\b/i.test(topicFocus)
+      /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|sancar|aziz sancar|turing|aurelius|hawking|sagan|newton|sinan|ali kuscu)\b/i.test(topicFocus)
+
+    // SPOTLIGHT KARTI MODU (Kullanıcı talimatı: Kitap Kulübü, Film Önerisi ve Motivasyon tekli post veya story olarak Spotlight tasarımında üretilir)
+    if (request.type !== 'carousel' && (isMotivationTopic || isMovieTopic || isBookTopic || findMatchingSpotlight(topicFocus))) {
+      const category: 'motivation' | 'movie' | 'book' = isMotivationTopic ? 'motivation' : isMovieTopic ? 'movie' : 'book'
+      const matched = findMatchingSpotlight(topicFocus) || getCuratedSpotlight(category, request.variationSeed || 1)
+      const postType = request.type === 'story' ? 'story' : 'post'
+      const spotlightPost = createSpotlightSocialPost(matched, postType)
+      return attachGrokEnhancements(spotlightPost, request.persona)
+    }
+
     const chosenSticker = request.storyStickerType || 'none'
     const seedNum = Math.max(1, request.variationSeed || 1)
     const curatedMoviePair = isMovieTopic ? pickCuratedMoviePair(request.excludeSummary, seedNum, topicFocus) : null
     const specificMovie = isMovieTopic ? findMatchingCuratedMovie(topicFocus) : null
     const customMovieName = isMovieTopic && !specificMovie ? extractCustomMovieTitle(topicFocus) : null
     const selectedAngle = isMotivationTopic
-      ? `GERÇEK BİLİM İNSANI / ÜNLÜ & FİLOZOF MOTİVASYON SEÇKİSİ (Alternatif #${seedNum}): Richard Feynman, Albert Einstein, Cahit Arf, Marie Curie vb. gibi gerçek bilim insanlarının ve düşünürlerin hayatından öğrencilere rehberlik edecek gerçek sözünü ve derin felsefesini anlat.`
+      ? `GERÇEK BİLİM İNSANI / ÜNLÜ & FİLOZOF MOTİVASYON SEÇKİSİ (Alternatif #${seedNum}): Aziz Sancar, İbn-i Sina, Alan Turing, Marcus Aurelius, Stephen Hawking vb. gibi gerçek bilim insanlarının ve düşünürlerin hayatından öğrencilere rehberlik edecek gerçek sözünü ve derin felsefesini anlat.`
       : isMovieTopic
         ? `GERÇEK SİNEMA & FİLM KULÜBÜ SEÇKİSİ (Alternatif #${seedNum}): Öğrencilere ilham veren, bilimsel merakı veya çalışma motivasyonunu artıran gerçek sinema filmlerini (Yönetmen, IMDb puanı, konusu ve öğrencinin neden izlemesi gerektiğiyle) tanıt. Asla "Film Önerisi sorularında ÖSYM çeldiricisi" gibi ders şablonu cümleleri yazma!`
         : isBookTopic
@@ -1364,7 +1375,7 @@ async function generateLocalFallbackPost(request: GeneratePostRequest): Promise<
   // 0. SPOTLIGHT KARTI MODU (Motivasyon / Ünlüler / Bilim İnsanları / Film / Kitap)
   const isMotivationTopic =
     request.topic === 'motivation' ||
-    /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|feynman|einstein|cahit arf|curie|marie curie|tesla|sancar|aziz sancar|turing|aurelius)\b/i.test(rawFocus)
+    /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|sancar|aziz sancar|turing|aurelius|hawking|sagan|newton|sinan|ali kuscu)\b/i.test(rawFocus)
 
   const matchedAnySpotlight = findMatchingSpotlight(rawFocus)
 
@@ -3441,14 +3452,28 @@ export async function processNaturalLanguageAgentCommand(request: SocialAgentCom
   let inferredType: InstagramContentType = 'carousel'
   if (command.includes('reels') || command.includes('video')) inferredType = 'reels'
   else if (command.includes('story') || command.includes('hikaye') || command.includes('anket') || command.includes('quiz')) inferredType = 'story'
-  else if (command.includes('soru') || command.includes('test')) inferredType = 'post'
+  else if (command.includes('tekli') || command.includes('post') || command.includes('kare') || command.includes('soru') || command.includes('test')) inferredType = 'post'
 
-  logs.push(`[FORMAT] Tespit edilen içerik tipi: ${inferredType.toUpperCase()}`)
+  let inferredTopic: ContentTopic = 'exam_tactics'
+  if (/\b(film|filmi|sinema|movie)\b/i.test(command)) inferredTopic = 'movie_recommendation'
+  else if (/\b(kitap|kitabi|roman|edebiyat|okuma)\b/i.test(command)) inferredTopic = 'book_recommendation'
+  else if (/\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|sancar|turing|aurelius|hawking|sagan|newton|sinan|ali kuscu)\b/i.test(command)) inferredTopic = 'motivation'
+
+  if (
+    (inferredTopic === 'movie_recommendation' || inferredTopic === 'book_recommendation' || inferredTopic === 'motivation') &&
+    inferredType === 'carousel' &&
+    !command.includes('carousel') &&
+    !command.includes('kaydırmalı')
+  ) {
+    inferredType = 'post'
+  }
+
+  logs.push(`[FORMAT] Tespit edilen içerik tipi: ${inferredType.toUpperCase()} | Konu: ${inferredTopic}`)
   logs.push(`[CREATIVE-ENGINE] Gemini Flash ve persona filtresi çalıştırılıyor...`)
 
   const post = await generateSocialPost({
     type: inferredType,
-    topic: 'exam_tactics',
+    topic: inferredTopic,
     subject: request.focusSubject,
     targetGrade: request.targetGrade || 'YKS (TYT/AYT)',
     persona,

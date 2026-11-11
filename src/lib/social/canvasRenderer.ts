@@ -1175,13 +1175,19 @@ export async function renderSlideToCanvas(
   canvas.height = height
 
   // 0. SPOTLIGHT KARTI TESPİTİ (Haftanın Motivasyonu / Bilim İnsanları, Haftanın Filmi veya Kitap Kulübü)
-  const effectiveSpotlight: SpotlightCardData | null =
+  let effectiveSpotlight: SpotlightCardData | null =
     spotlightData ||
     storyData?.spotlightData ||
     singlePost?.spotlightData ||
     (isCarousel ? null : findMatchingSpotlight(postTitle || postCaption || ''))
 
   if (effectiveSpotlight) {
+    if (!effectiveSpotlight.imageUrl) {
+      const match = findMatchingSpotlight(effectiveSpotlight.title || postTitle || '')
+      if (match?.imageUrl) {
+        effectiveSpotlight = { ...effectiveSpotlight, imageUrl: match.imageUrl }
+      }
+    }
     const rawSpotlightImg = effectiveSpotlight.imageUrl || customImageUrl
     const loadedSpotlightImg =
       preloadedImages?.mainImage !== undefined
