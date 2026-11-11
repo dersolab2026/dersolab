@@ -3220,7 +3220,7 @@ export default function SocialStudio() {
                     <input
                       type="text"
                       value={activeSpotlight.imageUrl || ''}
-                      placeholder="Örn: /spotlight/feynman_portrait.jpg"
+                      placeholder="Örn: /spotlight/aziz_sancar.jpg"
                       onChange={(e) => {
                         const updated: SpotlightCardData = { ...activeSpotlight, imageUrl: e.target.value }
                         handleUpdateActivePost({

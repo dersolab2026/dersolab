@@ -766,13 +766,17 @@ ${
 1. ${
       isMovieTopic
         ? `GERÇEK FİLM & SİNEMA ODAĞI: İçerik tamamen önerilen filmin/filmlerin konusunu, yönetmenini, IMDb başarısını, bilimsel/felsefi alt metnini ve sınav sürecindeki bir öğrenciye katacağı motivasyonu anlatmalıdır. Asla "Film Önerisi sorularında ÖSYM tuzağı" gibi ifadeler KULLANMA!
-AYRICA KULLANICI ŞU FİLMLERİ HAVUZDAN KALDIRDI, BUNLARI KESİNLİKLE SEÇME VEYA ÖNERME: [Yukarı Bak (Up), Ölü Ozanlar Derneği (Dead Poets Society)]. Yalnızca yukarıdaki çiftte belirtilen veya yasaklı olmayan diğer filmleri kullan!`
+AYRICA KULLANICI ŞU FİLMLERİ HAVUZDAN KALDIRDI, BUNLARI KESİNLİKLE SEÇME VEYA ÖNERME: [Yukarı Bak (Up), Yıldızlararası (Interstellar), Can Dostum (Good Will Hunting), Ölü Ozanlar Derneği (Dead Poets Society), Ekim Düşü (October Sky)]. Yalnızca yasaklı olmayan diğer ilham verici filmleri kullan!`
         : isBookTopic
           ? `GERÇEK EDEBİ ESER ZORUNLULUĞU & YASAKLI KİTAPLAR: Asla "LGS Paragraf Mantığı" veya "Yazar: DersoLab Ekibi" gibi sahte/uydurma kitaplar üretme!
-AYRICA KULLANICI ŞU KİTAPLARI HAVUZDAN KALDIRDI, BUNLARI KESİNLİKLE SEÇME VEYA ÖNERME:
-[Küçük Kara Balık, Fareler ve İnsanlar, Bilim Öyküleri, Simyacı, Uçan Sınıf, Kürk Mantolu Madonna, Mo'nun Gizemi, Denemeler, Momo, Dava, Bu Ülke, Sol Ayağım, Bulantı, Satranç, Gece Yarısı Kütüphanesi, Ölü Ozanlar Derneği, Yukarı Bak].
-Yalnızca yukarıdaki çiftte belirtilen veya yasaklı olmayan diğer taze edebi klasik eserleri ve gerçek yazarlarını kullan!`
-          : `ŞABLONSUZ & ÖZGÜR: Asla basmakalıp hazır şablon cümleleri yazma. İçerik KESİNLİKLE "${topicFocus}" konusunun gerçek ders içeriği, kuralları, formülleri, soru çözme mantığı veya püf noktaları üzerine odaklanmalıdır!`
+AYRICA KULLANICI ŞU KİTAPLARI VE YAZARLARI HAVUZDAN KALDIRDI, BUNLARI KESİNLİKLE SEÇME VEYA ÖNERME:
+[Ömer Seyfettin ve tüm eserleri (Kaşağı, Diyet, Pembe İncili Kaftan, Falaka, Forsa vb.), Küçük Kara Balık, Fareler ve İnsanlar, Bilim Öyküleri, Simyacı, Uçan Sınıf, Kürk Mantolu Madonna, Mo'nun Gizemi, Denemeler, Momo, Dava, Bu Ülke, Sol Ayağım, Bulantı, Satranç, Gece Yarısı Kütüphanesi, Ölü Ozanlar Derneği, Yukarı Bak].
+Yalnızca yukarıdaki listede olmayan diğer taze edebi klasik eserleri ve gerçek yazarlarını kullan!`
+          : isMotivationTopic
+            ? `GERÇEK BİLİM İNSANI & FİLOZOF MOTİVASYON KARTI:
+AYRICA KULLANICI ŞU BİLİM İNSANI VE FİGÜRLERİ HAVUZDAN KALDIRDI, BUNLARI KESİNLİKLE SEÇME VEYA ÖNERME: [Albert Einstein, Nikola Tesla, Marie Curie, Cahit Arf, Richard Feynman].
+Bunun yerine Aziz Sancar, İbn-i Sina, Alan Turing, Marcus Aurelius, Stephen Hawking, Carl Sagan, Isaac Newton, Mimar Sinan, Ali Kuşçu vb. gibi diğer büyük düşünür ve bilim insanlarının gerçek sözlerini ve derin felsefesini kullan!`
+            : `ŞABLONSUZ & ÖZGÜR: Asla basmakalıp hazır şablon cümleleri yazma. İçerik KESİNLİKLE "${topicFocus}" konusunun gerçek ders içeriği, kuralları, formülleri, soru çözme mantığı veya püf noktaları üzerine odaklanmalıdır!`
     }
 2. 4 SABİT TEMA: Her slayt ve görsel için 'themeVariant' değerini SADECE şu 4 temadan biri olarak belirle:
    - "lab_dark" (DersoLab Koyu)

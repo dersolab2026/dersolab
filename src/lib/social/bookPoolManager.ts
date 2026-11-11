@@ -53,6 +53,23 @@ export const BLACKLISTED_BOOKS: string[] = [
   'dead poets society',
   'yukarı bak',
   'yukari bak',
+  // Ömer Seyfettin ve eserleri (kullanıcı talebiyle tamamen kaldırıldı)
+  'ömer seyfettin',
+  'omer seyfettin',
+  'kaşağı',
+  'kasagi',
+  'diyet',
+  'pembe incili kaftan',
+  'falaka',
+  'yüksek ökçeler',
+  'yuksek okceler',
+  'forsa',
+  'bomba',
+  'kütük',
+  'kutuk',
+  'başını vermeyen şehit',
+  'basini vermeyen sehit',
+  'ilk cinayet',
 ]
 
 /**
@@ -63,11 +80,19 @@ export function isBlacklistedBook(
 ): boolean {
   if (!titleOrBook) return false
   const title = typeof titleOrBook === 'string' ? titleOrBook : titleOrBook.title || ''
+  const author = typeof titleOrBook === 'object' && titleOrBook ? titleOrBook.author || '' : ''
+  const authorNorm = author.toLocaleLowerCase('tr-TR')
+  if (authorNorm.includes('ömer seyfettin') || authorNorm.includes('omer seyfettin')) {
+    return true
+  }
   if (!title) return false
   const norm = title
     .toLocaleLowerCase('tr-TR')
     .replace(/['"’`]/g, '')
     .trim()
+  if (norm.includes('ömer seyfettin') || norm.includes('omer seyfettin')) {
+    return true
+  }
   return BLACKLISTED_BOOKS.some((bad) => {
     const cleanBad = bad
       .toLocaleLowerCase('tr-TR')
