@@ -204,6 +204,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(A Beautiful Mind, 2001)',
     ratingOrBadge: '⭐ 8.2 / 10',
     quote: '“Her zorluğun üstesinden gelen tek formül: Sebat ve inançtır.”',
+    quoteSecondary: '“Beni buraya getiren en önemli şey, vazgeçmeyi reddetmemdir.”',
     explanation:
       'Nobel ödüllü dahi matematikçi John Nash’in Oyun Teorisi’ni keşfederken zihninin sınırlarında verdiği destansı mücadele ve azim hikayesi.',
     badges: [
@@ -224,6 +225,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(Taare Zameen Par, 2007)',
     ratingOrBadge: '⭐ 8.3 / 10',
     quote: '“Her çocuğun kendi ritmi ve dünyası vardır; önemli olan onu anlayacak sevgiyle bakmaktır.”',
+    quoteSecondary: '“Yeryüzündeki her fidan, doğru ışığı bulduğunda çiçek açar.”',
     explanation:
       'Harfleri ve sayıları dans eder gibi gören disleksili bir çocuğun, idealist bir sanat öğretmeni sayesinde içindeki dahiyi ortaya çıkarma serüveni. Öğrenme gücünü katlayan bir başyapıt.',
     badges: [
@@ -244,6 +246,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(Whiplash, 2014)',
     ratingOrBadge: '⭐ 8.5 / 10',
     quote: '“İngiliz dilindeki en zararlı iki kelime şudur: ‘Aferin, yeterli.’ ”',
+    quoteSecondary: '“Sınırlarını aşmak istiyorsan, konfor alanından çıkmaya cesaret etmelisin.”',
     explanation:
       'Zirveye ulaşmak için gereken sınırları zorlayan çalışma disiplinini, odaklanmayı ve mükemmellik tutkusunu soluksuz bir tempoyla yaşatan modern başyapıt.',
     badges: [
@@ -264,6 +267,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(The Blind Side, 2009)',
     ratingOrBadge: '⭐ 7.6 / 10',
     quote: '“Fırsat verildiğinde ve bir insan sana inandığında, geçmişin hiçbir önemi kalmaz.”',
+    quoteSecondary: '“Cesaret korkunun olmaması değil, korkuya rağmen adım atmaktır.”',
     explanation:
       'Sokaklardan Amerikan futbolu şampiyonluğuna uzanan Michael Oher’ın gerçek başarı hikayesi. Sevgi, güven ve rehberliğin insan potansiyelini nasıl mucizeye dönüştürdüğünü gösterir.',
     badges: [
@@ -284,6 +288,7 @@ export const CURATED_MOVIE_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: "(The King's Speech, 2010)",
     ratingOrBadge: '⭐ 8.0 / 10',
     quote: '“En büyük zafer, kendi içindeki korkuyu ve tereddüdü yendiğin andır.”',
+    quoteSecondary: '“Sesini bulmak, kim olduğunu hatırlamakla başlar.”',
     explanation:
       'Kekemeliği yüzünden topluluk önünde konuşmaktan korkan Kral VI. George’un sıra dışı bir konuşma terapistiyle sabırla çalışarak milletine ilham veren bir lidere dönüşme serüveni.',
     badges: [
@@ -328,6 +333,7 @@ export const CURATED_BOOK_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(José Mauro de Vasconcelos, 1968)',
     ratingOrBadge: '⭐ 4.8 / 5',
     quote: '“İnsanın içi acır mı hiç? Acıyor işte. Hem de nasıl...”',
+    quoteSecondary: '“Sevgi olmadan hiçbir şeyin anlamı yoktur.”',
     explanation:
       'Küçük Zezé’nin dünyayı keşfetme serüveni; empati yeteneğini, duygusal zekayı ve uzun soluklu paragraf metinlerini derin duyguyla kavrama refleksini geliştirir.',
     badges: [
@@ -348,6 +354,7 @@ export const CURATED_BOOK_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(George Orwell, 1949)',
     ratingOrBadge: '⭐ 4.9 / 5',
     quote: '“Bilinçleninceye kadar asla başkaldıramayacaklar, başkaldırmadıkça da bilinçlenemezler.”',
+    quoteSecondary: '“Özgürlük, iki kere ikinin dört ettiğini söyleyebilmektir.”',
     explanation:
       'Düşünce özgürlüğü, dilin düşünce üzerindeki etkisi ve kavramsal analiz gücünü zirveye taşıyan, ÖSYM paragraf sorularının vazgeçilmez zihinsel altyapısı.',
     badges: [
@@ -368,6 +375,7 @@ export const CURATED_BOOK_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(Grigory Petrov, 1923)',
     ratingOrBadge: '⭐ 4.7 / 5',
     quote: '“Bir milletin büyüklüğü, her bir ferdinin kendi işini en iyi şekilde yapma arzusunda gizlidir.”',
+    quoteSecondary: '“Gelecek, bugünkü emeğin ve sabrın meyvesidir.”',
     explanation:
       'Atatürk’ün okullarda zorunlu okunmasını tavsiye ettiği; çalışma disiplini, irade ve sıfırdan başarı inşa etme azmini aşılayan bir rehber eserdir.',
     badges: [
@@ -388,6 +396,7 @@ export const CURATED_BOOK_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(Ray Bradbury, 1953)',
     ratingOrBadge: '⭐ 4.6 / 5',
     quote: '“Kitapları yakmaktan daha büyük bir suç varsa, o da onları okumamaktır.”',
+    quoteSecondary: '“Düşünmek, rüzgara karşı yürümek gibidir; cesaret ister.”',
     explanation:
       'Sığ düşünceye karşı derin okumanın kıymetini anlatan, hızlı okurken ana fikri yakalama refleksini güçlendiren sürükleyici bir distopya.',
     badges: [
@@ -408,6 +417,7 @@ export const CURATED_BOOK_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(Antoine de Saint-Exupéry, 1943)',
     ratingOrBadge: '⭐ 4.9 / 5',
     quote: '“Gerçeğin mayası gözle görülmez. İnsan ancak yüreğiyle baktığı zaman doğruyu görebilir.”',
+    quoteSecondary: '“Gülünü senin için bunca önemli kılan, ona harcadığın zamandır.”',
     explanation:
       'Satır aralarındaki metaforları okuma, soyut düşünme ve LGS-YKS’de kapalı anlamlı soruları saniyeler içinde çözme yetisi kazandırır.',
     badges: [
@@ -428,6 +438,7 @@ export const CURATED_BOOK_SPOTLIGHTS: SpotlightCardData[] = [
     subtitle: '(Franz Kafka, 1915)',
     ratingOrBadge: '⭐ 4.5 / 5',
     quote: '“Herkesin bir derdi var ve kimse kimsenin içindeki yükü tam olarak göremiyor.”',
+    quoteSecondary: '“Zaman hızla akıp giderken, asıl cesaret kendin kalabilmektir.”',
     explanation:
       'Kafkaesk anlatımı ve sembolik diliyle zihni zorlayan, AYT Edebiyat tahlillerinde ve felsefe metinlerinde derin kavrayış sağlayan kült eser.',
     badges: [

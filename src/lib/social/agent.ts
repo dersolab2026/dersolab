@@ -1373,16 +1373,20 @@ async function generateLocalFallbackPost(request: GeneratePostRequest): Promise<
   const t4 = themes[(vIdx + 3) % 4]
 
   // 0. SPOTLIGHT KARTI MODU (Motivasyon / Ünlüler / Bilim İnsanları / Film / Kitap)
+  const isMovieTopic = isMovieTopicRequest(request, rawFocus)
+  const isBookTopic =
+    !isMovieTopic &&
+    (request.topic === 'book_recommendation' ||
+      /kitap|roman|okuma kulübü|pazar hikayesi|kitap öneri/i.test(rawFocus))
   const isMotivationTopic =
     request.topic === 'motivation' ||
     /\b(motivasyon|ünlü|unlu|bilim insanı|bilim insani|fizikçi|fizikci|nobel|özlü söz|soz|quote|sancar|aziz sancar|turing|aurelius|hawking|sagan|newton|sinan|ali kuscu)\b/i.test(rawFocus)
 
-  const matchedAnySpotlight = findMatchingSpotlight(rawFocus)
-
-  if (matchedAnySpotlight || isMotivationTopic) {
-    const spotlightItem = matchedAnySpotlight || getCuratedSpotlight('motivation', vIdx)
+  if (request.type !== 'carousel' && (isMotivationTopic || isMovieTopic || isBookTopic || findMatchingSpotlight(rawFocus))) {
+    const category: 'motivation' | 'movie' | 'book' = isMotivationTopic ? 'motivation' : isMovieTopic ? 'movie' : 'book'
+    const matched = findMatchingSpotlight(rawFocus) || getCuratedSpotlight(category, vIdx)
     const postType = request.type === 'story' ? 'story' : 'post'
-    const spotlightPost = createSpotlightSocialPost(spotlightItem, postType)
+    const spotlightPost = createSpotlightSocialPost(matched, postType)
     return attachGrokEnhancements(spotlightPost, request.persona)
   }
 
