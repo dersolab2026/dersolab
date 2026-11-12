@@ -23,6 +23,7 @@ import {
   Sliders,
   Check
 } from 'lucide-react'
+import { DesignLabSwitcher } from '../DesignLabSwitcher'
 
 // Gerçek DersoLab eğitmenleri (Supabase veritabanından)
 const ALL_STAR_INSTRUCTORS = [
@@ -369,9 +370,9 @@ export function DersoLabTasteView() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">
+                    <h2 className="text-xs font-bold text-white uppercase tracking-wider">
                       Canlı Ders Odası Simülatörü
-                    </span>
+                    </h2>
                   </div>
                   <span className="text-xs font-mono text-amber-300 bg-amber-400/10 px-2.5 py-0.5 rounded border border-amber-400/20">
                     Öğretmen & Öğrenci Ekranı
@@ -445,33 +446,33 @@ export function DersoLabTasteView() {
               {/* İnteraktif Soru ve Çözüm Adımları */}
               <div className="p-5 space-y-4">
                 
-                {/* Soru Kutusu */}
-                <div className="p-4 rounded-xl bg-black/40 border border-white/[0.08]">
-                  <div className="flex items-center justify-between text-xs font-mono text-amber-400 mb-1.5">
+                {/* Soru Kutusu - Flat Açık Tasarım */}
+                <div className="py-3 px-4 border-l-2 border-amber-400/80 bg-white/[0.02]">
+                  <div className="flex items-center justify-between text-xs font-mono text-amber-300 mb-1.5">
                     <span>{activeDemo.subject}</span>
-                    <span className="text-slate-400">{activeDemo.verifiedTag}</span>
+                    <span className="text-slate-300">{activeDemo.verifiedTag}</span>
                   </div>
-                  <h2 className="text-xs sm:text-sm font-semibold text-slate-100 leading-relaxed">
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-100 leading-relaxed [text-wrap:balance]">
                     {activeDemo.question}
-                  </h2>
+                  </h3>
                 </div>
 
                 {/* Eğitmenin Çözüm Adımları */}
-                <div className="space-y-2.5">
-                  <div className="text-xs font-mono uppercase tracking-wider text-slate-400">
+                <div className="space-y-2.5 pt-1">
+                  <div className="text-xs font-mono uppercase tracking-wider text-slate-300">
                     Birebir Canlı Çözüm Adımları:
                   </div>
                   {activeDemo.steps.map((st, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs flex items-start gap-2.5"
+                      className="py-2.5 px-3 border-b border-white/[0.05] text-xs flex items-start gap-2.5 last:border-b-0"
                     >
                       <span className="w-5 h-5 rounded bg-amber-400/20 text-amber-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
                       <div>
-                        <div className="font-bold text-slate-200">{st.step}</div>
-                        <div className="text-slate-400 font-mono text-xs mt-0.5">{st.detail}</div>
+                        <div className="font-bold text-slate-100">{st.step}</div>
+                        <div className="text-slate-300 font-mono text-xs mt-0.5">{st.detail}</div>
                       </div>
                     </div>
                   ))}
@@ -500,11 +501,11 @@ export function DersoLabTasteView() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 border-t border-white/[0.08]">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight [text-wrap:balance]">
               Her Başvuran Değil, Yalnızca Doğrulanmış Branş Uzmanları.
             </h2>
           </div>
-          <p className="text-slate-400 text-sm max-w-md mt-4 sm:mt-0">
+          <p className="text-slate-300 text-sm max-w-md mt-4 sm:mt-0 [text-wrap:pretty]">
             Eğitmenlerimizin tamamı mülakat, deneme dersi ve veli değerlendirmesinden geçen deneyimli zümre öğretmenleridir.
           </p>
         </div>
@@ -514,7 +515,7 @@ export function DersoLabTasteView() {
           {ALL_STAR_INSTRUCTORS.map((teacher, index) => (
             <div
               key={index}
-              className="bg-[#0E121B] rounded-2xl border border-white/[0.08] p-5 flex flex-col justify-between hover:border-amber-400/40 transition-colors group"
+              className="bg-[#0E121B] rounded-2xl border border-white/[0.1] p-5 flex flex-col justify-between hover:border-amber-400/50 transition-colors group"
             >
               <div>
                 <div className="relative w-full h-44 rounded-xl overflow-hidden mb-4 bg-slate-800">
@@ -523,7 +524,7 @@ export function DersoLabTasteView() {
                     alt={teacher.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-2.5 right-2.5 bg-slate-900/90 backdrop-blur-md px-2 py-0.5 rounded text-xs font-bold text-amber-400 border border-white/[0.1] flex items-center gap-1">
+                  <div className="absolute top-2.5 right-2.5 bg-slate-900/95 backdrop-blur-md px-2 py-0.5 rounded text-xs font-bold text-amber-300 border border-white/[0.15] flex items-center gap-1">
                     <Star className="w-3 h-3 fill-current" />
                     <span>{teacher.rating}</span>
                   </div>
@@ -531,30 +532,30 @@ export function DersoLabTasteView() {
 
                 <div className="text-xs font-mono text-amber-400 mb-1">{teacher.badge}</div>
                 <h3 className="text-lg font-bold text-white mb-1">{teacher.name}</h3>
-                <p className="text-xs text-slate-400 mb-3">{teacher.title}</p>
+                <p className="text-xs text-slate-300 mb-3">{teacher.title}</p>
 
                 {/* Etiketler */}
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {teacher.tags.map((t, ti) => (
                     <span
                       key={ti}
-                      className="text-xs px-2 py-0.5 rounded bg-white/[0.04] text-slate-300 border border-white/[0.06]"
+                      className="text-xs px-2 py-0.5 rounded bg-white/[0.06] text-slate-200 border border-white/[0.08]"
                     >
                       {t}
                     </span>
                   ))}
                 </div>
 
-                <p className="text-xs text-slate-300 italic bg-white/[0.02] p-2.5 rounded-lg border border-white/[0.04] mb-4">
+                <p className="text-xs text-slate-200 italic border-l-2 border-amber-400/50 pl-3 py-1 my-3 [text-wrap:pretty]">
                   "{teacher.quote}"
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs">
-                <span className="text-slate-400">{teacher.lessons}</span>
+              <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs">
+                <span className="text-slate-300 font-medium">{teacher.lessons}</span>
                 <Link
                   href="/hesap-turu"
-                  className="font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                  className="font-bold text-amber-300 hover:text-amber-200 flex items-center gap-1"
                 >
                   <span>Ders İste</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -648,20 +649,20 @@ export function DersoLabTasteView() {
                 />
               </div>
 
-              {/* Sonuç Hesap Paneli */}
-              <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-black/40 border border-white/[0.06] text-center">
+              {/* Sonuç Hesap Paneli - Flat Divider Yapı */}
+              <div className="grid grid-cols-3 gap-3 py-4 border-y border-white/[0.08] text-center">
                 <div>
-                  <div className="text-xs font-mono text-slate-400">Öngörülen Süre</div>
+                  <div className="text-xs font-mono text-slate-300">Öngörülen Süre</div>
                   <div className="text-xl font-black text-white mt-0.5">~{estimatedWeeks} Hafta</div>
                 </div>
                 <div>
-                  <div className="text-xs font-mono text-slate-400">Eksik Konu Havuzu</div>
-                  <div className="text-xl font-black text-amber-400 mt-0.5">
+                  <div className="text-xs font-mono text-slate-300">Eksik Konu Havuzu</div>
+                  <div className="text-xl font-black text-amber-300 mt-0.5">
                     {Math.round(netDiff * 1.6)} Konu
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs font-mono text-slate-400">Kredi Güvencesi</div>
+                  <div className="text-xs font-mono text-slate-300">Kredi Güvencesi</div>
                   <div className="text-xl font-black text-emerald-400 mt-0.5">Yanmaz</div>
                 </div>
               </div>
@@ -766,6 +767,9 @@ export function DersoLabTasteView() {
           </div>
         </div>
       </footer>
+
+      {/* Yüzen Tasarım Seçici */}
+      <DesignLabSwitcher />
     </div>
   )
 }

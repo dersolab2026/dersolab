@@ -105,6 +105,29 @@ export function isBlacklistedMovie(text?: string | null): boolean {
   return BLACKLISTED_MOVIES.some((bad) => norm.includes(bad))
 }
 
+export const BLACKLISTED_FIGURES: string[] = [
+  'einstein',
+  'albert einstein',
+  'tesla',
+  'nikola tesla',
+  'curie',
+  'marie curie',
+  'cahit arf',
+  'arf',
+  'feynman',
+  'richard feynman',
+]
+
+export function isBlacklistedFigure(text?: string | null): boolean {
+  if (!text) return false
+  const norm = text
+    .toLocaleLowerCase('tr-TR')
+    .replace(/['"’`.,!?()-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return BLACKLISTED_FIGURES.some((bad) => norm.includes(bad))
+}
+
 export const CURATED_MOVIE_RECOMMENDATIONS: CuratedMovieRecommendation[] = (
   ((moviesPoolJson as any)?.movies || [])
 ).map((m: any) => ({

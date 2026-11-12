@@ -1,0 +1,3802 @@
+{
+  "version": "1.0",
+  "total": 100,
+  "figures": [
+    {
+      "id": "fig_1",
+      "name": "Aziz Sancar",
+      "title": "Moleküler Biyolog & Nobel Kimya Ödülü",
+      "category": "Bilim",
+      "quote": "“Çoğu insan zekaya inanır, ben inanmıyorum. Bizi birbirimizden ayıran emektir, çalışmaktır.”",
+      "quoteSecondary": "“Başarı bir tesadüf değildir; masa başında dökülen her damla terin karşılığıdır.”",
+      "explanation": "Sınav başarısı doğuştan gelen bir ayrıcalık değil, her gün düzenli masa başına geçip adım adım soru analiz eden emekçinin zaferidir.",
+      "badges": [
+        {
+          "text": "Nobel Kimya Ödülü",
+          "color": "green"
+        },
+        {
+          "text": "DNA Onarımı",
+          "color": "blue"
+        },
+        {
+          "text": "Çalışma Disiplini",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "S"
+      ],
+      "keywords": [
+        "aziz sancar",
+        "biyoloji",
+        "dna",
+        "nobel",
+        "çalışma"
+      ]
+    },
+    {
+      "id": "fig_2",
+      "name": "İbn-i Sina",
+      "title": "Tıp & Felsefe Dehası (Avicenna)",
+      "category": "Bilim & Felsefe",
+      "quote": "“Tıp ve ilim iki şeyle beslenir: Şüphe duymak ve sabırla araştırmak.”",
+      "quoteSecondary": "“Hiç kimse bir şeyi anlamadan onu gerçekten sevemez ya da ondan nefret edemez.”",
+      "explanation": "Anlamadığın bir konuyu hemen geçme. Sorgulayarak, parçalarına ayırarak ve derinlemesine sabır göstererek her zorluğun üstesinden gelebilirsin.",
+      "badges": [
+        {
+          "text": "El-Kanun Fi’t-Tıbb",
+          "color": "green"
+        },
+        {
+          "text": "Tıp & Felsefe",
+          "color": "blue"
+        },
+        {
+          "text": "Sabırlı Analiz",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "İ",
+        "S"
+      ],
+      "keywords": [
+        "ibn-i sina",
+        "ibni sina",
+        "avicenna",
+        "tıp",
+        "felsefe"
+      ]
+    },
+    {
+      "id": "fig_3",
+      "name": "Alan Turing",
+      "title": "Matematikçi & Bilgisayar Biliminin Babası",
+      "category": "Matematik & Teknoloji",
+      "quote": "“Bazen hiç kimsenin hayal edemediği şeyleri, hiç kimsenin beklemediği insanlar yapar.”",
+      "quoteSecondary": "“Makineler düşünebilir mi sorusu, insanların düşünebildiğini kanıtlama çabasıyla başlar.”",
+      "explanation": "Kendine olan inancını asla kaybetme. Netlerin bugün istediğin seviyede olmasa bile doğru strateji, sabır ve algoritmik düşünceyle hedefini fethedebilirsin.",
+      "badges": [
+        {
+          "text": "Enigma Şifre Kırıcı",
+          "color": "green"
+        },
+        {
+          "text": "Yapay Zeka Öncüsü",
+          "color": "blue"
+        },
+        {
+          "text": "Problem Çözme",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "T"
+      ],
+      "keywords": [
+        "alan turing",
+        "enigma",
+        "kriptoloji",
+        "bilgisayar",
+        "algoritma"
+      ]
+    },
+    {
+      "id": "fig_4",
+      "name": "Marcus Aurelius",
+      "title": "Filozof & Roma İmparatoru",
+      "category": "Felsefe",
+      "quote": "“Zihnini kontrol et, dış olayları değil. Bunu anladığında gerçek gücünü bulacaksın.”",
+      "quoteSecondary": "“Sabah uyandığında yaşayan, nefes alan, düşünen ve seven bir varlık olmanın ayrıcalığını hatırla.”",
+      "explanation": "Sınav stresini ve sonuç kaygısını büyütmek yerine sadece bugün çalışabileceğin saatlere ve çözeceğin sorulara odaklan. Stoacı sükunet sana kazandırır.",
+      "badges": [
+        {
+          "text": "Kendime Düşünceler",
+          "color": "green"
+        },
+        {
+          "text": "Stoacı Felsefe",
+          "color": "blue"
+        },
+        {
+          "text": "Sınav Sakinliği",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "M",
+        "A"
+      ],
+      "keywords": [
+        "marcus aurelius",
+        "stoacılık",
+        "felsefe",
+        "zihin kontrolü",
+        "sakinlik"
+      ]
+    },
+    {
+      "id": "fig_5",
+      "name": "Stephen Hawking",
+      "title": "Teorik Fizikçi & Kozmolog",
+      "category": "Fizik & Kozmoloji",
+      "quote": "“Zekâ, değişime ve yeni şartlara uyum sağlama yeteneğidir.”",
+      "quoteSecondary": "“Ayaklarınıza değil, yıldızlara bakın. Gördüğünüz şeylerin anlamını kavramaya çalışın.”",
+      "explanation": "Denemelerde soru tarzları veya sınav kuralları zorlaştığında şikayet etmek yerine zihnini esnet. Uyum sağlayan ve stratejisini güncelleyen her zaman zirveye ulaşır.",
+      "badges": [
+        {
+          "text": "Zamanın Kısa Tarihi",
+          "color": "green"
+        },
+        {
+          "text": "Kara Delik Fiziği",
+          "color": "blue"
+        },
+        {
+          "text": "Zihinsel Esneklik",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "S",
+        "H"
+      ],
+      "keywords": [
+        "stephen hawking",
+        "fizik",
+        "kozmoloji",
+        "kara delik",
+        "evren"
+      ]
+    },
+    {
+      "id": "fig_6",
+      "name": "Carl Sagan",
+      "title": "Astronom & Bilim İletişimcisi",
+      "category": "Astronomi & Bilim",
+      "quote": "“Bir yerlerde inanılmaz bir şey keşfedilmeyi bekliyor.”",
+      "quoteSecondary": "“Bizler yıldız tozuyuz; evrenin kendini anlama biçimiyiz.”",
+      "explanation": "Ders çalışmayı sıkıcı bir görev değil, evrenin ve doğanın kanunlarını çözen bir kaşiflik macerası olarak gör. Merak, en büyük çalışma yakıtındır.",
+      "badges": [
+        {
+          "text": "Cosmos Belgeseli",
+          "color": "green"
+        },
+        {
+          "text": "Soluk Mavi Nokta",
+          "color": "blue"
+        },
+        {
+          "text": "Evrensel Merak",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "C",
+        "S"
+      ],
+      "keywords": [
+        "carl sagan",
+        "astronomi",
+        "cosmos",
+        "bilim",
+        "merak"
+      ]
+    },
+    {
+      "id": "fig_7",
+      "name": "Isaac Newton",
+      "title": "Klasik Mekaniğin Kurucusu & Matematikçi",
+      "category": "Fizik & Matematik",
+      "quote": "“Eğer daha ileriyi görebildiysem, bu devlerin omuzlarında durduğum içindir.”",
+      "quoteSecondary": "“Doğa sadelikten hoşlanır ve gereksiz gösterişten kaçınır.”",
+      "explanation": "Büyük başarılar sıfırdan tek başına inşa edilmez; geçmişte öğrenilen temel formüllerin, kuralların ve soru çözümlerinin üzerine sabırla kat çıkılır.",
+      "badges": [
+        {
+          "text": "Principia Mathematica",
+          "color": "green"
+        },
+        {
+          "text": "Evrensel Çekim",
+          "color": "blue"
+        },
+        {
+          "text": "Kalkülüsün Doğuşu",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "I",
+        "N"
+      ],
+      "keywords": [
+        "isaac newton",
+        "fizik",
+        "yerçekimi",
+        "kalkülüs",
+        "mekanik"
+      ]
+    },
+    {
+      "id": "fig_8",
+      "name": "Mimar Sinan",
+      "title": "Başmimar & Geometri Dehası",
+      "category": "Mimarlık & Geometri",
+      "quote": "“Yaptığın işi gönlünde hissedersen, taşlar bile sana sırrını fısıldar.”",
+      "quoteSecondary": "“Çıraklık, kalfalık ve ustalık; insanın kendi sabrını nakış gibi işlemesidir.”",
+      "explanation": "Günü kurtarmak için değil, sağlam temeller üzerine kalıcı bilgi inşa etmek için çalış. Geometri ve matematiğin sabrı, hayallerinin mimarı olmanı sağlar.",
+      "badges": [
+        {
+          "text": "Selimiye & Süleymaniye",
+          "color": "green"
+        },
+        {
+          "text": "Kusursuz Statik",
+          "color": "blue"
+        },
+        {
+          "text": "Geometri Dehası",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "M",
+        "S"
+      ],
+      "keywords": [
+        "mimar sinan",
+        "mimarlık",
+        "geometri",
+        "statik",
+        "sabır"
+      ]
+    },
+    {
+      "id": "fig_9",
+      "name": "Ali Kuşçu",
+      "title": "Astronom & Matematikçi",
+      "category": "Astronomi & Matematik",
+      "quote": "“Gökleri anlamak, insanın yeryüzündeki cehaletini yenmesiyle başlar.”",
+      "quoteSecondary": "“Sayılar ve yıldızlar, disiplinli çalışan bir zihne asla kapı kapatmaz.”",
+      "explanation": "Zor konuların karşısında küçülme; zihnini evrenin genişliğine aç. Sayıların ve gök cisimlerinin düzeni, disiplinli çalışan bir zihne daima yol gösterir.",
+      "badges": [
+        {
+          "text": "Semerkant Rasathanesi",
+          "color": "green"
+        },
+        {
+          "text": "Gökbilim & Matematik",
+          "color": "blue"
+        },
+        {
+          "text": "Analitik Disiplin",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "K"
+      ],
+      "keywords": [
+        "ali kuşçu",
+        "ali kuscu",
+        "astronomi",
+        "semerkant",
+        "matematik"
+      ]
+    },
+    {
+      "id": "fig_10",
+      "name": "El-Harezmi",
+      "title": "Cebirin Kurucusu & Algoritmanın Babası",
+      "category": "Matematik",
+      "quote": "“Bilinmeyeni bulmanın tek yolu, bilinenleri adım adım ve adaletle dengelemektir.”",
+      "quoteSecondary": "“Sıfır, yokluk değil; sonsuz imkanların başladığı noktadır.”",
+      "explanation": "Bugün bilgisayarların ve yazılımların çalıştığı algoritma prensibini kuran Harezmi gibi karmaşık sınav problemlerini adım adım küçük mantık parçalarına bölerek çöz.",
+      "badges": [
+        {
+          "text": "Cebirin Doğuşu",
+          "color": "green"
+        },
+        {
+          "text": "Algoritma Kavramı",
+          "color": "blue"
+        },
+        {
+          "text": "Hint Rakamları & Sıfır",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "E",
+        "H"
+      ],
+      "keywords": [
+        "harezmi",
+        "el-harezmi",
+        "cebir",
+        "algoritma",
+        "matematik"
+      ]
+    },
+    {
+      "id": "fig_11",
+      "name": "El-Biruni",
+      "title": "Astronom, Fizikçi & Çok Yönlü Polimat",
+      "category": "Bilim & Coğrafya",
+      "quote": "“Bilgi, peşin hükümlerden arınmış tarafsız bir gözlemle elde edilir.”",
+      "quoteSecondary": "“Hakikati arayan insan, kendi inançlarının bile ötesine geçebilmelidir.”",
+      "explanation": "Bin yıl önce bir dağın tepesinden Dünya’nın yarıçapını bugünkü modern değere %99.8 doğrulukla hesaplayan Biruni gibi tarafsız gözlem ve titiz veri analizi yap.",
+      "badges": [
+        {
+          "text": "Dünya Yarıçapı Ölçümü",
+          "color": "green"
+        },
+        {
+          "text": "Trigonometri & Jeodezi",
+          "color": "blue"
+        },
+        {
+          "text": "Evrensel Deha",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "E",
+        "B"
+      ],
+      "keywords": [
+        "biruni",
+        "el-biruni",
+        "jeodezi",
+        "trigonometri",
+        "astronomi"
+      ]
+    },
+    {
+      "id": "fig_12",
+      "name": "Farabi",
+      "title": "Felsefeci & Mantıkçı (Muallim-i Sani)",
+      "category": "Felsefe & Mantık",
+      "quote": "“Önce doğruyu bilmek gerekir; doğru bilinirse yanlış da bilinir.”",
+      "quoteSecondary": "“Erdemli bir toplum, fertlerinin birbirine yardım etmesiyle kurulur.”",
+      "explanation": "Aristoteles’ten sonra felsefe ve mantığın ‘İkinci Öğretmeni’ kabul edilen Farabi gibi kavramları doğru tanımla; sağlam mantık temeli bütün paragraf sorularını çözer.",
+      "badges": [
+        {
+          "text": "El-Medinetü’l-Fazıla",
+          "color": "green"
+        },
+        {
+          "text": "Klasik Mantık",
+          "color": "blue"
+        },
+        {
+          "text": "Erdem & Akıl",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "F",
+        "R"
+      ],
+      "keywords": [
+        "farabi",
+        "muallim-i sani",
+        "mantık",
+        "felsefe",
+        "erdem"
+      ]
+    },
+    {
+      "id": "fig_13",
+      "name": "El-Cezeri",
+      "title": "Sibernetik ve Otomasyonun Babası",
+      "category": "Mühendislik & Robotik",
+      "quote": "“Uygulamaya dökülmeyen her bilgi, doğru ile yanlış arasında askıda kalır.”",
+      "quoteSecondary": "“Su, dişli ve yerçekimi; zekanın elinde harikalar yaratan araçlardır.”",
+      "explanation": "800 yıl önce Cizre’de ilk programlanabilir robotları, su saatlerini ve krank milini icat eden Cezeri gibi teorik ders bilgisini mutlaka soru çözerek pratiğe dök.",
+      "badges": [
+        {
+          "text": "Kitab-ül Hiyel",
+          "color": "green"
+        },
+        {
+          "text": "İlk Robotik Tasarımlar",
+          "color": "blue"
+        },
+        {
+          "text": "Mekanik & Otomasyon",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "E",
+        "C"
+      ],
+      "keywords": [
+        "cezeri",
+        "el-cezeri",
+        "sibernetik",
+        "robotik",
+        "otomasyon"
+      ]
+    },
+    {
+      "id": "fig_14",
+      "name": "İbn Heysem",
+      "title": "Optiğin Kurucusu & Bilimsel Yöntemin Mimarı",
+      "category": "Fizik & Optik",
+      "quote": "“Gerçeği arayan kimse, bilginlerin yazdıklarına körü körüne inanmamalı; onları kanıtlarla sınamalıdır.”",
+      "quoteSecondary": "“Işık dışarıdan göze gelir, gözden dışarı değil.”",
+      "explanation": "Karanlık odayı (kamera obskura) ve ışığın yansıma-kırılma kanunlarını keşfeden İbn Heysem gibi ezbere değil, deney ve kanıta dayalı analitik düşün.",
+      "badges": [
+        {
+          "text": "Kitabü’l-Menazır",
+          "color": "green"
+        },
+        {
+          "text": "Modern Optik",
+          "color": "blue"
+        },
+        {
+          "text": "Deney & Gözlem",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "İ",
+        "H"
+      ],
+      "keywords": [
+        "ibn heysem",
+        "alhazen",
+        "optik",
+        "fizik",
+        "deney"
+      ]
+    },
+    {
+      "id": "fig_15",
+      "name": "Ömer Hayyam",
+      "title": "Matematikçi, Astronom & Şair",
+      "category": "Matematik & Edebiyat",
+      "quote": "“Gök kubbenin sırrını çözmek, sayılarla şiir arasındaki ahengi yakalamaktır.”",
+      "quoteSecondary": "“Zaman hızla akıp giderken, anı derinlemesine yaşamak en büyük bilgeliktir.”",
+      "explanation": "Üçüncü dereceden denklemleri geometrik olarak çözen ve Celali Takvimi’ni hazırlayan Hayyam gibi hem sayısal aklını hem de edebi duyarlılığını birlikte geliştir.",
+      "badges": [
+        {
+          "text": "Celali Takvimi",
+          "color": "green"
+        },
+        {
+          "text": "Kübik Denklemler",
+          "color": "blue"
+        },
+        {
+          "text": "Rubailer",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "Ö",
+        "H"
+      ],
+      "keywords": [
+        "ömer hayyam",
+        "omer hayyam",
+        "cebir",
+        "rubai",
+        "astronomi"
+      ]
+    },
+    {
+      "id": "fig_16",
+      "name": "İbn Haldun",
+      "title": "Sosyoloji & Tarih Felsefesinin Kurucusu",
+      "category": "Sosyoloji & Tarih",
+      "quote": "“Geçmiş geleceğe, suyun suya benzediğinden daha çok benzer.”",
+      "quoteSecondary": "“Coğrafya kaderdir; ama o kaderi imar eden insanın çalışması ve ahlakıdır.”",
+      "explanation": "Toplumların yükseliş ve çöküş yasalarını ilk kez bilimsel bir yöntemle inceleyen İbn Haldun gibi olayların altındaki neden-sonuç zincirlerini kavramaya çalış.",
+      "badges": [
+        {
+          "text": "Mukaddime",
+          "color": "green"
+        },
+        {
+          "text": "Tarih Felsefesi",
+          "color": "blue"
+        },
+        {
+          "text": "Umran İlmi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "İ",
+        "H"
+      ],
+      "keywords": [
+        "ibn haldun",
+        "mukaddime",
+        "sosyoloji",
+        "tarih",
+        "felsefe"
+      ]
+    },
+    {
+      "id": "fig_17",
+      "name": "Piri Reis",
+      "title": "Büyük Denizci & Kartografya Dehası",
+      "category": "Coğrafya & Haritacılık",
+      "quote": "“Rüzgarı arkana almak yetmez, haritanı doğru okumayı bilmelisin.”",
+      "quoteSecondary": "“Denizler cesurları sever ama sadece tedbirlileri kıyıya ulaştırır.”",
+      "explanation": "1513 yılında çizdiği ceylan derisi dünya haritasıyla yüzyıllar sonrasının kıtalarını kusursuz konumlandıran Piri Reis gibi sınav hazırlığında sağlam bir yol haritası izle.",
+      "badges": [
+        {
+          "text": "1513 Dünya Haritası",
+          "color": "green"
+        },
+        {
+          "text": "Kitab-ı Bahriye",
+          "color": "blue"
+        },
+        {
+          "text": "Kusursuz Kartografya",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "P",
+        "R"
+      ],
+      "keywords": [
+        "piri reis",
+        "harita",
+        "kitab-ı bahriye",
+        "coğrafya",
+        "denizcilik"
+      ]
+    },
+    {
+      "id": "fig_18",
+      "name": "Uluğ Bey",
+      "title": "Hükümdar, Matematikçi & Astronom",
+      "category": "Astronomi & Matematik",
+      "quote": "“Devletler yıkılır, tahtlar unutulur; fakat ilim ve hakikat ebediyen parlar.”",
+      "quoteSecondary": "“Gök yüzünün haritasını çıkarmak, adaleti yeryüzüne indirmek gibidir.”",
+      "explanation": "Semerkant’ta kurduğu rasathanede 1018 yıldızın konumunu dakikalar mertebesinde hatasız kaydeden Uluğ Bey gibi yüksek hedeflere ulaşmak için sabırla gözlem ve ölçüm yap.",
+      "badges": [
+        {
+          "text": "Zic-i Uluğ Bey",
+          "color": "green"
+        },
+        {
+          "text": "Semerkant Medresesi",
+          "color": "blue"
+        },
+        {
+          "text": "Yıldız Kataloğu",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "U",
+        "B"
+      ],
+      "keywords": [
+        "uluğ bey",
+        "ulug bey",
+        "astronomi",
+        "semerkant",
+        "rasathane"
+      ]
+    },
+    {
+      "id": "fig_19",
+      "name": "Sokrates",
+      "title": "Felsefenin Babası & Sorgulama Ustası",
+      "category": "Felsefe",
+      "quote": "“Sorgulanmamış bir hayat, yaşanmaya değer değildir.”",
+      "quoteSecondary": "“Bildiğim tek şey, hiçbir şey bilmediğimdir.”",
+      "explanation": "Öğrenmenin ilk adımı bildiğini sanmaktan vazgeçip merakla soru sormaktır. Sokratik yöntemle her zor konuyu diyalog kurarak zihninde aydınlat.",
+      "badges": [
+        {
+          "text": "Sokratik Yöntem",
+          "color": "green"
+        },
+        {
+          "text": "Felsefi Doğurtma",
+          "color": "blue"
+        },
+        {
+          "text": "Eleştirel Sorgulama",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "S",
+        "K"
+      ],
+      "keywords": [
+        "sokrates",
+        "felsefe",
+        "sorgulama",
+        "sokratik",
+        "akıl"
+      ]
+    },
+    {
+      "id": "fig_20",
+      "name": "Platon (Eflatun)",
+      "title": "Felsefeci & Akademi’nin Kurucusu",
+      "category": "Felsefe",
+      "quote": "“Öğrenmek, ruhun unutmuş olduğu hakikatleri yeniden hatırlamasıdır.”",
+      "quoteSecondary": "“Kendini fetheden insan, dünyadaki en büyük zaferi kazanmıştır.”",
+      "explanation": "Gölgeye değil ışığa bakmayı anlatan Mağara Alegorisi gibi sınav hazırlığında yüzeysel ezberlerin ötesine geçip konuların ardındaki öz mantığı kavra.",
+      "badges": [
+        {
+          "text": "Devlet & İdealar",
+          "color": "green"
+        },
+        {
+          "text": "Atina Akademisi",
+          "color": "blue"
+        },
+        {
+          "text": "Mağara Alegorisi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "P",
+        "L"
+      ],
+      "keywords": [
+        "platon",
+        "eflatun",
+        "idealar",
+        "devlet",
+        "felsefe"
+      ]
+    },
+    {
+      "id": "fig_21",
+      "name": "Aristoteles",
+      "title": "Mantık Biliminin Kurucusu & İlk Öğretmen",
+      "category": "Mantık & Felsefe",
+      "quote": "“Biz neyi tekrar tekrar yapıyorsak oyuz. Dolayısıyla mükemmellik bir eylem değil, bir alışkanlıktır.”",
+      "quoteSecondary": "“Eğitimin kökleri acı, fakat meyveleri tatlıdır.”",
+      "explanation": "Disiplinli çalışmak bir kerelik coşku değil, her gün tekrarlanan erdemli bir alışkanlıktır. Günlük soru hedefini aksatmadan tamamlayan başarıya ulaşır.",
+      "badges": [
+        {
+          "text": "Organon (Mantık)",
+          "color": "green"
+        },
+        {
+          "text": "Altın Orta Kuralı",
+          "color": "blue"
+        },
+        {
+          "text": "Alışkanlık & Disiplin",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "R"
+      ],
+      "keywords": [
+        "aristoteles",
+        "aristo",
+        "mantık",
+        "alışkanlık",
+        "felsefe"
+      ]
+    },
+    {
+      "id": "fig_22",
+      "name": "Seneca",
+      "title": "Stoacı Filozof & Devlet Adamı",
+      "category": "Felsefe",
+      "quote": "“Hayat kısa değildir; biz onun çoğunu boşa harcarız.”",
+      "quoteSecondary": "“Hangi limana gideceğini bilmeyen gemiye hiçbir rüzgar yardım edemez.”",
+      "explanation": "Zamanını ertelemelerle, sosyal medya kaydırmalarıyla tüketmek yerine gününü dakikası dakikasına hedefine odakla. Zaman yönetimi sınavın en büyük anahtarıdır.",
+      "badges": [
+        {
+          "text": "Ahlak Mektupları",
+          "color": "green"
+        },
+        {
+          "text": "Zaman Yönetimi",
+          "color": "blue"
+        },
+        {
+          "text": "Ruh Dinginliği",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "S",
+        "N"
+      ],
+      "keywords": [
+        "seneca",
+        "stoacılık",
+        "zaman yönetimi",
+        "felsefe",
+        "hedef"
+      ]
+    },
+    {
+      "id": "fig_23",
+      "name": "Epiktetos",
+      "title": "Kölelikten Filozofluğa Uzanan Stoacı Bilge",
+      "category": "Felsefe",
+      "quote": "“Seni inciten olaylar değil, o olaylar hakkında geliştirdiğin yargılardır.”",
+      "quoteSecondary": "“Yalnızca kendi kontrolünde olan şeylere odaklan; gerisini sükunetle karşıla.”",
+      "explanation": "Sınavın zorluğu veya başkalarının netleri senin elinde değildir; senin elinde olan sadece bugün masaya oturup çözeceğin sorulardır.",
+      "badges": [
+        {
+          "text": "Söylevler & Kılavuz",
+          "color": "green"
+        },
+        {
+          "text": "Kontrol Alanı",
+          "color": "blue"
+        },
+        {
+          "text": "İçsel Özgürlük",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "E",
+        "P"
+      ],
+      "keywords": [
+        "epiktetos",
+        "stoacılık",
+        "kontrol alanı",
+        "felsefe",
+        "sükunet"
+      ]
+    },
+    {
+      "id": "fig_24",
+      "name": "Konfüçyüs",
+      "title": "Doğu Felsefesi Bilgesi & Düşünür",
+      "category": "Felsefe & Erdem",
+      "quote": "“Durmadığın sürece ne kadar yavaş gittiğinin hiçbir önemi yoktur.”",
+      "quoteSecondary": "“Düşünmeden öğrenmek emek kaybıdır; öğrenmeden düşünmek ise tehlikelidir.”",
+      "explanation": "Gelişimin yavaş görünse bile asla masayı terk etme. Her gün çözülen 30 soru, yıl sonunda binlerce netlik birikime dönüşür.",
+      "badges": [
+        {
+          "text": "Konuşmalar (Analektler)",
+          "color": "green"
+        },
+        {
+          "text": "Süreklilik İlkesi",
+          "color": "blue"
+        },
+        {
+          "text": "Öğrenme Disiplini",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "K",
+        "N"
+      ],
+      "keywords": [
+        "konfüçyüs",
+        "konfucyus",
+        "felsefe",
+        "süreklilik",
+        "sabır"
+      ]
+    },
+    {
+      "id": "fig_25",
+      "name": "Mevlana Celaleddin Rumi",
+      "title": "Mütefekkir, Şair & Sevgi Rehberi",
+      "category": "Tasavvuf & Felsefe",
+      "quote": "“Dünle beraber gitti cancağızım, ne kadar söz varsa düne ait. Şimdi yeni şeyler söylemek lazım.”",
+      "quoteSecondary": "“Mum olmak kolay değildir; ışık saçmak için önce yanmak gerekir.”",
+      "explanation": "Geçmiş denemelerdeki kötü sonuçlara takılıp kalma. Her yeni gün zihnini tazeleyip sıfırdan başlama fırsatıdır.",
+      "badges": [
+        {
+          "text": "Mesnevi",
+          "color": "green"
+        },
+        {
+          "text": "Yenilenme Gücü",
+          "color": "blue"
+        },
+        {
+          "text": "Umut & Sevgi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "M",
+        "V"
+      ],
+      "keywords": [
+        "mevlana",
+        "rumi",
+        "mesnevi",
+        "yenilenme",
+        "umut"
+      ]
+    },
+    {
+      "id": "fig_26",
+      "name": "Yunus Emre",
+      "title": "Gönül Dili & Türk Şiirinin Piri",
+      "category": "Edebiyat & Düşünce",
+      "quote": "“İlim ilim bilmektir, ilim kendin bilmektir. Sen kendini bilmezsin, ya nice okumaktır.”",
+      "quoteSecondary": "“Cümleler doğrudur sen doğru isen, doğruluk bulunmaz sen eğri isen.”",
+      "explanation": "Öğrendiğin her bilgi önce kendi karakterini ve iç dünyanı zenginleştirmelidir. Öz farkındalık, sınav stratejisinin temelidir.",
+      "badges": [
+        {
+          "text": "Risaletü’n-Nushiyye",
+          "color": "green"
+        },
+        {
+          "text": "Arı Türkçe",
+          "color": "blue"
+        },
+        {
+          "text": "Öz Farkındalık",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "Y",
+        "E"
+      ],
+      "keywords": [
+        "yunus emre",
+        "edebiyat",
+        "türkçe",
+        "öz farkındalık",
+        "şiir"
+      ]
+    },
+    {
+      "id": "fig_27",
+      "name": "Hacı Bektaş-ı Veli",
+      "title": "Anadolu Ereni & Düşünür",
+      "category": "Düşünce & Ahlak",
+      "quote": "“İlimden gidilmeyen yolun sonu karanlıktır.”",
+      "quoteSecondary": "“Okunacak en büyük kitap insandır.”",
+      "explanation": "Cehaleti ve karamsarlığı yenmenin tek çaresi aklın, bilimin ve öğrenmenin aydınlık yolundan sapmamaktır.",
+      "badges": [
+        {
+          "text": "Makalat",
+          "color": "green"
+        },
+        {
+          "text": "İlim ve İrfan",
+          "color": "blue"
+        },
+        {
+          "text": "Akıl ve Sevgi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "H",
+        "B"
+      ],
+      "keywords": [
+        "hacı bektaş-ı veli",
+        "haci bektas",
+        "ilim",
+        "makalat",
+        "anadolu"
+      ]
+    },
+    {
+      "id": "fig_28",
+      "name": "René Descartes",
+      "title": "Modern Felsefenin ve Analitik Geometrinin Babası",
+      "category": "Felsefe & Matematik",
+      "quote": "“Düşünüyorum, öyleyse varım.”",
+      "quoteSecondary": "“Zorlukları, çözümlerini kolaylaştıracak kadar küçük parçalara bölün.”",
+      "explanation": "Analitik geometriyi kuran Descartes’ın yöntemi: Karmaşık bir sınav problemini doğrudan çözmeye çalışma; en küçük parçalarına ayır ve adım adım fetheyle.",
+      "badges": [
+        {
+          "text": "Metot Üzerine Konuşma",
+          "color": "green"
+        },
+        {
+          "text": "Kartezyen Koordinatlar",
+          "color": "blue"
+        },
+        {
+          "text": "Metodik Şüphe",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "R",
+        "D"
+      ],
+      "keywords": [
+        "descartes",
+        "kartezyen",
+        "geometri",
+        "felsefe",
+        "metot"
+      ]
+    },
+    {
+      "id": "fig_29",
+      "name": "Baruch Spinoza",
+      "title": "Akılcı Filozof & Etik Düşünürü",
+      "category": "Felsefe",
+      "quote": "“Korkuya boyun eğmeyen, umuda aldanmayan akıl gerçek hürriyete kavuşur.”",
+      "quoteSecondary": "“Gülmemek, ağlamamak, nefret etmemek; yalnızca anlamak.”",
+      "explanation": "Duygusal iniş çıkışların çalışma temposunu bozmasına izin verme. Hedefine soğukkanlı bir akılla ve derin bir merakla odaklan.",
+      "badges": [
+        {
+          "text": "Etika",
+          "color": "green"
+        },
+        {
+          "text": "Akılcılık & Özgürlük",
+          "color": "blue"
+        },
+        {
+          "text": "Zihinsel Dinginlik",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "B",
+        "S"
+      ],
+      "keywords": [
+        "spinoza",
+        "etika",
+        "akılcılık",
+        "felsefe",
+        "özgürlük"
+      ]
+    },
+    {
+      "id": "fig_30",
+      "name": "Immanuel Kant",
+      "title": "Eleştirel Felsefenin Zirvesi",
+      "category": "Felsefe",
+      "quote": "“Aklını kendin kullanma cesareti göster! (Sapere Aude)”",
+      "quoteSecondary": "“Gökyüzündeki yıldızlı sema ve içimdeki ahlak yasası beni daima hayrete düşürür.”",
+      "explanation": "Başkalarının hazır şablonlarına güvenmek yerine kendi aklınla düşün, formüllerin mantığını sorgula ve bağımsız bir öğrenici ol.",
+      "badges": [
+        {
+          "text": "Saf Aklın Eleştirisi",
+          "color": "green"
+        },
+        {
+          "text": "Aydınlanma Felsefesi",
+          "color": "blue"
+        },
+        {
+          "text": "Ödev Ahlakı",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "I",
+        "K"
+      ],
+      "keywords": [
+        "kant",
+        "immanuel kant",
+        "sapere aude",
+        "aydınlanma",
+        "felsefe"
+      ]
+    },
+    {
+      "id": "fig_31",
+      "name": "Arşimet (Archimedes)",
+      "title": "Antik Çağın En Büyük Matematikçisi & Mucidi",
+      "category": "Matematik & Fizik",
+      "quote": "“Bana bir dayanak noktası verin, dünyayı yerinden oynatayım.”",
+      "quoteSecondary": "“Dairelerimi bozmayın!”",
+      "explanation": "Kaldıraç prensibi ve suyun kaldırma kuvvetini keşfeden Arşimet gibi doğru bilgi ve yöntem en büyük engelleri bile hafifletir.",
+      "badges": [
+        {
+          "text": "Kaldırma Kuvveti",
+          "color": "green"
+        },
+        {
+          "text": "Kaldıraç & Mekanik",
+          "color": "blue"
+        },
+        {
+          "text": "Pi Sayısı Yaklaşımı",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "R"
+      ],
+      "keywords": [
+        "arşimet",
+        "archimedes",
+        "kaldıraç",
+        "fizik",
+        "matematik"
+      ]
+    },
+    {
+      "id": "fig_32",
+      "name": "Öklid (Euclid)",
+      "title": "Geometrinin Babası",
+      "category": "Matematik & Geometri",
+      "quote": "“Geometriye giden hiçbir kral yolu yoktur; herkes aynı adımlarla yürümek zorundadır.”",
+      "quoteSecondary": "“Aksiyomlar sağlam kurulduğunda, tüm teorem kanıtları kendiliğinden parıldar.”",
+      "explanation": "Geometri sorularını çözmenin kestirme bir hilesi yoktur. Tanımları, aksiyomları ve kuralları adım adım sindiren her soruyu fetheder.",
+      "badges": [
+        {
+          "text": "Elementler (Stoikheia)",
+          "color": "green"
+        },
+        {
+          "text": "Aksiyomatik Sistem",
+          "color": "blue"
+        },
+        {
+          "text": "Klasik Geometri",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "Ö",
+        "K"
+      ],
+      "keywords": [
+        "öklid",
+        "euclid",
+        "geometri",
+        "aksiyom",
+        "elementler"
+      ]
+    },
+    {
+      "id": "fig_33",
+      "name": "Galileo Galilei",
+      "title": "Gözlemsel Astronominin & Modern Fiziğin Babası",
+      "category": "Fizik & Astronomi",
+      "quote": "“Ve yine de dönüyor!”",
+      "quoteSecondary": "“Evren matematik diliyle yazılmıştır; harfleri üçgenler, daireler ve diğer geometrik şekillerdir.”",
+      "explanation": "Kendi yaptığı teleskopla Jüpiter’in uydularını ve Ay kraterlerini keşfeden Galileo gibi önyargılara değil, somut gözleme ve matematiğe güven.",
+      "badges": [
+        {
+          "text": "Teleskopla Keşifler",
+          "color": "green"
+        },
+        {
+          "text": "Serbest Düşme Yasası",
+          "color": "blue"
+        },
+        {
+          "text": "Bilimsel Cesaret",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "G",
+        "G"
+      ],
+      "keywords": [
+        "galileo",
+        "galilei",
+        "astronomi",
+        "teleskop",
+        "fizik"
+      ]
+    },
+    {
+      "id": "fig_34",
+      "name": "Johannes Kepler",
+      "title": "Gezegensel Hareket Yasalarının Kaşifi",
+      "category": "Astronomi & Matematik",
+      "quote": "“Göklerin geometrisi, insan zihninin anlayabileceği en asil armonidir.”",
+      "quoteSecondary": "“Yıllarca süren hesaplamalarım tek bir dakikalık hatayla çöktü; fakat pes etmedim ve gerçeği buldum.”",
+      "explanation": "Gezegenlerin daire değil elips çizdiğini kanıtlamak için 8 yıl boyunca binlerce sayfa elle hesaplama yapan Kepler gibi sebat göster.",
+      "badges": [
+        {
+          "text": "Kepler Yasaları",
+          "color": "green"
+        },
+        {
+          "text": "Elips Yörüngeler",
+          "color": "blue"
+        },
+        {
+          "text": "Hesaplama Sebatı",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "J",
+        "K"
+      ],
+      "keywords": [
+        "kepler",
+        "johannes kepler",
+        "astronomi",
+        "elips",
+        "fizik"
+      ]
+    },
+    {
+      "id": "fig_35",
+      "name": "Nicolaus Copernicus",
+      "title": "Güneş Merkezli Evren Teorisinin Mimarı",
+      "category": "Astronomi",
+      "quote": "“Güneş bütün kainatın ortasında oturur ve her şeyi ışığıyla yönetir.”",
+      "quoteSecondary": "“Hakikati aramak, çağın kalıplaşmış tabularını sorgulamakla başlar.”",
+      "explanation": "Bin yıllık Dünya merkezli yanılgıyı yıkarak Güneş’i merkeze koyan Kopernik gibi zihnindeki merkezleri doğru belirle ve kalıpların dışına çık.",
+      "badges": [
+        {
+          "text": "De revolutionibus",
+          "color": "green"
+        },
+        {
+          "text": "Güneş Merkezli Sistem",
+          "color": "blue"
+        },
+        {
+          "text": "Kopernik Devrimi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "N",
+        "C"
+      ],
+      "keywords": [
+        "kopernik",
+        "copernicus",
+        "güneş merkezli",
+        "astronomi",
+        "devrim"
+      ]
+    },
+    {
+      "id": "fig_36",
+      "name": "James Clerk Maxwell",
+      "title": "Elektromanyetizmanın Büyük Birleştiricisi",
+      "category": "Fizik & Matematik",
+      "quote": "“Elektrik ve manyetizma aynı madalyonun iki yüzüdür; ışık ise bu dalgaların dansıdır.”",
+      "quoteSecondary": "“Dört basit denklem, bütün bir evrenin ışığını özetlemeye yeter.”",
+      "explanation": "Elektrik, manyetizma ve ışığı tek bir matematiksel çatı altında toplayan Maxwell gibi farklı dersler arasındaki bağlantıları görerek bütüncül öğren.",
+      "badges": [
+        {
+          "text": "Maxwell Denklemleri",
+          "color": "green"
+        },
+        {
+          "text": "Elektromanyetik Dalga",
+          "color": "blue"
+        },
+        {
+          "text": "Işığın Doğası",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "J",
+        "M"
+      ],
+      "keywords": [
+        "maxwell",
+        "elektromanyetizma",
+        "fizik",
+        "ışık",
+        "denklemler"
+      ]
+    },
+    {
+      "id": "fig_37",
+      "name": "Michael Faraday",
+      "title": "Elektromanyetik İndüksiyonun Öncüsü",
+      "category": "Fizik & Kimya",
+      "quote": "“Çalış, bitir, yayınla.”",
+      "quoteSecondary": "“Hiçbir şey hayal edilemeyecek kadar mucizevi değildir; yeter ki doğanın yasalarıyla uyumlu olsun.”",
+      "explanation": "Hiçbir resmi matematik eğitimi almadan ciltçilik çıraklığından gelip elektrik motorunu ve jeneratörünü icat eden Faraday gibi azmin sınır tanımaz.",
+      "badges": [
+        {
+          "text": "Faraday Kafesi & İndüksiyon",
+          "color": "green"
+        },
+        {
+          "text": "Elektrik Motorunun Doğuşu",
+          "color": "blue"
+        },
+        {
+          "text": "Öz Eğitim Dehası",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "M",
+        "F"
+      ],
+      "keywords": [
+        "faraday",
+        "michael faraday",
+        "indüksiyon",
+        "elektrik",
+        "fizik"
+      ]
+    },
+    {
+      "id": "fig_38",
+      "name": "Charles Darwin",
+      "title": "Doğa Bilimci & Evrim Teorisinin Kurucusu",
+      "category": "Biyoloji",
+      "quote": "“Hayatta kalanlar en güçlüler ya da en zekiler değil, değişime en çok uyum sağlayanlardır.”",
+      "quoteSecondary": "“Doğa acele etmez ama hiçbir şeyi de yarım bırakmaz.”",
+      "explanation": "HMS Beagle gemisiyle 5 yıl dünyayı gezip binlerce türü sabırla inceleyen Darwin gibi deneme sınavı sonuçlarına göre eksiklerini analiz edip çalışma tarzını güncelle.",
+      "badges": [
+        {
+          "text": "Türlerin Kökeni",
+          "color": "green"
+        },
+        {
+          "text": "Doğal Seçilim",
+          "color": "blue"
+        },
+        {
+          "text": "Gözlem Titizliği",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "C",
+        "D"
+      ],
+      "keywords": [
+        "darwin",
+        "charles darwin",
+        "biyoloji",
+        "evrim",
+        "uyum sağlama"
+      ]
+    },
+    {
+      "id": "fig_39",
+      "name": "Gregor Mendel",
+      "title": "Genetiğin Babası",
+      "category": "Biyoloji & Genetik",
+      "quote": "“Benim zamanım da gelecek; doğanın kanunları sabırla beklemeyi bilir.”",
+      "quoteSecondary": "“Manastır bahçesindeki bezelyeler bana hayatın matematiksel kodunu fısıldadı.”",
+      "explanation": "29.000 bezelye bitkisini tek tek tozlaştırarak kalıtım yasalarını matematiksel istatistikle kanıtlayan Mendel gibi sabırlı soru pratiği yap.",
+      "badges": [
+        {
+          "text": "Kalıtım Kanunları",
+          "color": "green"
+        },
+        {
+          "text": "Bezelye Deneyleri",
+          "color": "blue"
+        },
+        {
+          "text": "Genetik Bilimi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "G",
+        "M"
+      ],
+      "keywords": [
+        "mendel",
+        "gregor mendel",
+        "genetik",
+        "kalıtım",
+        "biyoloji"
+      ]
+    },
+    {
+      "id": "fig_40",
+      "name": "Louis Pasteur",
+      "title": "Mikrobiyolojinin Kurucusu & Kuduz Aşısının Mucidi",
+      "category": "Biyoloji & Tıp",
+      "quote": "“Şans, yalnızca hazırlıklı zihinlere güler.”",
+      "quoteSecondary": "“Laboratuvarımda beni başarıya ulaştıran tek sır sebatımdır.”",
+      "explanation": "Mikropları, mayalanmayı ve kuduz aşısını keşfeden Pasteur’ün dediği gibi: Sınav şansı, sadece daha önce masada geceler boyu ter dökmüş zihinlerin yanındadır.",
+      "badges": [
+        {
+          "text": "Kuduz Aşısı",
+          "color": "green"
+        },
+        {
+          "text": "Pastörizasyon",
+          "color": "blue"
+        },
+        {
+          "text": "Hazırlıklı Zihin",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "L",
+        "P"
+      ],
+      "keywords": [
+        "pasteur",
+        "louis pasteur",
+        "aşı",
+        "mikrobiyoloji",
+        "şans"
+      ]
+    },
+    {
+      "id": "fig_41",
+      "name": "Dmitri Mendeleev",
+      "title": "Periyodik Tablonun Mimarı",
+      "category": "Kimya",
+      "quote": "“Rüyamda tüm elementlerin atom ağırlıklarına göre dizildiği bir tablo gördüm; uyanır uyanmaz kağıda döktüm.”",
+      "quoteSecondary": "“Henüz keşfedilmemiş elementlerin bile özelliklerini bilmek, bilimin kehanet gücüdür.”",
+      "explanation": "Henüz keşfedilmemiş elementlerin yerini tabloda boş bırakıp atom ağırlıklarını önceden tahmin eden Mendeleev gibi sistemli ve örüntülü öğren.",
+      "badges": [
+        {
+          "text": "Periyodik Sistem",
+          "color": "green"
+        },
+        {
+          "text": "Kimyasal Örüntüler",
+          "color": "blue"
+        },
+        {
+          "text": "Tahmin Dehası",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "D",
+        "M"
+      ],
+      "keywords": [
+        "mendeleev",
+        "periyodik tablo",
+        "kimya",
+        "elementler",
+        "atom"
+      ]
+    },
+    {
+      "id": "fig_42",
+      "name": "Antoine Lavoisier",
+      "title": "Modern Kimyanın Babası",
+      "category": "Kimya",
+      "quote": "“Hiçbir şey yoktan var olmaz, hiçbir şey vardan yok olmaz; her şey sadece dönüşür.”",
+      "quoteSecondary": "“Doğru tartmak ve ölçmek, kimyayı simyadan ayıran tek farktır.”",
+      "explanation": "Kütlenin Korunumu Kanunu’nu bulan Lavoisier gibi sınav çalışmalarında her harcadığın enerjinin boşa gitmediğini, netlere dönüştüğünü bil.",
+      "badges": [
+        {
+          "text": "Kütlenin Korunumu",
+          "color": "green"
+        },
+        {
+          "text": "Oksijenin Keşfi",
+          "color": "blue"
+        },
+        {
+          "text": "Modern Kimya",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "L"
+      ],
+      "keywords": [
+        "lavoisier",
+        "kimya",
+        "kütlenin korunumu",
+        "terazi",
+        "deney"
+      ]
+    },
+    {
+      "id": "fig_43",
+      "name": "Robert Boyle",
+      "title": "Modern Kimyanın Öncüsü & Gaz Yasası Kaşifi",
+      "category": "Fizik & Kimya",
+      "quote": "“Şüpheci bir kimyager olarak her teoriyi deneyin ateşinde yakıp sınamalısınız.”",
+      "quoteSecondary": "“Basınç arttıkça hacim küçülür; ama öz aynı kalır.”",
+      "explanation": "Boyle Yasası ile gazların davranışını formüle eden Robert Boyle gibi stres ve sınav baskısı arttığında panik yapma; odağını koru.",
+      "badges": [
+        {
+          "text": "Boyle Yasası (P.V=sabit)",
+          "color": "green"
+        },
+        {
+          "text": "Kuşkucu Kimyager",
+          "color": "blue"
+        },
+        {
+          "text": "Gazlar Fiziği",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "R",
+        "B"
+      ],
+      "keywords": [
+        "boyle",
+        "robert boyle",
+        "gaz yasaları",
+        "kimya",
+        "basınç"
+      ]
+    },
+    {
+      "id": "fig_44",
+      "name": "Alfred Wegener",
+      "title": "Kıtaların Kayması Teorisinin Mimarı",
+      "category": "Jeoloji & Coğrafya",
+      "quote": "“Kıtaların bir yapboz gibi birbirine uyduğunu görmek için sadece haritaya önyargısız bakmak yeterlidir.”",
+      "quoteSecondary": "“Tüm dünya karşı çıksa bile doğanın kanıtları gerçeği haykırır.”",
+      "explanation": "Pangaea teorisini öne sürdüğünde alay edilen fakat Grönland buzullarında araştırmalarına devam eden Wegener gibi hedefine sadık kal.",
+      "badges": [
+        {
+          "text": "Kıtaların Kayması",
+          "color": "green"
+        },
+        {
+          "text": "Pangaea Süper Kıtası",
+          "color": "blue"
+        },
+        {
+          "text": "Jeoloji & Coğrafya",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "W"
+      ],
+      "keywords": [
+        "wegener",
+        "alfred wegener",
+        "kıtaların kayması",
+        "pangaea",
+        "jeoloji"
+      ]
+    },
+    {
+      "id": "fig_45",
+      "name": "Eratosthenes",
+      "title": "Dünya’nın Çevresini İlk Ölçen Coğrafyacı",
+      "category": "Matematik & Coğrafya",
+      "quote": "“Basit bir gölge boyu ve bir güneş ışını, koca gezegenin ölçüsünü almaya yeter.”",
+      "quoteSecondary": "“Coğrafya, aklın yeryüzüne çizdiği çizgidir.”",
+      "explanation": "MÖ 240’ta İskenderiye ve Asvan’daki güneş gölgelerini basit bir geometri orantısıyla hesaplayıp Dünya’nın çevresini bulan Eratosthenes gibi pratik zekanı kullan.",
+      "badges": [
+        {
+          "text": "Dünya Çevresi Ölçümü",
+          "color": "green"
+        },
+        {
+          "text": "Asal Sayı Kalburu",
+          "color": "blue"
+        },
+        {
+          "text": "Geometri & Coğrafya",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "E",
+        "R"
+      ],
+      "keywords": [
+        "eratosthenes",
+        "dünya çevresi",
+        "asal sayılar",
+        "geometri",
+        "coğrafya"
+      ]
+    },
+    {
+      "id": "fig_46",
+      "name": "Pisagor (Pythagoras)",
+      "title": "Sayılar Felsefesinin & Geometrinin Öncüsü",
+      "category": "Matematik",
+      "quote": "“Evren sayılardan ibarettir; sayıların ahengini çözen doğanın sırrına erer.”",
+      "quoteSecondary": "“Öfke delilikle başlar, pişmanlıkla biter. Aklını daima öfkenin önünde tut.”",
+      "explanation": "Üçgenlerde a² + b² = c² bağıntısını insanlığa armağan eden Pisagor gibi temel geometri kurallarını ezberlemeden geometrik çizimlerle içselleştir.",
+      "badges": [
+        {
+          "text": "Pisagor Bağıntısı",
+          "color": "green"
+        },
+        {
+          "text": "Müzik ve Matematik",
+          "color": "blue"
+        },
+        {
+          "text": "Geometri Temelleri",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "P",
+        "S"
+      ],
+      "keywords": [
+        "pisagor",
+        "pythagoras",
+        "geometri",
+        "sayılar",
+        "dik üçgen"
+      ]
+    },
+    {
+      "id": "fig_47",
+      "name": "Max Planck",
+      "title": "Kuantum Fiziğinin Kurucusu",
+      "category": "Modern Fizik",
+      "quote": "“Bilim insanı her zaman hayal gücüne sahip olmalıdır; çünkü yeni fikirler mantıktan değil, yaratıcı sezgiden doğar.”",
+      "quoteSecondary": "“Enerji sürekli bir akış değil, kuantlar halinde paket paket yayılır.”",
+      "explanation": "Klasik fiziğin tıkandığı noktada kuantum teorisini başlatıp Nobel kazanan Planck gibi zor konularda eski yöntemler çalışmıyorsa yeni bakış açıları geliştir.",
+      "badges": [
+        {
+          "text": "Kuantum Sabiti (h)",
+          "color": "green"
+        },
+        {
+          "text": "Nobel Fizik Ödülü",
+          "color": "blue"
+        },
+        {
+          "text": "Modern Fizik Devrimi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "M",
+        "P"
+      ],
+      "keywords": [
+        "max planck",
+        "kuantum",
+        "planck sabiti",
+        "fizik",
+        "modern fizik"
+      ]
+    },
+    {
+      "id": "fig_48",
+      "name": "Niels Bohr",
+      "title": "Atom Modeli Mimarı & Nobel Fizik Ödüllü",
+      "category": "Modern Fizik",
+      "quote": "“Bir uzman, çok dar bir alanda yapılabilecek tüm hataları yapmış olan kişidir.”",
+      "quoteSecondary": "“Eğer kuantum mekaniği aklınızı başınızdan almadıysa, onu henüz anlamamışsınız demektir.”",
+      "explanation": "Soru bankalarında yaptığın yanlışlar eksiklik değil, uzmanlığa giden basamaklardır. Bohr’un dediği gibi hatalarından ders alarak uzmanlaş.",
+      "badges": [
+        {
+          "text": "Bohr Atom Modeli",
+          "color": "green"
+        },
+        {
+          "text": "Nobel Fizik Ödülü",
+          "color": "blue"
+        },
+        {
+          "text": "Enerji Seviyeleri",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "N",
+        "B"
+      ],
+      "keywords": [
+        "niels bohr",
+        "atom modeli",
+        "kuantum",
+        "fizik",
+        "nobel"
+      ]
+    },
+    {
+      "id": "fig_49",
+      "name": "Werner Heisenberg",
+      "title": "Belirsizlik İlkesinin Kaşifi & Kuantum Mekanikçisi",
+      "category": "Modern Fizik",
+      "quote": "“Doğa bilimlerinin bardağından içilen ilk yudum sizi ateist yapabilir; ama bardağın dibinde Tanrı sizi beklemektedir.”",
+      "quoteSecondary": "“Bir parçacığın hem konumunu hem momentumunu aynı anda kesin olarak bilemezsiniz.”",
+      "explanation": "Belirsizlikler seni korkutmasın. Sınav gününü ve geleceği kontrol edemezsin; sadece şu anki çalışma ivmeni kontrol edebilirsin.",
+      "badges": [
+        {
+          "text": "Belirsizlik İlkesi",
+          "color": "green"
+        },
+        {
+          "text": "Matris Mekaniği",
+          "color": "blue"
+        },
+        {
+          "text": "Nobel Fizik Ödülü",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "W",
+        "H"
+      ],
+      "keywords": [
+        "heisenberg",
+        "werner heisenberg",
+        "belirsizlik ilkesi",
+        "kuantum",
+        "fizik"
+      ]
+    },
+    {
+      "id": "fig_50",
+      "name": "Erwin Schrödinger",
+      "title": "Dalga Mekaniğinin Kurucusu & Nobel Fizik Ödüllü",
+      "category": "Modern Fizik",
+      "quote": "“Gözlemlemek, ihtimaller dalgasını tek bir gerçekliğe çökertmektir.”",
+      "quoteSecondary": "“Yaşam nedir? Entropiye karşı düzeni koruma savaşıdır.”",
+      "explanation": "Ünlü dalga denklemi ve düşünce deneyleriyle kuantum dünyasını aydınlatan Schrödinger gibi odaklanmış zihninle tüm çeldiricileri ele.",
+      "badges": [
+        {
+          "text": "Schrödinger Dalga Denklemi",
+          "color": "green"
+        },
+        {
+          "text": "Nobel Fizik Ödülü",
+          "color": "blue"
+        },
+        {
+          "text": "Kuantum Dalgaları",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "E",
+        "S"
+      ],
+      "keywords": [
+        "schrödinger",
+        "schrodinger",
+        "dalga denklemi",
+        "kuantum",
+        "fizik"
+      ]
+    },
+    {
+      "id": "fig_51",
+      "name": "Srinivasa Ramanujan",
+      "title": "Sonsuzluk Dehası Matematikçi",
+      "category": "Matematik",
+      "quote": "“Bir denklem evrenin bir düşüncesini yansıtmıyorsa benim için hiçbir anlam taşımaz.”",
+      "quoteSecondary": "“Sayılar benim en yakın dostlarımdır; her birinin kendine has bir karakteri vardır.”",
+      "explanation": "Kendi kendine matematik öğrenip formülleri sezgisel olarak türeten Ramanujan gibi matematiği ezber kurallar değil, keşfedilmeyi bekleyen bir sanat gibi gör.",
+      "badges": [
+        {
+          "text": "Sonsuz Seriler",
+          "color": "green"
+        },
+        {
+          "text": "Sayılar Teorisi",
+          "color": "blue"
+        },
+        {
+          "text": "Saf Sezgi Dehası",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "S",
+        "R"
+      ],
+      "keywords": [
+        "ramanujan",
+        "matematik",
+        "sayılar",
+        "sonsuzluk",
+        "cambridge"
+      ]
+    },
+    {
+      "id": "fig_52",
+      "name": "Ada Lovelace",
+      "title": "Dünyanın İlk Bilgisayar Programcısı",
+      "category": "Teknoloji & Matematik",
+      "quote": "“Makineler sadece bizim onlara nasıl emredeceğimizi bildiğimiz şeyleri yapabilir.”",
+      "quoteSecondary": "“Şiirsel bilim: Mantık ve hayal gücünün kusursuz evliliği.”",
+      "explanation": "1840’larda Babbage’ın Analitik Motoru için ilk algoritmayı yazan Lovelace gibi analitik zekanla yaratıcı hayal gücünü birleştir.",
+      "badges": [
+        {
+          "text": "İlk Algoritma Tasarımı",
+          "color": "green"
+        },
+        {
+          "text": "Şiirsel Bilim",
+          "color": "blue"
+        },
+        {
+          "text": "Yazılımın Öncüsü",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "L"
+      ],
+      "keywords": [
+        "ada lovelace",
+        "yazılım",
+        "programlama",
+        "algoritma",
+        "matematik"
+      ]
+    },
+    {
+      "id": "fig_53",
+      "name": "Claude Shannon",
+      "title": "Bilgi Teorisinin Babası & Dijital Çağın Mimarı",
+      "category": "Teknoloji & Matematik",
+      "quote": "“Bilgi, belirsizliğin azalmasıdır.”",
+      "quoteSecondary": "“Her karmaşık mesaj, en basit 0 ve 1 ikilileriyle eksiksiz taşınabilir.”",
+      "explanation": "Bugün internetin ve dijital iletişimin temelini oluşturan ‘Bit’ kavramını kuran Shannon gibi öğrendiğin her yeni bilgiyle zihnindeki belirsizlikleri netleştir.",
+      "badges": [
+        {
+          "text": "Bilgi Teorisi (Bit)",
+          "color": "green"
+        },
+        {
+          "text": "Dijital Devrim",
+          "color": "blue"
+        },
+        {
+          "text": "Mantık Devreleri",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "C",
+        "S"
+      ],
+      "keywords": [
+        "shannon",
+        "claude shannon",
+        "bilgi teorisi",
+        "bit",
+        "dijital"
+      ]
+    },
+    {
+      "id": "fig_54",
+      "name": "John von Neumann",
+      "title": "Modern Bilgisayar Mimarisi & Oyun Teorisi Dehası",
+      "category": "Matematik & Bilgisayar",
+      "quote": "“Matematikte bir şeyleri anlamazsınız; sadece onlara alışırsınız.”",
+      "quoteSecondary": "“Strateji, karşı tarafın en rasyonel hamlesini önceden hesaplayabilme sanatıdır.”",
+      "explanation": "Bugün kullandığımız tüm bilgisayarların CPU-bellek mimarisini tasarlayan von Neumann gibi zihnini organize et ve sınavı stratejik bir oyun gibi planla.",
+      "badges": [
+        {
+          "text": "Von Neumann Mimarisi",
+          "color": "green"
+        },
+        {
+          "text": "Oyun Teorisi",
+          "color": "blue"
+        },
+        {
+          "text": "Polimat Zeka",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "J",
+        "N"
+      ],
+      "keywords": [
+        "von neumann",
+        "bilgisayar",
+        "oyun teorisi",
+        "matematik",
+        "strateji"
+      ]
+    },
+    {
+      "id": "fig_55",
+      "name": "Kurt Gödel",
+      "title": "Modern Mantığın & Matematik Felsefesinin Zirvesi",
+      "category": "Mantık & Matematik",
+      "quote": "“Her tutarlı matematiksel sistemde, doğruluğu sistem içinden kanıtlanamayan önermeler mutlaka vardır.”",
+      "quoteSecondary": "“Mantığın sınırlarını bilmek, aklın en yüce tevazuudur.”",
+      "explanation": "Eksiklik Teoremi ile matematiğin sınırlarını kanıtlayan Gödel gibi karşılaştığın zorlu sorularda şablonların dışına çıkıp üst bir bakış açısı kazan.",
+      "badges": [
+        {
+          "text": "Eksiklik Teoremi",
+          "color": "green"
+        },
+        {
+          "text": "Matematiksel Mantık",
+          "color": "blue"
+        },
+        {
+          "text": "Felsefi Çözümleme",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "K",
+        "G"
+      ],
+      "keywords": [
+        "gödel",
+        "kurt godel",
+        "eksiklik teoremi",
+        "mantık",
+        "matematik"
+      ]
+    },
+    {
+      "id": "fig_56",
+      "name": "Rosalind Franklin",
+      "title": "DNA’nın Çift Sarmal Yapısını Görüntüleyen Biyofizikçi",
+      "category": "Biyoloji & Biyofizik",
+      "quote": "“Bilim ve günlük hayat birbirinden ayrılamaz.”",
+      "quoteSecondary": "“Fotoğraf 51: Hayatın çift sarmal mimarisini açığa çıkaran x-ışını sabrı.”",
+      "explanation": "DNA’nın sarmal yapısını x-ışını kırınımıyla ilk kez kristalize edip fotoğraflayan Franklin gibi detaylara titizlikle odaklanarak soruların şifresini çöz.",
+      "badges": [
+        {
+          "text": "Fotoğraf 51",
+          "color": "green"
+        },
+        {
+          "text": "DNA Çift Sarmalı",
+          "color": "blue"
+        },
+        {
+          "text": "X-Işını Kırınımı",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "R",
+        "F"
+      ],
+      "keywords": [
+        "rosalind franklin",
+        "dna",
+        "çift sarmal",
+        "fotoğraf 51",
+        "biyofizik"
+      ]
+    },
+    {
+      "id": "fig_57",
+      "name": "Alexander Fleming",
+      "title": "Penisilinin Kaşifi & Tıpta Antibiyotik Devrimi",
+      "category": "Biyoloji & Tıp",
+      "quote": "“Ben penisilini icat etmedim; doğa onu zaten yaratmıştı. Ben sadece dikkatli baktım ve fark ettim.”",
+      "quoteSecondary": "“Beklenmedik bir sonuç, yeni bir keşfin ilk habercisidir.”",
+      "explanation": "Petri kabındaki küf mantarını bir hata değil devrim olarak görüp milyonlarca insanın hayatını kurtaran Fleming gibi denemelerdeki sürpriz hatalardan büyük dersler çıkar.",
+      "badges": [
+        {
+          "text": "Penisilinin Keşfi",
+          "color": "green"
+        },
+        {
+          "text": "Nobel Tıp Ödülü",
+          "color": "blue"
+        },
+        {
+          "text": "Antibiyotik Çağı",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "F"
+      ],
+      "keywords": [
+        "fleming",
+        "alexander fleming",
+        "penisilin",
+        "antibiyotik",
+        "tıp"
+      ]
+    },
+    {
+      "id": "fig_58",
+      "name": "Jonas Salk",
+      "title": "Çocuk Felci Aşısının Mucidi & İnsanlık Dostu",
+      "category": "Tıp & Halk Sağlığı",
+      "quote": "“Güneşi patentleyebilir misiniz?”",
+      "quoteSecondary": "“Geleceğe bırakabileceğimiz en güzel miras, iyi birer ata olabilmektir.”",
+      "explanation": "Milyarlarca dolar kazanabilecekken çocuk felci aşısını insanlığa ücretsiz armağan eden Salk gibi öğrendiğin bilgiyi insanlığın ve toplumun faydasına ada.",
+      "badges": [
+        {
+          "text": "Çocuk Felci Aşısı",
+          "color": "green"
+        },
+        {
+          "text": "Halk Sağlığı Zaferi",
+          "color": "blue"
+        },
+        {
+          "text": "Fedakarlık & Onur",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "J",
+        "S"
+      ],
+      "keywords": [
+        "jonas salk",
+        "çocuk felci",
+        "aşı",
+        "tıp",
+        "fedakarlık"
+      ]
+    },
+    {
+      "id": "fig_59",
+      "name": "Edward Jenner",
+      "title": "İmmünolojinin Babası & Çiçek Aşısının Mucidi",
+      "category": "Tıp & İmmünoloji",
+      "quote": "“Doğayı sabırla gözlemleyen bir zihin, en ölümcül felaketlere bile kalkan bulur.”",
+      "quoteSecondary": "“Aşı, insanlığın hastalıklara karşı kazandığı en büyük zaferdir.”",
+      "explanation": "Çiçek hastalığına karşı ilk modern aşıyı geliştiren Jenner gibi korkularının üzerine bilimsel yöntemle ve soğukkanlılıkla git.",
+      "badges": [
+        {
+          "text": "İlk Başarılı Aşı",
+          "color": "green"
+        },
+        {
+          "text": "İmmünoloji Temelleri",
+          "color": "blue"
+        },
+        {
+          "text": "Çiçek Hastalığı Zaferi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "E",
+        "J"
+      ],
+      "keywords": [
+        "edward jenner",
+        "aşı",
+        "immünoloji",
+        "çiçek hastalığı",
+        "tıp"
+      ]
+    },
+    {
+      "id": "fig_60",
+      "name": "Enrico Fermi",
+      "title": "Nükleer Çağın Mimarı & Fermi Paradoksu Dehası",
+      "category": "Nükleer Fizik",
+      "quote": "“Eğer evrende milyarlarca gelişmiş uygarlık varsa, neredeler?”",
+      "quoteSecondary": "“En karmaşık problemleri basit yaklaşımlarla kafadan hesaplayabilmek gerçek ustalıktır.”",
+      "explanation": "Hızlı kaba hesaplama yöntemiyle (Fermi Tahmini) tanınan fizikçi gibi sınavda seçenekleri elemek için büyüklük mertebelerini zihninde tart.",
+      "badges": [
+        {
+          "text": "Nobel Fizik Ödülü",
+          "color": "green"
+        },
+        {
+          "text": "Fermi Paradoksu",
+          "color": "blue"
+        },
+        {
+          "text": "Hızlı Tahmin Metodu",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "E",
+        "F"
+      ],
+      "keywords": [
+        "enrico fermi",
+        "fermi paradoksu",
+        "nükleer fizik",
+        "hesaplama"
+      ]
+    },
+    {
+      "id": "fig_61",
+      "name": "Lise Meitner",
+      "title": "Nükleer Fisyonun Kuramcısı",
+      "category": "Nükleer Fizik",
+      "quote": "“Hayat kolay olmak zorunda değildir; yeter ki içi amaçla ve merakla dolu olsun.”",
+      "quoteSecondary": "“Atom çekirdeğinin bölünmesi, bilimin insanlığa verdiği en büyük enerji anahtarıdır.”",
+      "explanation": "Uranyum çekirdeğinin bölündüğünü (fisyon) ilk kez matematiksel olarak açıklayan Meitner gibi tüm dış engellere rağmen zihnini sadece bilime ve hedefine odakla.",
+      "badges": [
+        {
+          "text": "Nükleer Fisyon Teorisi",
+          "color": "green"
+        },
+        {
+          "text": "Element 109 (Meitneryum)",
+          "color": "blue"
+        },
+        {
+          "text": "Sarsılmaz Kararlılık",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "L",
+        "M"
+      ],
+      "keywords": [
+        "lise meitner",
+        "nükleer fisyon",
+        "fizik",
+        "atom",
+        "meitneryum"
+      ]
+    },
+    {
+      "id": "fig_62",
+      "name": "Thomas Edison",
+      "title": "Büyük Mucit & Elektrik Çağının Öncüsü",
+      "category": "Teknoloji & İcat",
+      "quote": "“Ben başarısız olmadım; sadece işe yaramayan 10.000 yol buldum.”",
+      "quoteSecondary": "“Dehanın yüzde biri ilham, yüzde doksan dokuzu ise alın teridir.”",
+      "explanation": "Ampulü bulana kadar binlerce farklı filaman deneyen Edison gibi çözemediğin soruları birer kayıp değil, doğru çözüme seni bir adım daha yaklaştıran tecrübe olarak gör.",
+      "badges": [
+        {
+          "text": "1093 Patent",
+          "color": "green"
+        },
+        {
+          "text": "Elektrik Ampulü & Fonograf",
+          "color": "blue"
+        },
+        {
+          "text": "10.000 Deneme Azmi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "T",
+        "E"
+      ],
+      "keywords": [
+        "edison",
+        "thomas edison",
+        "ampul",
+        "icat",
+        "alın teri"
+      ]
+    },
+    {
+      "id": "fig_63",
+      "name": "Alexander Graham Bell",
+      "title": "Telefonun Mucidi & İletişim Öncüsü",
+      "category": "Teknoloji & İletişim",
+      "quote": "“Bir kapı kapandığında diğeri açılır; ama biz kapanan kapıya o kadar uzun bakarız ki açık olanı göremeyiz.”",
+      "quoteSecondary": "“Hazırlık, başarının en temel anahtarıdır.”",
+      "explanation": "Sesi teller üzerinden iletmeyi başaran Bell gibi dikkatini kaçırdığın netlere değil, önünde seni bekleyen onlarca net fırsatına çevir.",
+      "badges": [
+        {
+          "text": "Telefonun İcadı",
+          "color": "green"
+        },
+        {
+          "text": "İşitme Eğitimi Öncüsü",
+          "color": "blue"
+        },
+        {
+          "text": "Geniş Ufuklu İletişim",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "B"
+      ],
+      "keywords": [
+        "bell",
+        "graham bell",
+        "telefon",
+        "iletişim",
+        "icat"
+      ]
+    },
+    {
+      "id": "fig_64",
+      "name": "Wright Kardeşler",
+      "title": "Motorlu Uçuşun Öncüleri (Orville & Wilbur)",
+      "category": "Havacılık & Mühendislik",
+      "quote": "“Uçmak bir rüya değil; rüzgarın aerodinamiğini sabırla kanada işleme sanatıdır.”",
+      "quoteSecondary": "“Yüzlerce düşüş, ilk başarılı inişin öğretmenidir.”",
+      "explanation": "Bisiklet tamirciliğinden gelip 1903’te Kitty Hawk kumsalında ilk motorlu uçağı havalandıran Wright Kardeşler gibi hayallerini mühendislik disipliniyle uçur.",
+      "badges": [
+        {
+          "text": "İlk Motorlu Uçuş (1903)",
+          "color": "green"
+        },
+        {
+          "text": "Üç Eksenli Kontrol",
+          "color": "blue"
+        },
+        {
+          "text": "Rüzgar Tüneli Testleri",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "W",
+        "K"
+      ],
+      "keywords": [
+        "wright kardeşler",
+        "uçak",
+        "havacılık",
+        "aerodinamik",
+        "uçuş"
+      ]
+    },
+    {
+      "id": "fig_65",
+      "name": "Johannes Gutenberg",
+      "title": "Hareketli Harfli Matbaanın Mucidi",
+      "category": "Teknoloji & Medeniyet",
+      "quote": "“Kurşun harflerle bilginin kapılarını tüm insanlığa açtık.”",
+      "quoteSecondary": "“Bilgi artık sarayların tekelinde değil, okumak isteyen her zihnin ellerindedir.”",
+      "explanation": "Bilginin demokratikleşmesini ve Rönesans’ın patlamasını sağlayan Gutenberg matbaası gibi okuduğun her kitap zihnindeki karanlıkları aydınlatır.",
+      "badges": [
+        {
+          "text": "Hareketli Harfli Matbaa",
+          "color": "green"
+        },
+        {
+          "text": "Rönesans’ın Yakıtı",
+          "color": "blue"
+        },
+        {
+          "text": "Bilginin Yayılması",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "J",
+        "G"
+      ],
+      "keywords": [
+        "gutenberg",
+        "matbaa",
+        "kitap",
+        "rönesans",
+        "bilgi"
+      ]
+    },
+    {
+      "id": "fig_66",
+      "name": "Gazi Yaşargil",
+      "title": "Yüzyılın Beyin Cerrahı (Mikronöroşirürji Mimarı)",
+      "category": "Tıp & Cerrahi",
+      "quote": "“İnsan beyni evrendeki en karmaşık mimaridir; ona ancak derin bir tevazu ve sabırla dokunabilirsiniz.”",
+      "quoteSecondary": "“Cerrahi sadece el becerisi değil, kalbin ve aklın mikroskop altındaki senfonisidir.”",
+      "explanation": "Mikroskop altında beyin ameliyatlarını başlatarak Amerikan Beyin Cerrahları Birliği tarafından ‘Yüzyılın Beyin Cerrahı’ seçilen Yaşargil gibi milimetrik dikkatle çalış.",
+      "badges": [
+        {
+          "text": "Yüzyılın Cerrahı Ödülü",
+          "color": "green"
+        },
+        {
+          "text": "Mikronöroşirürji Kurucusu",
+          "color": "blue"
+        },
+        {
+          "text": "Tevazu ve Titizlik",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "G",
+        "Y"
+      ],
+      "keywords": [
+        "gazi yaşargil",
+        "gazi yasargil",
+        "beyin cerrahisi",
+        "tıp",
+        "mikronöroşirürji"
+      ]
+    },
+    {
+      "id": "fig_67",
+      "name": "Oktay Sinanoğlu",
+      "title": "Türkiye’nin Einstein’ı & Moleküler Biyolog",
+      "category": "Kimya & Moleküler Biyoloji",
+      "quote": "“Türkçe giderse Türkiye gider! Dilini kaybeden bir millet aklını ve kimliğini de kaybeder.”",
+      "quoteSecondary": "“26 yaşında Yale Üniversitesi’nin en genç profesörü olmak bir amaç değil, milletime borcumu ödeme aracıydı.”",
+      "explanation": "Atom ve moleküllerin çok elektronlu teorisini çözen Sinanoğlu gibi ana diline, zengin kavram dünyana ve bilimsel üretimine dört elle sarıl.",
+      "badges": [
+        {
+          "text": "Yale En Genç Tam Profesörü",
+          "color": "green"
+        },
+        {
+          "text": "Moleküler Biyoloji Kuramı",
+          "color": "blue"
+        },
+        {
+          "text": "Türkçe Bilim Dili",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "O",
+        "S"
+      ],
+      "keywords": [
+        "oktay sinanoğlu",
+        "oktay sinanoglu",
+        "kimya",
+        "yale",
+        "türkçe"
+      ]
+    },
+    {
+      "id": "fig_68",
+      "name": "Fuat Sezgin",
+      "title": "İslam Bilim Tarihi Araştırmacısı",
+      "category": "Tarih & Bilim Tarihi",
+      "quote": "“Günde 17 saat çalışmadan büyük bir ilim inşa edilemez.”",
+      "quoteSecondary": "“Aşağılık kompleksini yıkmadıkça, kendi medeniyetimizin bilim mirasını anlayamayız.”",
+      "explanation": "Onlarca dilde yazma eserleri tarayarak İslam bilim mirasını dünya kütüphanelerinden gün ışığına çıkaran Fuat Sezgin gibi yüksek çalışma temposunu yaşam tarzı yap.",
+      "badges": [
+        {
+          "text": "GAS (Arap-İslam Edebiyatı)",
+          "color": "green"
+        },
+        {
+          "text": "Günde 17 Saat Çalışma",
+          "color": "blue"
+        },
+        {
+          "text": "Bilim Tarihi Müzesi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "F",
+        "S"
+      ],
+      "keywords": [
+        "fuat sezgin",
+        "bilim tarihi",
+        "islam bilimi",
+        "çalışma",
+        "tarih"
+      ]
+    },
+    {
+      "id": "fig_69",
+      "name": "Halil İnalcık",
+      "title": "Tarihçilerin Kutbu & Osmanlı Tarihçisi",
+      "category": "Tarih",
+      "quote": "“Belgeye dayanmayan tarih, masaldan ibarettir.”",
+      "quoteSecondary": "“Bir ömrü arşiv tozları arasında gerçeği aramaya adamak en büyük şereftir.”",
+      "explanation": "100 yıllık ömrünü arşiv belgelerini kaynak eleştirisine tabi tutarak geçiren İnalcık gibi sınavda sorunun köküne ve metin belgelerine tarafsız bak.",
+      "badges": [
+        {
+          "text": "Tarihçilerin Kutbu",
+          "color": "green"
+        },
+        {
+          "text": "Osmanlı Kurumlar Tarihi",
+          "color": "blue"
+        },
+        {
+          "text": "Arşiv Titizliği",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "H",
+        "İ"
+      ],
+      "keywords": [
+        "halil inalcık",
+        "halil inalcik",
+        "tarih",
+        "osmanlı",
+        "arşiv"
+      ]
+    },
+    {
+      "id": "fig_70",
+      "name": "İlber Ortaylı",
+      "title": "Tarihçi, Yazar & Kültür İnsanı",
+      "category": "Tarih & Kültür",
+      "quote": "“Bir insan kendine yatırım yapmalı; dil öğrenmeli, dünyayı gezmeli ve vaktini asla israf etmemelidir.”",
+      "quoteSecondary": "“Cahillik tahsille geçmez; cahillik ancak merak ve okuma terbiyesiyle yenilir.”",
+      "explanation": "Tarihsel olayları çok yönlü, çok dilli ve karşılaştırmalı analiz eden İlber Ortaylı gibi zihnini tek bir kaynağa değil, zengin okumalara aç.",
+      "badges": [
+        {
+          "text": "Çok Dilli Kültür",
+          "color": "green"
+        },
+        {
+          "text": "Tarih & Toplum Analizi",
+          "color": "blue"
+        },
+        {
+          "text": "Geniş Entelektüel Ufuk",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "İ",
+        "O"
+      ],
+      "keywords": [
+        "ilber ortaylı",
+        "ilber ortayli",
+        "tarih",
+        "kültür",
+        "okuma"
+      ]
+    },
+    {
+      "id": "fig_71",
+      "name": "Feza Gürsey",
+      "title": "Teorik Fizikçi & Matematiksel Fizik Öncüsü",
+      "category": "Fizik & Matematik",
+      "quote": "“Doğa kanunları, soyut matematiğin en zarif grup teorisi simetrileriyle dans eder.”",
+      "quoteSecondary": "“Kuantum dünyasındaki simetriyi yakaladığınızda, evrenin zarafetine hayran kalırsınız.”",
+      "explanation": "Parçacık fiziğinde grup teorisi ve kiral simetri modelleriyle uluslararası alanda sayısız ödül alan Feza Gürsey gibi sayısal derslerdeki gizli simetrileri keşfet.",
+      "badges": [
+        {
+          "text": "Oppenheimer Ödülü",
+          "color": "green"
+        },
+        {
+          "text": "Grup Teorisi ve Simetri",
+          "color": "blue"
+        },
+        {
+          "text": "Yale Fizik Bölüm Başkanı",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "F",
+        "G"
+      ],
+      "keywords": [
+        "feza gürsey",
+        "feza gursey",
+        "fizik",
+        "kuantum",
+        "simetri"
+      ]
+    },
+    {
+      "id": "fig_72",
+      "name": "Hulusi Behçet",
+      "title": "Dermatolog & Kendi Adıyla Anılan Hastalığı Tanımlayan Hekim",
+      "category": "Tıp",
+      "quote": "“Gözlemlemek ve kaydetmek; tıbbın en karanlık bilmecelerini aydınlatan tek meşaledir.”",
+      "quoteSecondary": "“Bir Türk hekimi olarak dünya tıp literatürüne yeni bir hastalık tanımı kazandırmak onurdur.”",
+      "explanation": "Tıp literatürüne Behçet Hastalığı (Morbus Behçet) olarak geçen tanıyı titiz klinik takiple ortaya koyan Behçet gibi dikkatli ve sistemli gözlem yap.",
+      "badges": [
+        {
+          "text": "Behçet Hastalığı Tanımı",
+          "color": "green"
+        },
+        {
+          "text": "Uluslararası Tıp Literatürü",
+          "color": "blue"
+        },
+        {
+          "text": "Klinik Gözlem Titizliği",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "H",
+        "B"
+      ],
+      "keywords": [
+        "hulusi behçet",
+        "hulusi behcet",
+        "tıp",
+        "behçet hastalığı",
+        "dermatoloji"
+      ]
+    },
+    {
+      "id": "fig_73",
+      "name": "Vecihi Hürkuş",
+      "title": "Türk Havacılığının Efsane Pilotu & Uçak Tasarımcısı",
+      "category": "Havacılık & İnovasyon",
+      "quote": "“Kanatlarım kendi vatanımın göklerinde süzülmedikçe, özgürlük tam olamaz.”",
+      "quoteSecondary": "“Engeller karşısında geri çekilmek değil, her seferinde daha güçlü havalanmak gerekir.”",
+      "explanation": "İlk Türk sivil uçağı Vecihi K-VI’yı tasarlayıp imkansızlıklara rağmen göklere çıkaran Hürkuş gibi karşılaştığın bürokratik veya psikolojik engelleri aş.",
+      "badges": [
+        {
+          "text": "İlk Yerli Uçak (Vecihi K-VI)",
+          "color": "green"
+        },
+        {
+          "text": "Havacılık Cesareti",
+          "color": "blue"
+        },
+        {
+          "text": "İstikbal Göklerdedir",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "V",
+        "H"
+      ],
+      "keywords": [
+        "vecihi hürkuş",
+        "vecihi hurkus",
+        "uçak",
+        "havacılık",
+        "pilot"
+      ]
+    },
+    {
+      "id": "fig_74",
+      "name": "Nuri Demirağ",
+      "title": "Demiryolları & Uçak Sanayiimizin Öncüsü",
+      "category": "Sanayi & Girişimcilik",
+      "quote": "“Avrupa’dan, Amerika’dan lisans alıp uçak yapmak kopyacılıktır; biz kendi modelimizi üretmeliyiz.”",
+      "quoteSecondary": "“Demir ağlarla ördüğümüz vatanı, göklerdeki yerli uçaklarımızla taçlandıracağız.”",
+      "explanation": "Cumhuriyet’in ilk uçak fabrikasını ve paraşüt kulesini kuran Nuri Demirağ gibi yerli üretim vizyonu ve büyük düşünme cesaretiyle hedefine yürü.",
+      "badges": [
+        {
+          "text": "İlk Yerli Uçak Fabrikası",
+          "color": "green"
+        },
+        {
+          "text": "Demir Ağlar Mirası",
+          "color": "blue"
+        },
+        {
+          "text": "Milli Sanayi Vizyonu",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "N",
+        "D"
+      ],
+      "keywords": [
+        "nuri demirağ",
+        "nuri demirag",
+        "uçak fabrikası",
+        "sanayi",
+        "girişimcilik"
+      ]
+    },
+    {
+      "id": "fig_75",
+      "name": "Afet İnan",
+      "title": "Cumhuriyetin Öncü Sosyoloğu & Tarihçisi",
+      "category": "Tarih & Sosyoloji",
+      "quote": "“Kadınların eğitim ve bilimdeki varlığı, bir milletin medeniyet seviyesinin tek gerçek ölçüsüdür.”",
+      "quoteSecondary": "“Tarihini bilmeyen bir nesil, geleceğini başkalarının masallarına teslim eder.”",
+      "explanation": "Türk Tarih Kurumu’nun kurucularından olan ve kadın hakları sosyolojisinde çığır açan Afet İnan gibi toplumsal meselelere bilimsel akılla yaklaş.",
+      "badges": [
+        {
+          "text": "Türk Tarih Kurumu Kurucusu",
+          "color": "green"
+        },
+        {
+          "text": "Kadın Hakları Öncüsü",
+          "color": "blue"
+        },
+        {
+          "text": "Sosyolojik Araştırmalar",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "A",
+        "İ"
+      ],
+      "keywords": [
+        "afet inan",
+        "tarih",
+        "sosyoloji",
+        "kadın hakları",
+        "cumhuriyet"
+      ]
+    },
+    {
+      "id": "fig_76",
+      "name": "Nermin Abadan Unat",
+      "title": "Siyaset Bilimi & İletişim Sosyolojisi Hocaların Hocası",
+      "category": "Siyaset Bilimi & Sosyoloji",
+      "quote": "“Zorluklar mazeret değil; mücadele etmek için en asil gerekçedir.”",
+      "quoteSecondary": "“Hayat boyu öğrenci kalmayı başaran insan asla yaşlanmaz.”",
+      "explanation": "100 yılı aşan ömründe Türkiye’nin ilk kadın siyaset bilimcisi olarak göç ve kamuoyu araştırmalarına öncülük eden Unat gibi hayat boyu öğrenme aşkını koru.",
+      "badges": [
+        {
+          "text": "İlk Kadın Siyaset Bilimci",
+          "color": "green"
+        },
+        {
+          "text": "Hocaların Hocası",
+          "color": "blue"
+        },
+        {
+          "text": "Göç & Kamuoyu Uzmanı",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "N",
+        "U"
+      ],
+      "keywords": [
+        "nermin abadan unat",
+        "siyaset bilimi",
+        "sosyoloji",
+        "öğrenme"
+      ]
+    },
+    {
+      "id": "fig_77",
+      "name": "Mazhar Osman",
+      "title": "Modern Türk Psikiyatrisinin ve Nörolojisinin Kurucusu",
+      "category": "Tıp & Psikiyatri",
+      "quote": "“Ruh sağlığı sağlam olan fert, zorluklar karşısında eğilir ama asla kırılmaz.”",
+      "quoteSecondary": "“Zihin hekimliği, insan kalbinin fırtınalarına şefkatle liman olmaktır.”",
+      "explanation": "Bakırköy Ruh ve Sinir Hastalıkları Hastanesi’ni kurarak modern psikiyatrinin temellerini atan Mazhar Osman gibi sınav stresinde ruh sağlığını ve uyku düzenini koru.",
+      "badges": [
+        {
+          "text": "Bakırköy Kurucusu",
+          "color": "green"
+        },
+        {
+          "text": "Modern Psikiyatri",
+          "color": "blue"
+        },
+        {
+          "text": "Zihinsel Dayanıklılık",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "M",
+        "O"
+      ],
+      "keywords": [
+        "mazhar osman",
+        "psikiyatri",
+        "tıp",
+        "ruh sağlığı",
+        "bakırköy"
+      ]
+    },
+    {
+      "id": "fig_78",
+      "name": "Celal Şengör",
+      "title": "Jeolog & Levha Tektoniği Bilim İnsanı",
+      "category": "Jeoloji & Yer Bilimleri",
+      "quote": "“Bilim insanının tek ibadeti kütüphanede okumak, arazide gözlem yapmaktır.”",
+      "quoteSecondary": "“Kitap okumayan bir zihin, tektonik fay hattı gibi her an çökmeye mahkumdur.”",
+      "explanation": "Şerit kıtaların dağ kuşaklarını oluşturma teorisini (Kimberid Yığını) dünya jeolojisine kazandıran Şengör gibi tutkulu bir kitap okuma disiplini geliştir.",
+      "badges": [
+        {
+          "text": "Ulusal Bilimler Akademisi Üyesi",
+          "color": "green"
+        },
+        {
+          "text": "Levha Tektoniği Kuramı",
+          "color": "blue"
+        },
+        {
+          "text": "Kitap Aşkı & Arazi Bilimi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "C",
+        "Ş"
+      ],
+      "keywords": [
+        "celal şengör",
+        "celal sengor",
+        "jeoloji",
+        "deprem",
+        "kitap"
+      ]
+    },
+    {
+      "id": "fig_79",
+      "name": "Leonardo da Vinci",
+      "title": "Rönesans Polimatı, Ressam & Mühendis",
+      "category": "Sanat & Mühendislik",
+      "quote": "“Öğrenmek zihni asla tüketmez; tam tersine onu daha da açar.”",
+      "quoteSecondary": "“Detaylar mükemmelliği doğurur; ama mükemmellik bir detay değildir.”",
+      "explanation": "Anatomi çizimlerinden uçan makinelere, Mona Lisa’dan hidrolik mühendisliğine kadar her alanda merakını soruşturan Da Vinci gibi sınırlarını kaldırma.",
+      "badges": [
+        {
+          "text": "Mona Lisa & Son Akşam Yemeği",
+          "color": "green"
+        },
+        {
+          "text": "Vitruvius Adamı",
+          "color": "blue"
+        },
+        {
+          "text": "Evrensel Polimat",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "L",
+        "D"
+      ],
+      "keywords": [
+        "da vinci",
+        "leonardo da vinci",
+        "polimat",
+        "sanat",
+        "mühendislik"
+      ]
+    },
+    {
+      "id": "fig_80",
+      "name": "Michelangelo",
+      "title": "Heykeltıraş, Ressam & Mimar",
+      "category": "Sanat & Heykel",
+      "quote": "“Heykel zaten mermerin içinde saklıydı; ben sadece fazlalıkları yonttum.”",
+      "quoteSecondary": "“Hala öğreniyorum! (Ancora imparo)”",
+      "explanation": "Davud heykeli ve Sistina Şapeli tavanını insanüstü bir fiziksel ve zihinsel sabırla tamamlayan Michelangelo gibi içindeki fazlalıkları (ertelemeleri) yont.",
+      "badges": [
+        {
+          "text": "Davud Heykeli",
+          "color": "green"
+        },
+        {
+          "text": "Sistina Şapeli",
+          "color": "blue"
+        },
+        {
+          "text": "Hala Öğreniyorum",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "M",
+        "A"
+      ],
+      "keywords": [
+        "michelangelo",
+        "davud",
+        "heykel",
+        "sistina",
+        "sanat"
+      ]
+    },
+    {
+      "id": "fig_81",
+      "name": "Johann Wolfgang von Goethe",
+      "title": "Dünya Edebiyatının Zirvesi & Polimat",
+      "category": "Edebiyat & Felsefe",
+      "quote": "“Bilmek yetmez, uygulamak gerekir; istemek yetmez, yapmak gerekir.”",
+      "quoteSecondary": "“Yeteneğin sakinlikte, karakterin ise fırtınada şekillenir.”",
+      "explanation": "Faust eserini ve renk teorisini kaleme alan Goethe gibi sadece masada bilgi depolama; bildiklerini deneme sınavlarında eyleme dök.",
+      "badges": [
+        {
+          "text": "Faust & Doğu-Batı Divanı",
+          "color": "green"
+        },
+        {
+          "text": "Dünya Edebiyatı Kavramı",
+          "color": "blue"
+        },
+        {
+          "text": "Eylem ve İrade",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "J",
+        "G"
+      ],
+      "keywords": [
+        "goethe",
+        "faust",
+        "edebiyat",
+        "eylem",
+        "irade"
+      ]
+    },
+    {
+      "id": "fig_82",
+      "name": "William Shakespeare",
+      "title": "Evrensel Tiyatronun & İnsan Ruhunun Şairi",
+      "category": "Edebiyat & Tiyatro",
+      "quote": "“Olmak ya da olmamak, işte bütün mesele bu!”",
+      "quoteSecondary": "“Yıldızlar kaderimizi belirlemez; kaderimiz kendi kararlarımızda saklıdır.”",
+      "explanation": "Hamlet, Macbeth ve Othello ile insan hırsını, tereddüdünü ve vicdanını ölümsüzleştiren Shakespeare gibi kendi geleceğinin yazarının sen olduğunu bil.",
+      "badges": [
+        {
+          "text": "Hamlet & Macbeth",
+          "color": "green"
+        },
+        {
+          "text": "Evrensel İnsan Doğası",
+          "color": "blue"
+        },
+        {
+          "text": "Tiyatro & Şiir",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "W",
+        "S"
+      ],
+      "keywords": [
+        "shakespeare",
+        "william shakespeare",
+        "hamlet",
+        "tiyatro",
+        "edebiyat"
+      ]
+    },
+    {
+      "id": "fig_83",
+      "name": "Lev Tolstoy",
+      "title": "Büyük Rus Edebiyatçısı & Ahlak Düşünürü",
+      "category": "Edebiyat",
+      "quote": "“En güçlü iki savaşçı sabır ve zamandır.”",
+      "quoteSecondary": "“Tüm mutlu aileler birbirine benzer; her mutsuz ailenin mutsuzluğu kendine göredir.”",
+      "explanation": "Savaş ve Barış ile Anna Karenina’nın dev yazarı Tolstoy gibi aceleci olma; sabır ve zaman en büyük eksikleri bile tamamlama gücüne sahiptir.",
+      "badges": [
+        {
+          "text": "Savaş ve Barış",
+          "color": "green"
+        },
+        {
+          "text": "Anna Karenina",
+          "color": "blue"
+        },
+        {
+          "text": "Sabır ve Zaman",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "L",
+        "T"
+      ],
+      "keywords": [
+        "tolstoy",
+        "lev tolstoy",
+        "savaş ve barış",
+        "sabır",
+        "edebiyat"
+      ]
+    },
+    {
+      "id": "fig_84",
+      "name": "Fyodor Dostoyevski",
+      "title": "Ruhbilimci Yazar & İnsan Derinliği Ustası",
+      "category": "Edebiyat",
+      "quote": "“Kendi yolunda yanlış yürümek, başkasının yolunda doğru yürümekten daha iyidir.”",
+      "quoteSecondary": "“İnsanoğlu her şeye alışan bir varlıktır; sanırım onun en doğru tanımı da budur.”",
+      "explanation": "Suç ve Ceza ile Karamazov Kardeşler’de vicdanın sesini ve psikolojik derinliği zirveye taşıyan Dostoyevski gibi kendi çalışma tarzını keşfet ve onda uzmanlaş.",
+      "badges": [
+        {
+          "text": "Suç ve Ceza",
+          "color": "green"
+        },
+        {
+          "text": "Karamazov Kardeşler",
+          "color": "blue"
+        },
+        {
+          "text": "Vicdan ve Psikoloji",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "F",
+        "D"
+      ],
+      "keywords": [
+        "dostoyevski",
+        "suç ve ceza",
+        "karamazov kardeşler",
+        "edebiyat",
+        "psikoloji"
+      ]
+    },
+    {
+      "id": "fig_85",
+      "name": "Franz Kafka",
+      "title": "Modern Yabancılaşmanın ve Bürokrasinin Usta Kalemi",
+      "category": "Edebiyat",
+      "quote": "“Bir kitap, içimizdeki donmuş denizi parçalayacak bir balta olmalıdır.”",
+      "quoteSecondary": "“Hedef var ama yol yok; bizim yol dediğimiz şey tereddütten ibarettir.”",
+      "explanation": "Dönüşüm ve Dava ile modern bireyin iç çatışmalarını benzersiz bir dille işleyen Kafka gibi okuduğun metinlerin zihninde derin sarsıntılar yaratmasına izin ver.",
+      "badges": [
+        {
+          "text": "Dönüşüm & Dava",
+          "color": "green"
+        },
+        {
+          "text": "Kafkaesk Anlatım",
+          "color": "blue"
+        },
+        {
+          "text": "Zihinsel Derinlik",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "F",
+        "K"
+      ],
+      "keywords": [
+        "kafka",
+        "franz kafka",
+        "dönüşüm",
+        "dava",
+        "edebiyat"
+      ]
+    },
+    {
+      "id": "fig_86",
+      "name": "George Orwell",
+      "title": "Distopik Edebiyatın & Düşünce Özgürlüğünün Sesi",
+      "category": "Edebiyat & Fikir",
+      "quote": "“Özgürlük, iki kere ikinin dört ettiğini söyleyebilmektir.”",
+      "quoteSecondary": "“Geçmişi kontrol eden geleceği kontrol eder; bugünü kontrol eden geçmişi kontrol eder.”",
+      "explanation": "1984 ve Hayvan Çiftliği ile düşünce kontrolüne ve dildeki yozlaşmaya meydan okuyan Orwell gibi kavramları doğru kullan ve eleştirel aklını koru.",
+      "badges": [
+        {
+          "text": "1984 & Hayvan Çiftliği",
+          "color": "green"
+        },
+        {
+          "text": "Düşünce Özgürlüğü",
+          "color": "blue"
+        },
+        {
+          "text": "Eleştirel Okuma",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "G",
+        "O"
+      ],
+      "keywords": [
+        "orwell",
+        "george orwell",
+        "1984",
+        "hayvan çiftliği",
+        "distopya"
+      ]
+    },
+    {
+      "id": "fig_87",
+      "name": "Antoine de Saint-Exupéry",
+      "title": "Havacılığın Şairi & Küçük Prens’in Yazarı",
+      "category": "Edebiyat & Havacılık",
+      "quote": "“Gerçeğin mayası gözle görülmez. İnsan ancak yüreğiyle baktığı zaman doğruyu görebilir.”",
+      "quoteSecondary": "“Gülünü senin için bunca önemli kılan, ona harcadığın zamandır.”",
+      "explanation": "Çölün ortasında mahsur kalsa bile Küçük Prens ile milyonlarca insana çocukluğun saf masumiyetini hatırlatan Exupéry gibi hedefine emek ve sevgiyle bağlan.",
+      "badges": [
+        {
+          "text": "Küçük Prens",
+          "color": "green"
+        },
+        {
+          "text": "Gece Uçuşu",
+          "color": "blue"
+        },
+        {
+          "text": "Kalp Gözüyle Bakmak",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "S",
+        "E"
+      ],
+      "keywords": [
+        "saint-exupery",
+        "küçük prens",
+        "havacılık",
+        "edebiyat",
+        "rose"
+      ]
+    },
+    {
+      "id": "fig_88",
+      "name": "Victor Hugo",
+      "title": "Fransız Edebiyatının Vicdanı",
+      "category": "Edebiyat & Adalet",
+      "quote": "“Zamanı gelmiş bir fikrin karşısında hiçbir ordu duramaz.”",
+      "quoteSecondary": "“Affetmek, en yüce adalettir.”",
+      "explanation": "Sefiller ve Notre Dame’ın Kamburu ile haksızlıklara ve yoksulluğa karşı insanlık vicdanını savunan Hugo gibi inandığın idealler uğruna kararlılıkla mücadele et.",
+      "badges": [
+        {
+          "text": "Sefiller (Les Misérables)",
+          "color": "green"
+        },
+        {
+          "text": "Toplumsal Adalet",
+          "color": "blue"
+        },
+        {
+          "text": "Edebi Deha",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "V",
+        "H"
+      ],
+      "keywords": [
+        "victor hugo",
+        "sefiller",
+        "jean valjean",
+        "adalet",
+        "edebiyat"
+      ]
+    },
+    {
+      "id": "fig_89",
+      "name": "Miguel de Cervantes",
+      "title": "Modern Romanın Kurucusu",
+      "category": "Edebiyat",
+      "quote": "“Hayallerin peşinden koşmak delilikse, dünyadaki en güzel delilik budur.”",
+      "quoteSecondary": "“Kazanılacak bir dava varsa, yel değirmenleri bile seni durduramaz.”",
+      "explanation": "Don Kişot ile modern roman çağını başlatan Cervantes gibi hayallerinin peşinden kim ne derse desin cesaretle ve sarsılmaz bir inançla koş.",
+      "badges": [
+        {
+          "text": "Don Kişot",
+          "color": "green"
+        },
+        {
+          "text": "İlk Modern Roman",
+          "color": "blue"
+        },
+        {
+          "text": "İdealizm & Cesaret",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "M",
+        "C"
+      ],
+      "keywords": [
+        "cervantes",
+        "don kişot",
+        "don quixote",
+        "roman",
+        "edebiyat"
+      ]
+    },
+    {
+      "id": "fig_90",
+      "name": "Dante Alighieri",
+      "title": "İtalyan Edebiyatının ve Şiirinin Kurucusu",
+      "category": "Edebiyat & Şiir",
+      "quote": "“Sen kendi yolundan yürü, bırak başkaları ne söylerse söylesin.”",
+      "quoteSecondary": "“En karanlık gecenin bile sabahı güneşe gebedir.”",
+      "explanation": "İlahi Komedya ile karanlık ormandan başlayıp cennetin ışığına ulaşan destansı yolculuğu yazan Dante gibi sınav zorluklarını sabırla aş ve zirveye ulaş.",
+      "badges": [
+        {
+          "text": "İlahi Komedya",
+          "color": "green"
+        },
+        {
+          "text": "Alegorik Şiir",
+          "color": "blue"
+        },
+        {
+          "text": "Yoluna Sadık Kalmak",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "D",
+        "A"
+      ],
+      "keywords": [
+        "dante",
+        "ilahi komedya",
+        "şiir",
+        "edebiyat",
+        "azim"
+      ]
+    },
+    {
+      "id": "fig_91",
+      "name": "James Watt",
+      "title": "Modern Buhar Makinesinin Mucidi & Sanayi Devriminin Babası",
+      "category": "Mühendislik & İcat",
+      "quote": "“Buharın basıncını dizginlemek, insan emeğinin sınırlarını kaldırmaktır.”",
+      "quoteSecondary": "“Verimlilik, her gram kömürün hakkını vermekten geçer.”",
+      "explanation": "Ayrı kondenser ekleyerek buhar makinesini %75 daha verimli hale getiren ve Sanayi Devrimi’ni başlatan Watt gibi çalışma verimliliğini sürekli optimize et.",
+      "badges": [
+        {
+          "text": "Ayrı Kondenserli Buhar Motoru",
+          "color": "green"
+        },
+        {
+          "text": "Beygir Gücü & Watt Birimi",
+          "color": "blue"
+        },
+        {
+          "text": "Sanayi Devrimi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "J",
+        "W"
+      ],
+      "keywords": [
+        "james watt",
+        "buhar makinesi",
+        "sanayi devrimi",
+        "mühendislik"
+      ]
+    },
+    {
+      "id": "fig_92",
+      "name": "Ferdinand Magellan (Macellan)",
+      "title": "Dünyayı Dolaşan İlk Deniz Seferinin Lideri",
+      "category": "Keşif & Denizcilik",
+      "quote": "“Bilinmeyen sulara yelken açmayanlar, asla yeni kıtalar keşfedemezler.”",
+      "quoteSecondary": "“Deniz bittiğinde değil, cesaret bittiğinde yolculuk sona erer.”",
+      "explanation": "Atlas Okyanusu’ndan Büyük Okyanus’a geçit bulan Macellan Boğazı’nı aşan ve Dünya’nın yuvarlaklığını denizden ispatlayan Macellan gibi konfor alanından çık.",
+      "badges": [
+        {
+          "text": "Dünya Turu Seferi",
+          "color": "green"
+        },
+        {
+          "text": "Macellan Boğazı",
+          "color": "blue"
+        },
+        {
+          "text": "Cesaret & Keşif",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "F",
+        "M"
+      ],
+      "keywords": [
+        "macellan",
+        "magellan",
+        "dünya turu",
+        "keşif",
+        "denizcilik"
+      ]
+    },
+    {
+      "id": "fig_93",
+      "name": "Evliya Çelebi",
+      "title": "Dünya Seyyahı & Kültür Kaşifi",
+      "category": "Seyahat & Kültür",
+      "quote": "“Seyahat ya Resulallah!”",
+      "quoteSecondary": "“Gezip görmek, dünyayı tek bir millet gibi kardeşçe anlamaktır.”",
+      "explanation": "50 yıl boyunca at sırtında Osmanlı coğrafyasını ve Avrupa’yı gezerek 10 ciltlik muhteşem Seyahatname’yi yazan Evliya Çelebi gibi merakını tüm dünyayla paylaş.",
+      "badges": [
+        {
+          "text": "10 Ciltlik Seyahatname",
+          "color": "green"
+        },
+        {
+          "text": "UNESCO Kültür Mirası",
+          "color": "blue"
+        },
+        {
+          "text": "Seyahat Tutkusu",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "E",
+        "Ç"
+      ],
+      "keywords": [
+        "evliya çelebi",
+        "evliya celebi",
+        "seyahatname",
+        "seyyah",
+        "kültür"
+      ]
+    },
+    {
+      "id": "fig_94",
+      "name": "İbn Battuta",
+      "title": "Ortaçağ’ın En Büyük Seyyahı",
+      "category": "Seyahat & Coğrafya",
+      "quote": "“Yolculuk önce seni sözsüz bırakır, sonra da harika bir hikaye anlatıcısına dönüştürür.”",
+      "quoteSecondary": "“Yürümek, insanın kendi ufkunu adım adım genişletmesidir.”",
+      "explanation": "29 yıl boyunca 120.000 kilometre yol kat ederek Çin’den Afrika’ya kadar dünyayı adımlayan İbn Battuta gibi hedefine doğru her gün kararlı bir adım at.",
+      "badges": [
+        {
+          "text": "Rıhle (Seyahatname)",
+          "color": "green"
+        },
+        {
+          "text": "120.000 km Yolculuk",
+          "color": "blue"
+        },
+        {
+          "text": "Kültürler Köprüsü",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "İ",
+        "B"
+      ],
+      "keywords": [
+        "ibn battuta",
+        "seyyah",
+        "rıhle",
+        "coğrafya",
+        "yolculuk"
+      ]
+    },
+    {
+      "id": "fig_95",
+      "name": "Marco Polo",
+      "title": "İpek Yolu Seyyahı & Doğu-Batı Köprüsü",
+      "category": "Seyahat & Ticaret Tarihi",
+      "quote": "“Gördüklerimin sadece yarısını anlattım; çünkü anlatsaydım bana kimse inanmazdı.”",
+      "quoteSecondary": "“Uzak diyarlar, cesur tüccarların ve kaşiflerin ayakları altında yakınlaşır.”",
+      "explanation": "Venedik’ten Çin saraylarına uzanan 24 yıllık İpek Yolu macerasıyla Batı’ya Doğu’nun zenginliğini tanıtan Marco Polo gibi zihnini farklı kültürlerin bilgisine aç.",
+      "badges": [
+        {
+          "text": "İpek Yolu Seyahati",
+          "color": "green"
+        },
+        {
+          "text": "Dünyanın Tasviri",
+          "color": "blue"
+        },
+        {
+          "text": "Kültürlerarası Keşif",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "M",
+        "P"
+      ],
+      "keywords": [
+        "marco polo",
+        "ipek yolu",
+        "seyyah",
+        "keşif",
+        "venedik"
+      ]
+    },
+    {
+      "id": "fig_96",
+      "name": "Neil Armstrong",
+      "title": "Ay’a İlk Adım Atan İnsan & Test Pilotu",
+      "category": "Havacılık & Uzay",
+      "quote": "“Bu insan için küçük, insanlık için dev bir adım.”",
+      "quoteSecondary": "“Sakin kalmak ve göstergeleri doğru okumak, ölüm ile yaşam arasındaki ince çizgidir.”",
+      "explanation": "Apollo 11 modülünü ay yüzeyindeki kraterlerden kıl payı kurtararak elle manuel olarak Ay’a indiren Armstrong gibi en kritik sınavlarda soğukkanlılığını koru.",
+      "badges": [
+        {
+          "text": "Apollo 11 Komutanı",
+          "color": "green"
+        },
+        {
+          "text": "Ay’a İlk Adım (1969)",
+          "color": "blue"
+        },
+        {
+          "text": "Soğukkanlı Liderlik",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "N",
+        "A"
+      ],
+      "keywords": [
+        "neil armstrong",
+        "apollo 11",
+        "ay görevi",
+        "nasa",
+        "astronot"
+      ]
+    },
+    {
+      "id": "fig_97",
+      "name": "Yuri Gagarin",
+      "title": "Uzaya Çıkan İlk İnsan",
+      "category": "Havacılık & Uzay",
+      "quote": "“Poyekhali! (Haydi gidelim!)”",
+      "quoteSecondary": "“Dünya’yı uzaydan gördüm; ne kadar mavi, ne kadar narin ve ne kadar güzel olduğunu anladım. Onu korumalıyız.”",
+      "explanation": "12 Nisan 1961’de Vostok 1 roketiyle uzay boşluğuna çıkan ilk insan olan Gagarin gibi bilinmeyenin karşısında korkusuzca ‘haydi gidelim’ diyebil.",
+      "badges": [
+        {
+          "text": "Uzaya İlk Çıkış (1961)",
+          "color": "green"
+        },
+        {
+          "text": "Vostok 1",
+          "color": "blue"
+        },
+        {
+          "text": "Öncü Cesaret",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "Y",
+        "G"
+      ],
+      "keywords": [
+        "yuri gagarin",
+        "vostok 1",
+        "uzay",
+        "kozmonot",
+        "ilk insan"
+      ]
+    },
+    {
+      "id": "fig_98",
+      "name": "Charles Babbage",
+      "title": "Mekanik Bilgisayarın (Fark Motoru) Tasarımcısı",
+      "category": "Matematik & Mühendislik",
+      "quote": "“Hatalı insan hesaplamalarını durdurmanın tek yolu, aklı mekanik dişlilerle zapt etmektir.”",
+      "quoteSecondary": "“Yarınlar, bugünün mühendislerinin çizim masalarında doğar.”",
+      "explanation": "Elektronikten yüz yıl önce dişlilerle çalışan ilk mekanik programlanabilir bilgisayarı tasarlayan Babbage gibi vizyonunu bugünün imkanlarının çok ötesine taşı.",
+      "badges": [
+        {
+          "text": "Fark & Analitik Motor",
+          "color": "green"
+        },
+        {
+          "text": "Mekanik Bilgisayar",
+          "color": "blue"
+        },
+        {
+          "text": "Geleceği Tasarlamak",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "C",
+        "B"
+      ],
+      "keywords": [
+        "charles babbage",
+        "fark motoru",
+        "bilgisayar",
+        "analitik motor"
+      ]
+    },
+    {
+      "id": "fig_99",
+      "name": "Tim Berners-Lee",
+      "title": "World Wide Web’in (WWW) Mucidi",
+      "category": "Teknoloji & İnternet",
+      "quote": "“Bu herkes içindir! (This is for everyone)”",
+      "quoteSecondary": "“Ağ, insanları ve bilgiyi birbirine bağlayarak dünyayı tek bir kütüphaneye dönüştürdü.”",
+      "explanation": "HTML ve web protokolünü icat edip milyarlarca dolarlık patent hakkını almayarak web’i tüm insanlığa ücretsiz hediye eden Berners-Lee gibi bilginin paylaşıldıkça çoğaldığını hatırla.",
+      "badges": [
+        {
+          "text": "World Wide Web (WWW)",
+          "color": "green"
+        },
+        {
+          "text": "HTML & HTTP Kurucusu",
+          "color": "blue"
+        },
+        {
+          "text": "Açık Bilgi Devrimi",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "T",
+        "B"
+      ],
+      "keywords": [
+        "tim berners-lee",
+        "www",
+        "web",
+        "internet",
+        "html"
+      ]
+    },
+    {
+      "id": "fig_100",
+      "name": "Gutenberg Matbaasının Çırağı: Peter Schöffer",
+      "title": "Tipografinin & Kitap Sanatının Büyük Geliştiricisi",
+      "category": "Teknoloji & Matbaa",
+      "quote": "“Metal döküm her harf, cehaletin surlarına indirilen bir çekiç darbesidir.”",
+      "quoteSecondary": "“Usta bir çırak, ustasının mirasını daha mükemmel kılmakla yükümlüdür.”",
+      "explanation": "Gutenberg’in buluşunu renkli baskı, dayanıklı mürekkep ve kusursuz tipografiyle taçlandıran Schöffer gibi öğrendiğin yöntemleri daima bir adım ileriye taşı.",
+      "badges": [
+        {
+          "text": "Renkli Tipografi",
+          "color": "green"
+        },
+        {
+          "text": "Kitap Devrimi",
+          "color": "blue"
+        },
+        {
+          "text": "Ustalık ve İlerleme",
+          "color": "purple"
+        },
+        {
+          "text": "Haftalık Odak",
+          "color": "rose"
+        }
+      ],
+      "watermarkLetters": [
+        "P",
+        "S"
+      ],
+      "keywords": [
+        "peter schöffer",
+        "matbaa",
+        "tipografi",
+        "kitap",
+        "baskı"
+      ]
+    }
+  ]
+}

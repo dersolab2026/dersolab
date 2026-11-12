@@ -69,3 +69,9 @@ refactor_emails.js
 patch_*.js
 update_anatomy.js
 scripts/send-social-plan-email.mjs
+
+.claude/
+.gemini/
+.github/agents/
+.github/hooks/
+.github/skills/
