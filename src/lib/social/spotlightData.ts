@@ -1,4 +1,9 @@
 import type { SpotlightCardData, SocialPostItem, InstagramContentType } from '@/types/social'
+import {
+  findMovieInPool,
+  convertMovieToSpotlightData,
+  getAllPoolMovies,
+} from './moviePoolManager'
 
 export const CURATED_MOTIVATION_SPOTLIGHTS: SpotlightCardData[] = [
   {
@@ -460,12 +465,28 @@ export function getCuratedSpotlight(
   category: 'motivation' | 'movie' | 'book',
   seedOrName?: string | number
 ): SpotlightCardData {
+  if (category === 'movie') {
+    const allMovies = getAllPoolMovies()
+    if (typeof seedOrName === 'string' && seedOrName.trim()) {
+      const q = seedOrName.toLocaleLowerCase('tr-TR').trim()
+      const match = allMovies.find(
+        (m) =>
+          m.title.toLocaleLowerCase('tr-TR').includes(q) ||
+          m.originalTitle.toLocaleLowerCase('tr-TR').includes(q)
+      )
+      if (match) return convertMovieToSpotlightData(match)
+    }
+    const idx =
+      typeof seedOrName === 'number'
+        ? Math.abs(seedOrName) % allMovies.length
+        : Math.floor(Math.random() * allMovies.length)
+    return convertMovieToSpotlightData(allMovies[idx] || allMovies[0])
+  }
+
   const pool =
     category === 'motivation'
       ? CURATED_MOTIVATION_SPOTLIGHTS
-      : category === 'movie'
-        ? CURATED_MOVIE_SPOTLIGHTS
-        : CURATED_BOOK_SPOTLIGHTS
+      : CURATED_BOOK_SPOTLIGHTS
 
   if (typeof seedOrName === 'string' && seedOrName.trim()) {
     const q = seedOrName.toLocaleLowerCase('tr-TR').trim()
@@ -496,10 +517,15 @@ export function findMatchingSpotlight(text: string): SpotlightCardData | null {
   for (const item of CURATED_MOTIVATION_SPOTLIGHTS) {
     if (q.includes(item.title.toLocaleLowerCase('tr-TR'))) return item
   }
-  // 2. Film
+  // 2. Film (Önce ana kürasyon, sonra 100 filmlik havuz)
   for (const item of CURATED_MOVIE_SPOTLIGHTS) {
     if (q.includes(item.title.toLocaleLowerCase('tr-TR'))) return item
   }
+  const poolMovie = findMovieInPool(q)
+  if (poolMovie) {
+    return convertMovieToSpotlightData(poolMovie)
+  }
+
   // 3. Kitap
   for (const item of CURATED_BOOK_SPOTLIGHTS) {
     if (q.includes(item.title.toLocaleLowerCase('tr-TR'))) return item
