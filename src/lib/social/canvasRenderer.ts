@@ -916,17 +916,85 @@ function drawSpotlightCard(
     const sy = (loadedImg.height - sh) / 2
     ctx.drawImage(loadedImg, sx, sy, sw, sh, imgX, imgY, imgW, imgH)
   } else {
-    // Görsel henüz yüklenmediyse şık estetik fallback
+    // Görsel henüz yüklenmediyse şık, altın & neon yaldızlı estetik koleksiyon kartı
+    const isMovie = spotlight.category === 'movie'
+    const isBook = spotlight.category === 'book'
+
+    // Zengin gradyan arka plan (Kozmik / Entelektüel Derinlik)
     const grad = ctx.createLinearGradient(imgX, imgY, imgX + imgW, imgY + imgH)
-    grad.addColorStop(0, '#0f172a')
-    grad.addColorStop(1, '#0369a1')
+    if (isMovie) {
+      grad.addColorStop(0, '#1e1b4b')
+      grad.addColorStop(0.5, '#0f172a')
+      grad.addColorStop(1, '#312e81')
+    } else if (isBook) {
+      grad.addColorStop(0, '#064e3b')
+      grad.addColorStop(0.5, '#022c22')
+      grad.addColorStop(1, '#065f46')
+    } else {
+      grad.addColorStop(0, '#1e1b4b')
+      grad.addColorStop(0.4, '#0f172a')
+      grad.addColorStop(1, '#0369a1')
+    }
     ctx.fillStyle = grad
     ctx.fillRect(imgX, imgY, imgW, imgH)
 
-    ctx.font = `${isVertical ? 72 : 56}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`
+    // Konsantrik zarif yörünge halkaları (Altın / Neon ışıltılı)
+    const cx = imgX + imgW / 2
+    const cy = imgY + imgH * 0.42
+    ctx.save()
+    ctx.strokeStyle = isMovie
+      ? 'rgba(245, 158, 11, 0.28)'
+      : isBook
+      ? 'rgba(16, 185, 129, 0.28)'
+      : 'rgba(56, 189, 248, 0.28)'
+    ctx.lineWidth = 1.5
+    ctx.setLineDash([6, 6])
+    ctx.beginPath()
+    ctx.arc(cx, cy, imgW * 0.32, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.arc(cx, cy, imgW * 0.22, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.restore()
+
+    // Merkez İkon Rozeti
+    const badgeR = isVertical ? 46 : 36
+    ctx.save()
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)'
+    ctx.beginPath()
+    ctx.arc(cx, cy, badgeR, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = isMovie ? '#f59e0b' : isBook ? '#10b981' : '#38bdf8'
+    ctx.lineWidth = 2
+    ctx.stroke()
+    ctx.restore()
+
+    // Ana İkon
+    ctx.font = `${isVertical ? 48 : 38}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`
     ctx.textAlign = 'center'
-    const icon = spotlight.category === 'movie' ? '🎬' : spotlight.category === 'book' ? '📖' : '⚡'
-    ctx.fillText(icon, imgX + imgW / 2, imgY + imgH / 2 + 22)
+    const icon = isMovie ? '🎬' : isBook ? '📖' : '💡'
+    ctx.fillText(icon, cx, cy + (isVertical ? 15 : 12))
+
+    // Tipografik Başlık & Rozet (Kutunun alt yarısı)
+    ctx.font = `bold ${isVertical ? 22 : 18}px Inter, system-ui, sans-serif`
+    ctx.fillStyle = '#ffffff'
+    const dispTitle =
+      (spotlight.title || '').length > 22 ? spotlight.title.slice(0, 20) + '…' : spotlight.title
+    ctx.fillText(dispTitle, cx, imgY + imgH - (isVertical ? 72 : 54))
+
+    ctx.font = `bold ${isVertical ? 11 : 9.5}px Inter, system-ui, sans-serif`
+    ctx.fillStyle = isMovie ? '#fbbf24' : isBook ? '#34d399' : '#67e8f9'
+    ctx.fillText(
+      (isMovie
+        ? 'SİNEMA KULÜBÜ BAŞYAPITI'
+        : isBook
+        ? 'EDEBİYAT KLASİĞİ'
+        : 'DERSOLAB DEHA KOLEKSİYONU'
+      ).toUpperCase(),
+      cx,
+      imgY + imgH - (isVertical ? 44 : 34)
+    )
     ctx.textAlign = 'left'
   }
   ctx.restore()
