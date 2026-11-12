@@ -44,7 +44,8 @@
         "will smith",
         "chris gardner",
         "azim"
-      ]
+      ],
+      "imageUrl": "/spotlight/umudunu_kaybetme.jpg"
     },
     {
       "id": "film_2",
@@ -86,7 +87,8 @@
         "john nash",
         "oyun teorisi",
         "matematik"
-      ]
+      ],
+      "imageUrl": "/spotlight/akil_oyunlari.jpg"
     },
     {
       "id": "film_3",
@@ -128,7 +130,8 @@
         "aamir khan",
         "all is well",
         "mühendislik"
-      ]
+      ],
+      "imageUrl": "/spotlight/3_idiots.jpg"
     },
     {
       "id": "film_4",
@@ -170,7 +173,8 @@
         "alan turing",
         "enigma",
         "kriptoloji"
-      ]
+      ],
+      "imageUrl": "/spotlight/yapay_oyun.jpg"
     },
     {
       "id": "film_5",
@@ -212,7 +216,8 @@
         "atom",
         "kuantum",
         "manhattan projesi"
-      ]
+      ],
+      "imageUrl": "/spotlight/oppenheimer.jpg"
     },
     {
       "id": "film_6",
@@ -254,7 +259,8 @@
         "katherine johnson",
         "nasa",
         "matematik"
-      ]
+      ],
+      "imageUrl": "/spotlight/gizli_sayilar.jpg"
     },
     {
       "id": "film_7",
@@ -296,7 +302,8 @@
         "ramanujan",
         "hardy",
         "sayılar teorisi"
-      ]
+      ],
+      "imageUrl": "/spotlight/sonsuzluk_teorisi.jpg"
     },
     {
       "id": "film_8",
@@ -338,7 +345,8 @@
         "stephen hawking",
         "kara delikler",
         "kozmoloji"
-      ]
+      ],
+      "imageUrl": "/spotlight/her_seyin_teorisi.jpg"
     },
     {
       "id": "film_9",
@@ -381,7 +389,8 @@
         "polonyum",
         "radyum",
         "nobel"
-      ]
+      ],
+      "imageUrl": "/spotlight/radyoaktif.jpg"
     },
     {
       "id": "film_10",
@@ -423,7 +432,8 @@
         "biyokimya",
         "tıp",
         "araştırma"
-      ]
+      ],
+      "imageUrl": "/spotlight/lorenzo_nun_yagi.jpg"
     },
     {
       "id": "film_11",
@@ -465,7 +475,8 @@
         "dna",
         "irade",
         "uzay"
-      ]
+      ],
+      "imageUrl": "/spotlight/gattaca.jpg"
     },
     {
       "id": "film_12",
@@ -507,7 +518,8 @@
         "matematik",
         "sayılar",
         "fibonacci"
-      ]
+      ],
+      "imageUrl": "/spotlight/pi.jpg"
     },
     {
       "id": "film_13",
@@ -549,7 +561,8 @@
         "uzay",
         "kriz yönetimi",
         "tom hanks"
-      ]
+      ],
+      "imageUrl": "/spotlight/apollo_13.jpg"
     },
     {
       "id": "film_14",
@@ -591,7 +604,8 @@
         "neil armstrong",
         "apollo 11",
         "ay görevi"
-      ]
+      ],
+      "imageUrl": "/spotlight/ilk_insan.jpg"
     },
     {
       "id": "film_15",
@@ -633,7 +647,8 @@
         "botanik",
         "kimya",
         "matt damon"
-      ]
+      ],
+      "imageUrl": "/spotlight/marsli.jpg"
     },
     {
       "id": "film_16",
@@ -675,7 +690,8 @@
         "carl sagan",
         "astronomi",
         "radyo astronomi"
-      ]
+      ],
+      "imageUrl": "/spotlight/temas.jpg"
     },
     {
       "id": "film_17",
@@ -716,7 +732,8 @@
         "roket",
         "türk havacılığı",
         "gençlik"
-      ]
+      ],
+      "imageUrl": "/spotlight/bandirma_fuze_kulubu.jpg"
     },
     {
       "id": "film_18",
@@ -758,7 +775,8 @@
         "aamir khan",
         "disleksi",
         "öğretmen"
-      ]
+      ],
+      "imageUrl": "/spotlight/her_cocuk_ozeldir.jpg"
     },
     {
       "id": "film_19",
@@ -800,7 +818,8 @@
         "müzik",
         "öğretmen",
         "pedagoji"
-      ]
+      ],
+      "imageUrl": "/spotlight/koro.jpg"
     },
     {
       "id": "film_20",
@@ -842,7 +861,8 @@
         "öğretmen",
         "şiir",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/tehlikeli_dusunceler.jpg"
     },
     {
       "id": "film_21",
@@ -883,7 +903,8 @@
         "to sir with love",
         "sidney poitier",
         "klasik"
-      ]
+      ],
+      "imageUrl": "/spotlight/sevgili_ogretmenim.jpg"
     },
     {
       "id": "film_22",
@@ -925,7 +946,8 @@
         "günlük",
         "yazarlık",
         "empati"
-      ]
+      ],
+      "imageUrl": "/spotlight/ozgurluk_yazarlari.jpg"
     },
     {
       "id": "film_23",
@@ -967,7 +989,8 @@
         "öğretmen",
         "iran sineması",
         "okuma yazma"
-      ]
+      ],
+      "imageUrl": "/spotlight/karatahta.jpg"
     },
     {
       "id": "film_24",
@@ -1009,7 +1032,8 @@
         "auggie pullman",
         "nezaket",
         "empati"
-      ]
+      ],
+      "imageUrl": "/spotlight/mucize.jpg"
     },
     {
       "id": "film_25",
@@ -1051,7 +1075,8 @@
         "kekemelik",
         "hitabet",
         "colin firth"
-      ]
+      ],
+      "imageUrl": "/spotlight/kralin_konusmasi.jpg"
     },
     {
       "id": "film_26",
@@ -1093,7 +1118,8 @@
         "michael oher",
         "sandra bullock",
         "spor"
-      ]
+      ],
+      "imageUrl": "/spotlight/kor_nokta.jpg"
     },
     {
       "id": "film_27",
@@ -1135,7 +1161,8 @@
         "sürü psikolojisi",
         "sosyoloji",
         "eleştirel düşünce"
-      ]
+      ],
+      "imageUrl": "/spotlight/dalga.jpg"
     },
     {
       "id": "film_28",
@@ -1177,7 +1204,8 @@
         "fransızca",
         "tartışma",
         "cannes"
-      ]
+      ],
+      "imageUrl": "/spotlight/sinif.jpg"
     },
     {
       "id": "film_29",
@@ -1219,7 +1247,8 @@
         "ilker çatak",
         "etik",
         "adalet"
-      ]
+      ],
+      "imageUrl": "/spotlight/ogretmenler_odasi.jpg"
     },
     {
       "id": "film_30",
@@ -1261,7 +1290,8 @@
         "bateri",
         "disiplin",
         "miles teller"
-      ]
+      ],
+      "imageUrl": "/spotlight/whiplash.jpg"
     },
     {
       "id": "film_31",
@@ -1303,7 +1333,8 @@
         "güreş",
         "azim",
         "spor"
-      ]
+      ],
+      "imageUrl": "/spotlight/dangal.jpg"
     },
     {
       "id": "film_32",
@@ -1345,7 +1376,8 @@
         "istatistik",
         "veri analizi",
         "brad pitt"
-      ]
+      ],
+      "imageUrl": "/spotlight/kazanma_sanati.jpg"
     },
     {
       "id": "film_33",
@@ -1387,7 +1419,8 @@
         "halis karataş",
         "atçılık",
         "şampiyon"
-      ]
+      ],
+      "imageUrl": "/spotlight/bizim_icin_sampiyon.jpg"
     },
     {
       "id": "film_34",
@@ -1429,7 +1462,8 @@
         "halter",
         "olimpiyat",
         "rekor"
-      ]
+      ],
+      "imageUrl": "/spotlight/naim_cep_herkulu.jpg"
     },
     {
       "id": "film_35",
@@ -1471,7 +1505,8 @@
         "boks",
         "clint eastwood",
         "irade"
-      ]
+      ],
+      "imageUrl": "/spotlight/milyon_dolarlik_bebek.jpg"
     },
     {
       "id": "film_36",
@@ -1513,7 +1548,8 @@
         "nelson mandela",
         "rugby",
         "liderlik"
-      ]
+      ],
+      "imageUrl": "/spotlight/yenilmez.jpg"
     },
     {
       "id": "film_37",
@@ -1555,7 +1591,8 @@
         "formula 1",
         "niki lauda",
         "rekabet"
-      ]
+      ],
+      "imageUrl": "/spotlight/zafere_hucum.jpg"
     },
     {
       "id": "film_38",
@@ -1597,7 +1634,8 @@
         "basketbol",
         "akademik başarı",
         "disiplin"
-      ]
+      ],
+      "imageUrl": "/spotlight/koc_carter.jpg"
     },
     {
       "id": "film_39",
@@ -1639,7 +1677,8 @@
         "boks",
         "russell crowe",
         "buhran"
-      ]
+      ],
+      "imageUrl": "/spotlight/kulkedisi_adam.jpg"
     },
     {
       "id": "film_40",
@@ -1681,7 +1720,8 @@
         "boks",
         "azim",
         "pes etmemek"
-      ]
+      ],
+      "imageUrl": "/spotlight/rocky.jpg"
     },
     {
       "id": "film_41",
@@ -1723,7 +1763,8 @@
         "mühendislik",
         "ken miles",
         "carroll shelby"
-      ]
+      ],
+      "imageUrl": "/spotlight/ford_v_ferrari.jpg"
     },
     {
       "id": "film_42",
@@ -1765,7 +1806,8 @@
         "makul şüphe",
         "mantık",
         "hukuk"
-      ]
+      ],
+      "imageUrl": "/spotlight/12_ofkeli_adam.jpg"
     },
     {
       "id": "film_43",
@@ -1807,7 +1849,8 @@
         "andy dufresne",
         "sabır",
         "özgürlük"
-      ]
+      ],
+      "imageUrl": "/spotlight/esaretin_bedeli.jpg"
     },
     {
       "id": "film_44",
@@ -1849,7 +1892,8 @@
         "atticus finch",
         "harper lee",
         "adalet"
-      ]
+      ],
+      "imageUrl": "/spotlight/bulbulu_oldurmek.jpg"
     },
     {
       "id": "film_45",
@@ -1891,7 +1935,8 @@
         "tom cruise",
         "hukuk",
         "mahkeme"
-      ]
+      ],
+      "imageUrl": "/spotlight/birkac_iyi_adam.jpg"
     },
     {
       "id": "film_46",
@@ -1933,7 +1978,8 @@
         "al pacino",
         "kibir",
         "etik"
-      ]
+      ],
+      "imageUrl": "/spotlight/seytanin_avukati.jpg"
     },
     {
       "id": "film_47",
@@ -1975,7 +2021,8 @@
         "agatha christie",
         "billy wilder",
         "mantık"
-      ]
+      ],
+      "imageUrl": "/spotlight/nufuzlu_sahit.jpg"
     },
     {
       "id": "film_48",
@@ -2017,7 +2064,8 @@
         "hukuk",
         "tarih",
         "adalet"
-      ]
+      ],
+      "imageUrl": "/spotlight/nuremberg_durusmasi.jpg"
     },
     {
       "id": "film_49",
@@ -2059,7 +2107,8 @@
         "denzel washington",
         "adalet",
         "insan hakları"
-      ]
+      ],
+      "imageUrl": "/spotlight/philadelphia.jpg"
     },
     {
       "id": "film_50",
@@ -2101,7 +2150,8 @@
         "john coffey",
         "merhamet",
         "tom hanks"
-      ]
+      ],
+      "imageUrl": "/spotlight/yesil_yol.jpg"
     },
     {
       "id": "film_51",
@@ -2143,7 +2193,8 @@
         "jim carrey",
         "felsefe",
         "medya"
-      ]
+      ],
+      "imageUrl": "/spotlight/the_truman_show.jpg"
     },
     {
       "id": "film_52",
@@ -2185,7 +2236,8 @@
         "christopher nolan",
         "sihirbaz",
         "tesla"
-      ]
+      ],
+      "imageUrl": "/spotlight/prestij.jpg"
     },
     {
       "id": "film_53",
@@ -2227,7 +2279,8 @@
         "rüya",
         "bilinçaltı",
         "leonardo dicaprio"
-      ]
+      ],
+      "imageUrl": "/spotlight/baslangic.jpg"
     },
     {
       "id": "film_54",
@@ -2268,7 +2321,8 @@
         "eternal sunshine of the spotless mind",
         "hafıza",
         "jim carrey"
-      ]
+      ],
+      "imageUrl": "/spotlight/sil_bastan.jpg"
     },
     {
       "id": "film_55",
@@ -2310,7 +2364,8 @@
         "bengal kaplanı",
         "richard parker",
         "ang lee"
-      ]
+      ],
+      "imageUrl": "/spotlight/pi_nin_yasami.jpg"
     },
     {
       "id": "film_56",
@@ -2352,7 +2407,8 @@
         "tim burton",
         "masal",
         "metafor"
-      ]
+      ],
+      "imageUrl": "/spotlight/buyuk_balik.jpg"
     },
     {
       "id": "film_57",
@@ -2394,7 +2450,8 @@
         "zaman",
         "brad pitt",
         "fitzgerald"
-      ]
+      ],
+      "imageUrl": "/spotlight/benjamin_button_in_tuhaf_hikayesi.jpg"
     },
     {
       "id": "film_58",
@@ -2436,7 +2493,8 @@
         "tarsem singh",
         "sanat",
         "görsel"
-      ]
+      ],
+      "imageUrl": "/spotlight/dusus.jpg"
     },
     {
       "id": "film_59",
@@ -2478,7 +2536,8 @@
         "delorean",
         "doc brown",
         "zaman yolculuğu"
-      ]
+      ],
+      "imageUrl": "/spotlight/gelecege_donus.jpg"
     },
     {
       "id": "film_60",
@@ -2519,7 +2578,8 @@
         "one flew over the cuckoos nest",
         "jack nicholson",
         "milos forman"
-      ]
+      ],
+      "imageUrl": "/spotlight/guguk_kusu.jpg"
     },
     {
       "id": "film_61",
@@ -2561,7 +2621,8 @@
         "dustin hoffman",
         "tom cruise",
         "otizm"
-      ]
+      ],
+      "imageUrl": "/spotlight/yagmur_adam.jpg"
     },
     {
       "id": "film_62",
@@ -2603,7 +2664,8 @@
         "oliver sacks",
         "robin williams",
         "robert de niro"
-      ]
+      ],
+      "imageUrl": "/spotlight/uyanislar.jpg"
     },
     {
       "id": "film_63",
@@ -2645,7 +2707,8 @@
         "roberto benigni",
         "baba oğul",
         "savaş"
-      ]
+      ],
+      "imageUrl": "/spotlight/hayat_guzeldir.jpg"
     },
     {
       "id": "film_64",
@@ -2687,7 +2750,8 @@
         "adrien brody",
         "szpilman",
         "chopin"
-      ]
+      ],
+      "imageUrl": "/spotlight/piyanist.jpg"
     },
     {
       "id": "film_65",
@@ -2729,7 +2793,8 @@
         "oskar schindler",
         "spielberg",
         "tarih"
-      ]
+      ],
+      "imageUrl": "/spotlight/schindler_in_listesi.jpg"
     },
     {
       "id": "film_66",
@@ -2771,7 +2836,8 @@
         "giuseppe tornatore",
         "nostalji",
         "sinema"
-      ]
+      ],
+      "imageUrl": "/spotlight/cennet_sinemasi.jpg"
     },
     {
       "id": "film_67",
@@ -2813,7 +2879,8 @@
         "pablo neruda",
         "şiir",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/postaci.jpg"
     },
     {
       "id": "film_68",
@@ -2855,7 +2922,8 @@
         "stasi",
         "sanat",
         "vicdan"
-      ]
+      ],
+      "imageUrl": "/spotlight/baskalarinin_hayati.jpg"
     },
     {
       "id": "film_69",
@@ -2897,7 +2965,8 @@
         "tarih",
         "ikinci dünya savaşı",
         "bruno ganz"
-      ]
+      ],
+      "imageUrl": "/spotlight/cokus.jpg"
     },
     {
       "id": "film_70",
@@ -2939,7 +3008,8 @@
         "don cheadle",
         "insan hakları",
         "cesaret"
-      ]
+      ],
+      "imageUrl": "/spotlight/hotel_rwanda.jpg"
     },
     {
       "id": "film_71",
@@ -2981,7 +3051,8 @@
         "kore savaşı",
         "merhamet",
         "vefa"
-      ]
+      ],
+      "imageUrl": "/spotlight/ayla.jpg"
     },
     {
       "id": "film_72",
@@ -3023,7 +3094,8 @@
         "muzaffer tayyip uslu",
         "şiir",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/kelebegin_ruyasi.jpg"
     },
     {
       "id": "film_73",
@@ -3065,7 +3137,8 @@
         "van",
         "çocuklar",
         "tarih"
-      ]
+      ],
+      "imageUrl": "/spotlight/120.jpg"
     },
     {
       "id": "film_74",
@@ -3107,7 +3180,8 @@
         "çanakkale",
         "gelibolu",
         "russell crowe"
-      ]
+      ],
+      "imageUrl": "/spotlight/son_umut.jpg"
     },
     {
       "id": "film_75",
@@ -3149,7 +3223,8 @@
         "majid majidi",
         "ayakkabı",
         "kardeşlik"
-      ]
+      ],
+      "imageUrl": "/spotlight/cennetin_cocuklari.jpg"
     },
     {
       "id": "film_76",
@@ -3191,7 +3266,8 @@
         "majid majidi",
         "muhammed",
         "doğa"
-      ]
+      ],
+      "imageUrl": "/spotlight/cennetin_rengi.jpg"
     },
     {
       "id": "film_77",
@@ -3233,7 +3309,8 @@
         "iran",
         "fedakarlık",
         "afgan"
-      ]
+      ],
+      "imageUrl": "/spotlight/baran.jpg"
     },
     {
       "id": "film_78",
@@ -3275,7 +3352,8 @@
         "majid majidi",
         "kanaat",
         "aile"
-      ]
+      ],
+      "imageUrl": "/spotlight/sercelerin_sarkisi.jpg"
     },
     {
       "id": "film_79",
@@ -3317,7 +3395,8 @@
         "asghar farhadi",
         "etik",
         "oscar"
-      ]
+      ],
+      "imageUrl": "/spotlight/bir_ayrilik.jpg"
     },
     {
       "id": "film_80",
@@ -3359,7 +3438,8 @@
         "asghar farhadi",
         "arthur miller",
         "adalet"
-      ]
+      ],
+      "imageUrl": "/spotlight/satici.jpg"
     },
     {
       "id": "film_81",
@@ -3401,7 +3481,8 @@
         "kiarostami",
         "sorumluluk",
         "çocuk"
-      ]
+      ],
+      "imageUrl": "/spotlight/arkadasimin_evi_nerede.jpg"
     },
     {
       "id": "film_82",
@@ -3443,7 +3524,8 @@
         "çetin tekindor",
         "aile",
         "kuşak çatışması"
-      ]
+      ],
+      "imageUrl": "/spotlight/babam_ve_oglum.jpg"
     },
     {
       "id": "film_83",
@@ -3485,7 +3567,8 @@
         "nuri bilge ceylan",
         "haluk bilginer",
         "çehov"
-      ]
+      ],
+      "imageUrl": "/spotlight/kis_uykusu.jpg"
     },
     {
       "id": "film_84",
@@ -3526,7 +3609,8 @@
         "once upon a time in anatolia",
         "nuri bilge ceylan",
         "bozkır"
-      ]
+      ],
+      "imageUrl": "/spotlight/bir_zamanlar_anadolu_da.jpg"
     },
     {
       "id": "film_85",
@@ -3568,7 +3652,8 @@
         "nuri bilge ceylan",
         "yazarlık",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/ahlat_agaci.jpg"
     },
     {
       "id": "film_86",
@@ -3610,7 +3695,8 @@
         "nuri bilge ceylan",
         "merve dizdar",
         "öğretmen"
-      ]
+      ],
+      "imageUrl": "/spotlight/kuru_otlar_ustune.jpg"
     },
     {
       "id": "film_87",
@@ -3652,7 +3738,8 @@
         "emin alper",
         "alegori",
         "psikoloji"
-      ]
+      ],
+      "imageUrl": "/spotlight/tepenin_ardi.jpg"
     },
     {
       "id": "film_88",
@@ -3694,7 +3781,8 @@
         "zebercet",
         "ömer kavur",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/anayurt_oteli.jpg"
     },
     {
       "id": "film_89",
@@ -3736,7 +3824,8 @@
         "altın ayı",
         "necati cumalı",
         "mülkiyet"
-      ]
+      ],
+      "imageUrl": "/spotlight/susuz_yaz.jpg"
     },
     {
       "id": "film_90",
@@ -3777,7 +3866,8 @@
         "yılmaz güney",
         "faytoncu cabbar",
         "toplumsal gerçekçilik"
-      ]
+      ],
+      "imageUrl": "/spotlight/umut.jpg"
     },
     {
       "id": "film_91",
@@ -3819,7 +3909,8 @@
         "hayao miyazaki",
         "chihiro",
         "ghibli"
-      ]
+      ],
+      "imageUrl": "/spotlight/ruhlarin_kacisi.jpg"
     },
     {
       "id": "film_92",
@@ -3861,7 +3952,8 @@
         "miyazaki",
         "ghibli",
         "barış"
-      ]
+      ],
+      "imageUrl": "/spotlight/yuruyen_sato.jpg"
     },
     {
       "id": "film_93",
@@ -3903,7 +3995,8 @@
         "miyazaki",
         "totoro",
         "ghibli"
-      ]
+      ],
+      "imageUrl": "/spotlight/komsum_totoro.jpg"
     },
     {
       "id": "film_94",
@@ -3945,7 +4038,8 @@
         "uçak mühendisliği",
         "miyazaki",
         "aerodinamik"
-      ]
+      ],
+      "imageUrl": "/spotlight/ruzgar_yukseliyor.jpg"
     },
     {
       "id": "film_95",
@@ -3987,7 +4081,8 @@
         "ekoloji",
         "miyazaki",
         "ghibli"
-      ]
+      ],
+      "imageUrl": "/spotlight/prenses_mononoke.jpg"
     },
     {
       "id": "film_96",
@@ -4029,7 +4124,8 @@
         "çevre bilinci",
         "robot",
         "pixar"
-      ]
+      ],
+      "imageUrl": "/spotlight/wall_e.jpg"
     },
     {
       "id": "film_97",
@@ -4071,7 +4167,8 @@
         "pixar",
         "caz",
         "yaşam amacı"
-      ]
+      ],
+      "imageUrl": "/spotlight/ruh_soul.jpg"
     },
     {
       "id": "film_98",
@@ -4113,7 +4210,8 @@
         "duygusal zeka",
         "psikoloji",
         "pixar"
-      ]
+      ],
+      "imageUrl": "/spotlight/ters_yuz.jpg"
     },
     {
       "id": "film_99",
@@ -4155,7 +4253,8 @@
         "animasyon",
         "oyuncak",
         "paylaşmak"
-      ]
+      ],
+      "imageUrl": "/spotlight/klaus.jpg"
     },
     {
       "id": "film_100",
@@ -4197,7 +4296,8 @@
         "brad bird",
         "robot",
         "kimlik"
-      ]
+      ],
+      "imageUrl": "/spotlight/demir_dev.jpg"
     }
   ]
 }
