@@ -38,7 +38,8 @@
         "dna",
         "nobel",
         "çalışma"
-      ]
+      ],
+      "imageUrl": "/spotlight/aziz_sancar.jpg"
     },
     {
       "id": "fig_2",
@@ -76,7 +77,8 @@
         "avicenna",
         "tıp",
         "felsefe"
-      ]
+      ],
+      "imageUrl": "/spotlight/ibn_i_sina.jpg"
     },
     {
       "id": "fig_3",
@@ -114,7 +116,8 @@
         "kriptoloji",
         "bilgisayar",
         "algoritma"
-      ]
+      ],
+      "imageUrl": "/spotlight/alan_turing.jpg"
     },
     {
       "id": "fig_4",
@@ -152,7 +155,8 @@
         "felsefe",
         "zihin kontrolü",
         "sakinlik"
-      ]
+      ],
+      "imageUrl": "/spotlight/marcus_aurelius.jpg"
     },
     {
       "id": "fig_5",
@@ -190,7 +194,8 @@
         "kozmoloji",
         "kara delik",
         "evren"
-      ]
+      ],
+      "imageUrl": "/spotlight/stephen_hawking.jpg"
     },
     {
       "id": "fig_6",
@@ -228,7 +233,8 @@
         "cosmos",
         "bilim",
         "merak"
-      ]
+      ],
+      "imageUrl": "/spotlight/carl_sagan.jpg"
     },
     {
       "id": "fig_7",
@@ -266,7 +272,8 @@
         "yerçekimi",
         "kalkülüs",
         "mekanik"
-      ]
+      ],
+      "imageUrl": "/spotlight/isaac_newton.jpg"
     },
     {
       "id": "fig_8",
@@ -304,7 +311,8 @@
         "geometri",
         "statik",
         "sabır"
-      ]
+      ],
+      "imageUrl": "/spotlight/mimar_sinan.jpg"
     },
     {
       "id": "fig_9",
@@ -342,7 +350,8 @@
         "astronomi",
         "semerkant",
         "matematik"
-      ]
+      ],
+      "imageUrl": "/spotlight/ali_kuscu.jpg"
     },
     {
       "id": "fig_10",
@@ -380,7 +389,8 @@
         "cebir",
         "algoritma",
         "matematik"
-      ]
+      ],
+      "imageUrl": "/spotlight/el_harezmi.jpg"
     },
     {
       "id": "fig_11",
@@ -418,7 +428,8 @@
         "jeodezi",
         "trigonometri",
         "astronomi"
-      ]
+      ],
+      "imageUrl": "/spotlight/el_biruni.jpg"
     },
     {
       "id": "fig_12",
@@ -456,7 +467,8 @@
         "mantık",
         "felsefe",
         "erdem"
-      ]
+      ],
+      "imageUrl": "/spotlight/farabi.jpg"
     },
     {
       "id": "fig_13",
@@ -494,7 +506,8 @@
         "sibernetik",
         "robotik",
         "otomasyon"
-      ]
+      ],
+      "imageUrl": "/spotlight/el_cezeri.jpg"
     },
     {
       "id": "fig_14",
@@ -532,7 +545,8 @@
         "optik",
         "fizik",
         "deney"
-      ]
+      ],
+      "imageUrl": "/spotlight/ibn_heysem.jpg"
     },
     {
       "id": "fig_15",
@@ -570,7 +584,8 @@
         "cebir",
         "rubai",
         "astronomi"
-      ]
+      ],
+      "imageUrl": "/spotlight/omer_hayyam.jpg"
     },
     {
       "id": "fig_16",
@@ -608,7 +623,8 @@
         "sosyoloji",
         "tarih",
         "felsefe"
-      ]
+      ],
+      "imageUrl": "/spotlight/ibn_haldun.jpg"
     },
     {
       "id": "fig_17",
@@ -646,7 +662,8 @@
         "kitab-ı bahriye",
         "coğrafya",
         "denizcilik"
-      ]
+      ],
+      "imageUrl": "/spotlight/piri_reis.jpg"
     },
     {
       "id": "fig_18",
@@ -684,7 +701,8 @@
         "astronomi",
         "semerkant",
         "rasathane"
-      ]
+      ],
+      "imageUrl": "/spotlight/ulug_bey.jpg"
     },
     {
       "id": "fig_19",
@@ -722,7 +740,8 @@
         "sorgulama",
         "sokratik",
         "akıl"
-      ]
+      ],
+      "imageUrl": "/spotlight/sokrates.jpg"
     },
     {
       "id": "fig_20",
@@ -760,7 +779,8 @@
         "idealar",
         "devlet",
         "felsefe"
-      ]
+      ],
+      "imageUrl": "/spotlight/platon_eflatun.jpg"
     },
     {
       "id": "fig_21",
@@ -798,7 +818,8 @@
         "mantık",
         "alışkanlık",
         "felsefe"
-      ]
+      ],
+      "imageUrl": "/spotlight/aristoteles.jpg"
     },
     {
       "id": "fig_22",
@@ -836,7 +857,8 @@
         "zaman yönetimi",
         "felsefe",
         "hedef"
-      ]
+      ],
+      "imageUrl": "/spotlight/seneca.jpg"
     },
     {
       "id": "fig_23",
@@ -874,7 +896,8 @@
         "kontrol alanı",
         "felsefe",
         "sükunet"
-      ]
+      ],
+      "imageUrl": "/spotlight/epiktetos.jpg"
     },
     {
       "id": "fig_24",
@@ -912,7 +935,8 @@
         "felsefe",
         "süreklilik",
         "sabır"
-      ]
+      ],
+      "imageUrl": "/spotlight/konfucyus.jpg"
     },
     {
       "id": "fig_25",
@@ -950,7 +974,8 @@
         "mesnevi",
         "yenilenme",
         "umut"
-      ]
+      ],
+      "imageUrl": "/spotlight/mevlana_celaleddin_rumi.jpg"
     },
     {
       "id": "fig_26",
@@ -988,7 +1013,8 @@
         "türkçe",
         "öz farkındalık",
         "şiir"
-      ]
+      ],
+      "imageUrl": "/spotlight/yunus_emre.jpg"
     },
     {
       "id": "fig_27",
@@ -1026,7 +1052,8 @@
         "ilim",
         "makalat",
         "anadolu"
-      ]
+      ],
+      "imageUrl": "/spotlight/haci_bektas_i_veli.jpg"
     },
     {
       "id": "fig_28",
@@ -1064,7 +1091,8 @@
         "geometri",
         "felsefe",
         "metot"
-      ]
+      ],
+      "imageUrl": "/spotlight/ren_descartes.jpg"
     },
     {
       "id": "fig_29",
@@ -1102,7 +1130,8 @@
         "akılcılık",
         "felsefe",
         "özgürlük"
-      ]
+      ],
+      "imageUrl": "/spotlight/baruch_spinoza.jpg"
     },
     {
       "id": "fig_30",
@@ -1140,7 +1169,8 @@
         "sapere aude",
         "aydınlanma",
         "felsefe"
-      ]
+      ],
+      "imageUrl": "/spotlight/immanuel_kant.jpg"
     },
     {
       "id": "fig_31",
@@ -1178,7 +1208,8 @@
         "kaldıraç",
         "fizik",
         "matematik"
-      ]
+      ],
+      "imageUrl": "/spotlight/arsimet_archimedes.jpg"
     },
     {
       "id": "fig_32",
@@ -1216,7 +1247,8 @@
         "geometri",
         "aksiyom",
         "elementler"
-      ]
+      ],
+      "imageUrl": "/spotlight/oklid_euclid.jpg"
     },
     {
       "id": "fig_33",
@@ -1254,7 +1286,8 @@
         "astronomi",
         "teleskop",
         "fizik"
-      ]
+      ],
+      "imageUrl": "/spotlight/galileo_galilei.jpg"
     },
     {
       "id": "fig_34",
@@ -1292,7 +1325,8 @@
         "astronomi",
         "elips",
         "fizik"
-      ]
+      ],
+      "imageUrl": "/spotlight/johannes_kepler.jpg"
     },
     {
       "id": "fig_35",
@@ -1330,7 +1364,8 @@
         "güneş merkezli",
         "astronomi",
         "devrim"
-      ]
+      ],
+      "imageUrl": "/spotlight/nicolaus_copernicus.jpg"
     },
     {
       "id": "fig_36",
@@ -1368,7 +1403,8 @@
         "fizik",
         "ışık",
         "denklemler"
-      ]
+      ],
+      "imageUrl": "/spotlight/james_clerk_maxwell.jpg"
     },
     {
       "id": "fig_37",
@@ -1406,7 +1442,8 @@
         "indüksiyon",
         "elektrik",
         "fizik"
-      ]
+      ],
+      "imageUrl": "/spotlight/michael_faraday.jpg"
     },
     {
       "id": "fig_38",
@@ -1444,7 +1481,8 @@
         "biyoloji",
         "evrim",
         "uyum sağlama"
-      ]
+      ],
+      "imageUrl": "/spotlight/charles_darwin.jpg"
     },
     {
       "id": "fig_39",
@@ -1482,7 +1520,8 @@
         "genetik",
         "kalıtım",
         "biyoloji"
-      ]
+      ],
+      "imageUrl": "/spotlight/gregor_mendel.jpg"
     },
     {
       "id": "fig_40",
@@ -1520,7 +1559,8 @@
         "aşı",
         "mikrobiyoloji",
         "şans"
-      ]
+      ],
+      "imageUrl": "/spotlight/louis_pasteur.jpg"
     },
     {
       "id": "fig_41",
@@ -1558,7 +1598,8 @@
         "kimya",
         "elementler",
         "atom"
-      ]
+      ],
+      "imageUrl": "/spotlight/dmitri_mendeleev.jpg"
     },
     {
       "id": "fig_42",
@@ -1596,7 +1637,8 @@
         "kütlenin korunumu",
         "terazi",
         "deney"
-      ]
+      ],
+      "imageUrl": "/spotlight/antoine_lavoisier.jpg"
     },
     {
       "id": "fig_43",
@@ -1634,7 +1676,8 @@
         "gaz yasaları",
         "kimya",
         "basınç"
-      ]
+      ],
+      "imageUrl": "/spotlight/robert_boyle.jpg"
     },
     {
       "id": "fig_44",
@@ -1672,7 +1715,8 @@
         "kıtaların kayması",
         "pangaea",
         "jeoloji"
-      ]
+      ],
+      "imageUrl": "/spotlight/alfred_wegener.jpg"
     },
     {
       "id": "fig_45",
@@ -1710,7 +1754,8 @@
         "asal sayılar",
         "geometri",
         "coğrafya"
-      ]
+      ],
+      "imageUrl": "/spotlight/eratosthenes.jpg"
     },
     {
       "id": "fig_46",
@@ -1748,7 +1793,8 @@
         "geometri",
         "sayılar",
         "dik üçgen"
-      ]
+      ],
+      "imageUrl": "/spotlight/pisagor_pythagoras.jpg"
     },
     {
       "id": "fig_47",
@@ -1786,7 +1832,8 @@
         "planck sabiti",
         "fizik",
         "modern fizik"
-      ]
+      ],
+      "imageUrl": "/spotlight/max_planck.jpg"
     },
     {
       "id": "fig_48",
@@ -1824,7 +1871,8 @@
         "kuantum",
         "fizik",
         "nobel"
-      ]
+      ],
+      "imageUrl": "/spotlight/niels_bohr.jpg"
     },
     {
       "id": "fig_49",
@@ -1862,7 +1910,8 @@
         "belirsizlik ilkesi",
         "kuantum",
         "fizik"
-      ]
+      ],
+      "imageUrl": "/spotlight/werner_heisenberg.jpg"
     },
     {
       "id": "fig_50",
@@ -1900,7 +1949,8 @@
         "dalga denklemi",
         "kuantum",
         "fizik"
-      ]
+      ],
+      "imageUrl": "/spotlight/erwin_schrodinger.jpg"
     },
     {
       "id": "fig_51",
@@ -1938,7 +1988,8 @@
         "sayılar",
         "sonsuzluk",
         "cambridge"
-      ]
+      ],
+      "imageUrl": "/spotlight/srinivasa_ramanujan.jpg"
     },
     {
       "id": "fig_52",
@@ -1976,7 +2027,8 @@
         "programlama",
         "algoritma",
         "matematik"
-      ]
+      ],
+      "imageUrl": "/spotlight/ada_lovelace.jpg"
     },
     {
       "id": "fig_53",
@@ -2014,7 +2066,8 @@
         "bilgi teorisi",
         "bit",
         "dijital"
-      ]
+      ],
+      "imageUrl": "/spotlight/claude_shannon.jpg"
     },
     {
       "id": "fig_54",
@@ -2052,7 +2105,8 @@
         "oyun teorisi",
         "matematik",
         "strateji"
-      ]
+      ],
+      "imageUrl": "/spotlight/john_von_neumann.jpg"
     },
     {
       "id": "fig_55",
@@ -2090,7 +2144,8 @@
         "eksiklik teoremi",
         "mantık",
         "matematik"
-      ]
+      ],
+      "imageUrl": "/spotlight/kurt_godel.jpg"
     },
     {
       "id": "fig_56",
@@ -2128,7 +2183,8 @@
         "çift sarmal",
         "fotoğraf 51",
         "biyofizik"
-      ]
+      ],
+      "imageUrl": "/spotlight/rosalind_franklin.jpg"
     },
     {
       "id": "fig_57",
@@ -2166,7 +2222,8 @@
         "penisilin",
         "antibiyotik",
         "tıp"
-      ]
+      ],
+      "imageUrl": "/spotlight/alexander_fleming.jpg"
     },
     {
       "id": "fig_58",
@@ -2204,7 +2261,8 @@
         "aşı",
         "tıp",
         "fedakarlık"
-      ]
+      ],
+      "imageUrl": "/spotlight/jonas_salk.jpg"
     },
     {
       "id": "fig_59",
@@ -2242,7 +2300,8 @@
         "immünoloji",
         "çiçek hastalığı",
         "tıp"
-      ]
+      ],
+      "imageUrl": "/spotlight/edward_jenner.jpg"
     },
     {
       "id": "fig_60",
@@ -2279,7 +2338,8 @@
         "fermi paradoksu",
         "nükleer fizik",
         "hesaplama"
-      ]
+      ],
+      "imageUrl": "/spotlight/enrico_fermi.jpg"
     },
     {
       "id": "fig_61",
@@ -2317,7 +2377,8 @@
         "fizik",
         "atom",
         "meitneryum"
-      ]
+      ],
+      "imageUrl": "/spotlight/lise_meitner.jpg"
     },
     {
       "id": "fig_62",
@@ -2355,7 +2416,8 @@
         "ampul",
         "icat",
         "alın teri"
-      ]
+      ],
+      "imageUrl": "/spotlight/thomas_edison.jpg"
     },
     {
       "id": "fig_63",
@@ -2393,7 +2455,8 @@
         "telefon",
         "iletişim",
         "icat"
-      ]
+      ],
+      "imageUrl": "/spotlight/alexander_graham_bell.jpg"
     },
     {
       "id": "fig_64",
@@ -2431,7 +2494,8 @@
         "havacılık",
         "aerodinamik",
         "uçuş"
-      ]
+      ],
+      "imageUrl": "/spotlight/wright_kardesler.jpg"
     },
     {
       "id": "fig_65",
@@ -2469,7 +2533,8 @@
         "kitap",
         "rönesans",
         "bilgi"
-      ]
+      ],
+      "imageUrl": "/spotlight/johannes_gutenberg.jpg"
     },
     {
       "id": "fig_66",
@@ -2507,7 +2572,8 @@
         "beyin cerrahisi",
         "tıp",
         "mikronöroşirürji"
-      ]
+      ],
+      "imageUrl": "/spotlight/gazi_yasargil.jpg"
     },
     {
       "id": "fig_67",
@@ -2545,7 +2611,8 @@
         "kimya",
         "yale",
         "türkçe"
-      ]
+      ],
+      "imageUrl": "/spotlight/oktay_sinanoglu.jpg"
     },
     {
       "id": "fig_68",
@@ -2583,7 +2650,8 @@
         "islam bilimi",
         "çalışma",
         "tarih"
-      ]
+      ],
+      "imageUrl": "/spotlight/fuat_sezgin.jpg"
     },
     {
       "id": "fig_69",
@@ -2621,7 +2689,8 @@
         "tarih",
         "osmanlı",
         "arşiv"
-      ]
+      ],
+      "imageUrl": "/spotlight/halil_inalcik.jpg"
     },
     {
       "id": "fig_70",
@@ -2659,7 +2728,8 @@
         "tarih",
         "kültür",
         "okuma"
-      ]
+      ],
+      "imageUrl": "/spotlight/ilber_ortayli.jpg"
     },
     {
       "id": "fig_71",
@@ -2697,7 +2767,8 @@
         "fizik",
         "kuantum",
         "simetri"
-      ]
+      ],
+      "imageUrl": "/spotlight/feza_gursey.jpg"
     },
     {
       "id": "fig_72",
@@ -2735,7 +2806,8 @@
         "tıp",
         "behçet hastalığı",
         "dermatoloji"
-      ]
+      ],
+      "imageUrl": "/spotlight/hulusi_behcet.jpg"
     },
     {
       "id": "fig_73",
@@ -2773,7 +2845,8 @@
         "uçak",
         "havacılık",
         "pilot"
-      ]
+      ],
+      "imageUrl": "/spotlight/vecihi_hurkus.jpg"
     },
     {
       "id": "fig_74",
@@ -2811,7 +2884,8 @@
         "uçak fabrikası",
         "sanayi",
         "girişimcilik"
-      ]
+      ],
+      "imageUrl": "/spotlight/nuri_demirag.jpg"
     },
     {
       "id": "fig_75",
@@ -2849,7 +2923,8 @@
         "sosyoloji",
         "kadın hakları",
         "cumhuriyet"
-      ]
+      ],
+      "imageUrl": "/spotlight/afet_inan.jpg"
     },
     {
       "id": "fig_76",
@@ -2886,7 +2961,8 @@
         "siyaset bilimi",
         "sosyoloji",
         "öğrenme"
-      ]
+      ],
+      "imageUrl": "/spotlight/nermin_abadan_unat.jpg"
     },
     {
       "id": "fig_77",
@@ -2924,7 +3000,8 @@
         "tıp",
         "ruh sağlığı",
         "bakırköy"
-      ]
+      ],
+      "imageUrl": "/spotlight/mazhar_osman.jpg"
     },
     {
       "id": "fig_78",
@@ -2962,7 +3039,8 @@
         "jeoloji",
         "deprem",
         "kitap"
-      ]
+      ],
+      "imageUrl": "/spotlight/celal_sengor.jpg"
     },
     {
       "id": "fig_79",
@@ -3000,7 +3078,8 @@
         "polimat",
         "sanat",
         "mühendislik"
-      ]
+      ],
+      "imageUrl": "/spotlight/leonardo_da_vinci.jpg"
     },
     {
       "id": "fig_80",
@@ -3038,7 +3117,8 @@
         "heykel",
         "sistina",
         "sanat"
-      ]
+      ],
+      "imageUrl": "/spotlight/michelangelo.jpg"
     },
     {
       "id": "fig_81",
@@ -3076,7 +3156,8 @@
         "edebiyat",
         "eylem",
         "irade"
-      ]
+      ],
+      "imageUrl": "/spotlight/johann_wolfgang_von_goethe.jpg"
     },
     {
       "id": "fig_82",
@@ -3114,7 +3195,8 @@
         "hamlet",
         "tiyatro",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/william_shakespeare.jpg"
     },
     {
       "id": "fig_83",
@@ -3152,7 +3234,8 @@
         "savaş ve barış",
         "sabır",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/lev_tolstoy.jpg"
     },
     {
       "id": "fig_84",
@@ -3190,7 +3273,8 @@
         "karamazov kardeşler",
         "edebiyat",
         "psikoloji"
-      ]
+      ],
+      "imageUrl": "/spotlight/fyodor_dostoyevski.jpg"
     },
     {
       "id": "fig_85",
@@ -3228,7 +3312,8 @@
         "dönüşüm",
         "dava",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/franz_kafka.jpg"
     },
     {
       "id": "fig_86",
@@ -3266,7 +3351,8 @@
         "1984",
         "hayvan çiftliği",
         "distopya"
-      ]
+      ],
+      "imageUrl": "/spotlight/george_orwell.jpg"
     },
     {
       "id": "fig_87",
@@ -3304,7 +3390,8 @@
         "havacılık",
         "edebiyat",
         "rose"
-      ]
+      ],
+      "imageUrl": "/spotlight/antoine_de_saint_exup_ry.jpg"
     },
     {
       "id": "fig_88",
@@ -3342,7 +3429,8 @@
         "jean valjean",
         "adalet",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/victor_hugo.jpg"
     },
     {
       "id": "fig_89",
@@ -3380,7 +3468,8 @@
         "don quixote",
         "roman",
         "edebiyat"
-      ]
+      ],
+      "imageUrl": "/spotlight/miguel_de_cervantes.jpg"
     },
     {
       "id": "fig_90",
@@ -3418,7 +3507,8 @@
         "şiir",
         "edebiyat",
         "azim"
-      ]
+      ],
+      "imageUrl": "/spotlight/dante_alighieri.jpg"
     },
     {
       "id": "fig_91",
@@ -3455,7 +3545,8 @@
         "buhar makinesi",
         "sanayi devrimi",
         "mühendislik"
-      ]
+      ],
+      "imageUrl": "/spotlight/james_watt.jpg"
     },
     {
       "id": "fig_92",
@@ -3493,7 +3584,8 @@
         "dünya turu",
         "keşif",
         "denizcilik"
-      ]
+      ],
+      "imageUrl": "/spotlight/ferdinand_magellan_macellan.jpg"
     },
     {
       "id": "fig_93",
@@ -3531,7 +3623,8 @@
         "seyahatname",
         "seyyah",
         "kültür"
-      ]
+      ],
+      "imageUrl": "/spotlight/evliya_celebi.jpg"
     },
     {
       "id": "fig_94",
@@ -3569,7 +3662,8 @@
         "rıhle",
         "coğrafya",
         "yolculuk"
-      ]
+      ],
+      "imageUrl": "/spotlight/ibn_battuta.jpg"
     },
     {
       "id": "fig_95",
@@ -3607,7 +3701,8 @@
         "seyyah",
         "keşif",
         "venedik"
-      ]
+      ],
+      "imageUrl": "/spotlight/marco_polo.jpg"
     },
     {
       "id": "fig_96",
@@ -3645,7 +3740,8 @@
         "ay görevi",
         "nasa",
         "astronot"
-      ]
+      ],
+      "imageUrl": "/spotlight/neil_armstrong.jpg"
     },
     {
       "id": "fig_97",
@@ -3683,7 +3779,8 @@
         "uzay",
         "kozmonot",
         "ilk insan"
-      ]
+      ],
+      "imageUrl": "/spotlight/yuri_gagarin.jpg"
     },
     {
       "id": "fig_98",
@@ -3720,7 +3817,8 @@
         "fark motoru",
         "bilgisayar",
         "analitik motor"
-      ]
+      ],
+      "imageUrl": "/spotlight/charles_babbage.jpg"
     },
     {
       "id": "fig_99",
@@ -3758,7 +3856,8 @@
         "web",
         "internet",
         "html"
-      ]
+      ],
+      "imageUrl": "/spotlight/tim_berners_lee.jpg"
     },
     {
       "id": "fig_100",
@@ -3796,7 +3895,8 @@
         "tipografi",
         "kitap",
         "baskı"
-      ]
+      ],
+      "imageUrl": "/spotlight/gutenberg_matbaasinin_ciragi_peter_schoffer.jpg"
     }
   ]
 }
