@@ -77,7 +77,6 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
     <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-amber-400 selection:text-slate-950 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-6">
       <div className="max-w-6xl mx-auto space-y-8">
         
-
         {/* ── TOP AUDIENCE SWITCHER (FLOATING MASTER PILL) ── */}
         <div className="flex justify-center">
           <div className="inline-flex items-center p-1.5 rounded-full bg-slate-900/90 backdrop-blur-2xl border-2 border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.6)] gap-1">
@@ -127,7 +126,10 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
 
         {/* ── ACTIVE PERSONA CONTENT ── */}
         {activePersona === 'student' && (
-          <StudentLandingView examFilter={examFilter} onExamFilterChange={handleExamFilterChange} />
+          <StudentLandingView
+            examFilter={examFilter}
+            onExamFilterChange={handleExamFilterChange}
+          />
         )}
 
         {activePersona === 'parent' && (
@@ -139,35 +141,83 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
         )}
 
         {/* ── FOOTER SIGNATURE ── */}
-        <footer className="border-t border-white/[0.08] pt-12 pb-8 flex flex-col items-center justify-center space-y-6 text-xs text-slate-500">
-          {/* Social Links */}
-          <div className="flex items-center gap-4">
-            <a
-              href="https://www.instagram.com/dersolabegitim/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-amber-400 hover:bg-white/[0.08] hover:border-amber-400/30 transition-all duration-300"
-              aria-label="Instagram"
-            >
-              <InstagramIcon className="w-5 h-5" />
-            </a>
-            <a
-              href="https://www.tiktok.com/@dersolabegitim"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-amber-400 hover:bg-white/[0.08] hover:border-amber-400/30 transition-all duration-300"
-              aria-label="TikTok"
-            >
-              <TikTokIcon className="w-5 h-5" />
-            </a>
+        <footer className="border-t border-white/[0.08] pt-14 pb-10 text-xs text-slate-400">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+            {/* Sütun 1: Marka & İletişim */}
+            <div className="space-y-3">
+              <p className="text-base font-black text-white tracking-tight">DersoLab</p>
+              <p className="text-slate-400 leading-relaxed">
+                LGS ve YKS hazırlığında zorunlu abonelik dayatmayan, yanmayan kredi ve onaylı eğitmenlerle bire bir online özel ders ve koçluk platformu.
+              </p>
+              <p className="text-slate-400">
+                İletişim:{' '}
+                <a href="mailto:destek@dersolab.com" className="text-amber-400 hover:underline font-semibold">
+                  destek@dersolab.com
+                </a>
+              </p>
+              <div className="flex items-center gap-3 pt-1">
+                <a
+                  href="https://www.instagram.com/dersolabegitim/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-amber-400 hover:bg-white/[0.08] hover:border-amber-400/30 transition-all duration-300"
+                  aria-label="Instagram"
+                >
+                  <InstagramIcon className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.tiktok.com/@dersolabegitim"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-amber-400 hover:bg-white/[0.08] hover:border-amber-400/30 transition-all duration-300"
+                  aria-label="TikTok"
+                >
+                  <TikTokIcon className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Sütun 2: Platform ve Ücretsiz Araçlar */}
+            <div className="space-y-2.5">
+              <p className="text-white font-bold uppercase tracking-wider text-[11px]">Platform &amp; Araçlar</p>
+              <ul className="space-y-2">
+                <li><Link href="/instructors" className="hover:text-amber-400 transition-colors">Onaylı Eğitmenler</Link></li>
+                <li><Link href="/demo-ders" className="hover:text-amber-400 transition-colors">Ücretsiz Tanışma Dersi</Link></li>
+                <li><Link href="/hesaplama" className="hover:text-amber-400 transition-colors">LGS &amp; YKS Net-Puan Simülatörü</Link></li>
+                <li><Link href="/kocluk" className="hover:text-amber-400 transition-colors">Akademik Sınav Koçluğu</Link></li>
+                <li><Link href="/lab" className="hover:text-amber-400 transition-colors">DersoLab L.A.B. (3D Atölyeler)</Link></li>
+              </ul>
+            </div>
+
+            {/* Sütun 3: Branşlar ve Dersler (SEO) */}
+            <div className="space-y-2.5">
+              <p className="text-white font-bold uppercase tracking-wider text-[11px]">Özel Ders Branşları</p>
+              <ul className="space-y-2">
+                <li><Link href="/lab/matematik" className="hover:text-amber-400 transition-colors">LGS &amp; YKS Matematik Özel Ders</Link></li>
+                <li><Link href="/lab/fizik" className="hover:text-amber-400 transition-colors">TYT &amp; AYT Fizik Özel Ders</Link></li>
+                <li><Link href="/lab/kimya" className="hover:text-amber-400 transition-colors">TYT &amp; AYT Kimya Özel Ders</Link></li>
+                <li><Link href="/lab/biyoloji" className="hover:text-amber-400 transition-colors">TYT &amp; AYT Biyoloji Özel Ders</Link></li>
+                <li><Link href="/lab/turkce" className="hover:text-amber-400 transition-colors">LGS &amp; TYT Türkçe ve Paragraf</Link></li>
+                <li><Link href="/lab/sosyal" className="hover:text-amber-400 transition-colors">Tarih, Coğrafya &amp; Sosyal Bilimler</Link></li>
+              </ul>
+            </div>
+
+            {/* Sütun 4: Kurumsal & Hukuki */}
+            <div className="space-y-2.5">
+              <p className="text-white font-bold uppercase tracking-wider text-[11px]">Kurumsal &amp; Yasal</p>
+              <ul className="space-y-2">
+                <li><Link href="/hakkimizda" className="hover:text-amber-400 transition-colors">Hakkımızda</Link></li>
+                <li><Link href="/privacy" className="hover:text-amber-400 transition-colors">Gizlilik Politikası ve KVKK</Link></li>
+                <li><Link href="/terms" className="hover:text-amber-400 transition-colors">Kullanım ve İade Şartları</Link></li>
+                <li><Link href="/contact" className="hover:text-amber-400 transition-colors">İletişim</Link></li>
+                <li><Link href="/register?role=instructor" className="hover:text-amber-400 transition-colors">Eğitmen Başvurusu</Link></li>
+              </ul>
+            </div>
           </div>
 
-          <div className="flex items-center justify-center gap-6 text-slate-400 font-semibold">
-            <Link href="/hakkimizda" className="hover:text-amber-400 transition-colors">Hakkımızda</Link>
-            <Link href="/privacy" className="hover:text-amber-400 transition-colors">Gizlilik Politikası</Link>
-            <Link href="/terms" className="hover:text-amber-400 transition-colors">Kullanım Şartları</Link>
+          <div className="border-t border-white/[0.05] pt-6 text-center text-slate-500">
+            <p>© 2026 DersoLab · Online Özel Ders ve Akademik Koçluk Platformu. Tüm hakları saklıdır.</p>
           </div>
-          <p className="opacity-80">© 2026 DersoLab · Butik Online Akademi ve Koçluk Sistemi. Tüm hakları saklıdır.</p>
         </footer>
       </div>
     </div>

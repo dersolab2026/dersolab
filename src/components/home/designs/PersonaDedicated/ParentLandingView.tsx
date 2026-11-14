@@ -240,8 +240,57 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
         </div>
       </section>
 
-      {/* ── 2. SCROLL-REVEAL FEATURES ── */}
-      <section className="max-w-[90rem] mx-auto py-32 mt-12">
+      {/* ── 2. VELİLER İÇİN KURUMSAL GÜVENCE (ŞEFFAF TAKİP & MAHREMİYET DENGESİ) ── */}
+      <section className="max-w-[90rem] mx-auto pt-20 pb-10">
+        <div className="relative rounded-[2.5rem] bg-gradient-to-br from-emerald-950/50 via-[#081210] to-slate-950 border border-emerald-500/25 p-8 sm:p-12 overflow-hidden shadow-2xl">
+          <div className="absolute -right-20 -top-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-[90px] pointer-events-none" />
+          <div className="relative z-10 max-w-4xl space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[11px] font-bold uppercase tracking-widest">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Veliler İçin Kurumsal Güvence</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+              Özel Ders Sürecini Belirsizlikten Kurtarın
+            </h2>
+            <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-3xl">
+              “Derste ne işlendi, ödev yapıldı mı, netler artıyor mu?” sorularına son veriyoruz. Ücretsiz Veli Hesabınızla çocuğunuzun akademik gelişimini tek ekrandan şeffafça takip edin.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+                <p className="text-emerald-400 font-bold text-sm mb-1.5">📊 Şeffaf Akademik Takip</p>
+                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                  Ders takvimini, katılım oranını, eğitmen ders sonu değerlendirmesini, ödev durumunu ve deneme netlerini anlık görün.
+                </p>
+              </div>
+              <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
+                <p className="text-emerald-400 font-bold text-sm mb-1.5">🔒 Sağlıklı Mahremiyet Sınırı</p>
+                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                  Öğrencinin koçluk günlüğü ve öz değerlendirme notları öğrenciye özel kalır; böylece öğrenci koçuyla güvenle iletişim kurar.
+                </p>
+              </div>
+            </div>
+            <div className="pt-2 flex flex-wrap items-center gap-4">
+              <Link
+                href="/register?role=parent"
+                className="inline-flex items-center gap-2 px-7 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm transition-all shadow-lg shadow-emerald-500/20"
+              >
+                <span>Ücretsiz Veli Hesabı Oluştur</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/terms"
+                className="inline-flex items-center gap-2 px-6 py-4 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white font-bold text-sm transition-all"
+              >
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>İptal ve İade Güvencesini İncele</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 3. SCROLL-REVEAL FEATURES ── */}
+      <section className="max-w-[90rem] mx-auto py-16">
         <motion.div 
           initial="hidden"
           whileInView="visible"
@@ -254,15 +303,15 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
             <ShieldCheck className="w-8 h-8 text-indigo-400 mb-6 group-hover:scale-110 transition-transform" />
             <h3 className="text-xl font-bold text-white mb-3">Teyitli Eğitmenler</h3>
             <p className="text-slate-400 font-light leading-relaxed">
-              Çocuğunuzu kime emanet ettiğinizi bilirsiniz.
+              Mezuniyet belgesi, branş hakimiyeti ve pedagojik iletişim süreci doğrulanmış eğitmenlerle çocuğunuzu kime emanet ettiğinizi bilirsiniz.
             </p>
           </motion.div>
 
           <motion.div variants={fadeInUp} className="p-8 rounded-[2rem] bg-[#0c0c0c] border border-white/5 hover:border-amber-500/30 shadow-xl hover:-translate-y-2 transition-all duration-500 group">
             <Lock className="w-8 h-8 text-amber-500 mb-6 group-hover:scale-110 transition-transform" />
-            <h3 className="text-xl font-bold text-white mb-3">Yanmayan Kredi</h3>
+            <h3 className="text-xl font-bold text-white mb-3">Yanmayan Kredi &amp; İade</h3>
             <p className="text-slate-400 font-light leading-relaxed">
-              Satın aldığınız ders saatleri yıl sonuna kadar silinmez. Kullanılmayan kredileri dilediğiniz zaman, dilediğiniz branşta kullanabilirsiniz.
+              Satın aldığınız ders saatleri eğitim dönemi boyunca silinmez. Derse 24 saat kala yapılan iptallerde kredi kesintisi yaşanmaz, 14 gün cayma hakkınız korunur.
             </p>
           </motion.div>
           
@@ -270,11 +319,119 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
             <HeartHandshake className="w-8 h-8 text-emerald-400 mb-6 group-hover:scale-110 transition-transform" />
             <h3 className="text-xl font-bold text-white mb-3">İlk Ders Güvencesi</h3>
             <p className="text-slate-400 font-light leading-relaxed">
-              İlk seans tanışma amaçlıdır. Hiçbir ücret talep edilmez.
+              İlk seans tanışma ve seviye analizi amaçlıdır. Hiçbir ücret veya kart bilgisi talep edilmez; memnun kalırsanız devam edersiniz.
             </p>
           </motion.div>
           
         </motion.div>
+      </section>
+
+      {/* ── 4. ŞEFFAF PAKETLER & YANMAYAN KREDİ (VELİ GÖRÜNÜMÜ) ── */}
+      <section className="max-w-[90rem] mx-auto pb-20">
+        <div className="rounded-[2.5rem] bg-[#080B11] border border-white/[0.08] p-8 sm:p-12 space-y-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">Taahhütsüz · Otomatik Çekim Yok</span>
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
+                Şeffaf Ders Paketleri
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-400 max-w-md">
+              Aylık abonelik zorunluluğu yoktur. Aldığınız kredileri tüm branşlarda ve koçluk seanslarında ortak kullanabilirsiniz.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/[0.08] flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">İlk Adım</span>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[11px] font-bold">Ücretsiz</span>
+                </div>
+                <h3 className="text-lg font-black text-white">Tanışma Dersi</h3>
+                <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                  <span className="text-2xl sm:text-3xl font-black text-white whitespace-nowrap shrink-0">0 ₺</span>
+                  <span className="text-xs text-slate-400">/ Tek Seferlik</span>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Seçtiğiniz eğitmenle bire bir tanışma, seviye tespiti ve çalışma planı oluşturma seansı.
+                </p>
+              </div>
+              <Link
+                href="/demo-ders"
+                className="mt-6 w-full py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-xs font-bold text-center transition-colors"
+              >
+                Tanışma Dersi Planla
+              </Link>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/[0.08] flex flex-col justify-between">
+              <div className="space-y-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Esnek Başlangıç</span>
+                <h3 className="text-lg font-black text-white">Tek Ders Paketi</h3>
+                <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                  <span className="text-2xl sm:text-3xl font-black text-white whitespace-nowrap shrink-0">1.000 ₺</span>
+                  <span className="text-xs text-slate-400">/ 1 Kredi</span>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Sınav öncesi nokta atışı konu tekrarları veya sistemi denemek isteyen velilerimiz için 40 dakikalık bire bir ders.
+                </p>
+              </div>
+              <Link
+                href="/register?role=parent"
+                className="mt-6 w-full py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-xs font-bold text-center transition-colors"
+              >
+                Veli Hesabıyla Başla
+              </Link>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-gradient-to-b from-emerald-500/15 via-slate-900/95 to-slate-900/95 border-2 border-emerald-400/40 flex flex-col justify-between relative">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">En Çok Tercih Edilen</span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-950 text-[10px] font-black uppercase">+1 Ders Hediye</span>
+                </div>
+                <h3 className="text-lg font-black text-white">5+1 Ders Paketi</h3>
+                <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                  <span className="text-2xl sm:text-3xl font-black text-white whitespace-nowrap shrink-0">5.000 ₺</span>
+                  <span className="text-xs text-emerald-300 font-semibold">/ 6 Kredi (~833 ₺/ders)</span>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  5 ders alana +1 ders hediye (toplam 6 ders kredisi). İstediğiniz branşlarda ve eğitmenlerde ortak kullanım.
+                </p>
+              </div>
+              <Link
+                href="/register?role=parent"
+                className="mt-6 w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black text-center transition-colors"
+              >
+                Avantajlı Paketi Seç
+              </Link>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/[0.08] flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">Tam Dönem Hazırlık</span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-[10px] font-bold">+2 Ders Hediye</span>
+                </div>
+                <h3 className="text-lg font-black text-white">10+2 Ders Paketi</h3>
+                <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                  <span className="text-2xl sm:text-3xl font-black text-white whitespace-nowrap shrink-0">10.000 ₺</span>
+                  <span className="text-xs text-cyan-300 font-semibold">/ 12 Kredi (~833 ₺/ders)</span>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  10 ders alana +2 ders hediye (toplam 12 ders kredisi). LGS ve YKS maratonunda düzenli takip için en kapsamlı paket.
+                </p>
+              </div>
+              <Link
+                href="/register?role=parent"
+                className="mt-6 w-full py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-xs font-bold text-center transition-colors"
+              >
+                Paketi İncele
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ── 3. OTP CONNECT (Dark Premium Card) ── */}
