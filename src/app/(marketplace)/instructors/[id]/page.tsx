@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ShieldCheck, FlaskConical, CheckCircle2 } from 'lucide-react'
@@ -12,6 +13,27 @@ import { IntroVideoPlayer } from '@/components/marketplace/IntroVideoPlayer'
 interface InstructorDetailPageProps {
   params: Promise<{ id: string }>
   searchParams: Promise<{ tur?: string }>
+}
+
+export async function generateMetadata({ params }: InstructorDetailPageProps): Promise<Metadata> {
+  const { id } = await params
+  const instructor = await getInstructorById(id)
+  if (!instructor) {
+    return {
+      title: 'Eğitmen Profili',
+      description: 'DersoLab onaylı online özel ders ve koçluk eğitmen profili.',
+    }
+  }
+  const subjectsText = instructor.subjects.slice(0, 3).join(', ')
+  return {
+    title: subjectsText ? `${instructor.name} (${subjectsText})` : instructor.name,
+    description:
+      instructor.bio?.slice(0, 155) ||
+      `${instructor.name} ile ${subjectsText || 'LGS & YKS'} alanında bire bir online özel ders ve koçluk planlayın.`,
+    alternates: {
+      canonical: `/instructors/${instructor.userId}`,
+    },
+  }
 }
 
 export default async function InstructorDetailPage({ params, searchParams }: InstructorDetailPageProps) {

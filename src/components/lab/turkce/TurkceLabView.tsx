@@ -74,6 +74,25 @@ export function TurkceLabView() {
       {/* ── Top Navigation Bar ── */}
       <BranchNavHeader currentBranch="turkce" />
 
+      {/* ── Hero Banner ── */}
+      <div className="relative border-b border-slate-800/80 bg-gradient-to-b from-amber-950/20 via-slate-900/40 to-transparent">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-2.5">
+            <BookOpen className="w-3.5 h-3.5" />
+            DersoLab L.A.B. — Türkçe &amp; Edebiyat Laboratuvarı
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            TürkçeLab —{' '}
+            <span className="bg-gradient-to-r from-amber-400 via-orange-300 to-yellow-400 bg-clip-text text-transparent">
+              Biyonik Hızlı Okuma, Ses Olayları &amp; Canlı TDK
+            </span>
+          </h1>
+          <p className="mt-1.5 text-slate-400 text-sm max-w-2xl leading-relaxed">
+            LGS ve YKS paragraf hızınızı artıran Biyonik okuma antrenörü, ses olayları ve yazım kuralları atölyesi ile canlı TDK sözlük alanı.
+          </p>
+        </div>
+      </div>
+
       {/* ── Secondary Tab Navigation Pill Bar ── */}
       <div className="sticky top-16 z-40 backdrop-blur-2xl bg-slate-950/85 border-b border-slate-800/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">

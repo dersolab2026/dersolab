@@ -10,10 +10,19 @@ export const metadata: Metadata = {
 }
 
 import { Suspense } from 'react'
+import { AuthShell } from '@/components/auth/AuthShell'
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#07090E]" />}>
+    <Suspense
+      fallback={
+        <AuthShell baslik="Kaydol">
+          <div className="min-h-[320px] flex items-center justify-center text-sm font-semibold text-slate-400">
+            Kayıt formu yükleniyor...
+          </div>
+        </AuthShell>
+      }
+    >
       <RegisterForm />
     </Suspense>
   )

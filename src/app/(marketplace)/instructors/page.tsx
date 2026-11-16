@@ -1,9 +1,19 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ShieldCheck, Sparkles, Calculator } from 'lucide-react'
 import { InstructorCard } from '@/components/marketplace/InstructorCard'
 import { SubjectFilter } from '@/components/marketplace/SubjectFilter'
 import { getInstructors } from '@/lib/marketplace/get-instructors'
 import { getNextAvailableSlots } from '@/lib/availability/get-next-slots'
+
+export const metadata: Metadata = {
+  title: 'Onaylı Eğitmenler ve Bire Bir Online Özel Ders',
+  description:
+    'LGS, YKS ve okul sınavları için onaylı DersoLab eğitmenlerini branşa göre inceleyin, tanıtım videolarını izleyin ve yanmayan krediyle bire bir canlı ders planlayın.',
+  alternates: {
+    canonical: '/instructors',
+  },
+}
 
 interface InstructorsPageProps {
   searchParams: Promise<{ subject?: string; category?: string }>

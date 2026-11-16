@@ -52,9 +52,48 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'EducationalOrganization',
+        '@id': `${TABAN}/#organization`,
+        name: 'DersoLab',
+        url: TABAN,
+        logo: `${TABAN}/fox-head.png`,
+        description:
+          'LGS ve YKS hazırlığında onaylı eğitmenlerle bire bir online özel ders, akademik koçluk ve Maarif Modeli uyumlu L.A.B. simülasyonları.',
+        sameAs: [
+          'https://www.instagram.com/dersolabegitim/',
+          'https://www.tiktok.com/@dersolabegitim',
+        ],
+        contactPoint: {
+          '@type': 'ContactPoint',
+          email: 'destek@dersolab.com',
+          contactType: 'customer support',
+          availableLanguage: 'Turkish',
+        },
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${TABAN}/#website`,
+        url: TABAN,
+        name: 'DersoLab',
+        inLanguage: 'tr-TR',
+        publisher: { '@id': `${TABAN}/#organization` },
+      },
+    ],
+  }
+
   return (
     <html lang="tr" className={inter.variable}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c'),
+          }}
+        />
         <ToastProvider>
           {children}
           <WhatsAppButton />

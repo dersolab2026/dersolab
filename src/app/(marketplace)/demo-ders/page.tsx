@@ -6,8 +6,9 @@ import { DemoLessonRequestCard } from '@/components/demo-lessons/DemoLessonReque
 import { DemoLessonEmailForm } from '@/components/demo-lessons/DemoLessonEmailForm'
 
 export const metadata: Metadata = {
-  title: 'Hoş Geldin Paketi',
-  description: 'Ücretsiz tanışma dersi. Her öğrenciye bir kere, tamamen ücretsiz.',
+  title: 'Ücretsiz Tanışma Dersi — Hoş Geldin Paketi',
+  description:
+    'Kart bilgisi girmeden tamamen ücretsiz 20 dakikalık bire bir tanışma dersi alın. Seviye tespiti ve kişisel çalışma planınızı uzman eğitmenle oluşturun.',
   alternates: {
     canonical: '/demo-ders',
   },

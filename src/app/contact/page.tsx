@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Mail, Clock, ShieldCheck, ArrowLeft, MessageCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'İletişim & Destek — DersoLab',
+  title: 'İletişim & Destek',
   description: 'DersoLab öğrenci, veli ve eğitmen destek kanalları. Bize e-posta veya destek hattımızdan ulaşın.',
   alternates: {
     canonical: '/contact',

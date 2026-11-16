@@ -1,7 +1,17 @@
+import type { Metadata } from 'next'
 import { InstructorCard } from '@/components/marketplace/InstructorCard'
 import { getInstructors } from '@/lib/marketplace/get-instructors'
 import { getNextAvailableSlots } from '@/lib/availability/get-next-slots'
 import { GUIDANCE_SUBJECT } from '@/lib/constants'
+
+export const metadata: Metadata = {
+  title: 'YKS & LGS Birebir Eğitim Koçluğu',
+  description:
+    'Deneme net analizi, kişisel haftalık çalışma programı ve düzenli motivasyon takibi için onaylı DersoLab eğitim koçlarıyla bire bir seans planlayın.',
+  alternates: {
+    canonical: '/kocluk',
+  },
+}
 
 export default async function CoachingPage() {
   const instructors = await getInstructors({ subject: GUIDANCE_SUBJECT })
