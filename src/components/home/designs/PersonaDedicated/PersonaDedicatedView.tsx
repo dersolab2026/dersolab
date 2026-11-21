@@ -74,52 +74,52 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
   }
 
   return (
-    <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-amber-400 selection:text-slate-950 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-6">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-amber-400 selection:text-slate-950 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 sm:py-6">
+      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-8">
         
         {/* ── TOP AUDIENCE SWITCHER (FLOATING MASTER PILL) ── */}
         <div className="flex justify-center">
-          <div className="inline-flex items-center p-1.5 rounded-full bg-slate-900/90 backdrop-blur-2xl border-2 border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.6)] gap-1">
+          <div className="inline-flex items-center p-1 sm:p-1.5 rounded-full bg-slate-900/90 backdrop-blur-2xl border-2 border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.6)] gap-1">
             {/* Student Button */}
             <button
               type="button"
               onClick={() => handlePersonaChange('student')}
-              className={`flex items-center gap-2 px-5 sm:px-7 py-3 rounded-full text-xs sm:text-sm font-black transition-all duration-300 cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-7 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-black transition-all duration-300 cursor-pointer ${
                 activePersona === 'student'
                   ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-[0_0_25px_rgba(251,191,36,0.5)] scale-[1.03]'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
-              <GraduationCap className="w-4 h-4" />
-              <span>🎓 Öğrenci</span>
+              <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Öğrenci</span>
             </button>
 
             {/* Parent Button */}
             <button
               type="button"
               onClick={() => handlePersonaChange('parent')}
-              className={`flex items-center gap-2 px-5 sm:px-7 py-3 rounded-full text-xs sm:text-sm font-black transition-all duration-300 cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-7 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-black transition-all duration-300 cursor-pointer ${
                 activePersona === 'parent'
                   ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-[0_0_25px_rgba(52,211,153,0.5)] scale-[1.03]'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
-              <ShieldCheck className="w-4 h-4" />
-              <span>🛡️ Veli</span>
+              <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Veli</span>
             </button>
 
             {/* Instructor Button */}
             <button
               type="button"
               onClick={() => handlePersonaChange('instructor')}
-              className={`flex items-center gap-2 px-5 sm:px-7 py-3 rounded-full text-xs sm:text-sm font-black transition-all duration-300 cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-7 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-black transition-all duration-300 cursor-pointer ${
                 activePersona === 'instructor'
                   ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_0_25px_rgba(59,130,246,0.5)] scale-[1.03]'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
-              <Briefcase className="w-4 h-4" />
-              <span>👨‍🏫 Eğitmen</span>
+              <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Eğitmen</span>
             </button>
           </div>
         </div>

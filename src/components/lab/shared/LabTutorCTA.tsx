@@ -12,13 +12,15 @@ interface LabTutorCTAProps {
   gradeLevel?: string
 }
 
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
+
 export function LabTutorCTA({
   branch,
   topicName = 'bu konudaki',
   gradeLevel = 'LGS & YKS',
 }: LabTutorCTAProps) {
   const whatsappText = encodeURIComponent(
-    `Merhaba DersoLab! ${branch} laboratuvarında ${topicName} simülasyonunu inceliyordum. 20 dakikalık ücretsiz tanışma dersi hakkında bilgi alabilir miyim?`
+    `Merhaba DersoLab! ${branch} laboratuvarında ${topicName} simülasyonunu inceliyordum. Ücretsiz tanışma dersi hakkında bilgi alabilir miyim?`
   )
 
   return (
@@ -48,7 +50,7 @@ export function LabTutorCTA({
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-bold">
               <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              <span>20 Dakika Ücretsiz Tanışma Dersi</span>
+              <span>Ücretsiz Tanışma Dersi</span>
               <span className="text-slate-500">•</span>
               <span className="text-slate-300">{gradeLevel}</span>
             </div>
@@ -79,7 +81,7 @@ export function LabTutorCTA({
         {/* Right: Action Buttons */}
         <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full sm:w-auto shrink-0">
           <Link
-            href="/demo-lessons"
+            href={`/demo-ders?subject=${encodeURIComponent(branch)}`}
             onClick={playClickSound}
             className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-black text-xs sm:text-sm shadow-xl shadow-indigo-500/25 transition-all transform hover:scale-[1.02] active:scale-[0.98] text-center"
           >
@@ -90,24 +92,26 @@ export function LabTutorCTA({
 
           <div className="flex items-center gap-2">
             <Link
-              href={`/marketplace?branch=${encodeURIComponent(branch.toLowerCase())}`}
+              href={`/instructors?subject=${encodeURIComponent(branch)}`}
               onClick={playClickSound}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-slate-500 font-bold text-xs transition-colors text-center"
             >
               <span>Eğitmenleri Gör</span>
             </Link>
 
-            <a
-              href={`https://wa.me/905000000000?text=${whatsappText}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={playClickSound}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-950/50 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-500/40 font-bold text-xs transition-colors"
-              title="WhatsApp İle Danış"
-            >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span>WhatsApp</span>
-            </a>
+            {WHATSAPP_NUMBER && (
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={playClickSound}
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-950/50 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-500/40 font-bold text-xs transition-colors"
+                title="WhatsApp İle Danış"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>WhatsApp</span>
+              </a>
+            )}
           </div>
         </div>
       </div>

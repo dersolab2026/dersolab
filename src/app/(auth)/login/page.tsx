@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, Suspense } from 'react'
+import { useEffect, useState, useTransition, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Capacitor } from '@capacitor/core'
@@ -13,13 +13,22 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectParam = searchParams.get('redirect')
+  const callbackError = searchParams.get('error') === 'auth_callback_failed'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isInAppBrowser, setIsInAppBrowser] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [isGooglePending, setIsGooglePending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [role, setRole] = useState<'student' | 'instructor' | 'parent'>('student')
+
+  useEffect(() => {
+    const ua = navigator.userAgent || ''
+    if (/Instagram|FBAN|FBAV|musical_ly|BytedanceWebview|TikTok/i.test(ua)) {
+      setIsInAppBrowser(true)
+    }
+  }, [])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -58,6 +67,14 @@ function LoginForm() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
           <span>DersoLab simülasyonları ve platform içeriklerini kullanabilmek için lütfen giriş yapın veya kayıt olun.</span>
+        </div>
+      )}
+
+      {callbackError && (
+        <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-200 text-xs sm:text-sm mb-4">
+          <span>
+            Otomatik giriş tamamlanamadı. E-posta onay linkine farklı bir tarayıcıdan tıkladıysan hesabın onaylanmış olabilir — aşağıdan e-posta ve şifrenle doğrudan giriş yapabilirsin.
+          </span>
         </div>
       )}
 
@@ -102,7 +119,7 @@ function LoginForm() {
         type="button"
         onClick={handleGoogleLogin}
         disabled={isGooglePending}
-        className="w-full mb-6 py-4 px-4 bg-white text-black font-bold rounded-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-60 hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+        className="w-full mb-3 py-4 px-4 bg-white text-black font-bold rounded-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-60 hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
       >
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
@@ -110,7 +127,14 @@ function LoginForm() {
         {isGooglePending ? 'Yönlendiriliyor...' : 'Google ile Giriş'}
       </button>
 
-      <div className="flex items-center gap-4 mb-6">
+      {isInAppBrowser && (
+        <div className="mb-5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200 leading-relaxed">
+          <strong>Instagram / TikTok içinden açtın:</strong> Uygulama içi tarayıcı Google ile girişi engelleyebilir.
+          Aşağıdan e-posta ve şifrenle giriş yapabilir ya da sağ üstteki <strong>⋯</strong> menüsünden Chrome/Safari’de açabilirsin.
+        </div>
+      )}
+
+      <div className="flex items-center gap-4 my-5">
         <div className="h-[1px] w-full bg-white/10"></div>
         <span className="text-slate-500 font-medium text-sm">VEYA</span>
         <div className="h-[1px] w-full bg-white/10"></div>

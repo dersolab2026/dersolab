@@ -18,7 +18,8 @@ import { OAUTH_NOT_CEREZI, notuOku, notuUygula } from '@/lib/auth/oauth-hint'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl
   const taban = origin
-  const next = searchParams.get('next') ?? '/dashboard'
+  const rawNext = searchParams.get('next') ?? '/dashboard'
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard'
 
   // Google kendi tarafinda reddettiyse kod hic gelmiyor, hata parametreleri geliyor.
   const saglayiciHatasi = searchParams.get('error')

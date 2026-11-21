@@ -52,17 +52,38 @@ export async function requestDemoLesson(studentId: string): Promise<ActionResult
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-export async function requestDemoLessonByEmail(name: string, email: string): Promise<ActionResult> {
+interface DemoLeadOptions {
+  phone?: string
+  subject?: string
+}
+
+export async function requestDemoLessonByEmail(
+  name: string,
+  email: string,
+  options?: DemoLeadOptions
+): Promise<ActionResult> {
   const trimmedName = name.trim()
   const trimmedEmail = email.trim().toLowerCase()
+  const trimmedPhone = options?.phone?.trim().slice(0, 30) || ''
+  const trimmedSubject = options?.subject?.trim().slice(0, 60) || ''
 
   if (!trimmedName) return { success: false, error: 'İsmini girmelisin' }
   if (!EMAIL_RE.test(trimmedEmail)) return { success: false, error: 'Geçerli bir e-posta adresi gir' }
 
+  const supabase = await createClient()
+  const { data: { user: activeUser } } = await supabase.auth.getUser()
   const admin = createAdminClient()
 
-  const { data: existingUser } = await admin.from('users').select('id').eq('email', trimmedEmail).maybeSingle()
-  if (existingUser) {
+  const { data: existingUser } = await admin
+    .from('users')
+    .select('id, role')
+    .eq('email', trimmedEmail)
+    .maybeSingle()
+
+  const isLoggedInParentSelf =
+    Boolean(existingUser && activeUser && existingUser.id === activeUser.id && existingUser.role === 'parent')
+
+  if (existingUser && !isLoggedInParentSelf) {
     return { success: false, error: 'Bu e-posta zaten kayıtlı — giriş yapıp Hoş Geldin Paketini talep edebilirsin' }
   }
 
@@ -76,14 +97,23 @@ export async function requestDemoLessonByEmail(name: string, email: string): Pro
     return { success: false, error: 'Zaten bekleyen bir tanışma dersi talebin var' }
   }
 
+  const leadLabel = [
+    trimmedName,
+    trimmedSubject ? `Konu: ${trimmedSubject}` : '',
+    trimmedPhone ? `Tel: ${trimmedPhone}` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ')
+    .slice(0, 160)
+
   const { error } = await admin.from('demo_lesson_requests').insert({
-    lead_name: trimmedName,
+    lead_name: leadLabel,
     lead_email: trimmedEmail,
   })
 
   if (error) return { success: false, error: error.message }
 
-  await notifyDemoLessonRequested(trimmedName)
+  await notifyDemoLessonRequested(leadLabel)
 
   revalidatePath('/demo-ders')
   return { success: true }

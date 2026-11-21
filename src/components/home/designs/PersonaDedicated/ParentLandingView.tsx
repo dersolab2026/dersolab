@@ -60,10 +60,10 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
   }
 
   return (
-    <div className="py-12 px-4 sm:px-6 bg-[#000000] min-h-screen font-sans selection:bg-emerald-500/30 selection:text-white overflow-hidden text-slate-100">
+    <div className="py-4 sm:py-12 px-2 sm:px-6 bg-[#000000] min-h-screen font-sans selection:bg-emerald-500/30 selection:text-white overflow-hidden text-slate-100">
       
       {/* ── 1. DARK FINTECH HERO ── */}
-      <section className="max-w-[90rem] mx-auto min-h-[85vh] flex flex-col justify-center relative pt-12">
+      <section className="max-w-[90rem] mx-auto min-h-0 sm:min-h-[85vh] flex flex-col justify-center relative pt-4 sm:pt-12">
         {/* Subtle grid background for premium feel */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
         
@@ -71,7 +71,7 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
         <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-cyan-600/10 rounded-full blur-[100px] pointer-events-none mix-blend-screen" />
 
-        <div className="relative z-10 flex flex-col items-center text-center w-full px-4 mb-12 sm:mb-16">
+        <div className="relative z-10 flex flex-col items-center text-center w-full px-4 mb-6 sm:mb-16">
           {/* Premium Logo for Parent Theme - Centered at top */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -85,24 +85,24 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
               width={48}
               height={48}
               priority
-              className="w-12 h-12 sm:w-10 sm:h-10 object-contain drop-shadow-md" 
+              className="w-9 h-9 sm:w-10 sm:h-10 object-contain drop-shadow-md" 
             />
-            <span className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+            <span className="text-2xl sm:text-4xl font-black tracking-tight text-white">
               Derso<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Lab</span>
             </span>
           </motion.div>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-20 z-10">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 z-10">
           
           {/* Left: Oversized Typography Copy */}
           <motion.div 
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
-            className="flex-1 space-y-10 text-center lg:text-left"
+            className="flex-1 space-y-5 sm:space-y-10 text-center lg:text-left"
           >
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/[0.03] border border-white/[0.05] shadow-sm text-emerald-400 text-xs font-bold tracking-widest uppercase backdrop-blur-md">
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/[0.03] border border-white/[0.05] shadow-sm text-emerald-400 text-xs font-bold tracking-widest uppercase backdrop-blur-md">
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -110,9 +110,9 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
               Veli Kontrol Paneli
             </motion.div>
 
-            <motion.h1 variants={fadeInUp} className="text-6xl sm:text-7xl lg:text-[5.5rem] font-black text-white tracking-tighter leading-[1.05]">
+            <motion.h1 variants={fadeInUp} className="text-4xl sm:text-7xl lg:text-[5.5rem] font-black text-white tracking-tighter leading-[1.06]">
               Başarıyı <br />
-              <span className="relative inline-block mt-2">
+              <span className="relative inline-block mt-1 sm:mt-2">
                 <span className="absolute -inset-2 blur-2xl bg-emerald-500/20 mix-blend-screen"></span>
                 <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300">
                   Şansa Bırakmayın
@@ -120,23 +120,23 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
               </span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="text-xl sm:text-2xl text-slate-400 max-w-2xl mx-auto lg:mx-0 font-light leading-relaxed">
+            <motion.p variants={fadeInUp} className="text-base sm:text-2xl text-slate-400 max-w-2xl mx-auto lg:mx-0 font-light leading-relaxed">
               Özel ders sürecindeki belirsizliklere son. Çocuğunuzun gelişimini, ödevlerini ve net artışını kurumsal şeffaflıkla tek ekrandan takip edin.
             </motion.p>
 
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 justify-center lg:justify-start">
               <Link
-                href="/register?role=parent"
-                className="group relative px-8 py-5 rounded-2xl bg-white text-black font-semibold text-lg transition-all overflow-hidden flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)] w-full sm:w-auto"
+                href="/demo-ders"
+                className="group relative px-7 py-4 sm:px-8 sm:py-5 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-base sm:text-lg transition-all overflow-hidden flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(52,211,153,0.3)] w-full sm:w-auto"
               >
-                Ücretsiz Hesap Açın
+                Ücretsiz Tanışma Dersi Planla
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                href="/login"
-                className="px-8 py-5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-lg transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 w-full sm:w-auto"
+                href="/register?role=parent"
+                className="px-7 py-4 sm:px-8 sm:py-5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-base sm:text-lg transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 w-full sm:w-auto"
               >
-                Giriş Yap
+                Veli Hesabı Aç
               </Link>
             </motion.div>
           </motion.div>
@@ -378,7 +378,7 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
                 </p>
               </div>
               <Link
-                href="/register?role=parent"
+                href="/register?role=parent&redirect=%2Fdashboard%2Fparent%2Fpaketler"
                 className="mt-6 w-full py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-xs font-bold text-center transition-colors"
               >
                 Veli Hesabıyla Başla
@@ -401,7 +401,7 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
                 </p>
               </div>
               <Link
-                href="/register?role=parent"
+                href="/register?role=parent&redirect=%2Fdashboard%2Fparent%2Fpaketler"
                 className="mt-6 w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black text-center transition-colors"
               >
                 Avantajlı Paketi Seç
@@ -424,7 +424,7 @@ export function ParentLandingView({ examFilter, onExamFilterChange }: ParentLand
                 </p>
               </div>
               <Link
-                href="/register?role=parent"
+                href="/register?role=parent&redirect=%2Fdashboard%2Fparent%2Fpaketler"
                 className="mt-6 w-full py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-xs font-bold text-center transition-colors"
               >
                 Paketi İncele

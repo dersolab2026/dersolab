@@ -82,7 +82,7 @@ const REAL_PACKAGES = [
     sub: '1 ders kredisi (40 dk)',
     credits: '1 Ders Kredisi',
     desc: 'İhtiyaç duyduğunuz tek bir konu veya sınav öncesi soru çözümü için taahhütsüz tekil ders.',
-    href: '/register?role=student',
+    href: '/register?role=student&redirect=%2Fdashboard%2Fstudent%2Fpackages',
     cta: 'Paketi Seç →',
     highlight: 'slate'
   },
@@ -93,7 +93,7 @@ const REAL_PACKAGES = [
     sub: '5 al 1 hediye · Ders başı ~833 ₺',
     credits: 'Toplam 6 Ders Kredisi',
     desc: '5 ders kredisi alana 1 ders kredisi hediye. Tüm branşlarda ve koçlukta dönem boyu geçerli.',
-    href: '/register?role=student',
+    href: '/register?role=student&redirect=%2Fdashboard%2Fstudent%2Fpackages',
     cta: '5+1 Paketi Seç →',
     highlight: 'amber'
   },
@@ -104,7 +104,7 @@ const REAL_PACKAGES = [
     sub: '10 al 2 hediye · Toplam 12 ders',
     credits: 'Toplam 12 Ders Kredisi',
     desc: '10 ders kredisi alana 2 ders kredisi hediye. Düzenli konu takibi ve çoklu branş çalışması için ideal.',
-    href: '/register?role=student',
+    href: '/register?role=student&redirect=%2Fdashboard%2Fstudent%2Fpackages',
     cta: '10+2 Paketi Seç →',
     highlight: 'indigo'
   }
@@ -141,10 +141,10 @@ export function StudentLandingView({
   const [openFaq, setOpenFaq] = useState<number | null>(0)
 
   return (
-    <div className="space-y-28 py-8 px-4 sm:px-6 bg-black min-h-screen selection:bg-indigo-500/30 font-sans overflow-hidden">
+    <div className="space-y-20 sm:space-y-28 py-2 sm:py-8 px-2 sm:px-6 bg-black min-h-screen selection:bg-indigo-500/30 font-sans overflow-hidden">
       
       {/* ── 1. PREMIUM SPOTLIGHT HERO ── */}
-      <section className="relative w-full max-w-[90rem] mx-auto min-h-[82vh] flex flex-col items-center justify-center rounded-[3rem] sm:rounded-[4rem] overflow-hidden border border-white/[0.06] bg-[#030712] shadow-2xl px-4 py-16">
+      <section className="relative w-full max-w-[90rem] mx-auto min-h-0 sm:min-h-[82vh] flex flex-col items-center justify-center rounded-[2rem] sm:rounded-[4rem] overflow-hidden border border-white/[0.06] bg-[#030712] shadow-2xl px-4 py-7 sm:py-16">
         
         {/* Animated Background Mesh & Orbs */}
         <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px] opacity-40 mix-blend-overlay" />
@@ -162,17 +162,17 @@ export function StudentLandingView({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="mb-6 flex items-center justify-center gap-3"
+            className="mb-3 sm:mb-6 flex items-center justify-center gap-2.5 sm:gap-3"
           >
             <Image 
               src="/fox-head.png" 
               alt="DersoLab Avatar" 
-              width={40}
-              height={40}
+              width={36}
+              height={36}
               priority
-              className="object-contain drop-shadow-md" 
+              className="object-contain drop-shadow-md w-8 h-8 sm:w-10 sm:h-10" 
             />
-            <span className="text-3xl font-black tracking-tight text-white">
+            <span className="text-2xl sm:text-3xl font-black tracking-tight text-white">
               Derso<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-rose-400">Lab</span>
             </span>
           </motion.div>
@@ -181,13 +181,13 @@ export function StudentLandingView({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-md mb-8 shadow-[0_0_20px_rgba(255,255,255,0.02)]"
+            className="inline-flex items-center gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-md mb-4 sm:mb-8 shadow-[0_0_20px_rgba(255,255,255,0.02)]"
           >
-            <span className="relative flex h-2.5 w-2.5">
+            <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-amber-500"></span>
             </span>
-            <span className="text-slate-300 text-xs font-semibold uppercase tracking-[0.18em]">
+            <span className="text-slate-300 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.14em] sm:tracking-[0.18em]">
               LGS &amp; YKS Bire Bir Online Özel Ders ve Koçluk
             </span>
           </motion.div>
@@ -196,10 +196,10 @@ export function StudentLandingView({
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-5xl sm:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[1.05] mb-6"
+            className="text-4xl sm:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[1.06] mb-3.5 sm:mb-6"
           >
             Sınava Hazırlıkta <br />
-            <span className="relative inline-block mt-2">
+            <span className="relative inline-block mt-1 sm:mt-2">
               <span className="absolute -inset-2 blur-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-500 opacity-30 mix-blend-screen"></span>
               <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400">
                 Sınırları Kaldır
@@ -211,25 +211,47 @@ export function StudentLandingView({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.25 }}
-            className="text-lg sm:text-xl text-slate-300 max-w-2xl font-light mb-8 leading-relaxed"
+            className="text-sm sm:text-xl text-slate-300 max-w-2xl font-light mb-5 sm:mb-8 leading-relaxed"
           >
-            Zorunlu aylık abonelik yok, yanmayan ders kredisi var. Onaylı uzman eğitmenlerle bire bir canlı ders al, hedef simülatörü ve yapay zekâ destekli soru analizleriyle netlerini artır.
+            Zorunlu aylık abonelik yok, yanmayan ders kredisi var. Onaylı uzman eğitmenlerle bire bir canlı ders al, ilk tanışma dersin tamamen ücretsiz.
           </motion.p>
 
+          {/* Above-the-fold Primary Action Buttons (Instagram / TikTok Mobile First!) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.45, delay: 0.2 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xl mb-5 sm:mb-8 z-20"
+          >
+            <Link
+              href="/demo-ders"
+              className="w-full sm:w-auto flex-1 px-6 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-sm sm:text-base shadow-[0_0_30px_rgba(251,146,60,0.45)] transition-all flex items-center justify-center gap-2"
+            >
+              <span>Ücretsiz Tanışma Dersi Al</span>
+              <ArrowRight className="w-4 h-4 shrink-0" />
+            </Link>
+            <Link
+              href="/instructors"
+              className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-white font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2"
+            >
+              <span>Eğitmenleri Gör</span>
+            </Link>
+          </motion.div>
+
           {/* 3 Net Vaat Rozeti */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-10 text-xs sm:text-sm font-semibold text-slate-300">
-            <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> İlk Tanışma Dersi Ücretsiz
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8 text-[11px] sm:text-sm font-semibold text-slate-300">
+            <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" /> İlk Tanışma Dersi Ücretsiz
             </span>
-            <span className="px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-amber-400" /> Aylık Abonelik Yok · Krediler Yanmaz
+            <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" /> Aylık Abonelik Yok · Krediler Yanmaz
             </span>
-            <span className="px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-indigo-400" /> %100 Eğitmen Değişim Garantisi
+            <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400" /> %100 Eğitmen Değişim Garantisi
             </span>
           </div>
 
-          {/* Marketing CTA - Email Capture */}
+          {/* Marketing CTA - Quick Account Creation */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -243,19 +265,19 @@ export function StudentLandingView({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="E-posta adresin..."
-                className="w-full bg-transparent border-none outline-none text-white text-lg sm:text-xl px-4 py-3.5 placeholder-slate-500 font-light"
+                className="w-full bg-transparent border-none outline-none text-white text-base sm:text-xl px-4 py-3 placeholder-slate-500 font-light"
               />
               <Link 
                 href={email.trim() ? `/register?email=${encodeURIComponent(email.trim())}&role=student` : '/register?role=student'} 
-                className="w-full sm:w-auto shrink-0 group/btn relative overflow-hidden rounded-2xl bg-white text-black px-8 py-4 font-bold text-sm sm:text-base tracking-wide transition-transform hover:scale-[0.98] active:scale-95 flex justify-center items-center"
+                className="w-full sm:w-auto shrink-0 group/btn relative overflow-hidden rounded-2xl bg-white text-black px-7 py-3.5 font-bold text-sm sm:text-base tracking-wide transition-transform hover:scale-[0.98] active:scale-95 flex justify-center items-center"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Ücretsiz Başla <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                  Ücretsiz Hesap Aç <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                 </span>
               </Link>
             </div>
-            <p className="text-slate-400 text-xs sm:text-sm mt-3.5 text-center">
-              Kart bilgisi gerekmez · <Link href="/demo-ders" className="text-amber-400 font-semibold hover:underline">Ücretsiz tanışma dersini</Link> hemen planla.
+            <p className="text-slate-400 text-xs sm:text-sm mt-3 text-center">
+              Kart bilgisi gerekmez · Hesap açmadan da <Link href="/demo-ders" className="text-amber-400 font-semibold hover:underline">tanışma dersi talep edebilirsin</Link>.
             </p>
           </motion.div>
 
@@ -495,7 +517,7 @@ export function StudentLandingView({
             </p>
           </div>
           <Link
-            href="/register?redirect=/instructors"
+            href="/instructors"
             className="shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white text-black font-bold text-sm hover:bg-slate-200 transition-colors"
           >
             <span>Tüm Eğitmenleri Gör</span>
@@ -534,7 +556,7 @@ export function StudentLandingView({
               </div>
 
               <Link
-                href="/demo-ders"
+                href={`/demo-ders?subject=${encodeURIComponent(inst.subject)}`}
                 className="w-full py-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.08] text-center text-xs font-bold text-white transition-colors"
               >
                 Ücretsiz Tanışma Dersi Al →

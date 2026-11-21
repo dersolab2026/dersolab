@@ -8,18 +8,23 @@ import { DemoLessonEmailForm } from '@/components/demo-lessons/DemoLessonEmailFo
 export const metadata: Metadata = {
   title: 'Ücretsiz Tanışma Dersi — Hoş Geldin Paketi',
   description:
-    'Kart bilgisi girmeden tamamen ücretsiz 20 dakikalık bire bir tanışma dersi alın. Seviye tespiti ve kişisel çalışma planınızı uzman eğitmenle oluşturun.',
+    'Kart bilgisi girmeden tamamen ücretsiz bire bir tanışma dersi alın. Seviye tespiti ve kişisel çalışma planınızı uzman eğitmenle oluşturun.',
   alternates: {
     canonical: '/demo-ders',
   },
 }
 
-export default async function DemoLessonPage() {
+export default async function DemoLessonPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ subject?: string }>
+}) {
+  const { subject } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: userRecord } = user
-    ? await supabase.from('users').select('role').eq('id', user.id).single()
+    ? await supabase.from('users').select('role, name').eq('id', user.id).single()
     : { data: null }
 
   return (
@@ -39,7 +44,7 @@ export default async function DemoLessonPage() {
 
         {!user ? (
           <>
-            <DemoLessonEmailForm />
+            <DemoLessonEmailForm initialSubject={subject ?? ''} />
             <p className="text-center text-sm font-semibold text-slate-400">
               Zaten hesabın var mı?{' '}
               <Link href="/login" className="text-blue-400 font-bold hover:text-blue-300 transition-colors underline">Giriş Yap</Link>
@@ -47,10 +52,17 @@ export default async function DemoLessonPage() {
           </>
         ) : userRecord?.role === 'student' ? (
           <DemoLessonRequestCard studentId={user.id} initialStatus={await getDemoLessonStatus(user.id)} />
+        ) : userRecord?.role === 'parent' ? (
+          <DemoLessonEmailForm
+            defaultName={userRecord.name ?? ''}
+            defaultEmail={user.email ?? ''}
+            initialSubject={subject ?? ''}
+            isParent
+          />
         ) : (
           <div className="bg-[#0a0a0a] rounded-[2rem] p-8 sm:p-10 border border-white/5 shadow-2xl text-center">
             <p className="font-semibold text-slate-400">
-              Hoş Geldin Paketi sadece öğrenci hesapları için geçerli.
+              Hoş Geldin Paketi öğrenci ve veli hesapları için geçerlidir.
             </p>
           </div>
         )}

@@ -11,6 +11,8 @@ export const metadata: Metadata = {
 }
 
 export default function ContactPage() {
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
+
   return (
     <div className="min-h-screen w-full bg-[#07090E] text-slate-100 flex flex-col justify-center items-center px-4 py-16 relative overflow-hidden">
       {/* Background Glow */}
@@ -63,22 +65,38 @@ export default function ContactPage() {
             </div>
           </div>
 
-          {/* WhatsApp / Canlı İletişim */}
-          <a
-            href="https://wa.me/905000000000?text=Merhaba,%20DersoLab%20hakkında%20bilgi%20almak%20istiyorum."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-start gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] hover:border-emerald-500/30 transition-all group"
-          >
-            <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
-              <MessageCircle className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Hızlı İletişim</div>
-              <div className="text-base font-bold text-white mt-0.5">WhatsApp Danışma Hattı</div>
-              <div className="text-xs text-slate-400 mt-1">Ön kayıt, veli bilgilendirme ve koçluk desteği</div>
-            </div>
-          </a>
+          {/* WhatsApp (yalnızca gerçek hat tanımlıysa) veya Ücretsiz Tanışma Dersi */}
+          {whatsappNumber ? (
+            <a
+              href={`https://wa.me/${whatsappNumber}?text=Merhaba,%20DersoLab%20hakkında%20bilgi%20almak%20istiyorum.`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] hover:border-emerald-500/30 transition-all group"
+            >
+              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
+                <MessageCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Hızlı İletişim</div>
+                <div className="text-base font-bold text-white mt-0.5">WhatsApp Danışma Hattı</div>
+                <div className="text-xs text-slate-400 mt-1">Ön kayıt, veli bilgilendirme ve koçluk desteği</div>
+              </div>
+            </a>
+          ) : (
+            <Link
+              href="/demo-ders"
+              className="flex items-start gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] hover:border-emerald-500/30 transition-all group"
+            >
+              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
+                <MessageCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Hızlı Ön Kayıt</div>
+                <div className="text-base font-bold text-white mt-0.5">Ücretsiz Tanışma Dersi Talep Et</div>
+                <div className="text-xs text-slate-400 mt-1">Hesap açmadan bilgini bırak, uzman eğitmenimiz seninle iletişime geçsin</div>
+              </div>
+            </Link>
+          )}
         </div>
 
         <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">

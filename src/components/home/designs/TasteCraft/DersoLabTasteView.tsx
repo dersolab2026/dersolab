@@ -160,15 +160,13 @@ export function DersoLabTasteView() {
           <div className="flex items-center gap-4 text-slate-400 text-xs">
             <span className="text-amber-400 font-semibold">Aylık Paket Yok, Kredi Yanmaz</span>
             <span className="hidden md:inline">•</span>
-            <a
-              href="https://wa.me/905000000000"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              href="/demo-ders"
               className="text-slate-300 hover:text-white flex items-center gap-1 font-medium transition-colors"
             >
               <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Veli Danışma Hattı</span>
-            </a>
+              <span>Ücretsiz Tanışma Dersi</span>
+            </Link>
           </div>
         </div>
       </div>
@@ -241,7 +239,7 @@ export function DersoLabTasteView() {
               href="/hesap-turu"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-slate-950 active:scale-[0.98] transition-all shadow-md shadow-md"
             >
-              <span>20 Dk Ücretsiz Tanışma Dersi</span>
+              <span>Ücretsiz Tanışma Dersi</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -332,7 +330,7 @@ export function DersoLabTasteView() {
                 className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-sm font-bold bg-amber-400 hover:bg-amber-300 text-slate-950 active:scale-[0.98] transition-all shadow-md"
               >
                 <Calendar className="w-4 h-4 text-slate-950" />
-                <span>20 Dk Ücretsiz Tanışma Dersi Al</span>
+                <span>Ücretsiz Tanışma Dersi Al</span>
                 <ChevronRight className="w-4 h-4" />
               </Link>
               <Link
@@ -696,7 +694,7 @@ export function DersoLabTasteView() {
               <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 font-black text-sm flex items-center justify-center mb-4">
                 01
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">20 Dk Ücretsiz Tanışma Dersi</h3>
+              <h3 className="text-lg font-bold text-white mb-2">Ücretsiz Tanışma Dersi</h3>
               <p className="text-slate-400 text-sm leading-relaxed">
                 Öğrencinin seviyesini ve eğitmenle uyumunu test etmek için ilk görüşme tamamen ücretsizdir.
               </p>
@@ -762,7 +760,7 @@ export function DersoLabTasteView() {
               href="/hesap-turu"
               className="text-xs font-bold bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-2.5 rounded-xl transition-colors shadow-lg shadow-md"
             >
-              20 Dk Ücretsiz Tanışma Dersi Planla
+              Ücretsiz Tanışma Dersi Planla
             </Link>
           </div>
         </div>

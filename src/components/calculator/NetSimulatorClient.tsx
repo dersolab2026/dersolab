@@ -574,7 +574,7 @@ export function NetSimulatorClient() {
                   className="w-full py-3 px-4 rounded-xl bg-[#DD7B3A] hover:bg-[#DD7B3A]/90 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(221,123,58,0.3)]"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>20 Dk Ücretsiz Tanışma Dersi ile Planla</span>
+                  <span>Ücretsiz Tanışma Dersi ile Planla</span>
                 </Link>
               </div>
             </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { BookingCalendar } from '@/components/calendar/BookingCalendar'
 import { Loader2 } from 'lucide-react'
 import { createBooking } from '@/actions/bookings'
@@ -103,7 +104,27 @@ export function InstructorBookingSection({
       )}
 
       {result && (
-        <p className={`text-sm font-semibold ${result.success ? 'text-[#3F6E66]' : 'text-red-600'}`}>{result.message}</p>
+        <div className="space-y-3">
+          <p className={`text-sm font-semibold ${result.success ? 'text-[#3F6E66]' : 'text-red-400'}`}>
+            {result.message}
+          </p>
+          {!result.success && /kredi|bakiye/i.test(result.message) && (
+            <div className="flex flex-wrap items-center gap-2.5 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3.5">
+              <Link
+                href="/dashboard/student/packages"
+                className="inline-flex items-center justify-center rounded-xl bg-[#DD7B3A] px-4 py-2 text-xs font-bold text-white hover:bg-[#DD7B3A]/90 transition-colors"
+              >
+                Kredi Paketlerini Gör →
+              </Link>
+              <Link
+                href="/demo-ders"
+                className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold text-slate-200 hover:bg-white/10 transition-colors"
+              >
+                Ücretsiz Tanışma Dersi Al
+              </Link>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )

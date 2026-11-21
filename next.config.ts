@@ -33,6 +33,9 @@ const nextConfig: NextConfig = {
       // (20260824213000_remove_free_coaching_and_referral.sql), sayfasi da
       // birlikte gitti. Eski baglantilar Hos Geldin Paketine dusuyor.
       { source: '/ucretsiz-kocluk', destination: '/demo-ders', permanent: true },
+      // Eski veya harici /demo-lessons ve /marketplace linkleri 404 vermesin
+      { source: '/demo-lessons', destination: '/demo-ders', permanent: true },
+      { source: '/marketplace', destination: '/instructors', permanent: true },
     ];
   },
   async headers() {

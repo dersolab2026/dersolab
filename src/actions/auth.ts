@@ -20,6 +20,7 @@ interface RegisterParams {
   grade?: number
   track?: 'sayisal' | 'sozel' | 'ea' | 'dil'
   termsVersion: typeof TERMS_VERSION
+  redirectTo?: string
 }
 
 const emailSchema = z.string().trim().email('Geçerli bir e-posta adresi gir').max(254)
@@ -34,18 +35,30 @@ const registerSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   role: z.enum(['student', 'instructor', 'parent']),
-  schoolName: z.string().trim().min(2, 'Okul adını gir').max(120).optional(),
+  schoolName: z.string().trim().max(120).optional(),
   grade: gradeSchema.optional(),
   track: z.enum(['sayisal', 'sozel', 'ea', 'dil']).optional(),
   termsVersion: z.literal(TERMS_VERSION),
-}).superRefine((values, ctx) => {
-  if (values.role !== 'student') return
-  if (!values.schoolName) ctx.addIssue({ code: 'custom', path: ['schoolName'], message: 'Okul adını gir' })
-  if (!values.grade) ctx.addIssue({ code: 'custom', path: ['grade'], message: 'Sınıfını seç' })
-  if (values.grade && values.grade >= 9 && !values.track) {
-    ctx.addIssue({ code: 'custom', path: ['track'], message: 'Alanını seç' })
-  }
+  redirectTo: z.string().max(300).optional(),
 })
+
+async function resolveAppUrl(): Promise<string> {
+  const requestHeaders = await headers()
+  let appUrl = requestHeaders.get('origin')
+  if (!appUrl) {
+    const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host')
+    const protocol = requestHeaders.get('x-forwarded-proto') || (process.env.NODE_ENV === 'development' ? 'http' : 'https')
+    appUrl = host ? `${protocol}://${host}` : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  }
+  return appUrl.replace(/\/$/, '')
+}
+
+function sanitizeNextPath(path?: string): string | undefined {
+  if (!path) return undefined
+  const trimmed = path.trim()
+  if (!trimmed.startsWith('/') || trimmed.startsWith('//')) return undefined
+  return trimmed
+}
 
 function friendlySignUpError(message: string): string {
   const lower = message.toLowerCase()
@@ -70,17 +83,22 @@ export async function registerUser(params: RegisterParams): Promise<ActionResult
   const values = parsed.data
   const formattedName = formatTurkishTitleCase(values.name)
   const gradeTrack = values.grade ? (values.grade <= 8 ? 'lgs' : 'yks') : undefined
+  const cleanSchoolName = values.schoolName?.trim() || undefined
+  const appUrl = await resolveAppUrl()
+  const safeNext = sanitizeNextPath(values.redirectTo)
+  const emailRedirectTo = `${appUrl}/auth/callback${safeNext ? `?next=${encodeURIComponent(safeNext)}` : ''}`
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signUp({
     email: values.email,
     password: values.password,
     options: {
+      emailRedirectTo,
       data: {
         name: formattedName,
         role: values.role,
         grade_track: gradeTrack,
-        school_name: values.schoolName,
+        school_name: cleanSchoolName,
         grade: values.grade,
         track: values.track,
         terms_version: TERMS_VERSION,
@@ -135,18 +153,12 @@ export async function signInWithGoogle(
   not?: OAuthNotu,
   nextUrl?: string,
 ): Promise<{ url: string } | { error: string }> {
-  const requestHeaders = await headers()
-  let appUrl = requestHeaders.get('origin')
-  if (!appUrl) {
-    const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host')
-    const protocol = requestHeaders.get('x-forwarded-proto') || (process.env.NODE_ENV === 'development' ? 'http' : 'https')
-    appUrl = host ? `${protocol}://${host}` : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  }
-  appUrl = appUrl.replace(/\/$/, '')
+  const appUrl = await resolveAppUrl()
+  const safeNext = sanitizeNextPath(nextUrl)
 
   const callbackUrl = isNative
     ? 'com.dersolab.app://auth/callback'
-    : `${appUrl}/auth/callback${nextUrl ? `?next=${encodeURIComponent(nextUrl)}` : ''}`
+    : `${appUrl}/auth/callback${safeNext ? `?next=${encodeURIComponent(safeNext)}` : ''}`
 
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({

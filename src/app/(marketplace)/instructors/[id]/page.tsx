@@ -123,10 +123,16 @@ export default async function InstructorDetailPage({ params, searchParams }: Ins
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
                 <Link
-                  href={`/register?redirect=${encodeURIComponent(redirectPath)}`}
+                  href={`/demo-ders${instructor.subjects[0] ? `?subject=${encodeURIComponent(instructor.subjects[0])}` : ''}`}
                   className="inline-flex items-center justify-center bg-[#DD7B3A] text-white font-bold rounded-full px-6 py-2.5 text-sm hover:bg-[#DD7B3A]/90 transition-all shadow-[0_0_15px_rgba(221,123,58,0.3)]"
                 >
-                  Ücretsiz Kayıt Ol →
+                  Ücretsiz Tanışma Dersi Al →
+                </Link>
+                <Link
+                  href={`/register?redirect=${encodeURIComponent(redirectPath)}`}
+                  className="inline-flex items-center justify-center bg-white text-black font-bold rounded-full px-6 py-2.5 text-sm hover:bg-slate-200 transition-all"
+                >
+                  Ücretsiz Kayıt Ol
                 </Link>
                 <Link
                   href={`/login?redirect=${encodeURIComponent(redirectPath)}`}
