@@ -20,25 +20,49 @@ export interface WhiteboardStroke {
   points: Array<{ x: number; y: number }>
 }
 
+export type WhiteboardGridMode = 'notebook' | 'dots' | 'axes' | 'blank'
+
 interface SharedWhiteboardPanelProps {
   strokes: WhiteboardStroke[]
   bgImage: string | null
-  gridMode: 'dots' | 'axes' | 'blank'
+  gridMode: WhiteboardGridMode
   onAddStroke: (stroke: WhiteboardStroke) => void
   onUndoStroke: () => void
   onClearBoard: () => void
   onChangeBgImage: (dataUrl: string | null) => void
-  onChangeGridMode: (mode: 'dots' | 'axes' | 'blank') => void
-  onClose: () => void
+  onChangeGridMode: (mode: WhiteboardGridMode) => void
+  onClose?: () => void
 }
 
-const COLORS = [
+const LIGHT_COLORS = [
+  { label: 'Kırmızı Kalem', value: '#e11d48' },
+  { label: 'Lacivert Mürekkep', value: '#0f172a' },
+  { label: 'Kobalt Mavi', value: '#0284c7' },
+  { label: 'Zümrüt Yeşil', value: '#16a34a' },
+  { label: 'Turuncu Vurgu', value: '#ea580c' },
+]
+
+const DARK_COLORS = [
   { label: 'Turkuaz', value: '#22d3ee' },
   { label: 'Kehribar', value: '#f59e0b' },
   { label: 'Zümrüt', value: '#10b981' },
   { label: 'Mercan', value: '#f43f5e' },
   { label: 'Beyaz', value: '#ffffff' },
 ]
+
+const GRID_MODE_LABELS: Record<WhiteboardGridMode, string> = {
+  notebook: 'Çizgili Defter (Açık)',
+  blank: 'Beyaz Tahta',
+  dots: 'Koyu Noktalı',
+  axes: 'Koordinat (x-y)',
+}
+
+const NEXT_GRID_MODE: Record<WhiteboardGridMode, WhiteboardGridMode> = {
+  notebook: 'blank',
+  blank: 'dots',
+  dots: 'axes',
+  axes: 'notebook',
+}
 
 export function SharedWhiteboardPanel({
   strokes,
@@ -53,11 +77,23 @@ export function SharedWhiteboardPanel({
 }: SharedWhiteboardPanelProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const isLightPaper = gridMode === 'notebook' || gridMode === 'blank'
+  const palette = isLightPaper ? LIGHT_COLORS : DARK_COLORS
+
   const [tool, setTool] = useState<'pen' | 'highlighter' | 'eraser'>('pen')
-  const [color, setColor] = useState('#22d3ee')
-  const [size, setSize] = useState(3)
+  const [color, setColor] = useState('#e11d48')
+  const [size, setSize] = useState(3.5)
   const [isDrawing, setIsDrawing] = useState(false)
   const currentPointsRef = useRef<Array<{ x: number; y: number }>>([])
+
+  // Switch default pen color smoothly when flipping between light notebook paper and dark board
+  useEffect(() => {
+    if (isLightPaper && (color === '#ffffff' || color === '#22d3ee')) {
+      setColor('#e11d48')
+    } else if (!isLightPaper && (color === '#0f172a' || color === '#e11d48')) {
+      setColor('#22d3ee')
+    }
+  }, [isLightPaper, color])
 
   const redrawCanvas = useCallback(() => {
     const canvas = canvasRef.current
@@ -72,7 +108,7 @@ export function SharedWhiteboardPanel({
     // Coordinate Axes if enabled
     if (gridMode === 'axes') {
       ctx.save()
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.25)'
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.28)'
       ctx.lineWidth = 1.5
       ctx.beginPath()
       ctx.moveTo(w / 2, 0)
@@ -96,7 +132,7 @@ export function SharedWhiteboardPanel({
         ctx.strokeStyle = 'rgba(0,0,0,1)'
       } else if (s.tool === 'highlighter') {
         ctx.globalCompositeOperation = 'source-over'
-        ctx.globalAlpha = 0.35
+        ctx.globalAlpha = 0.32
         ctx.lineWidth = s.size * 4.5
         ctx.strokeStyle = s.color
       } else {
@@ -173,7 +209,7 @@ export function SharedWhiteboardPanel({
       ctx.lineWidth = size * 6
       ctx.strokeStyle = 'rgba(0,0,0,1)'
     } else if (tool === 'highlighter') {
-      ctx.globalAlpha = 0.35
+      ctx.globalAlpha = 0.32
       ctx.lineWidth = size * 4.5
       ctx.strokeStyle = color
     } else {
@@ -213,17 +249,41 @@ export function SharedWhiteboardPanel({
     reader.readAsDataURL(file)
   }
 
+  const paperStyle: React.CSSProperties =
+    gridMode === 'notebook'
+      ? {
+          backgroundColor: '#f8fafc',
+          backgroundImage:
+            'linear-gradient(90deg, transparent 78px, rgba(226, 232, 240, 0.95) 78px, rgba(226, 232, 240, 0.95) 81px, transparent 81px), repeating-linear-gradient(180deg, #f8fafc 0px, #f8fafc 37px, rgba(186, 230, 253, 0.85) 37px, rgba(186, 230, 253, 0.85) 39px)',
+        }
+      : gridMode === 'blank'
+        ? {
+            backgroundColor: '#ffffff',
+          }
+        : gridMode === 'dots'
+          ? {
+              backgroundColor: '#080B11',
+              backgroundImage: 'radial-gradient(rgba(148, 163, 184, 0.22) 1.2px, transparent 1.2px)',
+              backgroundSize: '22px 22px',
+            }
+          : {
+              backgroundColor: '#080B11',
+              backgroundImage:
+                'linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }
+
   return (
-    <div className="w-full h-full flex flex-col bg-[#080B11] select-none">
-      {/* Üst Araç Çubuğu */}
-      <div className="px-3 py-2 bg-[#101624] border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+    <div className="w-full h-full flex flex-col select-none">
+      {/* Üst Araç Çubuğu (OpenBoard Stüdyo Stili) */}
+      <div className="px-3.5 py-2 bg-[#0f172a]/95 border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs shrink-0">
         <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
             onClick={() => setTool('pen')}
             className={`px-2.5 py-1.5 rounded-lg font-bold flex items-center gap-1 transition-all ${
               tool === 'pen'
-                ? 'bg-cyan-500 text-slate-950'
+                ? 'bg-cyan-400 text-slate-950 shadow-[0_0_12px_rgba(56,189,248,0.4)]'
                 : 'bg-white/5 text-slate-300 hover:bg-white/10'
             }`}
           >
@@ -236,7 +296,7 @@ export function SharedWhiteboardPanel({
             onClick={() => setTool('highlighter')}
             className={`px-2.5 py-1.5 rounded-lg font-bold flex items-center gap-1 transition-all ${
               tool === 'highlighter'
-                ? 'bg-amber-400 text-slate-950'
+                ? 'bg-amber-400 text-slate-950 shadow-[0_0_12px_rgba(251,191,36,0.4)]'
                 : 'bg-white/5 text-slate-300 hover:bg-white/10'
             }`}
           >
@@ -260,8 +320,8 @@ export function SharedWhiteboardPanel({
           <div className="h-4 w-px bg-white/10 mx-1" />
 
           {/* Renk Seçici */}
-          <div className="flex items-center gap-1">
-            {COLORS.map((c) => (
+          <div className="flex items-center gap-1.5">
+            {palette.map((c) => (
               <button
                 key={c.value}
                 type="button"
@@ -272,8 +332,8 @@ export function SharedWhiteboardPanel({
                 title={c.label}
                 className={`w-5 h-5 rounded-full border-2 transition-transform ${
                   color === c.value && tool !== 'eraser'
-                    ? 'border-white scale-110'
-                    : 'border-transparent opacity-75 hover:opacity-100'
+                    ? 'border-white scale-115 ring-2 ring-cyan-400/50'
+                    : 'border-white/20 opacity-80 hover:opacity-100'
                 }`}
                 style={{ backgroundColor: c.value }}
               />
@@ -281,6 +341,28 @@ export function SharedWhiteboardPanel({
           </div>
 
           <div className="h-4 w-px bg-white/10 mx-1" />
+
+          {/* Kalınlık Seçici */}
+          <div className="hidden sm:flex items-center gap-1 bg-white/5 rounded-lg p-0.5 border border-white/10">
+            {[
+              { label: 'İnce', val: 2.5 },
+              { label: 'Orta', val: 4 },
+              { label: 'Kalın', val: 6.5 },
+            ].map((s) => (
+              <button
+                key={s.label}
+                type="button"
+                onClick={() => setSize(s.val)}
+                className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all ${
+                  size === s.val ? 'bg-white/15 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="h-4 w-px bg-white/10 mx-1 hidden sm:block" />
 
           {/* Soru Fotoğrafı Yükle */}
           <input
@@ -312,18 +394,12 @@ export function SharedWhiteboardPanel({
 
           <button
             type="button"
-            onClick={() =>
-              onChangeGridMode(
-                gridMode === 'dots' ? 'axes' : gridMode === 'axes' ? 'blank' : 'dots',
-              )
-            }
-            className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-bold flex items-center gap-1"
-            title="Izgara / Koordinat Düzlemi Değiştir"
+            onClick={() => onChangeGridMode(NEXT_GRID_MODE[gridMode])}
+            className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-bold flex items-center gap-1"
+            title="Kağıt / Tahta Zemini Değiştir"
           >
-            <Grid className="w-3.5 h-3.5" />
-            <span>
-              {gridMode === 'dots' ? 'Kareli' : gridMode === 'axes' ? 'Koordinat (x-y)' : 'Düz'}
-            </span>
+            <Grid className="w-3.5 h-3.5 text-cyan-400" />
+            <span>{GRID_MODE_LABELS[gridMode]}</span>
           </button>
         </div>
 
@@ -344,28 +420,21 @@ export function SharedWhiteboardPanel({
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
-            title="Soru Tahtasını Kapat"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+              title="Tam Kamera Görünümüne Geç"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Çizim Alanı */}
-      <div
-        className="relative flex-1 w-full h-full overflow-hidden"
-        style={{
-          backgroundImage:
-            gridMode === 'dots'
-              ? 'radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px)'
-              : 'none',
-          backgroundSize: gridMode === 'dots' ? '22px 22px' : 'auto',
-        }}
-      >
+      <div className="relative flex-1 w-full h-full overflow-hidden transition-colors" style={paperStyle}>
         {bgImage && (
           // eslint-disable-next-line @next/next/no-img-element
           <img

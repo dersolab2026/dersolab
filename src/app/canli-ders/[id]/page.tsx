@@ -25,7 +25,8 @@ export default async function LiveClassroomPage({ params }: LivePageProps) {
         otherPersonName="Test Öğrencisi"
         startTime={new Date().toISOString()}
         endTime={new Date(Date.now() + 40 * 60 * 1000).toISOString()}
-        topicNote="Canlı Ders Odası & 3D Laboratuvar Testi"
+        topicNote="Mol Kavramı"
+        instructorSubjects={['Kimya', 'Matematik', 'Fizik', 'Biyoloji', 'Türkçe', 'Coğrafya', 'Tarih', 'İngilizce', 'Koçluk']}
       />
     )
   }
@@ -71,9 +72,12 @@ export default async function LiveClassroomPage({ params }: LivePageProps) {
     )
   }
 
-  // Karşı tarafın adını çek
+  // Karşı tarafın adını ve eğitmenin branşlarını çek
   const otherUserId = isInstructor ? booking.student_id : booking.instructor_id
-  const { data: otherUserRow } = await admin.from('users').select('name').eq('id', otherUserId).maybeSingle()
+  const [{ data: otherUserRow }, { data: instructorProfile }] = await Promise.all([
+    admin.from('users').select('name').eq('id', otherUserId).maybeSingle(),
+    admin.from('instructors').select('subjects').eq('user_id', booking.instructor_id).maybeSingle(),
+  ])
 
   return (
     <LiveClassroomClient
@@ -85,6 +89,7 @@ export default async function LiveClassroomPage({ params }: LivePageProps) {
       endTime={booking.end_time}
       topicNote={booking.topic_note}
       meetLink={booking.meet_link}
+      instructorSubjects={instructorProfile?.subjects ?? []}
     />
   )
 }
