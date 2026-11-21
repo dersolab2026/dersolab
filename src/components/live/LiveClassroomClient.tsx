@@ -34,11 +34,13 @@ interface LiveClassroomClientProps {
   topicNote?: string | null
   meetLink?: string | null
   instructorSubjects?: string[]
+  sessionType?: string | null
 }
 
 interface BranchStudioPreset {
   id: string
   badge: string
+  shortLabel: string
   examLabel: string
   defaultTopic: string
   slogan: string
@@ -51,6 +53,7 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
   kimya: {
     id: 'kimya',
     badge: 'KİMYA',
+    shortLabel: 'Kimya',
     examLabel: 'YKS & LGS • MAARİF • KİMYA',
     defaultTopic: 'KİMYA ATÖLYESİ',
     slogan: 'Ezberleme, Keşfet! Sıfırdan Zirveye Kimya',
@@ -62,11 +65,27 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
       { label: 'NŞA Gaz:', value: '1 mol = 22,4 L', tone: 'orange' },
     ],
   },
+  fen: {
+    id: 'fen',
+    badge: 'FEN BİLİMLERİ',
+    shortLabel: 'Fen',
+    examLabel: 'LGS & ORTAOKUL • FEN BİLİMLERİ',
+    defaultTopic: 'FEN & DENEY ATÖLYESİ',
+    slogan: 'Ezberleme, Keşfet! Deneylerle Yeni Nesil Fen',
+    labHref: '/lab/kimya',
+    iconicTitle: 'FENİN İKONLARI',
+    iconicItems: [
+      { label: 'Kuvvet & Basınç:', value: 'P = F / S', tone: 'cyan' },
+      { label: 'Kalıtım & DNA:', value: 'Punnett 3 : 1', tone: 'white' },
+      { label: 'Asit & Baz:', value: 'pH 0 — 7 — 14', tone: 'orange' },
+    ],
+  },
   matematik: {
     id: 'matematik',
     badge: 'MATEMATİK',
+    shortLabel: 'Matematik',
     examLabel: 'YKS & LGS • MAARİF • MATEMATİK',
-    defaultTopic: 'MATEMATİK & GEOMETRİ',
+    defaultTopic: 'MATEMATİK ATÖLYESİ',
     slogan: 'Ezberleme, Keşfet! Analitik & Yeni Nesil Matematik',
     labHref: '/lab/matematik',
     iconicTitle: 'MATEMATİĞİN İKONLARI',
@@ -76,9 +95,25 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
       { label: 'Diskriminant:', value: 'Δ = b² - 4ac', tone: 'orange' },
     ],
   },
+  geometri: {
+    id: 'geometri',
+    badge: 'GEOMETRİ',
+    shortLabel: 'Geometri',
+    examLabel: 'YKS & LGS • ANALİTİK & GEOMETRİ',
+    defaultTopic: 'GEOMETRİ & UZAY',
+    slogan: 'Ezberleme, Keşfet! Görsel İspatlarla Geometri',
+    labHref: '/lab/matematik',
+    iconicTitle: 'GEOMETRİNİN İKONLARI',
+    iconicItems: [
+      { label: 'Pisagor:', value: 'a² + b² = c²', tone: 'cyan' },
+      { label: 'Öklid:', value: 'h² = p · k', tone: 'white' },
+      { label: 'Birim Çember:', value: 'sin²α + cos²α = 1', tone: 'orange' },
+    ],
+  },
   fizik: {
     id: 'fizik',
     badge: 'FİZİK',
+    shortLabel: 'Fizik',
     examLabel: 'YKS & LGS • MAARİF • FİZİK',
     defaultTopic: 'FİZİK LABORATUVARI',
     slogan: 'Ezberleme, Keşfet! Doğa Yasaları & Fizik',
@@ -93,6 +128,7 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
   biyoloji: {
     id: 'biyoloji',
     badge: 'BİYOLOJİ',
+    shortLabel: 'Biyoloji',
     examLabel: 'YKS & LGS • MAARİF • BİYOLOJİ',
     defaultTopic: 'BİYOLOJİ & YAŞAM',
     slogan: 'Ezberleme, Keşfet! Hücreden Ekosisteme Biyoloji',
@@ -107,7 +143,8 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
   turkce: {
     id: 'turkce',
     badge: 'TÜRKÇE',
-    examLabel: 'YKS & LGS • TÜRKÇE & EDEBİYAT',
+    shortLabel: 'Türkçe',
+    examLabel: 'YKS & LGS • TÜRKÇE & ANLAM',
     defaultTopic: 'PARAGRAF & DİL BİLGİSİ',
     slogan: 'Ezberleme, Keşfet! Hızlı Okuma & Anlam Analizi',
     labHref: '/lab/turkce',
@@ -118,11 +155,27 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
       { label: 'Dil Bilgisi:', value: 'Ses & Yazım', tone: 'orange' },
     ],
   },
+  edebiyat: {
+    id: 'edebiyat',
+    badge: 'EDEBİYAT',
+    shortLabel: 'Edebiyat',
+    examLabel: 'AYT & LİSE • TÜRK DİLİ VE EDEBİYATI',
+    defaultTopic: 'EDEBİYAT & METİN TAHLİLİ',
+    slogan: 'Ezberleme, Keşfet! Dönemler, Eserler & Tahlil',
+    labHref: '/lab/turkce',
+    iconicTitle: 'EDEBİYATIN İKONLARI',
+    iconicItems: [
+      { label: 'Şiir & Ahenk:', value: 'İmge & Ölçü', tone: 'cyan' },
+      { label: 'Anlatım:', value: 'Roman & Hikâye', tone: 'white' },
+      { label: 'Miras:', value: 'Divan → Cumhuriyet', tone: 'orange' },
+    ],
+  },
   cografya: {
     id: 'cografya',
     badge: 'COĞRAFYA',
-    examLabel: 'YKS & LGS • COĞRAFYA & SOSYAL',
-    defaultTopic: 'COĞRAFYA & ATLAS',
+    shortLabel: 'Coğrafya',
+    examLabel: 'YKS & LGS • COĞRAFYA & ATLAS',
+    defaultTopic: 'COĞRAFYA & HARİTA',
     slogan: 'Ezberleme, Keşfet! Harita & Doğa Sistemleri',
     labHref: '/lab/sosyal',
     iconicTitle: 'COĞRAFYANIN İKONLARI',
@@ -135,6 +188,7 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
   tarih: {
     id: 'tarih',
     badge: 'TARİH',
+    shortLabel: 'Tarih',
     examLabel: 'YKS & LGS • TARİH & İNKILAP',
     defaultTopic: 'TARİH & KRONOLOJİ',
     slogan: 'Ezberleme, Keşfet! Kronolojik & Haritalı Tarih',
@@ -146,9 +200,25 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
       { label: 'Analiz:', value: 'Belge & Harita', tone: 'orange' },
     ],
   },
+  sosyal: {
+    id: 'sosyal',
+    badge: 'SOSYAL BİLGİLER',
+    shortLabel: 'Sosyal',
+    examLabel: 'LGS & ORTAOKUL • SOSYAL BİLGİLER',
+    defaultTopic: 'TARİH, HARİTA & TOPLUM',
+    slogan: 'Ezberleme, Keşfet! Harita ve Kronolojiyle Sosyal',
+    labHref: '/lab/sosyal',
+    iconicTitle: 'SOSYALİN İKONLARI',
+    iconicItems: [
+      { label: 'İklim & Rüzgâr:', value: 'KaYıP SaKaL', tone: 'cyan' },
+      { label: 'Mevsimler:', value: "23° 27' Eksen", tone: 'white' },
+      { label: 'Millî Mücadele:', value: 'Cephe & Antlaşma', tone: 'orange' },
+    ],
+  },
   ingilizce: {
     id: 'ingilizce',
     badge: 'İNGİLİZCE',
+    shortLabel: 'İngilizce',
     examLabel: 'LGS & YDT • PRATİK İNGİLİZCE',
     defaultTopic: 'İNGİLİZCE ATÖLYESİ',
     slogan: 'Ezberleme, Keşfet! Doğal Konuşma & Dil Becerisi',
@@ -163,6 +233,7 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
   kocluk: {
     id: 'kocluk',
     badge: 'KOÇLUK',
+    shortLabel: 'Koçluk',
     examLabel: 'LGS & YKS • AKADEMİK KOÇLUK',
     defaultTopic: 'STRATEJİ & NET ANALİZİ',
     slogan: 'Ezberleme, Keşfet! Kişiye Özel Sınav Stratejisi',
@@ -178,27 +249,121 @@ const BRANCH_STUDIO_PRESETS: Record<string, BranchStudioPreset> = {
 
 const BRANCH_ORDER = [
   'kimya',
+  'fen',
   'matematik',
+  'geometri',
   'fizik',
   'biyoloji',
   'turkce',
+  'edebiyat',
   'cografya',
   'tarih',
+  'sosyal',
   'ingilizce',
   'kocluk',
 ] as const
 
-function detectInitialBranchKey(subjects?: string[], topicNote?: string | null): string {
-  const combined = `${(subjects || []).join(' ')} ${topicNote || ''}`.toLocaleLowerCase('tr-TR')
-  if (combined.includes('kimya') || combined.includes('mol') || combined.includes('atom')) return 'kimya'
-  if (combined.includes('matematik') || combined.includes('geometri') || combined.includes('türev') || combined.includes('parabol')) return 'matematik'
-  if (combined.includes('fizik') || combined.includes('optik') || combined.includes('kuvvet')) return 'fizik'
-  if (combined.includes('biyoloji') || combined.includes('hücre') || combined.includes('fen')) return 'biyoloji'
-  if (combined.includes('türkçe') || combined.includes('turkce') || combined.includes('edebiyat') || combined.includes('paragraf')) return 'turkce'
-  if (combined.includes('coğrafya') || combined.includes('cografya') || combined.includes('harita') || combined.includes('iklim')) return 'cografya'
-  if (combined.includes('tarih') || combined.includes('inkılap') || combined.includes('sosyal')) return 'tarih'
-  if (combined.includes('ingilizce') || combined.includes('ydt')) return 'ingilizce'
-  if (combined.includes('koçluk') || combined.includes('kocluk') || combined.includes('rehberlik')) return 'kocluk'
+function mapSubjectToBranchKey(subject: string): string | null {
+  const s = subject.toLocaleLowerCase('tr-TR').trim()
+  if (s.includes('kimya')) return 'kimya'
+  if (s.includes('fen')) return 'fen'
+  if (s.includes('geometri')) return 'geometri'
+  if (s.includes('matematik')) return 'matematik'
+  if (s.includes('fizik')) return 'fizik'
+  if (s.includes('biyoloji')) return 'biyoloji'
+  if (s.includes('edebiyat')) return 'edebiyat'
+  if (s.includes('türkçe') || s.includes('turkce')) return 'turkce'
+  if (s.includes('coğrafya') || s.includes('cografya')) return 'cografya'
+  if (s.includes('tarih') || s.includes('inkılap')) return 'tarih'
+  if (s.includes('sosyal')) return 'sosyal'
+  if (s.includes('ingilizce') || s.includes('ydt')) return 'ingilizce'
+  if (s.includes('koçluk') || s.includes('kocluk') || s.includes('rehberlik')) return 'kocluk'
+  return null
+}
+
+function getInstructorBranchKeys(subjects?: string[]): string[] {
+  const seen = new Set<string>()
+  for (const sub of subjects || []) {
+    const key = mapSubjectToBranchKey(sub)
+    if (key && BRANCH_STUDIO_PRESETS[key]) {
+      seen.add(key)
+    }
+  }
+  return Array.from(seen)
+}
+
+function buildKarmaPreset(branchKeys: string[]): BranchStudioPreset {
+  const validKeys = branchKeys.filter((k) => BRANCH_STUDIO_PRESETS[k])
+  if (validKeys.length === 0) return BRANCH_STUDIO_PRESETS.kimya
+  if (validKeys.length === 1) return BRANCH_STUDIO_PRESETS[validKeys[0]]
+
+  // Academic branches (excluding 'kocluk' if teacher has 2+ academic branches so badge stays concise)
+  const academicKeys = validKeys.filter((k) => k !== 'kocluk')
+  const badgeSource = academicKeys.length >= 2 ? academicKeys.slice(0, 2) : validKeys.slice(0, 2)
+  const combinedBadge = badgeSource
+    .map((k) => BRANCH_STUDIO_PRESETS[k].shortLabel.toLocaleUpperCase('tr-TR'))
+    .join(' • ')
+
+  const tones: Array<'cyan' | 'white' | 'orange'> = ['cyan', 'white', 'orange']
+  const combinedIcons: Array<{ label: string; value: string; tone: 'cyan' | 'white' | 'orange' }> = []
+
+  // Pick 1 iconic signature from each of the teacher's branches (up to 3)
+  for (let i = 0; i < Math.min(3, validKeys.length); i++) {
+    const p = BRANCH_STUDIO_PRESETS[validKeys[i]]
+    const first = p.iconicItems[0]
+    combinedIcons.push({
+      label: `${p.shortLabel}:`,
+      value: first.value,
+      tone: tones[i % 3],
+    })
+  }
+  // If teacher has exactly 2 branches, fill the 3rd row with the 2nd iconic signature of their primary branch
+  if (combinedIcons.length === 2) {
+    const p0 = BRANCH_STUDIO_PRESETS[validKeys[0]]
+    const second = p0.iconicItems[1]
+    if (second) {
+      combinedIcons.push({
+        label: second.label,
+        value: second.value,
+        tone: 'orange',
+      })
+    }
+  }
+
+  const primary = BRANCH_STUDIO_PRESETS[validKeys[0]]
+  return {
+    id: 'karma',
+    badge: combinedBadge,
+    shortLabel: 'Karma',
+    examLabel: `YKS & LGS • ${combinedBadge}`,
+    defaultTopic: 'BİREBİR CANLI DERS',
+    slogan: primary.slogan,
+    labHref: primary.labHref,
+    iconicTitle: 'BRANŞ İKONLARI',
+    iconicItems: combinedIcons,
+  }
+}
+
+function detectInitialBranchKey(
+  instructorKeys: string[],
+  topicNote?: string | null,
+  sessionType?: string | null
+): string {
+  if (sessionType === 'coaching' && instructorKeys.includes('kocluk')) {
+    return 'kocluk'
+  }
+  if (topicNote?.trim()) {
+    const fromTopic = mapSubjectToBranchKey(topicNote)
+    if (fromTopic && (instructorKeys.length === 0 || instructorKeys.includes(fromTopic))) {
+      return fromTopic
+    }
+  }
+  if (instructorKeys.length > 1) {
+    return 'karma'
+  }
+  if (instructorKeys.length === 1) {
+    return instructorKeys[0]
+  }
   return 'kimya'
 }
 
@@ -248,15 +413,21 @@ export function LiveClassroomClient({
   topicNote,
   meetLink,
   instructorSubjects,
+  sessionType,
 }: LiveClassroomClientProps) {
   const router = useRouter()
   const jitsiContainerRef = useRef<HTMLDivElement>(null)
   const apiRef = useRef<any>(null)
   const channelRef = useRef<any>(null)
 
-  const initialBranch = detectInitialBranchKey(instructorSubjects, topicNote)
+  const instructorKeys = getInstructorBranchKeys(instructorSubjects)
+  const karmaPreset = buildKarmaPreset(instructorKeys)
+  const initialBranch = detectInitialBranchKey(instructorKeys, topicNote, sessionType)
   const [branchKey, setBranchKey] = useState<string>(initialBranch)
-  const preset = BRANCH_STUDIO_PRESETS[branchKey] || BRANCH_STUDIO_PRESETS.kimya
+  const preset =
+    branchKey === 'karma'
+      ? karmaPreset
+      : BRANCH_STUDIO_PRESETS[branchKey] || karmaPreset
 
   const [customTopic, setCustomTopic] = useState<string>(
     topicNote?.trim() ? topicNote.trim().toLocaleUpperCase('tr-TR') : ''
@@ -308,7 +479,10 @@ export function LiveClassroomClient({
           }
         })
         .on('broadcast', { event: 'studio-meta' }, ({ payload }) => {
-          if (payload?.branchKey && BRANCH_STUDIO_PRESETS[payload.branchKey]) {
+          if (
+            payload?.branchKey &&
+            (payload.branchKey === 'karma' || BRANCH_STUDIO_PRESETS[payload.branchKey])
+          ) {
             setBranchKey(payload.branchKey)
           }
           if (typeof payload?.customTopic === 'string') {
@@ -365,16 +539,27 @@ export function LiveClassroomClient({
     })
   }
 
-  const handleCycleBranch = () => {
+  const handleSelectBranch = (nextKey: string) => {
     if (!isInstructor) return
-    const idx = BRANCH_ORDER.indexOf(branchKey as any)
-    const nextKey = BRANCH_ORDER[(idx + 1) % BRANCH_ORDER.length]
     setBranchKey(nextKey)
     channelRef.current?.send({
       type: 'broadcast',
       event: 'studio-meta',
       payload: { branchKey: nextKey, customTopic },
     })
+  }
+
+  const handleCycleBranch = () => {
+    if (!isInstructor) return
+    const cyclePool =
+      instructorKeys.length > 1
+        ? ['karma', ...instructorKeys]
+        : instructorKeys.length === 1
+          ? instructorKeys
+          : [...BRANCH_ORDER]
+    const idx = cyclePool.indexOf(branchKey)
+    const nextKey = cyclePool[(idx + 1) % cyclePool.length]
+    handleSelectBranch(nextKey)
   }
 
   const handleSaveTopic = () => {
@@ -637,7 +822,7 @@ export function LiveClassroomClient({
               <div className="relative rounded-[20px] bg-gradient-to-br from-[#131e36]/95 to-[#0b1222]/98 border border-slate-800 p-3.5 text-center shadow-xl overflow-hidden">
                 <div className="absolute top-0 left-6 right-6 h-[3px] rounded-full bg-gradient-to-r from-sky-400 via-indigo-500 to-orange-500" />
                 <div className="flex justify-center mt-0.5">
-                  <DersoLabMonogram size={50} />
+                  <DersoLabMonogram size={48} />
                 </div>
                 <div className="text-xl font-black tracking-tight text-white mt-1">DERSOLAB</div>
                 <button
@@ -650,6 +835,33 @@ export function LiveClassroomClient({
                 >
                   <span>{preset.badge}</span>
                 </button>
+
+                {/* Çoklu branşı olan eğitmenler için kendi branşları arasında tek tıkla görünür geçiş */}
+                {isInstructor && instructorKeys.length > 1 && (
+                  <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-1">
+                    {['karma', ...instructorKeys].map((k) => {
+                      const label =
+                        k === 'karma'
+                          ? 'Karma'
+                          : BRANCH_STUDIO_PRESETS[k]?.shortLabel || k
+                      const active = branchKey === k
+                      return (
+                        <button
+                          key={k}
+                          type="button"
+                          onClick={() => handleSelectBranch(k)}
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${
+                            active
+                              ? 'bg-sky-500/25 border border-sky-400 text-sky-200'
+                              : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* CARD 2: Active Lesson Topic Card */}
