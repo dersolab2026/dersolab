@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 100" width="430" height="100" fill="none">
+  <defs>
+    <linearGradient id="dl-cyan-light" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="dl-orange-light" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(4, 6) scale(0.88)">
+    <path d="M10 10L30 10L30 70L44 70L64 90L10 90Z" fill="url(#dl-cyan-light)"/>
+    <path d="M42 10L50 10C67.346 10.004 82.712 21.188 88.05 37.692C93.387 54.196 87.479 72.26 73.42 82.42L58.91 67.91C67.226 63.777 71.603 54.464 69.478 45.424C67.354 36.384 59.286 29.996 50 30L42 30Z" fill="url(#dl-orange-light)"/>
+  </g>
+  <text x="112" y="69" font-family="'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="56" font-weight="800" letter-spacing="-1.6">
+    <tspan fill="#0f172a">Derso</tspan><tspan fill="#ea580c">Lab</tspan>
+  </text>
+</svg>

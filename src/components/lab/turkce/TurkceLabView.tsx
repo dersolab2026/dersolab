@@ -154,10 +154,11 @@ export function TurkceLabView() {
           <div className="space-y-1.5 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
               <Image
-                src="/fox-head.png"
-                alt="DersoLab Maskot"
+                src="/dersolab-mark.svg"
+                alt="DersoLab"
                 width={16}
                 height={16}
+                unoptimized
                 className="w-3.5 h-3.5 object-contain"
               />
               <span>DersoLab Bire Bir Türkçe Atölyesi</span>

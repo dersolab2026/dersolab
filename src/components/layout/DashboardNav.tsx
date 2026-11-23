@@ -130,7 +130,7 @@ export function DashboardNav({ role, offersFreeTrial, notifications }: Dashboard
 
   const dividerIndex = role === 'admin' ? NAV_ITEMS.admin.length : -1
 
-  const mascotSrc = '/fox-head.png'
+  const mascotSrc = '/dersolab-mark.svg'
 
   return (
     <>

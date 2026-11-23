@@ -145,7 +145,10 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
             {/* Sütun 1: Marka & İletişim */}
             <div className="space-y-3">
-              <p className="text-base font-black text-white tracking-tight">DersoLab</p>
+              <div className="flex items-center gap-2">
+                <img src="/dersolab-mark.svg" alt="DersoLab" className="w-6 h-6 object-contain" />
+                <p className="text-base font-black text-white tracking-tight">DersoLab</p>
+              </div>
               <p className="text-slate-400 leading-relaxed">
                 LGS ve YKS hazırlığında zorunlu abonelik dayatmayan, yanmayan kredi ve onaylı eğitmenlerle bire bir online özel ders ve koçluk platformu.
               </p>

@@ -100,12 +100,13 @@ export function InstructorLandingView({ examFilter, onExamFilterChange }: Instru
             className="flex items-center justify-center gap-3"
           >
             <Image 
-              src="/fox-head.png" 
-              alt="DersoLab Avatar" 
+              src="/dersolab-mark.svg" 
+              alt="DersoLab" 
               width={48}
               height={48}
               priority
-              className="w-12 h-12 sm:w-10 sm:h-10 object-contain drop-shadow-md" 
+              unoptimized
+              className="w-10 h-10 sm:w-10 sm:h-10 object-contain drop-shadow-md" 
             />
             <span className="text-3xl sm:text-4xl font-black tracking-tight text-white">
               Derso<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Lab</span>

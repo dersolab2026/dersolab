@@ -60,7 +60,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         '@id': `${TABAN}/#organization`,
         name: 'DersoLab',
         url: TABAN,
-        logo: `${TABAN}/fox-head.png`,
+        logo: `${TABAN}/dersolab-mark-512.png`,
         description:
           'LGS ve YKS hazırlığında onaylı eğitmenlerle bire bir online özel ders, akademik koçluk ve Maarif Modeli uyumlu L.A.B. simülasyonları.',
         sameAs: [

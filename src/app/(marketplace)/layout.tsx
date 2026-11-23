@@ -19,7 +19,7 @@ export default async function MarketplaceLayout({ children }: { children: ReactN
         <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#0a0a0a]/85 border-b border-white/10">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <Image src="/fox-head.png" alt="DersoLab" width={32} height={32} className="w-8 h-8 object-contain" />
+              <Image src="/dersolab-mark.svg" alt="DersoLab" width={32} height={32} unoptimized className="w-8 h-8 object-contain" />
               <span className="text-lg font-black tracking-tight text-white">
                 Derso<span className="text-orange-400">Lab</span>
               </span>

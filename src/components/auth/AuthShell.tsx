@@ -14,7 +14,7 @@ function DynamicRoleHeader({ role }: { role?: 'student' | 'instructor' | 'parent
   let textFrom = 'from-orange-400'
   let textTo = 'to-amber-400'
   let glowColor = 'bg-orange-500/10'
-  const mascotSrc = '/fox-head.png'
+  const mascotSrc = '/dersolab-mark.svg'
 
   if (role === 'instructor') {
     textFrom = 'from-blue-400'
@@ -33,9 +33,10 @@ function DynamicRoleHeader({ role }: { role?: 'student' | 'instructor' | 'parent
         <div className={`w-14 h-14 relative transition-all duration-500 group-hover:scale-105`}>
           <Image 
             src={mascotSrc} 
-            alt="DersoLab Avatar" 
+            alt="DersoLab" 
             fill
             sizes="56px"
+            unoptimized
             className="object-contain" 
           />
         </div>

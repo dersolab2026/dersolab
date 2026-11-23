@@ -17,10 +17,11 @@ export function SocialCommunityBar() {
         <div className="space-y-3 text-center lg:text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-bold">
             <Image
-              src="/fox-head.png"
-              alt="DersoLab Maskot"
+              src="/dersolab-mark.svg"
+              alt="DersoLab"
               width={18}
               height={18}
+              unoptimized
               className="w-4 h-4 object-contain"
             />
             <span>@dersolabegitim • Sosyal Medya Topluluğu</span>

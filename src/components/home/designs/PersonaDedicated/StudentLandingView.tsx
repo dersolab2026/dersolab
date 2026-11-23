@@ -165,11 +165,12 @@ export function StudentLandingView({
             className="mb-3 sm:mb-6 flex items-center justify-center gap-2.5 sm:gap-3"
           >
             <Image 
-              src="/fox-head.png" 
-              alt="DersoLab Avatar" 
+              src="/dersolab-mark.svg" 
+              alt="DersoLab" 
               width={36}
               height={36}
               priority
+              unoptimized
               className="object-contain drop-shadow-md w-8 h-8 sm:w-10 sm:h-10" 
             />
             <span className="text-2xl sm:text-3xl font-black tracking-tight text-white">

@@ -35,10 +35,11 @@ export function LabTutorCTA({
           <div className="relative shrink-0">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-indigo-600/20 border border-indigo-400/30 p-2 flex items-center justify-center shadow-lg">
               <Image
-                src="/fox-head.png"
-                alt="DersoLab Maskot"
+                src="/dersolab-mark.svg"
+                alt="DersoLab"
                 width={64}
                 height={64}
+                unoptimized
                 className="w-full h-full object-contain drop-shadow"
               />
             </div>

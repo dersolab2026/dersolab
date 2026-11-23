@@ -23,10 +23,11 @@ export default function NotFound() {
         >
           <div className="w-12 h-12 relative transition-transform duration-300 group-hover:scale-105">
             <Image
-              src="/fox-head.png"
-              alt="DersoLab Avatar"
+              src="/dersolab-mark.svg"
+              alt="DersoLab"
               fill
               sizes="48px"
+              unoptimized
               className="object-contain"
               priority
             />

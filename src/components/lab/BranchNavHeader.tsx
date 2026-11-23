@@ -142,10 +142,11 @@ export function BranchNavHeader({ currentBranch }: BranchNavHeaderProps) {
               title="Hesabımın Ana Sayfasına (Dashboard) Dön"
             >
               <Image
-                src="/fox-head.png"
-                alt="DersoLab Maskot"
+                src="/dersolab-mark.svg"
+                alt="DersoLab"
                 width={36}
                 height={36}
+                unoptimized
                 className="w-8 h-8 object-contain drop-shadow-md group-hover:scale-110 transition-transform shrink-0"
                 priority
               />
