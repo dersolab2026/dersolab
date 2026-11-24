@@ -230,7 +230,7 @@ export function DersoLabTasteView() {
           {/* CTA Butonları */}
           <div className="flex items-center gap-3">
             <Link
-              href="/auth/giris"
+              href="/login"
               className="hidden sm:inline-block text-xs font-bold text-slate-300 hover:text-white px-3 py-2 transition-colors"
             >
               Giriş Yap

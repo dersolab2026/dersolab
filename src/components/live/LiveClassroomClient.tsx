@@ -468,9 +468,12 @@ export function LiveClassroomClient({
 
       channel
         .on('broadcast', { event: 'lab-sync' }, ({ payload }) => {
-          if (payload && typeof payload.url !== 'undefined') {
+          if (!payload || typeof payload.url === 'undefined') return
+          if (payload.url === null) {
+            setActiveSplitLabUrl(null)
+          } else if (typeof payload.url === 'string' && /^\/lab(\/[a-z0-9-]+)?$/i.test(payload.url)) {
             setActiveSplitLabUrl(payload.url)
-            if (payload.url) setStudioMode(true)
+            setStudioMode(true)
           }
         })
         .on('broadcast', { event: 'studio-mode' }, ({ payload }) => {
@@ -501,7 +504,10 @@ export function LiveClassroomClient({
           setStrokes([])
         })
         .on('broadcast', { event: 'wb-bg' }, ({ payload }) => {
-          setWhiteboardBg(payload?.dataUrl ?? null)
+          const dUrl = payload?.dataUrl
+          if (dUrl === null || (typeof dUrl === 'string' && dUrl.startsWith('data:image/') && dUrl.length <= 6_000_000)) {
+            setWhiteboardBg(dUrl)
+          }
         })
         .on('broadcast', { event: 'wb-grid' }, ({ payload }) => {
           if (payload?.mode) setGridMode(payload.mode)

@@ -1,20 +1,17 @@
 import crypto from 'crypto'
 
 function getSigningSecret(): string {
-  const secret = process.env.OAUTH_SIGNING_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.CRON_SECRET
-  if (!secret) {
-    throw new Error('OAuth state imzalama anahtarı (OAUTH_SIGNING_SECRET veya SUPABASE_SERVICE_ROLE_KEY) yapılandırılmamış.')
+  if (process.env.OAUTH_SIGNING_SECRET) {
+    return process.env.OAUTH_SIGNING_SECRET
   }
-  return secret
+  const baseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!baseKey) {
+    throw new Error('OAuth state imzalama anahtarı (OAUTH_SIGNING_SECRET veya SUPABASE_SECRET_KEY) yapılandırılmamış.')
+  }
+  // Domain-separated HKDF-benzeri türetilmiş anahtar (ham DB anahtarını doğrudan imzada kullanmaz)
+  return crypto.createHmac('sha256', baseKey).update('dersolab:google-oauth-state:v1').digest('hex')
 }
 
-/**
- * Google Calendar OAuth state parametresini kullanıcı kimliği ve zaman damgasıyla
- * HMAC-SHA256 kullanarak güvenli şekilde imzalar.
- * 
- * Bu sayede Android Capacitor uygulamasında harici sistem tarayıcısı (Chrome) açıldığında
- * oturum çerezleri taşınmasa bile geri dönüşte kullanıcının kimliği kriptografik olarak doğrulanır.
- */
 export function createSignedOAuthState(userId: string): string {
   const nonce = crypto.randomBytes(16).toString('hex')
   const timestamp = Date.now()
@@ -32,9 +29,11 @@ export function verifySignedOAuthState(stateStr: string): { valid: boolean; user
     const parts = raw.split(':')
     if (parts.length !== 4) return { valid: false, userId: null }
     const [userId, timestampStr, nonce, signature] = parts
+    if (!userId || !nonce || !/^[0-9a-f]{64}$/i.test(signature)) {
+      return { valid: false, userId: null }
+    }
     const timestamp = Number(timestampStr)
 
-    // 15 dakika geçerlilik süresi kontrolü
     if (isNaN(timestamp) || Date.now() - timestamp > 15 * 60 * 1000 || Date.now() < timestamp - 60 * 1000) {
       return { valid: false, userId: null }
     }

@@ -146,7 +146,7 @@ export function ModernAcademyView() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/giris"
+              href="/login"
               className="px-4 py-2 text-xs font-semibold text-slate-200 hover:text-white transition-colors"
             >
               Giriş Yap
@@ -190,7 +190,7 @@ export function ModernAcademyView() {
               <div className="flex items-center gap-2.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
                 <div className="text-xs">
-                  <div className="font-bold text-white">İlk 20 Dk İade</div>
+                  <div className="font-bold text-white">İlk Ders Güvencesi</div>
                   <div className="text-slate-300 font-medium">Frekans tutmazsa sıfır risk</div>
                 </div>
               </div>

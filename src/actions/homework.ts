@@ -120,6 +120,9 @@ export async function markHomeworkCompleted(homeworkId: string): Promise<ActionR
  */
 export async function listResources(subject?: string) {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
   let sorgu = supabase
     .from('study_resources')
     .select('id, publisher, title, subject, exam_type, total_units')

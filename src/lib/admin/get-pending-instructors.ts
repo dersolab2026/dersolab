@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export interface PendingInstructor {
@@ -11,6 +12,12 @@ export interface PendingInstructor {
 }
 
 export async function getPendingInstructors(): Promise<PendingInstructor[]> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data: roleRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+  if (roleRow?.role !== 'admin') return []
+
   const admin = createAdminClient()
 
   const { data: instructors, error } = await admin

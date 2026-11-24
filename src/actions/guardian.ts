@@ -59,10 +59,13 @@ export async function veliKoduUret(): Promise<
 /** Ogrencinin duran (kullanilmamis, suresi gecmemis) kodu. */
 export async function aktifVeliKodu(studentId: string): Promise<StudentGuardianCode | null> {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.id !== studentId) return null
+
   const { data } = await supabase
     .from('guardian_link_codes')
     .select('code, expires_at')
-    .eq('student_id', studentId)
+    .eq('student_id', user.id)
     .is('used_at', null)
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: false })
@@ -223,6 +226,13 @@ export async function veliPaketAlimiBaslat(
 /** Ogrenciye bagli veliler — ogrenci gorur ama kaldiramaz. */
 export async function ogrenciyeBagliVeliler(studentId: string): Promise<GuardianLinkRow[]> {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  if (user.id !== studentId) {
+    const { data: roleRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+    if (roleRow?.role !== 'admin') return []
+  }
 
   const { data: links } = await supabase
     .from('guardian_links')

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import { ModernAcademyView } from '@/components/home/designs/ModernAcademy/ModernAcademyView'
 
 export const metadata: Metadata = {
@@ -7,5 +8,8 @@ export const metadata: Metadata = {
 }
 
 export default function Tasarim5Page() {
+  if (process.env.NODE_ENV === 'production') {
+    redirect('/')
+  }
   return <ModernAcademyView />
 }

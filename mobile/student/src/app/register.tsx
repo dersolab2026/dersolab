@@ -90,8 +90,8 @@ export default function UnifiedRegisterScreen() {
       setErrorMsg('Lütfen ad soyad, e-posta ve şifre alanlarını doldurunuz.');
       return;
     }
-    if (password.length < 6) {
-      setErrorMsg('Şifreniz en az 6 karakter olmalıdır.');
+    if (password.length < 8) {
+      setErrorMsg('Şifreniz en az 8 karakter olmalıdır.');
       return;
     }
     if (password !== passwordConfirm) {

@@ -1,11 +1,34 @@
+export function escapeHtml(value: string | null | undefined): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+export function sanitizeEmailUrl(rawUrl: string | null | undefined): string {
+  if (!rawUrl) return 'https://dersolab.com/dashboard'
+  try {
+    const parsed = new URL(rawUrl, 'https://dersolab.com')
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      return escapeHtml(parsed.toString())
+    }
+  } catch {
+    // fallback below
+  }
+  return 'https://dersolab.com/dashboard'
+}
+
 export function buildEmailHtml(title: string, contentHtml: string): string {
+  const safeTitle = escapeHtml(title)
   return `
 <!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
+  <title>${safeTitle}</title>
   <style>
     body {
       margin: 0;
@@ -93,7 +116,7 @@ export function buildEmailHtml(title: string, contentHtml: string): string {
     <div class="card">
       <div class="header">
         <img src="https://dersolab.com/icon.png" alt="DersoLab Logo" class="logo" />
-        <h1 class="title">${title}</h1>
+        <h1 class="title">${safeTitle}</h1>
       </div>
       <div class="content">
         ${contentHtml}

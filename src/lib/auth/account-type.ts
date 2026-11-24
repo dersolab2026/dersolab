@@ -56,11 +56,14 @@ export async function hesapTuruBelirle(
       .upsert({ user_id: userId, grade_track: 'yks' }, { onConflict: 'user_id', ignoreDuplicates: true })
   }
 
-  const { error } = await admin
+  const { data: updated, error } = await admin
     .from('users')
     .update({ role: rol, role_confirmed: true })
     .eq('id', userId)
+    .eq('role_confirmed', false)
+    .select('id')
+    .maybeSingle()
 
-  if (error) return { success: false, error: 'Hesap türü ayarlanamadı, lütfen tekrar dene' }
+  if (error || !updated) return { success: false, error: 'Hesap türü ayarlanamadı, lütfen tekrar dene' }
   return { success: true }
 }

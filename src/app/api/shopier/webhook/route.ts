@@ -4,11 +4,12 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 interface ShopierOrderPayload {
   id: string
+  currency?: string
   paymentStatus?: string
   note?: string
   shippingInfo?: { email?: string; firstName?: string; lastName?: string }
-  lineItems?: { productId: string }[]
-  totals?: { total?: string }
+  lineItems?: { productId: string; quantity?: number }[]
+  totals?: { total?: string; currency?: string }
 }
 
 async function queueUnmatched(
@@ -27,7 +28,6 @@ async function queueUnmatched(
     note: order.note ?? null,
     reason,
   })
-  // aynı sipariş için webhook tekrar gelirse unique(shopier_order_id) ihlali beklenir, yok say
   if (error && error.code !== '23505') console.error('shopier_unmatched_payments insert hatası:', error)
 }
 
@@ -58,7 +58,14 @@ export async function POST(request: NextRequest) {
   }
 
   const order = payload as ShopierOrderPayload
-  if (order.paymentStatus && order.paymentStatus !== 'paid') {
+  const orderId = typeof order?.id === 'string' ? order.id.trim() : ''
+  if (!orderId) {
+    return NextResponse.json({ error: 'missing order id' }, { status: 400 })
+  }
+  order.id = orderId
+
+  // Fail-closed: yalnızca açıkça 'paid' olan siparişlere kredi tanımla
+  if (order.paymentStatus !== 'paid') {
     return NextResponse.json({ ok: true, ignored: 'not paid' })
   }
 
@@ -68,18 +75,19 @@ export async function POST(request: NextRequest) {
     .from('package_purchases')
     .select('id')
     .eq('payment_provider', 'shopier')
-    .eq('payment_reference', order.id)
+    .eq('payment_reference', orderId)
     .maybeSingle()
   if (existingPurchase) return NextResponse.json({ ok: true, duplicate: true })
 
   const { data: existingUnmatched } = await admin
     .from('shopier_unmatched_payments')
     .select('id')
-    .eq('shopier_order_id', order.id)
+    .eq('shopier_order_id', orderId)
     .maybeSingle()
   if (existingUnmatched) return NextResponse.json({ ok: true, duplicate: true })
 
-  const productId = order.lineItems?.[0]?.productId
+  const firstItem = order.lineItems?.[0]
+  const productId = firstItem?.productId
   const { data: pkg } = productId
     ? await admin.from('packages').select('id, credit_amount, price').eq('shopier_product_id', productId).maybeSingle()
     : { data: null }
@@ -89,9 +97,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, queued: true })
   }
 
+  // Para birimi, miktar ve tutar doğrulaması
+  const currency = (order.currency || order.totals?.currency || 'TRY').toUpperCase()
+  const paidTotal = Number(order.totals?.total)
+  const expectedPrice = Number(pkg.price)
+  const itemQty = firstItem?.quantity ?? 1
+
+  if (
+    currency !== 'TRY' ||
+    (order.lineItems && order.lineItems.length !== 1) ||
+    itemQty !== 1 ||
+    !Number.isFinite(paidTotal) ||
+    Math.abs(paidTotal - expectedPrice) > 0.01
+  ) {
+    await queueUnmatched(admin, order, pkg.id, 'tutar_veya_adet_uyusmazligi')
+    return NextResponse.json({ ok: true, queued: true })
+  }
+
   const buyerEmail = order.shippingInfo?.email?.trim().toLowerCase()
   const { data: buyer } = buyerEmail
-    ? await admin.from('users').select('id, role').ilike('email', buyerEmail).maybeSingle()
+    ? await admin.from('users').select('id, role').ilike('email', buyerEmail).is('deleted_at', null).maybeSingle()
     : { data: null }
 
   if (!buyer) {
@@ -99,12 +124,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, queued: true })
   }
 
-  // VELI ALIMI: veli, panelde hangi ogrenci icin aldigini seciyor ve o
-  // secim odemeden once 'pending' bir package_purchases satiri olarak
-  // yaziliyor. Burada o satiri bulup 'completed' yapiyoruz; krediyi
-  // trg_grant_credits satirdaki student_id'ye yaziyor. Shopier'e "kredi
-  // kime" bilgisini tasiyacak bir alan gonderemedigimiz icin, birden fazla
-  // cocugu olan velide dogru kardesi bulmanin yolu bu.
   if (buyer.role === 'parent') {
     const { data: bekleyen } = await admin
       .from('package_purchases')
@@ -117,20 +136,31 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (!bekleyen) {
-      // Veli paneli disindan (dogrudan Shopier linkiyle) odeme yapilmis:
-      // hangi ogrenci oldugunu bilemeyiz, admin cozsun.
       await queueUnmatched(admin, order, pkg.id, 'veli_secim_yok')
       return NextResponse.json({ ok: true, queued: true })
     }
 
-    const { error: updateError } = await admin
+    const { data: updatedRow, error: updateError } = await admin
       .from('package_purchases')
-      .update({ status: 'completed', payment_reference: order.id })
+      .update({
+        status: 'completed',
+        payment_reference: orderId,
+        credits_granted: pkg.credit_amount,
+        amount_paid: pkg.price,
+      })
       .eq('id', bekleyen.id)
+      .eq('status', 'pending')
+      .select('id')
+      .maybeSingle()
 
     if (updateError) {
+      if (updateError.code === '23505') {
+        return NextResponse.json({ ok: true, duplicate: true })
+      }
       console.error('Shopier webhook: veli alimi tamamlanamadi:', updateError)
       await queueUnmatched(admin, order, pkg.id, 'kayit_hatasi')
+    } else if (!updatedRow) {
+      return NextResponse.json({ ok: true, duplicate: true })
     }
 
     return NextResponse.json({ ok: true, guardianPurchase: true })
@@ -148,7 +178,7 @@ export async function POST(request: NextRequest) {
     credits_granted: pkg.credit_amount,
     amount_paid: pkg.price,
     payment_provider: 'shopier',
-    payment_reference: order.id,
+    payment_reference: orderId,
     status: 'completed',
   })
 

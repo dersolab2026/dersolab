@@ -27,9 +27,6 @@ const config: CapacitorConfig = {
       // Shopier ödeme akışı
       'shopier.com',
       '*.shopier.com',
-      // Google OAuth (Giriş & Takvim bağlama)
-      'accounts.google.com',
-      '*.google.com',
       // Canlı Ders Odası (Jitsi / 8x8 WebRTC)
       'meet.jit.si',
       '*.jitsi.net',

@@ -54,6 +54,25 @@ const FALLBACK_QUIZ: SpacedQuizQuestion[] = [
   },
 ]
 
+const quizRateMap = new Map<string, { count: number; resetAt: number }>()
+
+function checkQuizRateLimit(userId: string): boolean {
+  const now = Date.now()
+  if (quizRateMap.size > 500) {
+    for (const [k, v] of quizRateMap.entries()) {
+      if (v.resetAt < now) quizRateMap.delete(k)
+    }
+  }
+  const entry = quizRateMap.get(userId)
+  if (!entry || entry.resetAt < now) {
+    quizRateMap.set(userId, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 })
+    return true
+  }
+  if (entry.count >= 25) return false
+  entry.count += 1
+  return true
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -72,14 +91,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Lütfen giriş yapın.' }, { status: 401 })
     }
 
-    const body = await request.json()
-    const {
-      subject = 'TYT Matematik',
-      recentQuestions = [],
-    } = body as {
-      subject?: string
-      recentQuestions?: Array<{ subject: string; question: string }>
+    if (!checkQuizRateLimit(user.id)) {
+      return NextResponse.json({ error: 'Günlük tekrar testi limitine ulaştınız.' }, { status: 429 })
     }
+
+    const body = await request.json()
+    const rawSubject = typeof body?.subject === 'string' ? body.subject : 'TYT Matematik'
+    const subject = rawSubject.replace(/[\r\n"`]/g, '').trim().slice(0, 60) || 'TYT Matematik'
+    const recentQuestions: Array<{ subject: string; question: string }> = Array.isArray(body?.recentQuestions)
+      ? body.recentQuestions
+          .slice(0, 5)
+          .map((q: any) => ({
+            subject: String(q?.subject ?? '').replace(/[\r\n]/g, ' ').slice(0, 60),
+            question: String(q?.question ?? '').slice(0, 180),
+          }))
+      : []
 
     const apiKey = process.env.GEMINI_API_KEY
     if (!apiKey) {

@@ -1,6 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createBooking } from '@/actions/bookings'
@@ -50,7 +52,25 @@ export async function requestDemoLesson(studentId: string): Promise<ActionResult
   return { success: true }
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const demoLeadEmailSchema = z.string().trim().toLowerCase().max(254).email()
+const demoLeadRateMap = new Map<string, { count: number; resetAt: number }>()
+
+function checkDemoLeadRateLimit(ip: string): boolean {
+  const now = Date.now()
+  if (demoLeadRateMap.size > 500) {
+    for (const [k, v] of demoLeadRateMap.entries()) {
+      if (now > v.resetAt) demoLeadRateMap.delete(k)
+    }
+  }
+  const entry = demoLeadRateMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    demoLeadRateMap.set(ip, { count: 1, resetAt: now + 60 * 60 * 1000 })
+    return true
+  }
+  if (entry.count >= 4) return false
+  entry.count += 1
+  return true
+}
 
 interface DemoLeadOptions {
   phone?: string
@@ -62,13 +82,23 @@ export async function requestDemoLessonByEmail(
   email: string,
   options?: DemoLeadOptions
 ): Promise<ActionResult> {
-  const trimmedName = name.trim()
-  const trimmedEmail = email.trim().toLowerCase()
-  const trimmedPhone = options?.phone?.trim().slice(0, 30) || ''
-  const trimmedSubject = options?.subject?.trim().slice(0, 60) || ''
+  const trimmedName = (name || '').trim().replace(/[\r\n<>]/g, '').slice(0, 80)
+  const parsedEmail = demoLeadEmailSchema.safeParse(email)
+  const trimmedPhone = (options?.phone || '').trim().replace(/[^\d+\s()-]/g, '').slice(0, 24)
+  const trimmedSubject = (options?.subject || '').trim().replace(/[\r\n<>]/g, '').slice(0, 60)
 
-  if (!trimmedName) return { success: false, error: 'İsmini girmelisin' }
-  if (!EMAIL_RE.test(trimmedEmail)) return { success: false, error: 'Geçerli bir e-posta adresi gir' }
+  if (trimmedName.length < 2) return { success: false, error: 'İsmini girmelisin' }
+  if (!parsedEmail.success) return { success: false, error: 'Geçerli bir e-posta adresi gir' }
+  const trimmedEmail = parsedEmail.data
+
+  const reqHeaders = await headers()
+  const clientIp =
+    reqHeaders.get('x-real-ip') ||
+    reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    'unknown'
+  if (clientIp !== 'unknown' && !checkDemoLeadRateLimit(clientIp)) {
+    return { success: false, error: 'Çok fazla talep gönderildi, lütfen biraz bekleyip tekrar dene' }
+  }
 
   const supabase = await createClient()
   const { data: { user: activeUser } } = await supabase.auth.getUser()
@@ -83,8 +113,9 @@ export async function requestDemoLessonByEmail(
   const isLoggedInParentSelf =
     Boolean(existingUser && activeUser && existingUser.id === activeUser.id && existingUser.role === 'parent')
 
+  // Hesap numaralandırma (enumeration) engeli: dış ziyaretçiye kaydın varlığını ifşa etme
   if (existingUser && !isLoggedInParentSelf) {
-    return { success: false, error: 'Bu e-posta zaten kayıtlı — giriş yapıp Hoş Geldin Paketini talep edebilirsin' }
+    return { success: true }
   }
 
   const { data: existingRequest } = await admin
@@ -94,7 +125,7 @@ export async function requestDemoLessonByEmail(
     .eq('status', 'pending')
     .maybeSingle()
   if (existingRequest) {
-    return { success: false, error: 'Zaten bekleyen bir tanışma dersi talebin var' }
+    return { success: true }
   }
 
   const leadLabel = [
@@ -111,7 +142,10 @@ export async function requestDemoLessonByEmail(
     lead_email: trimmedEmail,
   })
 
-  if (error) return { success: false, error: error.message }
+  if (error) {
+    console.error('requestDemoLessonByEmail insert error:', error)
+    return { success: false, error: 'Talep oluşturulamadı, lütfen tekrar dene' }
+  }
 
   await notifyDemoLessonRequested(leadLabel)
 

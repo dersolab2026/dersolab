@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export interface AdminStats {
@@ -8,7 +9,21 @@ export interface AdminStats {
   revenueThisMonth: number
 }
 
+const EMPTY_STATS: AdminStats = {
+  totalStudents: 0,
+  totalInstructors: 0,
+  pendingInstructors: 0,
+  bookingsThisMonth: 0,
+  revenueThisMonth: 0,
+}
+
 export async function getAdminStats(): Promise<AdminStats> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return EMPTY_STATS
+  const { data: roleRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+  if (roleRow?.role !== 'admin') return EMPTY_STATS
+
   const admin = createAdminClient()
 
   const startOfMonth = new Date()

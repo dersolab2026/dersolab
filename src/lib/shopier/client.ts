@@ -108,11 +108,13 @@ export async function deleteShopierWebhook(id: string): Promise<void> {
 export function verifyShopierWebhookSignature(rawBody: string, signatureHeader: string | null): boolean {
   const token = process.env.SHOPIER_WEBHOOK_TOKEN
   if (!token || !signatureHeader) return false
+  const cleanSig = signatureHeader.trim()
+  if (!/^[0-9a-f]{64}$/i.test(cleanSig)) return false
 
   const expected = crypto.createHmac('sha256', token).update(rawBody).digest('hex')
 
   const expectedBuf = Buffer.from(expected, 'hex')
-  const actualBuf = Buffer.from(signatureHeader, 'hex')
+  const actualBuf = Buffer.from(cleanSig, 'hex')
   if (expectedBuf.length !== actualBuf.length) return false
   return crypto.timingSafeEqual(expectedBuf, actualBuf)
 }

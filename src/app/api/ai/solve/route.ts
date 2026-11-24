@@ -140,16 +140,22 @@ export async function POST(request: NextRequest) {
 
     const ai = new GoogleGenAI({ apiKey })
 
-    const userPrompt = subject
-      ? `Branş: ${subject}\n\nSoru:\n${effectiveQuestion}`
+    const safeSubject = typeof subject === 'string' ? subject.replace(/[\r\n]/g, ' ').trim().slice(0, 60) : ''
+    const userPrompt = safeSubject
+      ? `Branş: ${safeSubject}\n\nSoru:\n${effectiveQuestion}`
       : `Soru:\n${effectiveQuestion}`
 
     // Görsel varsa multimodal, yoksa sadece metin
     let contents: Parameters<typeof ai.models.generateContent>[0]['contents']
 
     if (imageBase64) {
-      const mimeMatch = imageBase64.match(/^data:(image\/[a-zA-Z0-9.+_-]+);base64,/)
-      const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg'
+      if (typeof imageBase64 !== 'string' || imageBase64.length > 6_000_000) {
+        return NextResponse.json({ error: 'Yüklenen görsel boyutu çok büyük (maksimum ~4.5 MB).' }, { status: 413 })
+      }
+      const mimeMatch = imageBase64.match(/^data:(image\/(?:jpeg|jpg|png|webp));base64,/i)
+      const mimeType = mimeMatch
+        ? (mimeMatch[1].toLowerCase() === 'image/jpg' ? 'image/jpeg' : mimeMatch[1].toLowerCase())
+        : 'image/jpeg'
       const base64Data = imageBase64.replace(/^data:image\/[a-zA-Z0-9.+_-]+;base64,/, '')
       contents = [
         {

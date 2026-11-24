@@ -74,8 +74,8 @@ export default function InstructorRegisterScreen() {
       return;
     }
 
-    if (password.length < 6) {
-      setErrorMsg('Şifreniz en az 6 karakterden oluşmalıdır.');
+    if (password.length < 8) {
+      setErrorMsg('Şifreniz en az 8 karakterden oluşmalıdır.');
       return;
     }
 

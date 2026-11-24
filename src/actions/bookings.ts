@@ -11,7 +11,7 @@ import {
   notifyLessonCompleted,
   notifyLessonMissed,
 } from '@/lib/notifications/send-guardian-notification'
-import { TRIAL_LESSON_DURATION_MINUTES } from '@/lib/constants'
+import { LESSON_DURATION_MINUTES, TRIAL_LESSON_DURATION_MINUTES } from '@/lib/constants'
 import type { TimeSlot, SessionType } from '@/types'
 
 type ActionResult = { success: true } | { success: false; error: string }
@@ -45,9 +45,17 @@ export async function createBooking({
     return { success: false, error: 'Bu işlem için giriş yapmalısın' }
   }
 
-  const endTime = isTrial
-    ? new Date(new Date(slot.start).getTime() + TRIAL_LESSON_DURATION_MINUTES * 60_000).toISOString()
-    : slot.end
+  const startMs = Date.parse(slot.start)
+  if (!Number.isFinite(startMs)) {
+    return { success: false, error: 'Geçersiz ders saati seçildi' }
+  }
+  if (startMs < Date.now() - 60_000) {
+    return { success: false, error: 'Geçmiş bir saat için ders planlanamaz' }
+  }
+
+  const durationMins = isTrial ? TRIAL_LESSON_DURATION_MINUTES : LESSON_DURATION_MINUTES
+  const startIso = new Date(startMs).toISOString()
+  const endTime = new Date(startMs + durationMins * 60_000).toISOString()
 
   const { data: booking, error: bookingError } = await supabase
     .from('bookings')
@@ -55,12 +63,12 @@ export async function createBooking({
       student_id: studentId,
       instructor_id: instructorId,
       purchased_by: user.id,
-      start_time: slot.start,
+      start_time: startIso,
       end_time: endTime,
       status: 'scheduled',
       is_trial: isTrial ?? false,
-      topic_note: topicNote?.trim() || null,
-      session_type: sessionType ?? 'lesson',
+      topic_note: topicNote?.trim().slice(0, 300) || null,
+      session_type: sessionType === 'coaching' ? 'coaching' : 'lesson',
     })
     .select('id')
     .single()
@@ -230,15 +238,18 @@ export async function markBookingCompleted(bookingId: string, instructorNotes?: 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Giriş yapmalısın' }
 
+  const nowIso = new Date().toISOString()
   const { data: booking, error } = await supabase
     .from('bookings')
-    .update({ status: 'completed', completed_at: new Date().toISOString(), instructor_notes: instructorNotes ?? null })
+    .update({ status: 'completed', completed_at: nowIso, instructor_notes: instructorNotes?.slice(0, 1000) ?? null })
     .eq('id', bookingId)
     .eq('instructor_id', user.id)
+    .eq('status', 'scheduled')
+    .lte('start_time', nowIso)
     .select('student_id, start_time')
     .single()
 
-  if (error || !booking) return { success: false, error: error?.message ?? 'Rezervasyon güncellenemedi' }
+  if (error || !booking) return { success: false, error: 'Yalnızca başlamış ve planlı bir ders tamamlandı olarak işaretlenebilir' }
 
   const { data: instructorUser } = await admin.from('users').select('name').eq('id', user.id).single()
   await notifyLessonCompleted({
@@ -257,15 +268,18 @@ export async function markBookingNoShow(bookingId: string): Promise<ActionResult
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Giriş yapmalısın' }
 
+  const nowIso = new Date().toISOString()
   const { data: booking, error } = await supabase
     .from('bookings')
-    .update({ status: 'no_show', completed_at: new Date().toISOString() })
+    .update({ status: 'no_show', completed_at: nowIso })
     .eq('id', bookingId)
     .eq('instructor_id', user.id)
+    .eq('status', 'scheduled')
+    .lte('start_time', nowIso)
     .select('student_id, start_time')
     .single()
 
-  if (error || !booking) return { success: false, error: error?.message ?? 'Rezervasyon güncellenemedi' }
+  if (error || !booking) return { success: false, error: 'Yalnızca saati gelmiş ve planlı bir ders katılmadı olarak işaretlenebilir' }
 
   const { data: instructorUser2 } = await admin.from('users').select('name').eq('id', user.id).single()
   await notifyLessonMissed({

@@ -3,14 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter, Link } from 'expo-router';
+import { Link } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
 export default function UnifiedAppIndex() {
-  const router = useRouter();
-
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <StatusBar style="light" />
@@ -89,39 +86,6 @@ export default function UnifiedAppIndex() {
               <Text style={styles.secondaryButtonText}>Ücretsiz Hesap Oluştur</Text>
             </TouchableOpacity>
           </Link>
-
-          {/* Hızlı Native Arayüz Keşfi (Web Role Renkleriyle Birebir) */}
-          <View style={styles.quickExploreBox}>
-            <Text style={styles.quickExploreTitle}>PANELLERİ DOĞRUDAN KEŞFET</Text>
-            <View style={styles.quickRoleRow}>
-              <TouchableOpacity
-                style={[styles.roleChip, { backgroundColor: 'rgba(249, 115, 22, 0.14)', borderColor: 'rgba(249, 115, 22, 0.4)' }]}
-                onPress={() => router.push('/dashboard' as any)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="school" size={15} color="#fb923c" />
-                <Text style={[styles.roleChipText, { color: '#fb923c' }]}>Öğrenci</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.roleChip, { backgroundColor: 'rgba(16, 185, 129, 0.14)', borderColor: 'rgba(16, 185, 129, 0.4)' }]}
-                onPress={() => router.push('/parent' as any)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="shield-checkmark" size={15} color="#34d399" />
-                <Text style={[styles.roleChipText, { color: '#34d399' }]}>Veli</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.roleChip, { backgroundColor: 'rgba(59, 130, 246, 0.14)', borderColor: 'rgba(59, 130, 246, 0.4)' }]}
-                onPress={() => router.push('/instructor' as any)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="easel" size={15} color="#60a5fa" />
-                <Text style={[styles.roleChipText, { color: '#60a5fa' }]}>Eğitmen</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -275,39 +239,5 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
-  },
-  quickExploreBox: {
-    marginTop: 8,
-    paddingTop: 14,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
-    alignItems: 'center',
-  },
-  quickExploreTitle: {
-    color: '#64748b',
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 1.5,
-    marginBottom: 10,
-  },
-  quickRoleRow: {
-    flexDirection: 'row',
-    gap: 10,
-    width: '100%',
-  },
-  roleChip: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 11,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderWidth: 1,
-  },
-  roleChipText: {
-    fontSize: 12,
-    fontWeight: '800',
   },
 });

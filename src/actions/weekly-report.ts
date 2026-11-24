@@ -15,7 +15,7 @@ export async function haftalikRaporOnizle(
   studentId: string, hafta: string, kocYorumu: string,
 ): Promise<{ success: true; rapor: HaftalikRapor } | { success: false; error: string }> {
   const insight = await getStudentInsight(studentId)
-  if (!insight) return { success: false, error: 'Bu öğrenciyi görme yetkin yok' }
+  if (!insight || !insight.isCoach) return { success: false, error: 'Bu öğrenciye koçluk raporu hazırlama yetkin yok' }
 
   return {
     success: true,
@@ -23,8 +23,8 @@ export async function haftalikRaporOnizle(
       insight,
       planItems: insight.planItems,
       planWeeks: insight.planWeeks,
-      hafta,
-      kocYorumu,
+      hafta: hafta.slice(0, 20),
+      kocYorumu: kocYorumu.slice(0, 2000),
     }),
   }
 }

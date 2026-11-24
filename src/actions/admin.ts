@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { buildEmailHtml, escapeHtml } from '@/lib/email-template'
 import { notifyInstructorApprovalStatus } from '@/lib/notifications/send-guardian-notification'
 import { getCategoryLink, type AdminNotificationCategory } from '@/lib/notifications/get-notification-link'
 import { createShopierProduct, updateShopierProduct } from '@/lib/shopier/client'
@@ -278,13 +279,14 @@ export async function sendAdminNotification(params: SendAdminNotificationParams)
   const { error } = await admin.from('notifications').insert(rows)
   if (error) return { success: false, error: error.message }
 
+  const safeBodyHtml = escapeHtml(body).replace(/\n/g, '<br/>')
   await Promise.allSettled(
     recipients.map((recipient) =>
       resend.emails.send({
         from: 'DersoLab <notifications@dersolab.com>',
         to: recipient.email,
         subject: `${title} - DersoLab`,
-        html: `<p>Merhaba ${recipient.name},</p><p>${body.replace(/\n/g, '<br/>')}</p>`,
+        html: buildEmailHtml(title, `<p>Merhaba ${escapeHtml(recipient.name)},</p><p>${safeBodyHtml}</p>`),
       })
     )
   )
@@ -345,6 +347,11 @@ export async function deleteUserAccount(userId: string): Promise<ActionResult> {
   if (userId === user.id) return { success: false, error: 'Kendi hesabını silemezsin' }
 
   const admin = createAdminClient()
+  const { data: targetUser } = await admin.from('users').select('role').eq('id', userId).maybeSingle()
+  if (targetUser?.role === 'admin') {
+    return { success: false, error: 'Yönetici hesapları bu ekrandan silinemez' }
+  }
+
   const anonymizedEmail = `silinmis-${userId}@dersolab.local`
 
   const { error: userError } = await admin
@@ -362,19 +369,21 @@ export async function deleteUserAccount(userId: string): Promise<ActionResult> {
     })
     .eq('id', userId)
 
-  if (userError) return { success: false, error: userError.message }
+  if (userError) return { success: false, error: 'Kullanıcı kaydı güncellenemedi' }
 
   await admin
     .from('instructors')
-    .update({ approval_status: 'rejected', bio: null, intro_video_url: null })
+    .update({ approval_status: 'rejected', bio: null, intro_video_url: null, paused: true })
     .eq('user_id', userId)
+
+  await admin.rpc('delete_user_oauth_identities', { p_user_id: userId })
 
   const { error: authError } = await admin.auth.admin.updateUserById(userId, {
     email: anonymizedEmail,
     ban_duration: '876000h',
   })
 
-  if (authError) return { success: false, error: authError.message }
+  if (authError) return { success: false, error: 'Kimlik doğrulama kaydı kapatılamadı' }
 
   revalidatePath('/dashboard/admin/users')
   return { success: true }

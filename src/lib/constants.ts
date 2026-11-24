@@ -40,6 +40,7 @@ export const INSTRUCTOR_SUBJECT_OPTIONS = [...LESSON_SUBJECTS, GUIDANCE_SUBJECT]
 export const SOCIAL_LINKS: { platform: SocialPlatform; url: string }[] = [
   { platform: 'instagram', url: 'https://www.instagram.com/dersolabegitim/' },
   { platform: 'tiktok', url: 'https://www.tiktok.com/@dersolabegitim' },
+  { platform: 'youtube', url: 'https://www.youtube.com/channel/UC9YAcbRIPALgsMEjiORUEFQ' },
 ]
 
 export type SocialPlatform = 'instagram' | 'youtube' | 'tiktok' | 'x' | 'linkedin'

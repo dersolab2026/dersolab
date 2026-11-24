@@ -42,12 +42,19 @@ export default function RootLayout() {
       firstSegment === 'instructor';
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session && !inRoleArea) {
+      if (!session && inRoleArea) {
+        router.replace('/');
+        return;
+      }
+      if (session) {
         const target = await resolveTargetRouteForSession(
           session.user.id,
           session.user.user_metadata?.role
         );
-        router.replace(target as any);
+        const expectedSegment = target.slice(1);
+        if (!inRoleArea || firstSegment !== expectedSegment) {
+          router.replace(target as any);
+        }
       }
     });
 

@@ -1,5 +1,6 @@
 'use server'
 
+import crypto from 'crypto'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -22,6 +23,11 @@ export async function getOrCreateCoachInviteCode(): Promise<
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Giriş yapmalısın' }
 
+  const { data: isActiveCoach } = await supabase.rpc('is_coach', { p_user_id: user.id })
+  if (!isActiveCoach) {
+    return { success: false, error: 'Davet kodu oluşturmak için onaylı bir koç olmalısın' }
+  }
+
   const admin = createAdminClient()
   let mevcut: { coach_invite_code: string | null } | null = null
   const { data: initData, error: coachCodeErr } = await admin
@@ -42,19 +48,16 @@ export async function getOrCreateCoachInviteCode(): Promise<
 
   if (mevcut?.coach_invite_code) return { success: true, code: mevcut.coach_invite_code }
 
-  // Karisabilecek harfler (I, O, 0, 1) disarida birakildi: kod elle
-  // yaziliyor, okunakli olmasi gerekiyor.
   const ALFABE = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   for (let deneme = 0; deneme < 8; deneme++) {
     let kod = 'KOC-'
-    for (let i = 0; i < 5; i++) kod += ALFABE[Math.floor(Math.random() * ALFABE.length)]
+    for (let i = 0; i < 8; i++) kod += ALFABE[crypto.randomInt(0, ALFABE.length)]
 
     let { error } = await admin
       .from('instructor_coach_codes')
       .upsert({ user_id: user.id, coach_invite_code: kod }, { onConflict: 'user_id' })
 
     if (error) {
-      // Tablo henuz olusturulmadiysa fallback
       const { error: fallbackErr } = await admin
         .from('instructors')
         .update({ coach_invite_code: kod })
@@ -63,9 +66,8 @@ export async function getOrCreateCoachInviteCode(): Promise<
     }
 
     if (!error) return { success: true, code: kod }
-    // unique ihlali disinda bir hata varsa tekrar denemenin anlami yok
     if (!error.message.includes('duplicate') && !error.message.includes('unique')) {
-      return { success: false, error: error.message }
+      return { success: false, error: 'Kod üretilemedi, tekrar dener misin?' }
     }
   }
   return { success: false, error: 'Kod üretilemedi, tekrar dener misin?' }
@@ -77,10 +79,20 @@ export async function joinCoachByCode(code: string): Promise<ActionResult> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Giriş yapmalısın' }
 
-  const temiz = code.trim().toUpperCase()
+  const temiz = code.trim().toUpperCase().slice(0, 20)
   if (!temiz) return { success: false, error: 'Kod boş olamaz' }
 
   const admin = createAdminClient()
+  const { data: callerUser } = await admin
+    .from('users')
+    .select('role, deleted_at')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (!callerUser || callerUser.deleted_at || callerUser.role !== 'student') {
+    return { success: false, error: 'Yalnızca öğrenci hesapları koç daveti kullanabilir' }
+  }
+
   let { data: koc } = await admin
     .from('instructor_coach_codes')
     .select('user_id')
@@ -96,7 +108,12 @@ export async function joinCoachByCode(code: string): Promise<ActionResult> {
     koc = fallback
   }
 
-  if (!koc) return { success: false, error: 'Böyle bir koç kodu bulunamadı' }
+  if (!koc || koc.user_id === user.id) return { success: false, error: 'Böyle bir koç kodu bulunamadı' }
+
+  const { data: isTargetActiveCoach } = await admin.rpc('is_coach', { p_user_id: koc.user_id })
+  if (!isTargetActiveCoach) {
+    return { success: false, error: 'Bu koç şu anda yeni öğrenci kabul etmiyor' }
+  }
 
   const { data: zaten } = await admin
     .from('coaching_relationships')
@@ -108,7 +125,7 @@ export async function joinCoachByCode(code: string): Promise<ActionResult> {
   const { error } = await admin.from('coaching_relationships').insert({
     student_id: user.id, coach_id: koc.user_id,
   })
-  if (error) return { success: false, error: error.message }
+  if (error) return { success: false, error: 'Koçluk bağlantısı kurulamadı, tekrar dener misin?' }
 
   revalidatePath('/dashboard/student/settings')
   return { success: true }

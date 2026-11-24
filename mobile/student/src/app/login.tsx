@@ -90,21 +90,32 @@ export default function LoginScreen() {
         if (data?.url) {
           const res = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
           if (res.type === 'success' && res.url) {
-            const hash = res.url.includes('#') ? res.url.split('#')[1] : res.url.split('?')[1];
-            if (hash) {
-              const params = new URLSearchParams(hash);
-              const access_token = params.get('access_token');
-              const refresh_token = params.get('refresh_token');
+            const queryPart = res.url.includes('?') ? res.url.split('?')[1]?.split('#')[0] : '';
+            const codeParam = queryPart ? new URLSearchParams(queryPart).get('code') : null;
+            if (codeParam) {
+              const { data: sessionData, error: sessionErr } = await supabase.auth.exchangeCodeForSession(codeParam);
+              if (sessionErr) {
+                setErrorMsg(sessionErr.message);
+              } else if (sessionData.user) {
+                await routeByUserRole(sessionData.user.id, sessionData.user.user_metadata?.role);
+              }
+            } else {
+              const hash = res.url.includes('#') ? res.url.split('#')[1] : '';
+              if (hash) {
+                const params = new URLSearchParams(hash);
+                const access_token = params.get('access_token');
+                const refresh_token = params.get('refresh_token');
 
-              if (access_token && refresh_token) {
-                const { data: sessionData, error: sessionErr } = await supabase.auth.setSession({
-                  access_token,
-                  refresh_token,
-                });
-                if (sessionErr) {
-                  setErrorMsg(sessionErr.message);
-                } else if (sessionData.user) {
-                  await routeByUserRole(sessionData.user.id, sessionData.user.user_metadata?.role);
+                if (access_token && refresh_token) {
+                  const { data: sessionData, error: sessionErr } = await supabase.auth.setSession({
+                    access_token,
+                    refresh_token,
+                  });
+                  if (sessionErr) {
+                    setErrorMsg(sessionErr.message);
+                  } else if (sessionData.user) {
+                    await routeByUserRole(sessionData.user.id, sessionData.user.user_metadata?.role);
+                  }
                 }
               }
             }

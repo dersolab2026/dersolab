@@ -56,8 +56,7 @@ export async function POST(req: Request) {
     if (!tokenRes.ok || tokenData.error) {
       return NextResponse.json(
         {
-          error: tokenData.error_description || tokenData.error?.message || 'TikTok token alınamadı.',
-          details: tokenData,
+          error: 'TikTok yetkilendirme anahtarı alınamadı.',
         },
         { status: 400 }
       )
@@ -68,11 +67,9 @@ export async function POST(req: Request) {
       accessToken: tokenData.access_token || tokenData.data?.access_token,
       openId: tokenData.open_id || tokenData.data?.open_id,
       expiresIn: tokenData.expires_in || tokenData.data?.expires_in,
-      refreshToken: tokenData.refresh_token || tokenData.data?.refresh_token,
-      raw: tokenData,
     })
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('TikTok token exchange error:', err)
-    return NextResponse.json({ error: err?.message || 'Sunucu hatası oluştu.' }, { status: 500 })
+    return NextResponse.json({ error: 'Sunucu hatası oluştu.' }, { status: 500 })
   }
 }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getInstagramConfig, publishToInstagram } from '@/lib/social/instagram'
 import { getTikTokConfig, publishToTikTok } from '@/lib/social/tiktok'
-import { uploadSocialDataUrlToStorage } from '@/actions/social-posts'
+import { uploadSocialDataUrlToStorage } from '@/lib/social/storage'
 
 export async function GET() {
   const supabase = await createClient()

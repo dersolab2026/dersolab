@@ -3,9 +3,14 @@ import { GoogleGenAI } from '@google/genai'
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 
-function checkRateLimit(ip: string, limit = 120): boolean {
+function checkRateLimit(ip: string, limit = 40): boolean {
   const now = Date.now()
   const windowMs = 60 * 60 * 1000 // 1 saat
+  if (rateLimitMap.size > 1000) {
+    for (const [k, v] of rateLimitMap.entries()) {
+      if (v.resetAt < now) rateLimitMap.delete(k)
+    }
+  }
   const entry = rateLimitMap.get(ip)
   if (!entry || entry.resetAt < now) {
     rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs })
@@ -40,8 +45,8 @@ function buildSmartFallback(
 export async function POST(request: NextRequest) {
   try {
     const ip =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       request.headers.get('x-real-ip') ||
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       'anon'
 
     if (!checkRateLimit(ip)) {
@@ -52,23 +57,26 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const {
-      branch = 'Fen & Matematik',
-      moduleTitle = 'L.A.B. Simülasyonu',
-      currentState = {},
-      question = '',
-      history = [],
-    } = body as {
-      branch?: string
-      moduleTitle?: string
+    const rawBody = (body && typeof body === 'object' ? body : {}) as {
+      branch?: unknown
+      moduleTitle?: unknown
       currentState?: Record<string, unknown>
-      question?: string
+      question?: unknown
       history?: Array<{ sender: 'ai' | 'user'; text: string }>
     }
 
-    const trimmedQuestion = question.trim()
+    const branch = String(rawBody.branch ?? 'Fen & Matematik').replace(/[\r\n\t]/g, ' ').trim().slice(0, 60) || 'Fen & Matematik'
+    const moduleTitle = String(rawBody.moduleTitle ?? 'L.A.B. Simülasyonu').replace(/[\r\n\t]/g, ' ').trim().slice(0, 80) || 'L.A.B. Simülasyonu'
+    const currentState =
+      rawBody.currentState && typeof rawBody.currentState === 'object' && !Array.isArray(rawBody.currentState)
+        ? rawBody.currentState
+        : {}
+    const trimmedQuestion = String(rawBody.question ?? '').trim()
     if (!trimmedQuestion || trimmedQuestion.length < 2) {
       return NextResponse.json({ error: 'Lütfen bir soru yazın.' }, { status: 400 })
+    }
+    if (trimmedQuestion.length > 600) {
+      return NextResponse.json({ error: 'Sorunuz çok uzun (en fazla 600 karakter).' }, { status: 400 })
     }
 
     const apiKey = process.env.GEMINI_API_KEY
@@ -79,8 +87,13 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const stateFormatted = Object.entries(currentState || {})
-      .map(([k, v]) => `- ${k}: ${typeof v === 'object' ? JSON.stringify(v) : String(v)}`)
+    const stateFormatted = Object.entries(currentState)
+      .slice(0, 12)
+      .map(([k, v]) => {
+        const safeKey = String(k).replace(/[\r\n]/g, '').slice(0, 40)
+        const safeVal = (typeof v === 'object' ? JSON.stringify(v) : String(v)).replace(/[\r\n]/g, ' ').slice(0, 80)
+        return `- ${safeKey}: ${safeVal}`
+      })
       .join('\n')
 
     const systemInstruction = `Sen DersoLab L.A.B. (Laboratuvar Destekli Akademik Başarı) platformunun Sokratik Deney Koçusun (DersoAI).
@@ -96,12 +109,11 @@ PEDAGOJİK VE SOKRATİK KURALLARIN:
 3. Yanıtının sonunda mutlaka öğrenciye simülasyondaki bir slider'ı/parametreyi değiştirmesini öneren 1 adet merak uyandırıcı Sokratik soru sor (Örn: "Şimdi ekrandaki açıyı 45 dereceden 60 dereceye çekersen menzilin nasıl değişeceğini tahmin ediyorsun?").
 4. Eğitim ve bu deney dışındaki konulara (sohbet, fal, oyun vb.) kesinlikle yanıt verme; kibarca deneye odaklanmasını söyle.`
 
-    const recentHistoryText = Array.isArray(history)
-      ? history
-          .slice(-4)
-          .map((m) => `${m.sender === 'user' ? 'Öğrenci' : 'DersoAI'}: ${m.text}`)
-          .join('\n')
-      : ''
+    const history = Array.isArray(rawBody.history) ? rawBody.history : []
+    const recentHistoryText = history
+      .slice(-4)
+      .map((m) => `${m?.sender === 'user' ? 'Öğrenci' : 'DersoAI'}: ${String(m?.text ?? '').slice(0, 350)}`)
+      .join('\n')
 
     const promptText = recentHistoryText
       ? `Önceki Diyalog:\n${recentHistoryText}\n\nÖğrencinin Yeni Sorusu: ${trimmedQuestion}`

@@ -8,7 +8,12 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_APP_URL))
+    return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_APP_URL || 'https://dersolab.com'))
+  }
+
+  const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+  if (userRow?.role !== 'instructor' && userRow?.role !== 'admin') {
+    return NextResponse.redirect(new URL('/dashboard', process.env.NEXT_PUBLIC_APP_URL || 'https://dersolab.com'))
   }
 
   const state = createSignedOAuthState(user.id)

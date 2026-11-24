@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyBookingReminder } from '@/lib/notifications/send-guardian-notification'
+import { verifyCronRequest } from '@/lib/auth/cron'
 
 export async function POST(request: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  const authHeader = request.headers.get('authorization')
-
-  if (!secret || authHeader !== `Bearer ${secret}`) {
+  if (!verifyCronRequest(request)) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 
@@ -24,7 +22,7 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     console.error('send-reminders: rezervasyonlar okunamadı', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'internal_error' }, { status: 500 })
   }
 
   let sent = 0

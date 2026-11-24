@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { sanitizeRedirectPath } from '@/lib/auth/redirect'
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -52,7 +53,7 @@ export async function updateSession(request: NextRequest) {
 
   // Giriş yapmış kullanıcının /login veya /register sayfalarına girmesini önle, hedef sayfaya yönlendir
   if (user && (pathname === '/login' || pathname === '/register')) {
-    const redirectTarget = request.nextUrl.searchParams.get('redirect') || '/dashboard'
+    const redirectTarget = sanitizeRedirectPath(request.nextUrl.searchParams.get('redirect'), '/dashboard')
     const redirectResponse = NextResponse.redirect(new URL(redirectTarget, request.url))
     response.cookies.getAll().forEach((cookie) => {
       redirectResponse.cookies.set(cookie)

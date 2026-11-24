@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { parseVideoUrl } from '@/lib/video/parse-video-url'
+import { INSTRUCTOR_SUBJECT_OPTIONS } from '@/lib/constants'
 
 type ActionResult = { success: true } | { success: false; error: string }
 
@@ -75,9 +76,14 @@ export async function updateInstructorSubjects(subjects: string[]): Promise<Acti
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Giriş yapmalısın' }
 
-  const { error } = await supabase.from('instructors').update({ subjects }).eq('user_id', user.id)
+  const allowedSet = new Set<string>(INSTRUCTOR_SUBJECT_OPTIONS)
+  const cleanSubjects = Array.from(
+    new Set((Array.isArray(subjects) ? subjects : []).filter((s) => typeof s === 'string' && allowedSet.has(s)))
+  ).slice(0, 12)
 
-  if (error) return { success: false, error: error.message }
+  const { error } = await supabase.from('instructors').update({ subjects: cleanSubjects }).eq('user_id', user.id)
+
+  if (error) return { success: false, error: 'Branş bilgileri güncellenemedi' }
   revalidatePath('/dashboard/instructor/profile')
   revalidatePath('/instructors')
   return { success: true }
@@ -162,12 +168,12 @@ export async function updateIntroVideo(videoUrl: string): Promise<ActionResult> 
     return { success: true }
   }
 
-  const ownStorageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/instructor-videos/`
+  const ownStoragePrefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/instructor-videos/${user.id}/`
   const isEmbed = parseVideoUrl(trimmedUrl) !== null
-  const isOwnUpload = trimmedUrl.startsWith(ownStorageUrl)
+  const isOwnUpload = trimmedUrl.startsWith(ownStoragePrefix) && !trimmedUrl.includes('..')
 
   if (!isEmbed && !isOwnUpload) {
-    return { success: false, error: 'Sadece YouTube/Vimeo linki ya da doğrudan yüklenen video kabul ediliyor' }
+    return { success: false, error: 'Sadece YouTube/Vimeo linki ya da kendi yüklediğin tanıtım videosu kabul ediliyor' }
   }
 
   const { error } = await supabase.from('instructors').update({ intro_video_url: trimmedUrl }).eq('user_id', user.id)

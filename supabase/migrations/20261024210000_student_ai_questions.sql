@@ -16,24 +16,13 @@ create index if not exists student_ai_questions_student_created_idx
 
 alter table public.student_ai_questions enable row level security;
 
+drop policy if exists "ai_questions_select_own_or_authorized" on public.student_ai_questions;
 create policy "ai_questions_select_own_or_authorized" on public.student_ai_questions
   for select using (
     student_id = (select auth.uid())
-    or exists (
-      select 1 from public.bookings b
-      where b.student_id = student_ai_questions.student_id
-        and b.instructor_id = (select auth.uid())
-    )
-    or exists (
-      select 1 from public.guardians g
-      where g.student_id = student_ai_questions.student_id
-        and g.parent_id = (select auth.uid())
-    )
-    or exists (
-      select 1 from public.users u
-      where u.id = (select auth.uid())
-        and u.role = 'admin'
-    )
+    or public.can_view_student(student_id)
+    or public.is_guardian_of(student_id)
+    or public.is_admin()
   );
 
 create policy "ai_questions_insert_own" on public.student_ai_questions

@@ -8,6 +8,7 @@ import { Browser } from '@capacitor/browser'
 import { AuthShell } from '@/components/auth/AuthShell'
 import { PasswordInput } from '@/components/auth/PasswordInput'
 import { loginUser, signInWithGoogle } from '@/actions/auth'
+import { sanitizeRedirectPath } from '@/lib/auth/redirect'
 
 function LoginForm() {
   const router = useRouter()
@@ -36,7 +37,7 @@ function LoginForm() {
     startTransition(async () => {
       const result = await loginUser(email, password)
       if (!result.success) { setError(result.error); return }
-      router.push(redirectParam || '/dashboard')
+      router.push(sanitizeRedirectPath(redirectParam, '/dashboard'))
       router.refresh()
     })
   }

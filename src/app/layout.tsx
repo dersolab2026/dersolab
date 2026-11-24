@@ -66,6 +66,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         sameAs: [
           'https://www.instagram.com/dersolabegitim/',
           'https://www.tiktok.com/@dersolabegitim',
+          'https://www.youtube.com/channel/UC9YAcbRIPALgsMEjiORUEFQ',
         ],
         contactPoint: {
           '@type': 'ContactPoint',

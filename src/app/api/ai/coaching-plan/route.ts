@@ -34,6 +34,25 @@ function buildFallbackDraft(subjects: string[]): GeneratedPlanDraftItem[] {
   return items
 }
 
+const planRateMap = new Map<string, { count: number; resetAt: number }>()
+
+function checkPlanRateLimit(userId: string): boolean {
+  const now = Date.now()
+  if (planRateMap.size > 500) {
+    for (const [k, v] of planRateMap.entries()) {
+      if (v.resetAt < now) planRateMap.delete(k)
+    }
+  }
+  const entry = planRateMap.get(userId)
+  if (!entry || entry.resetAt < now) {
+    planRateMap.set(userId, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 })
+    return true
+  }
+  if (entry.count >= 25) return false
+  entry.count += 1
+  return true
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -52,8 +71,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Oturum açmanız gerekiyor.' }, { status: 401 })
     }
 
+    if (!checkPlanRateLimit(user.id)) {
+      return NextResponse.json({ error: 'Günlük otomatik plan oluşturma limitine ulaştınız.' }, { status: 429 })
+    }
+
     const body = await request.json()
-    const { subjects = [] } = body as { subjects?: string[] }
+    const rawSubjects = Array.isArray(body?.subjects) ? body.subjects : []
+    const subjects = rawSubjects
+      .filter((s: unknown): s is string => typeof s === 'string')
+      .map((s: string) => s.replace(/[\r\n"`]/g, '').trim().slice(0, 60))
+      .filter(Boolean)
+      .slice(0, 10)
 
     const apiKey = process.env.GEMINI_API_KEY
     if (!apiKey) {

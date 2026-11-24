@@ -1,4 +1,4 @@
-import { buildEmailHtml } from '@/lib/email-template'
+import { buildEmailHtml, escapeHtml } from '@/lib/email-template'
 import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -11,11 +11,19 @@ export async function notifyDemoLessonRequested(studentName: string) {
     .from('instructors')
     .select('user_id')
     .eq('offers_free_trial', true)
+    .eq('approval_status', 'approved')
+    .eq('paused', false)
 
   if (!eligibleInstructors || eligibleInstructors.length === 0) return
 
   const ids = eligibleInstructors.map((i) => i.user_id)
-  const { data: users } = await admin.from('users').select('id, name, email').in('id', ids)
+  const { data: users } = await admin
+    .from('users')
+    .select('id, name, email')
+    .in('id', ids)
+    .is('deleted_at', null)
+
+  const safeStudent = escapeHtml(studentName)
 
   for (const u of users ?? []) {
     await admin.from('notifications').insert({
@@ -31,9 +39,12 @@ export async function notifyDemoLessonRequested(studentName: string) {
         from: 'DersoLab <bildirim@dersolab.com>',
         to: u.email,
         subject: 'Yeni ücretsiz tanışma dersi talebi - DersoLab',
-        html: buildEmailHtml('Yeni ücretsiz tanışma dersi talebi', `<p>Merhaba ${u.name},</p>
-          <p><strong>${studentName}</strong> için ücretsiz tanışma dersi talebi var.</p>
-          <p>Uygunsan panelden kabul edip bir saat seçebilirsin. İlk kabul eden eğitmen dersi alır.</p>`),
+        html: buildEmailHtml(
+          'Yeni ücretsiz tanışma dersi talebi',
+          `<p>Merhaba ${escapeHtml(u.name)},</p>
+          <p><strong>${safeStudent}</strong> için ücretsiz tanışma dersi talebi var.</p>
+          <p>Uygunsan panelden kabul edip bir saat seçebilirsin. İlk kabul eden eğitmen dersi alır.</p>`
+        ),
       })
     } catch (err) {
       console.error('Demo ders talebi bildirimi gonderilemedi:', err)

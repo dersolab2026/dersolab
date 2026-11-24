@@ -17,12 +17,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(settingsUrl)
   }
 
-  // 1. İmzalı HMAC state kontrolü (Android sistem tarayıcısında çerez taşınmasa da doğrulanır)
+  // 1. İmzalı HMAC state her durumda geçerli olmalı
   const { valid: isSignedValid, userId: signedUserId } = verifySignedOAuthState(state)
-  // 2. Masaüstü yerel çerez kontrolü (saved_state)
-  const isCookieMatch = savedState && state === savedState
+  const isCookieMatch = Boolean(savedState && state === savedState)
 
-  if (!isSignedValid && !isCookieMatch) {
+  if (!isSignedValid || !signedUserId) {
     settingsUrl.searchParams.set('calendar_error', 'invalid_state')
     return NextResponse.redirect(settingsUrl)
   }
@@ -30,10 +29,19 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const targetUserId = user?.id || (isSignedValid ? signedUserId : null)
-  if (!targetUserId) {
-    return NextResponse.redirect(new URL('/login', appUrl))
+  // Tarayıcıda aktif bir oturum varsa: state içindeki kullanıcı kimliği oturumla BİREBİR eşleşmeli
+  // ve masaüstü akışında çerez varsa çerez de eşleşmeli (çapraz hesap takvim bağlama / CSRF engeli).
+  if (user) {
+    if (user.id !== signedUserId || (savedState && !isCookieMatch)) {
+      settingsUrl.searchParams.set('calendar_error', 'invalid_state')
+      return NextResponse.redirect(settingsUrl)
+    }
+  } else if (savedState && !isCookieMatch) {
+    settingsUrl.searchParams.set('calendar_error', 'invalid_state')
+    return NextResponse.redirect(settingsUrl)
   }
+
+  const targetUserId = signedUserId
 
   const admin = createAdminClient()
   const { data: instructor } = await admin

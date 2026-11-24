@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { OAUTH_NOT_CEREZI, notuOku, notuUygula } from '@/lib/auth/oauth-hint'
+import { sanitizeRedirectPath } from '@/lib/auth/redirect'
 
 /**
  * Google (OAuth) donus adresi.
@@ -17,9 +18,10 @@ import { OAUTH_NOT_CEREZI, notuOku, notuUygula } from '@/lib/auth/oauth-hint'
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl
-  const taban = origin
-  const rawNext = searchParams.get('next') ?? '/dashboard'
-  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard'
+  const taban = (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_APP_URL)
+    ? process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')
+    : origin
+  const next = sanitizeRedirectPath(searchParams.get('next'), '/dashboard')
 
   // Google kendi tarafinda reddettiyse kod hic gelmiyor, hata parametreleri geliyor.
   const saglayiciHatasi = searchParams.get('error')

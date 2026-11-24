@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyInstructorCalendarReminder, notifyStudentDemoLessonReminder } from '@/lib/notifications/send-engagement-reminders'
+import { verifyCronRequest } from '@/lib/auth/cron'
 
 export async function POST(request: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  const authHeader = request.headers.get('authorization')
-
-  if (!secret || authHeader !== `Bearer ${secret}`) {
+  if (!verifyCronRequest(request)) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 

@@ -32,6 +32,15 @@ function InstagramIcon({ className }: { className?: string }) {
   )
 }
 
+function YouTubeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path>
+      <path d="m10 15 5-3-5-3z"></path>
+    </svg>
+  )
+}
+
 interface PersonaDedicatedViewProps {
   initialPersona?: PersonaType
 }
@@ -176,6 +185,15 @@ export function PersonaDedicatedView({ initialPersona = 'student' }: PersonaDedi
                   aria-label="TikTok"
                 >
                   <TikTokIcon className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.youtube.com/channel/UC9YAcbRIPALgsMEjiORUEFQ"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-amber-400 hover:bg-white/[0.08] hover:border-amber-400/30 transition-all duration-300"
+                  aria-label="YouTube"
+                >
+                  <YouTubeIcon className="w-4 h-4" />
                 </a>
               </div>
             </div>

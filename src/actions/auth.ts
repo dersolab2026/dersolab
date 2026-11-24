@@ -8,6 +8,7 @@ import { gecerliRolMu } from '@/lib/auth/account-type'
 import { OAUTH_NOT_CEREZI, OAUTH_NOT_OMRU, notuYaz, type OAuthNotu } from '@/lib/auth/oauth-hint'
 import { createClient } from '@/lib/supabase/server'
 import { formatTurkishTitleCase } from '@/lib/format/name'
+import { sanitizeRedirectPath } from '@/lib/auth/redirect'
 
 type ActionResult = { success: true } | { success: false; error: string }
 
@@ -43,21 +44,20 @@ const registerSchema = z.object({
 })
 
 async function resolveAppUrl(): Promise<string> {
-  const requestHeaders = await headers()
-  let appUrl = requestHeaders.get('origin')
-  if (!appUrl) {
-    const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host')
-    const protocol = requestHeaders.get('x-forwarded-proto') || (process.env.NODE_ENV === 'development' ? 'http' : 'https')
-    appUrl = host ? `${protocol}://${host}` : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')
   }
+  const requestHeaders = await headers()
+  const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host')
+  const protocol = requestHeaders.get('x-forwarded-proto') || (process.env.NODE_ENV === 'development' ? 'http' : 'https')
+  const appUrl = host ? `${protocol}://${host}` : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   return appUrl.replace(/\/$/, '')
 }
 
 function sanitizeNextPath(path?: string): string | undefined {
   if (!path) return undefined
-  const trimmed = path.trim()
-  if (!trimmed.startsWith('/') || trimmed.startsWith('//')) return undefined
-  return trimmed
+  const safe = sanitizeRedirectPath(path, '')
+  return safe || undefined
 }
 
 function friendlySignUpError(message: string): string {
@@ -185,9 +185,10 @@ export async function requestPasswordReset(email: string): Promise<ActionResult>
   const parsedEmail = emailSchema.safeParse(email)
   if (!parsedEmail.success) return { success: false, error: 'Geçerli bir e-posta adresi gir' }
 
+  const appUrl = await resolveAppUrl()
   const supabase = await createClient()
   const { error } = await supabase.auth.resetPasswordForEmail(parsedEmail.data, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+    redirectTo: `${appUrl}/reset-password`,
   })
   if (error) return { success: false, error: 'Şifre sıfırlama bağlantısı gönderilemedi, lütfen tekrar dene' }
   return { success: true }
@@ -198,6 +199,9 @@ export async function updatePassword(newPassword: string): Promise<ActionResult>
   if (!parsedPassword.success) return { success: false, error: parsedPassword.error.issues[0]?.message ?? 'Şifre geçersiz' }
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Giriş yapmalısın' }
+
   const { error } = await supabase.auth.updateUser({ password: parsedPassword.data })
   if (error) return { success: false, error: 'Şifre güncellenemedi, lütfen tekrar dene' }
   return { success: true }

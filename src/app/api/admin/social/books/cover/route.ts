@@ -9,16 +9,18 @@ import {
 
 export async function GET(req: Request) {
   try {
-    const isDev = process.env.NODE_ENV === 'development'
-    if (!isDev) {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-      if (!user) {
-        return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 })
-      }
+    if (!user) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 })
+    }
+
+    const { data: userRow } = await supabase.from('users').select('role').eq('id', user.id).single()
+    if (userRow?.role !== 'admin') {
+      return NextResponse.json({ error: 'Bu işlem yalnızca sistem yöneticilerine açıktır.' }, { status: 403 })
     }
 
     const { searchParams } = new URL(req.url)
@@ -67,7 +69,6 @@ export async function GET(req: Request) {
     })
   } catch (err: unknown) {
     console.error('Cover/Poster fetch error:', err)
-    const message = err instanceof Error ? err.message : 'Kapak/afiş sorgulama hatası'
-    return NextResponse.json({ found: false, error: message }, { status: 500 })
+    return NextResponse.json({ found: false, error: 'Kapak/afiş sorgulama hatası.' }, { status: 500 })
   }
 }

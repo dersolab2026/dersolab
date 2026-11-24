@@ -58,9 +58,9 @@ export async function saveAiQuestion(params: {
       .from('student_ai_questions')
       .insert({
         student_id: user.id,
-        subject: params.subject,
+        subject: params.subject.trim().slice(0, 80),
         question: params.question.slice(0, 2000),
-        solution: params.solution,
+        solution: params.solution.slice(0, 16000),
         is_favorite: false,
       })
       .select('id')
