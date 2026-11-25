@@ -45,6 +45,7 @@ import { downloadAllPostMedia, generateAllPostMediaFiles, triggerDownload } from
 import { VisualCanvasEngine } from './VisualCanvasEngine'
 import { InstagramMockup } from './InstagramMockup'
 import { PublishSuccessModal, type PublishResultData, InstagramIcon, TikTokIcon } from './PublishSuccessModal'
+import { TikTokDirectPostPanel, type TikTokDirectPostSettings } from './TikTokDirectPostPanel'
 import { toast } from 'sonner'
 
 function XPlatformIcon({ className = 'w-4 h-4' }: { className?: string }) {
@@ -82,6 +83,17 @@ export function PostEditorDrawer({
     instagram: true,
     tiktok: true,
   })
+  const [tiktokSettings, setTiktokSettings] = useState<TikTokDirectPostSettings>({
+    privacyLevel: '',
+    allowComment: false,
+    allowDuet: false,
+    allowStitch: false,
+    commercialContentEnabled: false,
+    brandOrganicToggle: false,
+    brandContentToggle: false,
+  })
+  const [tiktokValid, setTiktokValid] = useState(false)
+  const [tiktokInvalidReason, setTiktokInvalidReason] = useState<string>('Lütfen TikTok gizlilik düzeyini seçin.')
   const [publishSuccessData, setPublishSuccessData] = useState<PublishResultData | null>(null)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [publishedMediaCount, setPublishedMediaCount] = useState(1)
@@ -584,6 +596,12 @@ export function PostEditorDrawer({
       }
     }
 
+    if ((selectedPlatform === 'both' || selectedPlatform === 'tiktok') && !tiktokValid) {
+      toast.error(tiktokInvalidReason || 'Lütfen TikTok gizlilik ve içerik bildirim ayarlarını tamamlayın.')
+      setActiveTab('publish')
+      return
+    }
+
     setIsPublishingBoth(true)
     const isPostStory = post.type === 'story'
     toast.info(
@@ -672,6 +690,8 @@ export function PostEditorDrawer({
           instagramAccessToken: localApiKeys.igToken || undefined,
           instagramAccountId: localApiKeys.igAccountId || undefined,
           tiktokAccessToken: localApiKeys.tiktokToken || undefined,
+          tiktokSettings:
+            selectedPlatform === 'both' || selectedPlatform === 'tiktok' ? tiktokSettings : undefined,
         }),
       })
 
@@ -2503,6 +2523,20 @@ export function PostEditorDrawer({
                         </span>
                       </div>
                     </div>
+
+                    {publishTargetPlatforms.tiktok && (
+                      <div className="relative z-10">
+                        <TikTokDirectPostPanel
+                          isVideo={isReels}
+                          value={tiktokSettings}
+                          onChange={setTiktokSettings}
+                          onValidityChange={(valid, reason) => {
+                            setTiktokValid(valid)
+                            setTiktokInvalidReason(reason || '')
+                          }}
+                        />
+                      </div>
+                    )}
 
                     {/* ⚡ DEV BUTON: TEK TUŞLA HEM INSTA HEM TIKTOK PAYLAŞ */}
                     <button

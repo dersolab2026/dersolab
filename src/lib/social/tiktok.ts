@@ -7,6 +7,16 @@
  * 3. Smart Web & Deep-link Assistant Fallback (API anahtarı henüz girilmediğinde)
  */
 
+export interface TikTokPostSettings {
+  privacyLevel?: 'PUBLIC_TO_EVERYONE' | 'MUTUAL_FOLLOW_FRIENDS' | 'FOLLOWER_OF_CREATOR' | 'SELF_ONLY'
+  allowComment?: boolean
+  allowDuet?: boolean
+  allowStitch?: boolean
+  commercialContentEnabled?: boolean
+  brandOrganicToggle?: boolean
+  brandContentToggle?: boolean
+}
+
 export interface TikTokPublishResult {
   success: boolean
   postId?: string
@@ -40,6 +50,7 @@ export async function publishToTikTok({
   isReels = false,
   title,
   customToken,
+  tiktokSettings,
 }: {
   caption: string
   imageUrls?: string[]
@@ -48,6 +59,7 @@ export async function publishToTikTok({
   isReels?: boolean
   title?: string
   customToken?: string
+  tiktokSettings?: TikTokPostSettings
 }): Promise<TikTokPublishResult> {
   const { isConfigured, token } = getTikTokConfig(customToken)
   const actionType: 'story' | 'post' = isStory ? 'story' : 'post'
@@ -72,6 +84,35 @@ export async function publishToTikTok({
   try {
     const TIKTOK_API_BASE = 'https://open.tiktokapis.com/v2'
 
+    // 0. Zorunlu creator_info/query ön kontrolü (TikTok Audit gereksinimi)
+    try {
+      const creatorRes = await fetch(`${TIKTOK_API_BASE}/post/publish/creator_info/query/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: '{}',
+      })
+      const creatorJson = await creatorRes.json().catch(() => null)
+      if (!creatorRes.ok || creatorJson?.error?.code !== 'ok') {
+        console.warn('TikTok creator_info/query uyarısı:', creatorJson?.error || creatorRes.status)
+      }
+    } catch (preflightErr) {
+      console.warn('TikTok creator_info/query çağrısı atlandı:', preflightErr)
+    }
+
+    const effectivePrivacy = tiktokSettings?.privacyLevel || 'PUBLIC_TO_EVERYONE'
+    const disableComment = tiktokSettings ? !tiktokSettings.allowComment : false
+    const disableDuet = tiktokSettings ? !tiktokSettings.allowDuet : false
+    const disableStitch = tiktokSettings ? !tiktokSettings.allowStitch : false
+    const commercialFields = tiktokSettings?.commercialContentEnabled
+      ? {
+          brand_organic_toggle: Boolean(tiktokSettings.brandOrganicToggle),
+          brand_content_toggle: Boolean(tiktokSettings.brandContentToggle),
+        }
+      : {}
+
     // 1. VIDEO / REELS PAYLAŞIMI
     if ((isReels || videoUrl) && videoUrl) {
       const response = await fetch(`${TIKTOK_API_BASE}/post/publish/video/init/`, {
@@ -83,11 +124,12 @@ export async function publishToTikTok({
         body: JSON.stringify({
           post_info: {
             title: caption.slice(0, 2200),
-            privacy_level: 'PUBLIC_TO_EVERYONE',
-            disable_duet: false,
-            disable_stitch: false,
-            disable_comment: false,
+            privacy_level: effectivePrivacy,
+            disable_duet: disableDuet,
+            disable_stitch: disableStitch,
+            disable_comment: disableComment,
             video_cover_timestamp_ms: 1000,
+            ...commercialFields,
           },
           source_info: {
             source: 'PULL_FROM_URL',
@@ -146,8 +188,9 @@ export async function publishToTikTok({
             post_info: {
               title: (title || caption).slice(0, 150),
               description: caption.slice(0, 2200),
-              privacy_level: 'PUBLIC_TO_EVERYONE',
-              disable_comment: false,
+              privacy_level: effectivePrivacy,
+              disable_comment: disableComment,
+              ...commercialFields,
             },
             source_info: {
               source: 'PULL_FROM_URL',

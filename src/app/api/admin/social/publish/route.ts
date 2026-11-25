@@ -67,10 +67,11 @@ export async function POST(request: NextRequest) {
     const isReels = Boolean(body.isReels || contentType === 'reels')
     const title = body.title || postObj.title || 'DersoLab'
 
-    // İsteğe bağlı: Admin panelinden girilen API anahtarları
+    // İsteğe bağlı: Admin panelinden girilen API anahtarları & TikTok denetim ayarları
     const customIgToken: string | undefined = body.instagramAccessToken
     const customIgAccountId: string | undefined = body.instagramAccountId
     const customTtToken: string | undefined = body.tiktokAccessToken
+    const tiktokSettings = body.tiktokSettings
 
     // Gönderi mi Story mi? Otomatik tespit
     const isStory = Boolean(body.isStory || contentType === 'story')
@@ -139,6 +140,7 @@ export async function POST(request: NextRequest) {
           isStory,
           title,
           customToken: customTtToken,
+          tiktokSettings,
         }).then((res) => {
           tiktokResult = res
         })
