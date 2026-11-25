@@ -1,6 +1,4 @@
-import { Readable } from 'node:stream'
 import { NextRequest, NextResponse } from 'next/server'
-import { google } from 'googleapis'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { verifyCronRequest } from '@/lib/auth/cron'
@@ -75,14 +73,14 @@ export async function POST(request: NextRequest) {
   try {
     const mediaRes = await fetch(videoUrl, { redirect: 'error' })
     if (!mediaRes.ok) {
-      return NextResponse.json({ error: 'Video dosyası indirilemedi.' }, { status: 400 })
+      return NextResponse.json({ error: 'Video dosyası indirilemedi.', stage: 'download' }, { status: 400 })
     }
     const contentLength = Number(mediaRes.headers.get('content-length') || '0')
     if (contentLength > MAX_VIDEO_BYTES) {
       return NextResponse.json({ error: 'Video boyutu 50 MB sınırını aşıyor.' }, { status: 413 })
     }
-    const videoBuf = Buffer.from(await mediaRes.arrayBuffer())
-    if (videoBuf.length === 0 || videoBuf.length > MAX_VIDEO_BYTES) {
+    const videoArrayBuffer = await mediaRes.arrayBuffer()
+    if (videoArrayBuffer.byteLength === 0 || videoArrayBuffer.byteLength > MAX_VIDEO_BYTES) {
       return NextResponse.json({ error: 'Geçersiz video dosya boyutu.' }, { status: 400 })
     }
 
@@ -94,54 +92,115 @@ export async function POST(request: NextRequest) {
     })
 
     const tokenRes = await oauthClient.getAccessToken()
-    const freshToken = tokenRes?.token || oauthClient.credentials.access_token
-    if (freshToken) {
-      await saveYouTubeCredentials({
-        ...creds,
-        access_token: freshToken,
-        expiry_date: oauthClient.credentials.expiry_date ?? creds.expiry_date,
-        updated_at: new Date().toISOString(),
-      }).catch(() => {})
+    const accessToken = tokenRes?.token || oauthClient.credentials.access_token
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: 'Google erişim anahtarı yenilenemedi.', stage: 'token_refresh' },
+        { status: 401 }
+      )
     }
 
-    const yt = google.youtube({ version: 'v3', auth: oauthClient })
-    const insertRes = await yt.videos.insert({
-      part: ['snippet', 'status'],
-      requestBody: {
-        snippet: {
-          title,
-          description,
-          tags,
-          categoryId: '27', // Education
-          defaultLanguage: 'tr',
-          defaultAudioLanguage: 'tr',
-        },
-        status: {
-          privacyStatus,
-          selfDeclaredMadeForKids: false,
-        },
+    await saveYouTubeCredentials({
+      ...creds,
+      access_token: accessToken,
+      expiry_date: oauthClient.credentials.expiry_date ?? creds.expiry_date,
+      updated_at: new Date().toISOString(),
+    }).catch(() => {})
+
+    // 1. YouTube Data API v3 Resumable Upload oturumu başlat (saf fetch, Node stream/duplex hatası yok)
+    const metadata = {
+      snippet: {
+        title,
+        description,
+        tags,
+        categoryId: '27', // Education
+        defaultLanguage: 'tr',
+        defaultAudioLanguage: 'tr',
       },
-      media: {
-        mimeType: 'video/mp4',
-        body: Readable.from(videoBuf),
+      status: {
+        privacyStatus,
+        selfDeclaredMadeForKids: false,
       },
+    }
+
+    const initRes = await fetch(
+      'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-Upload-Content-Length': String(videoArrayBuffer.byteLength),
+          'X-Upload-Content-Type': 'video/mp4',
+        },
+        body: JSON.stringify(metadata),
+      }
+    )
+
+    if (!initRes.ok) {
+      const errJson = await initRes.json().catch(() => null)
+      const reason = errJson?.error?.errors?.[0]?.reason || errJson?.error?.status || 'unknown'
+      console.error('YouTube resumable init hatası:', initRes.status, reason)
+      return NextResponse.json(
+        {
+          error: 'YouTube yükleme oturumu başlatılamadı.',
+          stage: 'resumable_init',
+          googleStatus: initRes.status,
+          googleReason: reason,
+        },
+        { status: 502 }
+      )
+    }
+
+    const uploadUrl = initRes.headers.get('location')
+    if (!uploadUrl) {
+      return NextResponse.json(
+        { error: 'YouTube yükleme adresi (Location) dönmedi.', stage: 'resumable_init' },
+        { status: 502 }
+      )
+    }
+
+    // 2. Video verisini tek hamlede PUT ile gönder
+    const putRes = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'video/mp4',
+        'Content-Length': String(videoArrayBuffer.byteLength),
+      },
+      body: new Uint8Array(videoArrayBuffer),
     })
 
-    const videoId = insertRes.data.id
-    if (!videoId) {
-      throw new Error('YouTube API video kimliği döndürmedi.')
+    const putData = await putRes.json().catch(() => null)
+    if (!putRes.ok || !putData?.id) {
+      const reason = putData?.error?.errors?.[0]?.reason || putData?.error?.status || 'unknown'
+      console.error('YouTube video PUT hatası:', putRes.status, reason)
+      return NextResponse.json(
+        {
+          error: 'YouTube video verisi yüklenemedi.',
+          stage: 'resumable_put',
+          googleStatus: putRes.status,
+          googleReason: reason,
+        },
+        { status: 502 }
+      )
     }
 
+    const videoId = String(putData.id)
     return NextResponse.json({
       success: true,
       videoId,
       shortsUrl: `https://youtube.com/shorts/${videoId}`,
       watchUrl: `https://youtu.be/${videoId}`,
-      privacyStatus: insertRes.data.status?.privacyStatus || privacyStatus,
+      privacyStatus: putData.status?.privacyStatus || privacyStatus,
       channelTitle: creds.channel_title || null,
     })
   } catch (err) {
     console.error('YouTube Shorts yükleme hatası:', err)
-    return NextResponse.json({ error: 'YouTube yüklemesi sırasında hata oluştu.' }, { status: 500 })
+    const msg = err instanceof Error ? err.message.slice(0, 120) : 'unknown'
+    return NextResponse.json(
+      { error: 'YouTube yüklemesi sırasında hata oluştu.', stage: 'exception', detail: msg },
+      { status: 500 }
+    )
   }
 }
