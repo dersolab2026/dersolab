@@ -83,7 +83,7 @@ export async function uploadSocialDataUrlToStorage(
     }
 
     const contentType = rawMime === 'image/jpg' ? 'image/jpeg' : rawMime
-    const fileName = `posts/${safePrefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`
+    const fileName = `bot/${safePrefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`
 
     const { error: uploadError } = await admin.storage
       .from(bucketName)
