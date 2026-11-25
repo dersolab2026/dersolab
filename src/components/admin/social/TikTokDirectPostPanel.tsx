@@ -45,6 +45,7 @@ interface TikTokDirectPostPanelProps {
   value: TikTokDirectPostSettings
   onChange: (next: TikTokDirectPostSettings) => void
   onValidityChange?: (valid: boolean, reason?: string) => void
+  refreshKey?: string | number
 }
 
 export function validateTikTokSettings(settings: TikTokDirectPostSettings): { valid: boolean; reason?: string } {
@@ -65,6 +66,7 @@ export function TikTokDirectPostPanel({
   value,
   onChange,
   onValidityChange,
+  refreshKey,
 }: TikTokDirectPostPanelProps) {
   const [creatorInfo, setCreatorInfo] = useState<TikTokCreatorInfo | null>(null)
   const [loadingInfo, setLoadingInfo] = useState(false)
@@ -121,7 +123,7 @@ export function TikTokDirectPostPanel({
   useEffect(() => {
     fetchCreatorInfo()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refreshKey])
 
   useEffect(() => {
     const check = validateTikTokSettings(value)

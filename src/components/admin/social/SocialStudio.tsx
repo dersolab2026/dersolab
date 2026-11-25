@@ -62,6 +62,14 @@ import { CURRICULUM_TOPICS } from '@/lib/exams/curriculum'
 import { SocialPhoneMockup } from './SocialPhoneMockup'
 import { PublishSuccessModal, type PublishResultData } from './PublishSuccessModal'
 import {
+  TikTokDirectPostPanel,
+  validateTikTokSettings,
+  type TikTokDirectPostSettings,
+} from './TikTokDirectPostPanel'
+
+const TIKTOK_OAUTH_URL =
+  'https://www.tiktok.com/v2/auth/authorize/?client_key=sbawm5ipgpytsjdnp9&scope=user.info.basic,video.upload,video.publish&response_type=code&redirect_uri=https%3A%2F%2Fdersolab.com%2Fadmin%2Fsocial'
+import {
   downloadAllPostMedia,
   generateAllPostMediaFiles,
   downloadPostAsZip,
@@ -525,6 +533,17 @@ export default function SocialStudio() {
   const [customIgToken, setCustomIgToken] = useState<string>('')
   const [customIgAccountId, setCustomIgAccountId] = useState<string>('')
   const [customTiktokToken, setCustomTiktokToken] = useState<string>('')
+  const [tiktokSettings, setTiktokSettings] = useState<TikTokDirectPostSettings>({
+    privacyLevel: '',
+    allowComment: false,
+    allowDuet: false,
+    allowStitch: false,
+    commercialContentEnabled: false,
+    brandOrganicToggle: false,
+    brandContentToggle: false,
+  })
+  const [tiktokValid, setTiktokValid] = useState<boolean>(false)
+  const [tiktokInvalidReason, setTiktokInvalidReason] = useState<string>('')
   const [isSearchingCover, setIsSearchingCover] = useState<{ ortaokul?: boolean; lise?: boolean }>({})
   const [poolStats, setPoolStats] = useState(() => getPoolStats())
 
@@ -1188,10 +1207,20 @@ export default function SocialStudio() {
   }
 
   // Tek Tuşla Instagram & TikTok Paylaşımı (Cihaza zorunlu indirme yapmadan doğrudan Bulut + Graph API / TikTok API üzerinden paylaşır)
-  async function handleOneClickPublish() {
+  async function handleOneClickPublish(targetPlatform: 'both' | 'tiktok' = 'both') {
+    if (targetPlatform === 'tiktok') {
+      const check = validateTikTokSettings(tiktokSettings)
+      if (!check.valid) {
+        toast.error(check.reason || 'TikTok paylaşım ayarlarını tamamlayın.')
+        return
+      }
+    }
+
     setIsPublishing(true)
     const toastId = toast.loading(
-      '1080p medya buluta yükleniyor ve Instagram Graph API & TikTok API üzerinden paylaşılıyor...'
+      targetPlatform === 'tiktok'
+        ? 'Medya buluta yükleniyor ve TikTok Direct Post üzerinden yayınlanıyor...'
+        : '1080p medya buluta yükleniyor ve Instagram Graph API & TikTok API üzerinden paylaşılıyor...'
     )
     try {
       // 1. Görselleri bellekte 1080p PNG olarak üret (cihaza zorla İNDİRMEZ!)
@@ -1232,10 +1261,11 @@ export default function SocialStudio() {
           title: activePost.title,
           imageUrls: mediaFiles.map((f) => f.dataUrl),
           videoUrl: reelsVideoDataUrl,
-          platform: 'both',
+          platform: targetPlatform,
           instagramAccessToken: customIgToken.trim() || undefined,
           instagramAccountId: customIgAccountId.trim() || undefined,
           tiktokAccessToken: customTiktokToken.trim() || undefined,
+          tiktokSettings,
         }),
       })
       const data = await res.json()
@@ -1252,7 +1282,12 @@ export default function SocialStudio() {
       setIsPublishModalOpen(true)
 
       if (data.directApiPublished) {
-        toast.success('Gönderi doğrudan Instagram & TikTok hesaplarında yayınlandı!', { id: toastId })
+        toast.success(
+          targetPlatform === 'tiktok'
+            ? 'Gönderi TikTok Direct Post üzerinden yayınlandı!'
+            : 'Gönderi doğrudan Instagram & TikTok hesaplarında yayınlandı!',
+          { id: toastId }
+        )
       } else {
         toast.success(
           'Görseller buluta yüklendi! Doğrudan otomatik paylaşım için API anahtarı bağlayabilir veya tek tıkla paylaşabilirsin.',
@@ -4801,11 +4836,53 @@ export default function SocialStudio() {
               </span>
             </button>
 
+            {/* TikTok Login Kit & Direct Post Paneli */}
+            <div className="rounded-2xl border border-cyan-500/25 bg-[#0A1120] p-3 space-y-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-white">TikTok Login Kit &amp; Direct Post</span>
+                  {customTiktokToken.trim() && (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-300">
+                      Bağlı
+                    </span>
+                  )}
+                </div>
+                <a
+                  href={TIKTOK_OAUTH_URL}
+                  className="text-[11px] px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-500/40 font-bold flex items-center gap-1 transition-all"
+                >
+                  <span>🔗 TikTok Hesabını Bağla (Login Kit)</span>
+                </a>
+              </div>
+
+              <TikTokDirectPostPanel
+                isVideo={activePost.type === 'reels'}
+                value={tiktokSettings}
+                onChange={setTiktokSettings}
+                refreshKey={customTiktokToken}
+                onValidityChange={(valid, reason) => {
+                  setTiktokValid(valid)
+                  setTiktokInvalidReason(reason || '')
+                }}
+              />
+
+              <button
+                type="button"
+                disabled={isPublishing || isDownloading || isZipDownloading || !tiktokValid}
+                title={!tiktokValid ? tiktokInvalidReason : undefined}
+                onClick={() => handleOneClickPublish('tiktok')}
+                className="w-full py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>TikTok&apos;a Doğrudan Paylaş (Direct Post)</span>
+              </button>
+            </div>
+
             {/* Tek Tuşla Instagram & TikTok Paylaşım Butonu (Zorla İndirmez, Doğrudan Bulut & API Kullanır) */}
             <button
               type="button"
               disabled={isPublishing || isDownloading || isZipDownloading}
-              onClick={handleOneClickPublish}
+              onClick={() => handleOneClickPublish('both')}
               className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-pink-500 via-orange-500 to-amber-500 hover:from-pink-600 hover:to-amber-600 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-pink-500/20 transition-all active:scale-98 cursor-pointer"
             >
               {isPublishing ? (
@@ -4982,7 +5059,7 @@ export default function SocialStudio() {
                     Token kopyalamak yerine tek tıkla izin verin:
                   </span>
                   <a
-                    href="https://www.tiktok.com/v2/auth/authorize/?client_key=sbawm5ipgpytsjdnp9&scope=user.info.basic,video.upload&response_type=code&redirect_uri=https%3A%2F%2Fdersolab.com%2Fadmin%2Fsocial"
+                    href={TIKTOK_OAUTH_URL}
                     className="text-[10px] px-2.5 py-1 rounded bg-cyan-500/25 hover:bg-cyan-500/35 text-cyan-200 border border-cyan-500/40 font-bold flex items-center gap-1 transition-all"
                   >
                     <span>🔗 TikTok'a Tek Tıkla Bağlan (@dersolabegitim)</span>
