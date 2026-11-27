@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { KimyaLabView } from '@/components/lab/KimyaLabView'
 
 export const metadata: Metadata = {
-  title: 'KimyaLab — 3D Bohr Atom Modeli, Periyodik Cetvel & Titrasyon',
+  title: 'KimyaLab — 59 Deney & 8 Gösteri, 3D Bohr Atom, Titrasyon & Maarif Tezgâhı',
   description:
-    'DersoLab Kimya Laboratuvarı: MEB ve Maarif Modeli uyumlu 3D Bohr atom modeli ve katman elektron dağılımı, sanal asit-baz titrasyon deneyi ve Kimya-Le oyunu.',
+    'DersoLab Kimya Laboratuvarı: MEB Türkiye Yüzyılı Maarif Modeli uyumlu 59 etkileşimli deney ve 8 gösteri içeren Sanal Kimya Tezgâhı, 3D Bohr atom modeli, gaz yasaları, titrasyon ve Kimya-Le.',
   alternates: {
     canonical: '/lab/kimya',
   },

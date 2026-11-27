@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -28,6 +28,7 @@ import { ChemistryGameModule } from './ChemistryGameModule'
 import { MolCalculatorModule } from './MolCalculatorModule'
 import { GasLawsModule } from './GasLawsModule'
 import { ReactionRateEquilibriumModule } from './ReactionRateEquilibriumModule'
+import { VirtualChemWorkbench, type WorkbenchLiveSnapshot } from './kimya-tezgah/VirtualChemWorkbench'
 import { BranchNavHeader } from './BranchNavHeader'
 import { InteractiveLabSandbox } from './shared/InteractiveLabSandbox'
 import { LabChallengePanel, type LabChallenge } from './shared/LabChallengePanel'
@@ -39,6 +40,7 @@ import { LabTutorCTA } from './shared/LabTutorCTA'
 import { playClickSound } from '@/lib/soundFx'
 
 export type KimyaTabType =
+  | 'workbench'
   | 'periodic'
   | 'gas_laws'
   | 'titration'
@@ -50,14 +52,36 @@ export type KimyaTabType =
 type GradeLevelFilter = 'all' | 'ortaokul' | 'lise'
 
 export function KimyaLabView() {
-  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('ortaokul')
-  const [activeTab, setActiveTab] = useState<KimyaTabType>('periodic')
+  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('all')
+  const [activeTab, setActiveTab] = useState<KimyaTabType>('workbench')
+  const [liveWorkbench, setLiveWorkbench] = useState<WorkbenchLiveSnapshot | null>(null)
+
+  const handleWorkbenchStateChange = useCallback((snapshot: WorkbenchLiveSnapshot) => {
+    setLiveWorkbench(snapshot)
+  }, [])
+
+  const handleSwitchWorkbenchTab = useCallback(
+    (tab: 'periodic' | 'titration' | 'gas_laws' | 'equilibrium' | 'calculator' | 'game') => {
+      setActiveTab(tab)
+    },
+    []
+  )
 
   // Modals state
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false)
 
   const ALL_MODULES = [
+    {
+      id: 'workbench' as KimyaTabType,
+      label: 'Sanal Kimya Tezgâhı (59 Deney & 8 Gösteri)',
+      level: 'all' as const,
+      gradeBadge: '9-12. Sınıf & Gösteriler',
+      icon: FlaskConical,
+      badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+      activeBorder: 'border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.25)] ring-1 ring-cyan-500/20',
+      desc: '59 Maarif deneyi, 8 gösteri, otomatik oynatma, 4× hız, geri al, tanecik modu ve öğretmen ödev kodu',
+    },
     // ── Ortaokul & Temel Kimya Üniteleri (7 - 8. Sınıf & LGS) ──
     {
       id: 'periodic' as KimyaTabType,
@@ -135,7 +159,7 @@ export function KimyaLabView() {
 
   const visibleModules = ALL_MODULES.filter((m) => {
     if (levelFilter === 'all') return true
-    return m.level === levelFilter || m.id === 'sandbox'
+    return m.level === levelFilter || m.id === 'sandbox' || m.id === 'workbench'
   })
 
   // ── CHEMISTRY CHALLENGES ──
@@ -306,6 +330,17 @@ export function KimyaLabView() {
                 type="button"
                 onClick={() => {
                   playClickSound()
+                  setActiveTab('workbench')
+                }}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 text-xs font-bold transition-all shadow-md cursor-pointer"
+              >
+                <FlaskConical className="w-4 h-4 text-cyan-400" />
+                <span>59 Deney Tezgâhı</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playClickSound()
                   setActiveTab('sandbox')
                 }}
                 className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition-all shadow-md cursor-pointer"
@@ -361,7 +396,7 @@ export function KimyaLabView() {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Tümü (7)
+                Tümü (8)
               </button>
             </div>
           </div>
@@ -408,6 +443,12 @@ export function KimyaLabView() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2 }}
           >
+            {activeTab === 'workbench' && (
+              <VirtualChemWorkbench
+                onStateChange={handleWorkbenchStateChange}
+                onSwitchTab={handleSwitchWorkbenchTab}
+              />
+            )}
             {activeTab === 'periodic' && <PeriodicTableModule />}
             {activeTab === 'gas_laws' && <GasLawsModule />}
             {activeTab === 'titration' && <TitrationModule />}
@@ -435,20 +476,38 @@ export function KimyaLabView() {
             {/* Socratic AI Coach */}
             <DersoAISocraticAssistant
               branch="Kimya"
-              moduleTitle="İdeal Gaz Yasaları Simülatörü"
-              currentState={{
-                'Basınç (P)': '1.0 atm',
-                'Hacim (V)': '24.6 L',
-                'Sıcaklık (T)': '300 K',
-                'Mol Sayısı (n)': '1.0 mol',
-              }}
+              moduleTitle={
+                activeTab === 'workbench' && liveWorkbench
+                  ? liveWorkbench.experimentTitle
+                  : 'İdeal Gaz Yasaları Simülatörü'
+              }
+              currentState={
+                activeTab === 'workbench' && liveWorkbench
+                  ? {
+                      'Aktif Deney': liveWorkbench.experimentTitle,
+                      'Sınıf / Kategori': liveWorkbench.gradeLabel,
+                      'Adım İlerlemesi': liveWorkbench.stepProgress,
+                      Sıcaklık: liveWorkbench.temperature,
+                      pH: liveWorkbench.ph,
+                      Hacim: liveWorkbench.volume,
+                      'Son Gözlem': liveWorkbench.lastObservation,
+                    }
+                  : {
+                      'Basınç (P)': '1.0 atm',
+                      'Hacim (V)': '24.6 L',
+                      'Sıcaklık (T)': '300 K',
+                      'Mol Sayısı (n)': '1.0 mol',
+                    }
+              }
             />
 
             {/* Uzman Eğitmen & Tanışma Dersi Dönüşüm Hunisi */}
             <LabTutorCTA
               branch="Kimya"
               topicName={
-                activeTab === 'titration'
+                activeTab === 'workbench' && liveWorkbench
+                  ? liveWorkbench.experimentTitle
+                  : activeTab === 'titration'
                   ? 'Asit-Baz Titrasyonu ve pH'
                   : activeTab === 'gas_laws'
                   ? 'İdeal Gaz Yasaları ve Gazlar'
@@ -458,7 +517,13 @@ export function KimyaLabView() {
                   ? 'Kimyasal Denge ve Tepkime Hızı'
                   : 'Kimya Deneyleri'
               }
-              gradeLevel={levelFilter === 'ortaokul' ? '8. Sınıf LGS' : '10-12. Sınıf YKS/AYT'}
+              gradeLevel={
+                activeTab === 'workbench' && liveWorkbench
+                  ? liveWorkbench.gradeLabel
+                  : levelFilter === 'ortaokul'
+                  ? '8. Sınıf LGS'
+                  : '10-12. Sınıf YKS/AYT'
+              }
             />
           </div>
         )}
@@ -468,12 +533,24 @@ export function KimyaLabView() {
       <LabReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
-        branch="Kimya (11. Sınıf AYT)"
-        experimentTitle="İdeal Gazlarda Basınç-Hacim-Sıcaklık İlişkisinin İncelenmesi"
-        measurements={CHEMISTRY_MEASUREMENTS}
-        independentVar="Gazın Sıcaklığı (T) ve Mol Miktarı (n)"
-        dependentVar="Gazın Hacmi (V) ve Basıncı (P)"
-        controlledVars="İdeal Gaz Sabiti (R = 0.0821), Atmosferik Dış Basınç"
+        branch={
+          activeTab === 'workbench' && liveWorkbench
+            ? `Kimya (${liveWorkbench.gradeLabel})`
+            : 'Kimya (11. Sınıf AYT)'
+        }
+        experimentTitle={
+          activeTab === 'workbench' && liveWorkbench
+            ? liveWorkbench.experimentTitle
+            : 'İdeal Gazlarda Basınç-Hacim-Sıcaklık İlişkisinin İncelenmesi'
+        }
+        measurements={
+          activeTab === 'workbench' && liveWorkbench && liveWorkbench.measurements.length > 0
+            ? liveWorkbench.measurements
+            : CHEMISTRY_MEASUREMENTS
+        }
+        independentVar="Gazın Sıcaklığı (T) ve Mol Miktarı (n) / Reaktif Miktarı"
+        dependentVar="Sıcaklık, pH, Renk Değişimi ve Ürün Verimi"
+        controlledVars="İdeal Gaz Sabiti (R = 0.0821), Laboratuvar Koşulları (1 atm, 25°C)"
       />
 
       <LabSplitScreenModal
@@ -488,7 +565,7 @@ export function KimyaLabView() {
 
       {/* ── Footer ── */}
       <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
-        DersoLab L.A.B. • Türkiye Yüzyılı Maarif Modeli, Ortaokul & Lise Müfredatına Uygun 7 Kimya Simülasyonu
+        DersoLab L.A.B. • Türkiye Yüzyılı Maarif Modeli, Ortaokul & Lise Müfredatına Uygun 8 Kimya Modülü · 59 Deney & 8 Gösteri
       </footer>
     </div>
   )

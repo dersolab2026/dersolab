@@ -193,3 +193,127 @@ export function playSwitchSound(): void {
   osc.start(ctx.currentTime)
   osc.stop(ctx.currentTime + 0.042)
 }
+
+/**
+ * Liquid pour sound: smooth filtered rising frequency sweep for reagent addition
+ */
+export function playLiquidPour(): void {
+  if (isSoundMuted()) return
+  const ctx = getAudioContext()
+  if (!ctx) return
+
+  const osc1 = ctx.createOscillator()
+  const osc2 = ctx.createOscillator()
+  const gain = ctx.createGain()
+
+  osc1.type = 'sine'
+  osc1.frequency.setValueAtTime(280, ctx.currentTime)
+  osc1.frequency.exponentialRampToValueAtTime(620, ctx.currentTime + 0.22)
+
+  osc2.type = 'triangle'
+  osc2.frequency.setValueAtTime(420, ctx.currentTime)
+  osc2.frequency.exponentialRampToValueAtTime(840, ctx.currentTime + 0.22)
+
+  gain.gain.setValueAtTime(0.05, ctx.currentTime)
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.24)
+
+  osc1.connect(gain)
+  osc2.connect(gain)
+  gain.connect(ctx.destination)
+
+  osc1.start(ctx.currentTime)
+  osc2.start(ctx.currentTime)
+  osc1.stop(ctx.currentTime + 0.25)
+  osc2.stop(ctx.currentTime + 0.25)
+}
+
+/**
+ * Burner ignite sound: crisp match spark + warm low burner hum
+ */
+export function playBurnerIgnite(): void {
+  if (isSoundMuted()) return
+  const ctx = getAudioContext()
+  if (!ctx) return
+
+  const pop = ctx.createOscillator()
+  const popGain = ctx.createGain()
+  pop.type = 'square'
+  pop.frequency.setValueAtTime(950, ctx.currentTime)
+  pop.frequency.exponentialRampToValueAtTime(160, ctx.currentTime + 0.06)
+  popGain.gain.setValueAtTime(0.07, ctx.currentTime)
+  popGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.065)
+  pop.connect(popGain)
+  popGain.connect(ctx.destination)
+  pop.start(ctx.currentTime)
+  pop.stop(ctx.currentTime + 0.07)
+
+  const hum = ctx.createOscillator()
+  const humGain = ctx.createGain()
+  hum.type = 'triangle'
+  hum.frequency.setValueAtTime(115, ctx.currentTime + 0.04)
+  hum.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.28)
+  humGain.gain.setValueAtTime(0.05, ctx.currentTime + 0.04)
+  humGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
+  hum.connect(humGain)
+  humGain.connect(ctx.destination)
+  hum.start(ctx.currentTime + 0.04)
+  hum.stop(ctx.currentTime + 0.31)
+}
+
+/**
+ * Glass clink sound: crisp laboratory glassware chime
+ */
+export function playGlassClink(): void {
+  if (isSoundMuted()) return
+  const ctx = getAudioContext()
+  if (!ctx) return
+
+  ;[2400, 3850].forEach((freq, idx) => {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.012)
+    gain.gain.setValueAtTime(0.045, ctx.currentTime + idx * 0.012)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.09)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start(ctx.currentTime + idx * 0.012)
+    osc.stop(ctx.currentTime + 0.095)
+  })
+}
+
+/**
+ * Dramatic multi-burst reaction sound for Gösteriler & energetic exothermic reactions
+ */
+export function playShowExplosion(): void {
+  if (isSoundMuted()) return
+  const ctx = getAudioContext()
+  if (!ctx) return
+
+  const burst = ctx.createOscillator()
+  const burstGain = ctx.createGain()
+  burst.type = 'sawtooth'
+  burst.frequency.setValueAtTime(220, ctx.currentTime)
+  burst.frequency.exponentialRampToValueAtTime(55, ctx.currentTime + 0.35)
+  burstGain.gain.setValueAtTime(0.11, ctx.currentTime)
+  burstGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.36)
+  burst.connect(burstGain)
+  burstGain.connect(ctx.destination)
+  burst.start(ctx.currentTime)
+  burst.stop(ctx.currentTime + 0.38)
+
+  for (let i = 0; i < 6; i++) {
+    const t = ctx.currentTime + 0.05 + i * 0.045
+    const fizz = ctx.createOscillator()
+    const fg = ctx.createGain()
+    fizz.type = 'sine'
+    fizz.frequency.setValueAtTime(700 + i * 160, t)
+    fizz.frequency.exponentialRampToValueAtTime(1250 + i * 120, t + 0.05)
+    fg.gain.setValueAtTime(0.045, t)
+    fg.gain.exponentialRampToValueAtTime(0.001, t + 0.055)
+    fizz.connect(fg)
+    fg.connect(ctx.destination)
+    fizz.start(t)
+    fizz.stop(t + 0.06)
+  }
+}

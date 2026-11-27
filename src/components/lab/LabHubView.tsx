@@ -59,14 +59,19 @@ const LAB_BRANCH_DATA: BranchCardData[] = [
     bgGlow: 'bg-cyan-500/10',
     borderColor: 'border-cyan-500/30 group-hover:border-cyan-400/60',
     textColor: 'text-cyan-400',
-    tag: '3D Atom, Gazlar & Titrasyon',
+    tag: '59 Deney, Gösteriler & 3D Atom',
     category: 'sayisal',
     levels: ['ortaokul', 'lise'],
     levelBadge: '7 - 12. Sınıf & Maarif',
     maarifModel: true,
     description:
-      '3D Bohr atom modeli ve katman elektron dağılımı (2-8-8 kuralı), ideal gaz yasaları, sanal asit-baz titrasyon deneyi, tepkime hız/denge ve mol/çözelti aracı.',
+      '59 Maarif Modeli deneyi ve 8 gösteri içeren etkileşimli Sanal Kimya Tezgâhı, otomatik oynatma, tanecik modu, öğretmen ödev kodu, 3D Bohr atom modeli, gaz yasaları ve titrasyon.',
     modules: [
+      {
+        title: 'Sanal Kimya Tezgâhı (59 Deney & 8 Gösteri)',
+        desc: '9–12. sınıf müfredatı ve 8 gösteri (fil diş macunu, termit, iyot saati...), otomatik oynatma, 4× hız, geri al, tanecik modu ve öğretmen ödev kodları.',
+        badge: '59 Deney + 8 Gösteri',
+      },
       {
         title: '3D Atom Modeli & Katman Dağılımı (Bohr)',
         desc: 'Çekirdekteki proton ve nötronlar ile yörüngelerdeki elektron katmanlarını (2-8-8 kuralı) 3 boyutta inceleyin; grup-periyot ilişkisini keşfedin.',
