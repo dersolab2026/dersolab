@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { GoogleGenAI } from '@google/genai'
 
-// Rate limiting için basit in-memory store (production'da Redis kullanılır)
+// L1 bellek önbelleği + Supabase private storage (`bot-secrets`) tabanlı dağıtık (serverless-safe) rate limiter
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 let lastRateLimitCleanup = Date.now()
+const RATE_LIMIT_BUCKET = 'bot-secrets'
 
-const DAILY_LIMIT_STUDENT = 500 // Kayıtlı öğrenciler için sınırsız kullanım (güvenlik tavanı)
+const DAILY_LIMIT_STUDENT = 500 // Kayıtlı öğrenciler için günlük güvenlik tavanı
 
-function getRateLimit(key: string, limit: number): { allowed: boolean; remaining: number } {
+function getInMemoryRateLimit(key: string, limit: number): { allowed: boolean; remaining: number; count: number } {
   const now = Date.now()
   const dayMs = 24 * 60 * 60 * 1000
 
@@ -23,15 +25,65 @@ function getRateLimit(key: string, limit: number): { allowed: boolean; remaining
 
   if (!entry || entry.resetAt < now) {
     rateLimitMap.set(key, { count: 1, resetAt: now + dayMs })
-    return { allowed: true, remaining: limit - 1 }
+    return { allowed: true, remaining: limit - 1, count: 1 }
   }
 
   if (entry.count >= limit) {
-    return { allowed: false, remaining: 0 }
+    return { allowed: false, remaining: 0, count: entry.count }
   }
 
   entry.count++
-  return { allowed: true, remaining: limit - entry.count }
+  return { allowed: true, remaining: limit - entry.count, count: entry.count }
+}
+
+async function checkDistributedRateLimit(
+  userId: string,
+  limit: number
+): Promise<{ allowed: boolean; remaining: number }> {
+  const utcDay = new Date().toISOString().slice(0, 10)
+  const memKey = `user:${userId}:${utcDay}`
+  const storagePath = `rate-limits/ai-solve/${utcDay}/${userId}.json`
+
+  try {
+    const admin = createAdminClient()
+    let remoteCount = 0
+
+    // Cold-start veya ilk istekte Supabase üzerindeki kalıcı sayacı oku
+    const cached = rateLimitMap.get(memKey)
+    if (!cached) {
+      const { data: blob } = await admin.storage.from(RATE_LIMIT_BUCKET).download(storagePath)
+      if (blob) {
+        const parsed = JSON.parse(await blob.text()) as { count?: number }
+        if (typeof parsed.count === 'number' && parsed.count > 0) {
+          remoteCount = parsed.count
+          rateLimitMap.set(memKey, {
+            count: remoteCount,
+            resetAt: Date.now() + 24 * 60 * 60 * 1000,
+          })
+        }
+      }
+    }
+
+    const mem = getInMemoryRateLimit(memKey, limit)
+    if (!mem.allowed) {
+      return { allowed: false, remaining: 0 }
+    }
+
+    // Güncel sayacı kalıcı depoya asenkron kaydet (isteği bloklamadan)
+    const payload = Buffer.from(
+      JSON.stringify({ count: mem.count, date: utcDay, updatedAt: new Date().toISOString() }),
+      'utf-8'
+    )
+    void admin.storage
+      .from(RATE_LIMIT_BUCKET)
+      .upload(storagePath, payload, { contentType: 'application/json', upsert: true })
+      .catch(() => {})
+
+    return { allowed: true, remaining: mem.remaining }
+  } catch {
+    const fallback = getInMemoryRateLimit(memKey, limit)
+    return { allowed: fallback.allowed, remaining: fallback.remaining }
+  }
 }
 
 const SYSTEM_PROMPT = `Sen DersoLab AI Soru Asistanı'sın. 
@@ -108,9 +160,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Rate limiting (Kayıtlı öğrenciler için)
-    const rateLimitKey = `user:${user.id}`
-    const { allowed, remaining } = getRateLimit(rateLimitKey, DAILY_LIMIT_STUDENT)
+    // Rate limiting (Kayıtlı öğrenciler için — dağıtık Supabase + L1 bellek)
+    const { allowed, remaining } = await checkDistributedRateLimit(user.id, DAILY_LIMIT_STUDENT)
     if (!allowed) {
       return NextResponse.json(
         {

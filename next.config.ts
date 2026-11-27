@@ -1,6 +1,19 @@
 import type { NextConfig } from 'next'
 
-const SUPABASE_ORIGIN = 'https://nkqifjcyudvwfaehgtgp.supabase.co'
+const DEFAULT_SUPABASE_ORIGIN = 'https://nkqifjcyudvwfaehgtgp.supabase.co'
+
+const SUPABASE_ORIGIN = (() => {
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+  if (!raw) return DEFAULT_SUPABASE_ORIGIN
+  try {
+    return new URL(raw).origin
+  } catch {
+    return DEFAULT_SUPABASE_ORIGIN
+  }
+})()
+
+const SUPABASE_HOST = new URL(SUPABASE_ORIGIN).hostname
+const SUPABASE_WS_ORIGIN = `wss://${SUPABASE_HOST}`
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -11,7 +24,7 @@ const CSP = [
   `img-src 'self' data: blob: ${SUPABASE_ORIGIN} https://img.youtube.com https://i.ytimg.com https://*.googleusercontent.com https://lh3.googleusercontent.com https://meet.jit.si https://8x8.vc https://*.mzstatic.com https://upload.wikimedia.org https://covers.openlibrary.org https://*.tiktokcdn.com https://*.tiktokcdn-eu.com https://*.tiktokcdn-us.com`,
   `media-src 'self' ${SUPABASE_ORIGIN} blob:`,
   "font-src 'self' data:",
-  `connect-src 'self' ${SUPABASE_ORIGIN} wss://nkqifjcyudvwfaehgtgp.supabase.co https://meet.jit.si https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc${isDev ? ' ws://localhost:* wss://localhost:*' : ''}`,
+  `connect-src 'self' ${SUPABASE_ORIGIN} ${SUPABASE_WS_ORIGIN} https://meet.jit.si https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc${isDev ? ' ws://localhost:* wss://localhost:*' : ''}`,
   "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://meet.jit.si https://8x8.vc",
   "frame-ancestors 'self'",
   "form-action 'self'",
@@ -26,7 +39,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'nkqifjcyudvwfaehgtgp.supabase.co',
+        hostname: SUPABASE_HOST,
         pathname: '/storage/v1/object/public/**',
       },
       {
