@@ -95,6 +95,34 @@ interface VirtualChemWorkbenchProps {
 
 const PROGRESS_STORAGE_KEY = 'dersolab_kimya_progress_v2'
 
+/** Official MEB Türkiye Yüzyılı Maarif Modeli outcome reference mapper (from 2024/2026 MEB Kimya PDF). */
+function getMebOutcomeCode(exp: ChemExperiment): string {
+  const unit = exp.maarifUnit.toLowerCase()
+  if (exp.grade === '9') {
+    if (unit.includes('atom') || unit.includes('orbital') || unit.includes('periyodik')) return 'KİM.9.1.3 · KİM.9.1.8'
+    if (unit.includes('buhar') || unit.includes('kaynama') || unit.includes('viskozite') || unit.includes('yüzey')) return 'KİM.9.2.9 – KİM.9.2.13'
+    if (unit.includes('nanoparçacık') || unit.includes('sürdürülebilir')) return 'KİM.9.3.1'
+    return 'KİM.9.2.2 – KİM.9.2.7'
+  }
+  if (exp.grade === '10') {
+    if (unit.includes('gaz') || unit.includes('difüzyon') || unit.includes('boyle')) return 'KİM.10.1.8 – KİM.10.1.11'
+    if (unit.includes('çözün') || unit.includes('koligatif') || unit.includes('molar')) return 'KİM.10.2.1 – KİM.10.2.8'
+    return 'KİM.10.1.1 – KİM.10.1.7'
+  }
+  if (exp.grade === '11') {
+    if (unit.includes('entalpi') || unit.includes('kalorimetre') || unit.includes('enerji')) return 'KİM.11.1.1 – KİM.11.1.4'
+    if (unit.includes('hız')) return 'KİM.11.1.6 – KİM.11.1.8'
+    if (unit.includes('titrasyon') || unit.includes('asit') || unit.includes('ph')) return 'KİM.11.2.8 – KİM.11.2.11'
+    return 'KİM.11.2.1 – KİM.11.2.5'
+  }
+  if (exp.grade === '12') {
+    if (unit.includes('elektroliz') || unit.includes('kaplama') || unit.includes('korozyon')) return 'KİM.12.1.6 – KİM.12.1.9'
+    if (unit.includes('redoks') || unit.includes('galvanik') || unit.includes('pil')) return 'KİM.12.1.1 – KİM.12.1.5'
+    return 'KİM.12.3.1 – KİM.12.3.2'
+  }
+  return 'KİM.10.1.1 · KİM.11.1.7 (Gösteri)'
+}
+
 export function VirtualChemWorkbench({ onStateChange, onSwitchTab }: VirtualChemWorkbenchProps) {
   // Navigation & Filters
   const [gradeFilter, setGradeFilter] = useState<'all' | ChemGradeKey | 'sandbox'>('all')
@@ -130,7 +158,7 @@ export function VirtualChemWorkbench({ onStateChange, onSwitchTab }: VirtualChem
   const [fastForward, setFastForward] = useState(false)
   const [microMode, setMicroMode] = useState(false)
   const [mobileZoom, setMobileZoom] = useState(false)
-  const [isTrayOpen, setIsTrayOpen] = useState(true)
+  const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [trayCategory, setTrayCategory] = useState<'bu_deney' | 'tumu' | ChemItemCategory>('bu_deney')
   const [selectedAmount, setSelectedAmount] = useState<number>(25)
   const [muted, setMuted] = useState(false)
@@ -892,7 +920,7 @@ export function VirtualChemWorkbench({ onStateChange, onSwitchTab }: VirtualChem
             onClick={() => setIsTrayOpen((p) => !p)}
             className="px-3 py-2 rounded-xl text-xs font-bold bg-slate-950 border border-slate-800 text-slate-300 hover:text-white cursor-pointer"
           >
-            {isTrayOpen ? 'Tepsiyi Gizle' : 'Tepsiyi Aç'}
+            {isTrayOpen ? 'Dolabı Gizle' : 'Malzeme Dolabı (84)'}
           </button>
 
           <button
@@ -1053,7 +1081,12 @@ export function VirtualChemWorkbench({ onStateChange, onSwitchTab }: VirtualChem
             microMode={microMode}
             mobileZoom={mobileZoom}
             onTriggerStep={() => executeGuidedStep(false)}
+            onSelectBenchMaterial={(itemId) => handleTrayItemClick(itemId)}
             onSelectSandboxVessel={(v) => setSim((p) => ({ ...p, sandboxVessel: v }))}
+            onResetBench={() => {
+              playGlassClink()
+              loadExperiment(currentExp, isSandbox)
+            }}
           />
 
           {/* "Her Deney Sayfasında" 4 Pedagogical Cards */}
@@ -1120,15 +1153,26 @@ export function VirtualChemWorkbench({ onStateChange, onSwitchTab }: VirtualChem
         <div className="xl:col-span-4 space-y-4">
           {/* Step Checklist Card */}
           <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-4 space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-xs font-black text-white uppercase tracking-wider">
                 <ClipboardList className="w-4 h-4 text-cyan-400" />
                 <span>{isSandbox ? 'Serbest Çalışma' : 'Deney Adımları'}</span>
               </div>
               {!isSandbox && (
-                <span className="px-2 py-0.5 rounded-full bg-slate-950 border border-slate-700 font-mono text-xs text-cyan-300 font-bold">
-                  {currentStepIndex}/{currentExp.steps.length}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className="px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-[10px] font-bold text-cyan-300"
+                    title={currentExp.maarifUnit}
+                  >
+                    {getMebOutcomeCode(currentExp)}
+                  </span>
+                  <span
+                    className="px-2 py-0.5 rounded-full bg-slate-950 border border-slate-700 text-xs text-cyan-300 font-bold"
+                    style={{ fontVariantNumeric: 'tabular-nums' }}
+                  >
+                    {currentStepIndex}/{currentExp.steps.length}
+                  </span>
+                </div>
               )}
             </div>
 
@@ -1289,16 +1333,39 @@ export function VirtualChemWorkbench({ onStateChange, onSwitchTab }: VirtualChem
 
           {/* Live Dynamic Chart Card */}
           <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-4 space-y-2">
-            <div className="text-xs font-black text-white uppercase tracking-wider">
-              {currentExp.chartConfig.title}
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-xs font-black text-white uppercase tracking-wider">
+                {currentExp.chartConfig.title}
+              </div>
+              <span className="text-[10px] font-semibold text-slate-400">
+                Birim: {currentExp.chartConfig.unit}
+              </span>
             </div>
             <svg viewBox="0 0 300 140" className="w-full h-32 bg-slate-950/70 rounded-xl border border-slate-800/80">
+              <line x1="36" y1="24" x2="284" y2="24" stroke="rgba(148,163,184,0.12)" strokeDasharray="3 3" />
+              <line x1="36" y1="73" x2="284" y2="73" stroke="rgba(148,163,184,0.12)" strokeDasharray="3 3" />
               <line x1="36" y1="20" x2="36" y2="122" stroke="#334155" strokeWidth="1.5" />
               <line x1="36" y1="122" x2="284" y2="122" stroke="#334155" strokeWidth="1.5" />
-              <text x="6" y="28" fill="#64748b" fontSize="9" fontFamily="monospace">
+              <text
+                x="30"
+                y="27"
+                textAnchor="end"
+                fill="#94a3b8"
+                fontSize="9.5"
+                fontWeight="600"
+                style={{ fontVariantNumeric: 'tabular-nums' }}
+              >
                 {chartMaxY}
               </text>
-              <text x="6" y="122" fill="#64748b" fontSize="9" fontFamily="monospace">
+              <text
+                x="30"
+                y="122"
+                textAnchor="end"
+                fill="#94a3b8"
+                fontSize="9.5"
+                fontWeight="600"
+                style={{ fontVariantNumeric: 'tabular-nums' }}
+              >
                 {chartMinY}
               </text>
               {activeChartPts.length > 1 && (

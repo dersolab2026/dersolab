@@ -460,7 +460,7 @@ export function KimyaLabView() {
         </AnimatePresence>
 
         {/* ── ENHANCEMENT SUITE (Challenges, Exam Question & Socratic AI) ── */}
-        {activeTab !== 'sandbox' && (
+        {activeTab !== 'sandbox' && activeTab !== 'workbench' && (
           <div className="space-y-6 pt-4 border-t border-slate-800">
             {/* Challenges */}
             <LabChallengePanel
@@ -477,37 +477,27 @@ export function KimyaLabView() {
             <DersoAISocraticAssistant
               branch="Kimya"
               moduleTitle={
-                activeTab === 'workbench' && liveWorkbench
-                  ? liveWorkbench.experimentTitle
+                activeTab === 'titration'
+                  ? 'Asit-Baz Titrasyonu & pH'
+                  : activeTab === 'periodic'
+                  ? 'Periyodik Tablo & Bohr Atom'
+                  : activeTab === 'equilibrium'
+                  ? 'Tepkime Hızı & Denge'
                   : 'İdeal Gaz Yasaları Simülatörü'
               }
-              currentState={
-                activeTab === 'workbench' && liveWorkbench
-                  ? {
-                      'Aktif Deney': liveWorkbench.experimentTitle,
-                      'Sınıf / Kategori': liveWorkbench.gradeLabel,
-                      'Adım İlerlemesi': liveWorkbench.stepProgress,
-                      Sıcaklık: liveWorkbench.temperature,
-                      pH: liveWorkbench.ph,
-                      Hacim: liveWorkbench.volume,
-                      'Son Gözlem': liveWorkbench.lastObservation,
-                    }
-                  : {
-                      'Basınç (P)': '1.0 atm',
-                      'Hacim (V)': '24.6 L',
-                      'Sıcaklık (T)': '300 K',
-                      'Mol Sayısı (n)': '1.0 mol',
-                    }
-              }
+              currentState={{
+                'Basınç (P)': '1.0 atm',
+                'Hacim (V)': '24.6 L',
+                'Sıcaklık (T)': '300 K',
+                'Mol Sayısı (n)': '1.0 mol',
+              }}
             />
 
             {/* Uzman Eğitmen & Tanışma Dersi Dönüşüm Hunisi */}
             <LabTutorCTA
               branch="Kimya"
               topicName={
-                activeTab === 'workbench' && liveWorkbench
-                  ? liveWorkbench.experimentTitle
-                  : activeTab === 'titration'
+                activeTab === 'titration'
                   ? 'Asit-Baz Titrasyonu ve pH'
                   : activeTab === 'gas_laws'
                   ? 'İdeal Gaz Yasaları ve Gazlar'
@@ -517,13 +507,7 @@ export function KimyaLabView() {
                   ? 'Kimyasal Denge ve Tepkime Hızı'
                   : 'Kimya Deneyleri'
               }
-              gradeLevel={
-                activeTab === 'workbench' && liveWorkbench
-                  ? liveWorkbench.gradeLabel
-                  : levelFilter === 'ortaokul'
-                  ? '8. Sınıf LGS'
-                  : '10-12. Sınıf YKS/AYT'
-              }
+              gradeLevel={levelFilter === 'ortaokul' ? '8. Sınıf LGS' : '10-12. Sınıf YKS/AYT'}
             />
           </div>
         )}
