@@ -20,7 +20,7 @@ export const CHEM_EXPERIMENTS_PART_1: ChemExperiment[] = [
     initialVol: 0,
     steps: [
       {
-        instruction: '250 mL erlenmayere %30 derişimli H₂O₂ çözeltisi ekle.',
+        instruction: '500 mL uzun mezür 1 içine %30 derişimli H₂O₂ çözeltisi ekle.',
         actionLabel: '50 mL H₂O₂ Ekle',
         materialIds: ['erlen', 'h2o2'],
         amountOptions: [25, 50, 100],
@@ -32,7 +32,7 @@ export const CHEM_EXPERIMENTS_PART_1: ChemExperiment[] = [
         logExplanation: 'Hidrojen peroksit (H₂O₂) oda sıcaklığında çok yavaş kendiliğinden ayrışır.',
       },
       {
-        instruction: 'Çıkan oksijen gazını köpük halinde hapsetmek için sıvı deterjan ekle.',
+        instruction: 'Çıkan oksijen gazını köpük halinde hapsetmek için sıvı deterjan (ve istersen boya) ekle.',
         actionLabel: '10 mL Deterjan Ekle',
         materialIds: ['deterjan'],
         amountOptions: [10, 25],
@@ -44,7 +44,7 @@ export const CHEM_EXPERIMENTS_PART_1: ChemExperiment[] = [
         logExplanation: 'Deterjan sıvının yüzey gerilimini düşürerek açığa çıkacak O₂ kabarcıklarını köpükte hapseder.',
       },
       {
-        instruction: 'Sıcaklığı ölçmek için dijital termometreyi erlene yerleştir.',
+        instruction: 'Sıcaklığı ölçmek için dijital termometreyi mezüre yerleştir.',
         actionLabel: 'Termometreyi Yerleştir',
         materialIds: ['termometre'],
         sfx: 'clink',
