@@ -7,7 +7,7 @@ import {
   Percent,
   Sliders,
   RotateCcw,
-  Sparkles,
+  Compass,
   CheckCircle2,
   HelpCircle,
   Divide,
@@ -116,7 +116,7 @@ export function FractionsLabModule() {
             }`}
           >
             {isUnitFraction
-              ? '✨ Birim Kesir (Pay = 1)'
+              ? 'Birim Kesir (Pay = 1)'
               : isProper
               ? '🟢 Basit Kesir (Pay < Payda)'
               : isWhole
@@ -212,7 +212,7 @@ export function FractionsLabModule() {
             <div className="pt-2 border-t border-slate-800/80 space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-300 font-semibold flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <Compass className="w-3.5 h-3.5 text-cyan-400" />
                   Denk Kesir (Genişletme):
                 </span>
                 <span className="font-mono text-cyan-300 font-bold">

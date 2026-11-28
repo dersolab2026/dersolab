@@ -299,7 +299,7 @@ export function SosyalLabView() {
       <footer className="border-t border-slate-800/80 bg-slate-950/60 py-6 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-slate-500">
-            DersoLab Sosyal Bilimler Laboratuvarı — Ortaokul ve Lise MEB Müfredatına Uygun 4 Sanal Simülasyon.
+            DersoLab Sosyal Bilimler Laboratuvarı — Ortaokul ve Lise MEB Müfredatına Uygun 6 Sanal Simülasyon.
           </p>
           <div className="flex items-center gap-4 text-xs font-medium">
             <Link

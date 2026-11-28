@@ -6,7 +6,7 @@ import {
   TrendingUp,
   Activity,
   Sliders,
-  Sparkles,
+  Compass,
   ArrowRight,
   HelpCircle,
   Maximize2,
@@ -250,7 +250,7 @@ export function ParabolaModule() {
           {/* Formül & AYT Bilgi Kartı */}
           <div className="p-4 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs space-y-2">
             <div className="font-bold text-white flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+              <Compass className="w-3.5 h-3.5 text-violet-400" />
               <span>AYT Parabol Formül Kartı</span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-[11px]">

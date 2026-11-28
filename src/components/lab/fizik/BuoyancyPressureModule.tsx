@@ -7,7 +7,6 @@ import {
   Droplets,
   Scale,
   Sliders,
-  Sparkles,
   Info,
   ArrowDown,
   ArrowUp,

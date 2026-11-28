@@ -6,7 +6,6 @@ import {
   Volume2,
   CheckCircle2,
   XCircle,
-  Sparkles,
   School,
   GraduationCap,
   MessageSquare,

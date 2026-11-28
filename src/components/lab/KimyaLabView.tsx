@@ -16,7 +16,6 @@ import {
   Wind,
   Activity,
   School,
-  Sparkles,
   FileText,
   Columns,
   Wrench,

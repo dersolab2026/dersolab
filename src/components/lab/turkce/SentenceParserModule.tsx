@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
-  Sparkles,
+  Compass,
   Search,
   CheckCircle2,
   HelpCircle,
@@ -248,7 +248,7 @@ export function SentenceParserModule() {
           {/* Fiilimsi Kodlama Kartı */}
           <div className="p-4 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs space-y-2">
             <div className="font-bold text-white flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Compass className="w-3.5 h-3.5 text-amber-400" />
               <span>Fiilimsi Ekleri Kodlaması</span>
             </div>
             <div className="space-y-1.5 text-[11px] text-slate-300">

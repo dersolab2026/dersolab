@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Sparkles, ArrowRight, MessageCircle, GraduationCap, CheckCircle2 } from 'lucide-react'
+import { Compass, ArrowRight, MessageCircle, GraduationCap, CheckCircle2 } from 'lucide-react'
 import { playClickSound } from '@/lib/soundFx'
 
 interface LabTutorCTAProps {
@@ -50,7 +50,7 @@ export function LabTutorCTA({
 
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-bold">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+              <Compass className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
               <span>Ücretsiz Tanışma Dersi</span>
               <span className="text-slate-500">•</span>
               <span className="text-slate-300">{gradeLevel}</span>

@@ -7,7 +7,7 @@ import {
   Globe2,
   Calendar,
   Compass,
-  Sparkles,
+  Award,
   Info,
   Clock,
   ArrowRight,
@@ -262,7 +262,7 @@ export function SeasonsOrbitModule() {
           {/* LGS & Coğrafya Taktik Kartı */}
           <div className="p-4 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs space-y-2">
             <div className="font-bold text-white flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Award className="w-3.5 h-3.5 text-amber-400" />
               <span>LGS 1. Ünite Soru Tuzakları</span>
             </div>
             <ul className="list-disc list-inside space-y-1 text-[11px] text-slate-300">

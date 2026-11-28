@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import {
   Bot,
-  Sparkles,
+  Compass,
   Send,
   Lightbulb,
   ChevronDown,
@@ -215,7 +215,7 @@ export function DersoAISocraticAssistant({
               >
                 {m.sender === 'ai' && (
                   <div className="w-6 h-6 rounded-lg bg-violet-600/30 border border-violet-500/40 flex items-center justify-center text-violet-300 shrink-0 mt-0.5">
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Compass className="w-3.5 h-3.5" />
                   </div>
                 )}
                 <div
@@ -232,7 +232,7 @@ export function DersoAISocraticAssistant({
 
             {isTyping && (
               <div className="flex items-center gap-2 text-slate-400 text-xs italic p-1">
-                <Sparkles className="w-3.5 h-3.5 animate-spin text-violet-400" />
+                <Compass className="w-3.5 h-3.5 animate-spin text-violet-400" />
                 <span>DersoAI canlı simülasyon parametrelerini analiz ediyor...</span>
               </div>
             )}

@@ -12,7 +12,6 @@ import {
   Shield,
   Flag,
   CheckCircle2,
-  Sparkles,
   BookOpen,
 } from 'lucide-react'
 import { playClickSound, playChemicalReaction, playSuccessFanfare, playErrorBuzz } from '@/lib/soundFx'
@@ -1121,7 +1120,7 @@ export function BattleSimulatorModule() {
           {/* Interactive Commander Quiz */}
           <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-rose-950/25 border border-rose-500/30 p-4 space-y-3">
             <div className="text-[11px] font-black text-rose-300 uppercase tracking-wider inline-flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Shield className="w-3.5 h-3.5" />
               Komutan Sensin · MEB Çıkarım Kontrolü
             </div>
             <p className="text-xs font-bold text-slate-100 leading-relaxed">{battle.quiz.question}</p>

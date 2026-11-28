@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Trophy, CheckCircle2, AlertCircle, HelpCircle, Sparkles, Award } from 'lucide-react'
+import { Trophy, CheckCircle2, AlertCircle, HelpCircle, Compass, Award } from 'lucide-react'
 import { playSuccessFanfare, playClickSound } from '@/lib/soundFx'
 
 export type ChallengeLevel = 'easy' | 'medium' | 'hard'
@@ -143,7 +143,7 @@ export function LabChallengePanel({
       {/* Just completed celebration alert */}
       {justCompletedId && (
         <div className="my-4 p-3 rounded-xl bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm font-bold flex items-center gap-3 animate-bounce">
-          <Sparkles className="w-5 h-5 text-emerald-400 shrink-0" />
+          <Compass className="w-5 h-5 text-emerald-400 shrink-0" />
           <span>Tebrikler! Bir hedef görevi başarıyla tamamladın ve XP kazandın! 🎉</span>
         </div>
       )}

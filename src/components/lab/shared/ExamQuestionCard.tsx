@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { CheckCircle2, XCircle, HelpCircle, ExternalLink, Sparkles, BookOpen } from 'lucide-react'
+import { CheckCircle2, XCircle, HelpCircle, ExternalLink, Compass, BookOpen } from 'lucide-react'
 import { playSuccessFanfare, playErrorBuzz, playClickSound } from '@/lib/soundFx'
 
 export interface ExamQuestion {
@@ -72,7 +72,7 @@ export function ExamQuestionCard({ question }: ExamQuestionCardProps) {
           }}
           className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-3 py-1.5 rounded-lg transition-all cursor-pointer"
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <Compass className="w-3.5 h-3.5 text-amber-400" />
           <span>{showSimTip ? 'Simülasyon İpucunu Gizle' : 'Simülasyonda Doğrula 🧪'}</span>
         </button>
       </div>

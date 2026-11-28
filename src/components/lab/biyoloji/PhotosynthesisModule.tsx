@@ -7,7 +7,7 @@ import {
   Droplet,
   Flame,
   Wind,
-  Sparkles,
+  Compass,
   Sliders,
   RotateCcw,
   Activity,
@@ -310,7 +310,7 @@ export function PhotosynthesisModule() {
           {/* Engelmann Deneyi Bilgi Kutusu */}
           <div className="p-4 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs space-y-2">
             <div className="font-bold text-white flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <Compass className="w-3.5 h-3.5 text-emerald-400" />
               <span>Engelmann Deneyi & AYT Soru Taktikleri</span>
             </div>
             <ul className="list-disc list-inside space-y-1 text-[11px] text-slate-300">

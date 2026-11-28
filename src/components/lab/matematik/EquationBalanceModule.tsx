@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Scale,
-  Sparkles,
+  Compass,
   Plus,
   Minus,
   RotateCcw,
@@ -199,7 +199,7 @@ export function EquationBalanceModule() {
           {/* Maarif Step-by-Step Equality Preserving Actions */}
           <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
             <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Compass className="w-3.5 h-3.5" />
               <span>Eşitliğin Korunumu Adımları</span>
             </div>
 

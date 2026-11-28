@@ -10,7 +10,7 @@ import {
   ChevronRight,
   Headphones,
   FlaskConical,
-  Sparkles,
+  Compass,
   CheckCircle2,
 } from 'lucide-react'
 import { playSpeech, EnglishAccent } from './speechHelper'
@@ -488,7 +488,7 @@ export function PronunciationWorkoutModule() {
               <div className="p-6 rounded-2xl bg-gradient-to-b from-slate-950 to-slate-900 border border-slate-800 space-y-5">
                 <div className="text-center space-y-1">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Compass className="w-3.5 h-3.5" />
                     <span>Fonetik Kıyaslama & Tuzak Analiz Alanı</span>
                   </div>
                   <h4 className="text-base sm:text-lg font-bold text-white">
@@ -534,7 +534,7 @@ export function PronunciationWorkoutModule() {
                     <div className="space-y-1.5 text-left">
                       <div className="flex items-center justify-between">
                         <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
-                          ✨ Doğru Fonetik Çözüm
+                          Doğru Fonetik Çözüm
                         </span>
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-bold">
                           Hedef

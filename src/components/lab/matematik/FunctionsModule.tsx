@@ -6,7 +6,7 @@ import {
   TrendingUp,
   Activity,
   Sliders,
-  Sparkles,
+  Compass,
   ArrowRight,
   Layers,
   HelpCircle,
@@ -302,7 +302,7 @@ export function FunctionsModule() {
           {/* Fonksiyon Makinesi Kartı */}
           <div className="p-4 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs space-y-2">
             <div className="font-bold text-white flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+              <Compass className="w-3.5 h-3.5 text-violet-400" />
               <span>Girdi-Çıktı Fonksiyon Makinesi</span>
             </div>
             <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-950/80 border border-slate-800 font-mono">

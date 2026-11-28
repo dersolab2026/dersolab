@@ -9,7 +9,7 @@ import {
   Camera,
   School,
   GraduationCap,
-  Sparkles,
+  Compass,
 } from 'lucide-react'
 import { BranchNavHeader } from '../BranchNavHeader'
 import { MEBCurriculumEnglishModule } from './MEBCurriculumEnglishModule'
@@ -30,7 +30,7 @@ export function IngilizceLabView() {
       id: 'workbench' as EnglishTabType,
       label: 'Sanal İngilizce Tezgâhı',
       sublabel: '5–12. Sınıf Adım Adım Pratik',
-      icon: Sparkles,
+      icon: Compass,
       badge: '24 MEB Simülasyonu',
       color: 'from-cyan-500 to-sky-600',
       activeBorder: 'border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.3)] ring-1 ring-cyan-500/20',

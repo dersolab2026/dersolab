@@ -7,7 +7,7 @@ import {
   Pause,
   RotateCcw,
   Sliders,
-  Sparkles,
+  Compass,
   ArrowRight,
   ShieldCheck,
   Scale,
@@ -666,7 +666,7 @@ export function NewtonDynamicsModule() {
           {/* MEB / YKS Formula Quick Card */}
           <div className="p-4 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs space-y-2">
             <div className="font-bold text-slate-200 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Compass className="w-3.5 h-3.5 text-amber-400" />
               <span>YKS & Lise Temel Formül Kartı</span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-[11px]">

@@ -8,7 +8,7 @@ import {
   Pause,
   RotateCcw,
   Sliders,
-  Sparkles,
+  Compass,
   Zap,
   Globe2,
 } from 'lucide-react'
@@ -582,7 +582,7 @@ export function HarmonicWaveModule() {
           {/* Sınav Taktik Kartı */}
           <div className="p-4 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs space-y-2">
             <div className="font-bold text-slate-200 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+              <Compass className="w-3.5 h-3.5 text-violet-400" />
               <span>AYT & 12. Sınıf Kritik Soru İpuçları</span>
             </div>
             <ul className="list-disc list-inside space-y-1 text-[11px] text-slate-300">

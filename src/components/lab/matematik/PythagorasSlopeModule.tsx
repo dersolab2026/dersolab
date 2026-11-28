@@ -7,7 +7,7 @@ import {
   TrendingUp,
   Sliders,
   CheckCircle2,
-  Sparkles,
+  Award,
   HelpCircle,
   RotateCcw,
   Compass,
@@ -146,7 +146,7 @@ export function PythagorasSlopeModule() {
             <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <Award className="w-3.5 h-3.5 text-amber-400" />
                   LGS Gerçek Hayat Problemleri
                 </span>
                 <button

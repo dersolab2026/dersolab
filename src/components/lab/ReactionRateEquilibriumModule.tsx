@@ -7,7 +7,6 @@ import {
   Zap,
   Activity,
   Sliders,
-  Sparkles,
   ArrowRight,
   TrendingUp,
   RotateCcw,

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Columns, X, ArrowRight, Sparkles, Scale, Info } from 'lucide-react'
+import { Columns, X, ArrowRight, Compass, Scale, Info } from 'lucide-react'
 import { playClickSound, playSliderTick } from '@/lib/soundFx'
 
 export interface SplitStateScenario {
@@ -179,7 +179,7 @@ export function LabSplitScreenModal({
           {/* Delta Insights / Bilimsel Fark Analizi */}
           <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-cyan-950/30 via-slate-900 to-teal-950/30 border border-cyan-500/30">
             <div className="flex items-center gap-2 text-cyan-300 text-xs font-extrabold uppercase tracking-wider mb-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
+              <Compass className="w-4 h-4 text-cyan-400" />
               <span>Δ Değişim & Bilimsel Çıkarım (Sınav Mantığı)</span>
             </div>
             <ul className="space-y-2 text-xs sm:text-sm text-slate-200">

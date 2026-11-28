@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import {
   Calculator,
   Grid,
-  Sparkles,
+  Compass,
   Layers,
   ArrowRight,
   HelpCircle,
@@ -278,7 +278,7 @@ export function FactorsLcmGcdModule() {
           {/* LGS Taktik Kartı */}
           <div className="p-4 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs space-y-2">
             <div className="font-bold text-white flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Compass className="w-3.5 h-3.5 text-amber-400" />
               <span>LGS Altın Eşitliği</span>
             </div>
             <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 font-mono text-center text-amber-300 font-bold">

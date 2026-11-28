@@ -7,7 +7,7 @@ import {
   TrendingDown,
   TrendingUp,
   Activity,
-  Sparkles,
+  Compass,
   Info,
   Building,
   HeartPulse,
@@ -269,7 +269,7 @@ export function PopulationPyramidModule() {
           {/* Sınav Taktik Kartı */}
           <div className="p-4 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs space-y-2">
             <div className="font-bold text-white flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+              <Compass className="w-3.5 h-3.5 text-rose-400" />
               <span>YKS & LGS Coğrafya Püf Noktaları</span>
             </div>
             <ul className="list-disc list-inside space-y-1 text-[11px] text-slate-300">

@@ -10,7 +10,7 @@ import {
   Sliders,
   Thermometer,
   Gauge,
-  Sparkles,
+  Compass,
   Play,
   Pause,
   AlertTriangle,
@@ -115,7 +115,7 @@ export function InteractiveLabSandbox() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-black uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Compass className="w-3.5 h-3.5" />
             <span>Serbest Deney Masası (Sandbox)</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white mt-1">

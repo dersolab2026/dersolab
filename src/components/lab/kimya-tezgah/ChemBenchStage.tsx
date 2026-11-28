@@ -7,7 +7,7 @@ import {
   Zap,
   Play,
   AlertTriangle,
-  Sparkles,
+  Compass,
   ChevronLeft,
   ChevronRight,
   RotateCcw,
@@ -731,7 +731,7 @@ export function ChemBenchStage({
             </span>
           ) : isSandbox ? (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Compass className="w-3.5 h-3.5" />
               <span>Serbest Tezgâh — Şişelere tıkla veya sürükle</span>
             </span>
           ) : isCompleted ? (

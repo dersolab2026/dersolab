@@ -6,7 +6,6 @@ import {
   Thermometer,
   Compass,
   ArrowRight,
-  Sparkles,
   HelpCircle,
   Plus,
   Minus,

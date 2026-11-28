@@ -19,7 +19,7 @@ import {
   ChevronRight,
   ChevronDown,
   BookOpen,
-  Sparkles,
+  Compass,
   Award,
   KeyRound,
   Copy,
@@ -1084,7 +1084,7 @@ export function GradeWorkbenchEngine({ config }: GradeWorkbenchEngineProps) {
           {/* Gözlem Defteri */}
           <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-4 space-y-2.5">
             <div className="text-xs font-black text-white uppercase tracking-wider inline-flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-amber-400" />
+              <Compass className="w-4 h-4 text-amber-400" />
               <span>Gözlem Defteri</span>
             </div>
             <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
