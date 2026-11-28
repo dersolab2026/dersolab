@@ -16,14 +16,26 @@ import { MEBCurriculumEnglishModule } from './MEBCurriculumEnglishModule'
 import { TinyLessonsModule } from './TinyLessonsModule'
 import { PronunciationWorkoutModule } from './PronunciationWorkoutModule'
 import { VisualSceneModule } from './VisualSceneModule'
+import { GradeWorkbenchEngine } from '../shared/GradeWorkbenchEngine'
+import { INGILIZCE_WORKBENCH_CONFIG } from './ingilizceTezgahData'
 import { playClickSound } from '@/lib/soundFx'
 
-type EnglishTabType = 'meb-curriculum' | 'tiny-lessons' | 'pronunciation' | 'visual-scenes'
+type EnglishTabType = 'workbench' | 'meb-curriculum' | 'tiny-lessons' | 'pronunciation' | 'visual-scenes'
 
 export function IngilizceLabView() {
-  const [activeTab, setActiveTab] = useState<EnglishTabType>('meb-curriculum')
+  const [activeTab, setActiveTab] = useState<EnglishTabType>('workbench')
 
   const TABS = [
+    {
+      id: 'workbench' as EnglishTabType,
+      label: 'Sanal İngilizce Tezgâhı',
+      sublabel: '5–12. Sınıf Adım Adım Pratik',
+      icon: Sparkles,
+      badge: '24 MEB Simülasyonu',
+      color: 'from-cyan-500 to-sky-600',
+      activeBorder: 'border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.3)] ring-1 ring-cyan-500/20',
+      activeText: 'text-cyan-300',
+    },
     {
       id: 'meb-curriculum' as EnglishTabType,
       label: 'MEB Okul Üniteleri',
@@ -164,6 +176,7 @@ export function IngilizceLabView() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2 }}
           >
+            {activeTab === 'workbench' && <GradeWorkbenchEngine config={INGILIZCE_WORKBENCH_CONFIG} />}
             {activeTab === 'meb-curriculum' && <MEBCurriculumEnglishModule />}
             {activeTab === 'tiny-lessons' && <TinyLessonsModule />}
             {activeTab === 'pronunciation' && <PronunciationWorkoutModule />}

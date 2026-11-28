@@ -18,14 +18,18 @@ import {
 import { BionicSpeedReader } from './BionicSpeedReader'
 import { PhoneticInspector } from './PhoneticInspector'
 import { TdkWordOfTheDay } from './TdkWordOfTheDay'
+import { SentenceParserModule } from './SentenceParserModule'
+import { LiteratureMatchGame } from './LiteratureMatchGame'
 import { SocialCommunityBar } from '@/components/home/SocialCommunityBar'
+import { GradeWorkbenchEngine } from '../shared/GradeWorkbenchEngine'
+import { TURKCE_WORKBENCH_CONFIG } from './turkceTezgahData'
 
 import { BranchNavHeader } from '../BranchNavHeader'
 
-export type TurkceTabType = 'bionic' | 'phonetics' | 'tdk'
+export type TurkceTabType = 'workbench' | 'bionic' | 'phonetics' | 'parser' | 'literature' | 'tdk'
 
 export function TurkceLabView() {
-  const [activeTab, setActiveTab] = useState<TurkceTabType>('bionic')
+  const [activeTab, setActiveTab] = useState<TurkceTabType>('workbench')
   const [sessionSeconds, setSessionSeconds] = useState(0)
 
   // Focus timer on TurkceLab
@@ -45,6 +49,12 @@ export function TurkceLabView() {
 
   const TABS = [
     {
+      id: 'workbench' as TurkceTabType,
+      label: 'Sanal Türkçe Tezgâhı (5–12. Sınıf)',
+      badge: '24 MEB Atölyesi',
+      icon: FlaskConical,
+    },
+    {
       id: 'bionic' as TurkceTabType,
       label: 'Paragraf Hız Antrenörü',
       badge: 'Okuma & Kavrama',
@@ -55,6 +65,18 @@ export function TurkceLabView() {
       label: 'Ses Olayları & Yazım Kuralları',
       badge: 'Yazım Kuralları',
       icon: Layers,
+    },
+    {
+      id: 'parser' as TurkceTabType,
+      label: 'Cümlenin Ögeleri',
+      badge: '8–12. Sınıf',
+      icon: Tag,
+    },
+    {
+      id: 'literature' as TurkceTabType,
+      label: 'Edebiyat Eşleştirme',
+      badge: 'YKS / AYT',
+      icon: GraduationCap,
     },
     {
       id: 'tdk' as TurkceTabType,
@@ -143,8 +165,11 @@ export function TurkceLabView() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2 }}
           >
+            {activeTab === 'workbench' && <GradeWorkbenchEngine config={TURKCE_WORKBENCH_CONFIG} />}
             {activeTab === 'bionic' && <BionicSpeedReader />}
             {activeTab === 'phonetics' && <PhoneticInspector />}
+            {activeTab === 'parser' && <SentenceParserModule />}
+            {activeTab === 'literature' && <LiteratureMatchGame />}
             {activeTab === 'tdk' && <TdkWordOfTheDay />}
           </motion.div>
         </AnimatePresence>

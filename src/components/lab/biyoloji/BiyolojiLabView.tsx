@@ -17,15 +17,27 @@ import { ProteinSynthesis } from './ProteinSynthesis'
 import { CellDivisionModule } from './CellDivisionModule'
 import { PhotosynthesisModule } from './PhotosynthesisModule'
 import { BranchNavHeader } from '../BranchNavHeader'
+import { GradeWorkbenchEngine } from '../shared/GradeWorkbenchEngine'
+import { BIYOLOJI_WORKBENCH_CONFIG } from './biyolojiTezgahData'
 
-export type BioTabType = 'genetics' | 'division' | 'photosynthesis' | 'protein'
+export type BioTabType = 'workbench' | 'genetics' | 'division' | 'photosynthesis' | 'protein'
 type GradeLevelFilter = 'all' | 'ortaokul' | 'lise'
 
 export function BiyolojiLabView() {
-  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('ortaokul')
-  const [activeTab, setActiveTab] = useState<BioTabType>('genetics')
+  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('all')
+  const [activeTab, setActiveTab] = useState<BioTabType>('workbench')
 
   const ALL_MODULES = [
+    {
+      id: 'workbench' as BioTabType,
+      label: 'Sanal Biyoloji & Mikroskop Tezgâhı (5–12. Sınıf)',
+      level: 'all' as const,
+      gradeBadge: '24 MEB Deneyi',
+      icon: Dna,
+      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      activeBorder: 'border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.25)] ring-1 ring-emerald-500/20',
+      desc: '5–12. sınıf mikroskop, kan grubu aglütinasyonu, besin ayraçları, ozmoz, fotosentez ve protein sentezi',
+    },
     // ── Ortaokul & Temel Biyoloji (7 - 8. Sınıf & LGS) ──
     {
       id: 'genetics' as BioTabType,
@@ -72,7 +84,7 @@ export function BiyolojiLabView() {
   ]
 
   const visibleModules = ALL_MODULES.filter((m) => {
-    if (levelFilter === 'all') return true
+    if (levelFilter === 'all' || m.level === 'all') return true
     return m.level === levelFilter
   })
 
@@ -196,6 +208,18 @@ export function BiyolojiLabView() {
       {/* ── Active Module Content ── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AnimatePresence mode="wait">
+          {activeTab === 'workbench' && (
+            <motion.div
+              key="workbench"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+            >
+              <GradeWorkbenchEngine config={BIYOLOJI_WORKBENCH_CONFIG} />
+            </motion.div>
+          )}
+
           {activeTab === 'genetics' && (
             <motion.div
               key="genetics"

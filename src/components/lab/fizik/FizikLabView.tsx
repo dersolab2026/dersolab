@@ -34,9 +34,12 @@ import { LabReportModal, type MeasurementRow } from '../shared/LabReportModal'
 import { LabSplitScreenModal, type SplitStateScenario } from '../shared/LabSplitScreenModal'
 import { DersoAISocraticAssistant } from '../shared/DersoAISocraticAssistant'
 import { LabTutorCTA } from '../shared/LabTutorCTA'
+import { GradeWorkbenchEngine } from '../shared/GradeWorkbenchEngine'
+import { FIZIK_WORKBENCH_CONFIG } from './fizikTezgahData'
 import { playClickSound } from '@/lib/soundFx'
 
 export type FizikTabType =
+  | 'workbench'
   | 'circuits'
   | 'optics'
   | 'buoyancy'
@@ -48,14 +51,24 @@ export type FizikTabType =
 type GradeLevelFilter = 'all' | 'ortaokul' | 'lise'
 
 export function FizikLabView() {
-  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('ortaokul')
-  const [activeTab, setActiveTab] = useState<FizikTabType>('circuits')
+  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('all')
+  const [activeTab, setActiveTab] = useState<FizikTabType>('workbench')
 
   // Modals state
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false)
 
   const ALL_MODULES = [
+    {
+      id: 'workbench' as FizikTabType,
+      label: 'Sanal Fizik Deney Tezgâhı (5–12. Sınıf)',
+      level: 'all' as const,
+      gradeBadge: '24 MEB Deneyi',
+      icon: Sparkles,
+      badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+      activeBorder: 'border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.25)] ring-1 ring-blue-500/20',
+      desc: '5–12. sınıf sınıf sınıf tüm fizik deneyleri, dinamometre, taşırma kabı, Torricelli, optik ve eğik atış',
+    },
     // ── Ortaokul & Temel Fizik Üniteleri (7 - 8. Sınıf & LGS) ──
     {
       id: 'circuits' as FizikTabType,
@@ -132,7 +145,7 @@ export function FizikLabView() {
   ]
 
   const visibleModules = ALL_MODULES.filter((m) => {
-    if (levelFilter === 'all') return true
+    if (levelFilter === 'all' || m.level === 'all') return true
     return m.level === levelFilter || m.id === 'sandbox'
   })
 
@@ -402,6 +415,18 @@ export function FizikLabView() {
       {/* ── Active Module Content ── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <AnimatePresence mode="wait">
+          {activeTab === 'workbench' && (
+            <motion.div
+              key="workbench"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+            >
+              <GradeWorkbenchEngine config={FIZIK_WORKBENCH_CONFIG} />
+            </motion.div>
+          )}
+
           {activeTab === 'circuits' && (
             <motion.div
               key="circuits"
@@ -488,7 +513,7 @@ export function FizikLabView() {
         </AnimatePresence>
 
         {/* ── INTERACTIVE ENHANCEMENT SECTION (Challenges + Exam Question + Socratic AI) ── */}
-        {activeTab !== 'sandbox' && (
+        {activeTab !== 'sandbox' && activeTab !== 'workbench' && (
           <div className="space-y-6 pt-4 border-t border-slate-800">
             {/* 1. Görev & Meydan Okuma Sistemi (Challenges) */}
             <LabChallengePanel

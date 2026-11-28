@@ -18,15 +18,27 @@ import { HistoryTimeline } from './HistoryTimeline'
 import { SeasonsOrbitModule } from './SeasonsOrbitModule'
 import { PopulationPyramidModule } from './PopulationPyramidModule'
 import { BranchNavHeader } from '../BranchNavHeader'
+import { GradeWorkbenchEngine } from '../shared/GradeWorkbenchEngine'
+import { SOSYAL_WORKBENCH_CONFIG } from './sosyalTezgahData'
 
-export type SosyalTabType = 'geo' | 'seasons' | 'pyramids' | 'history'
+export type SosyalTabType = 'workbench' | 'geo' | 'seasons' | 'pyramids' | 'history'
 type GradeLevelFilter = 'all' | 'ortaokul' | 'lise'
 
 export function SosyalLabView() {
-  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('ortaokul')
-  const [activeTab, setActiveTab] = useState<SosyalTabType>('geo')
+  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('all')
+  const [activeTab, setActiveTab] = useState<SosyalTabType>('workbench')
 
   const ALL_MODULES = [
+    {
+      id: 'workbench' as SosyalTabType,
+      label: 'Sanal Tarih & Coğrafya Tezgâhı (5–12. Sınıf)',
+      level: 'all' as const,
+      gradeBadge: '24 MEB Simülasyonu',
+      icon: Compass,
+      badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+      activeBorder: 'border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.25)] ring-1 ring-rose-500/20',
+      desc: '5–12. sınıf iklim rüzgârları, izohips, ilk Türkler, Osmanlı tımarı, Kurtuluş Savaşı ve jeopolitik',
+    },
     // ── Ortaokul & Temel Sosyal Bilgiler (5 - 8. Sınıf) ──
     {
       id: 'geo' as SosyalTabType,
@@ -73,7 +85,7 @@ export function SosyalLabView() {
   ]
 
   const visibleModules = ALL_MODULES.filter((m) => {
-    if (levelFilter === 'all') return true
+    if (levelFilter === 'all' || m.level === 'all') return true
     return m.level === levelFilter
   })
 
@@ -197,6 +209,18 @@ export function SosyalLabView() {
       {/* ── Active Module Content ── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AnimatePresence mode="wait">
+          {activeTab === 'workbench' && (
+            <motion.div
+              key="workbench"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+            >
+              <GradeWorkbenchEngine config={SOSYAL_WORKBENCH_CONFIG} />
+            </motion.div>
+          )}
+
           {activeTab === 'geo' && (
             <motion.div
               key="geo"

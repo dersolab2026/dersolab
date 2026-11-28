@@ -29,8 +29,11 @@ import { FunctionsModule } from './FunctionsModule'
 import { ParabolaModule } from './ParabolaModule'
 import { FactorsLcmGcdModule } from './FactorsLcmGcdModule'
 import { BranchNavHeader } from '../BranchNavHeader'
+import { GradeWorkbenchEngine } from '../shared/GradeWorkbenchEngine'
+import { MATEMATIK_WORKBENCH_CONFIG } from './matematikTezgahData'
 
 export type MathTabType =
+  | 'workbench'
   | 'factors'
   | 'pythagoras'
   | 'equation'
@@ -44,10 +47,20 @@ export type MathTabType =
 type GradeLevelFilter = 'all' | 'ortaokul' | 'lise'
 
 export function MatematikLabView() {
-  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('ortaokul')
-  const [activeTab, setActiveTab] = useState<MathTabType>('factors')
+  const [levelFilter, setLevelFilter] = useState<GradeLevelFilter>('all')
+  const [activeTab, setActiveTab] = useState<MathTabType>('workbench')
 
   const ALL_MODULES = [
+    {
+      id: 'workbench' as MathTabType,
+      label: 'Sanal Matematik & Geometri Tezgâhı (5–12. Sınıf)',
+      level: 'all' as const,
+      gradeBadge: '24 MEB Simülasyonu',
+      icon: Sparkles,
+      badgeColor: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+      activeBorder: 'border-violet-500/50 shadow-[0_0_15px_rgba(139,92,246,0.25)] ring-1 ring-violet-500/20',
+      desc: '5–12. sınıf kesirler, tam sayılar, terazi denklemleri, Pisagor, parabol, birim çember, türev ve integral',
+    },
     // ── Ortaokul Modülleri (5 - 8. Sınıf & LGS) ──
     {
       id: 'factors' as MathTabType,
@@ -144,7 +157,7 @@ export function MatematikLabView() {
   ]
 
   const visibleModules = ALL_MODULES.filter((m) => {
-    if (levelFilter === 'all') return true
+    if (levelFilter === 'all' || m.level === 'all') return true
     return m.level === levelFilter
   })
 
@@ -268,6 +281,18 @@ export function MatematikLabView() {
       {/* ── Active Module Content ── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AnimatePresence mode="wait">
+          {activeTab === 'workbench' && (
+            <motion.div
+              key="workbench"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+            >
+              <GradeWorkbenchEngine config={MATEMATIK_WORKBENCH_CONFIG} />
+            </motion.div>
+          )}
+
           {activeTab === 'factors' && (
             <motion.div
               key="factors"
