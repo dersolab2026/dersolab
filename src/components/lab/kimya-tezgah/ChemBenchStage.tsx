@@ -390,6 +390,7 @@ export function ChemBenchStage({
         label: 'Erlen 1',
         x: 122,
         colorHex: '#38bdf8',
+        hasSpillTray: true,
         vesselRole: 'primary',
       })
       entities.push({
@@ -417,6 +418,7 @@ export function ChemBenchStage({
         label: primaryKind === 'erlen' ? 'Erlen 1' : 'Beher 1',
         x: 130,
         colorHex: '#38bdf8',
+        hasSpillTray: true,
         vesselRole: 'primary',
       })
       entities.push({
@@ -488,6 +490,30 @@ export function ChemBenchStage({
   const viewWidth = mobileZoom ? 640 : 920
   const maxPan = Math.max(0, layout.totalWidth - viewWidth)
   const clampedPan = Math.min(maxPan, Math.max(0, panX))
+
+  // Auto-select current step's reagent on load and step advance so Miktar popover + target glows show across all 59 experiments
+  useEffect(() => {
+    if (isCompleted) {
+      setSelectedId(null)
+      return
+    }
+    const reagents = layout.entities.filter((e) => e.kind === 'reagent')
+    if (reagents.length === 0) return
+    const stepMatIds = activeStep?.materialIds || []
+    if (stepMatIds.includes('termometre')) {
+      setSelectedId('bench_thermometer')
+      return
+    }
+    const matched =
+      reagents.find((r) => stepMatIds.includes(r.id)) ||
+      reagents[0]
+    if (matched) {
+      setSelectedId(matched.id)
+      if (matched.containerStyle === 'dropper') setSelectedDose(2)
+      else if (matched.isSolid) setSelectedDose(1)
+      else setSelectedDose(10)
+    }
+  }, [experiment.id, currentStepIndex, isCompleted, isSandbox, activeStep, layout.entities])
 
   const vesselTargets = useMemo(
     () =>
@@ -1153,6 +1179,16 @@ export function ChemBenchStage({
                   }}
                   className="cursor-pointer"
                 >
+                  {/* Spill Tray under primary Erlenmeyer */}
+                  {entity.hasSpillTray && (
+                    <g>
+                      <rect x="-78" y="324" width="156" height="10" rx="4" fill="#cbd5e1" stroke="#94a3b8" strokeWidth="1" />
+                      <rect x="-74" y="326" width="148" height="4" rx="2" fill="#f1f5f9" />
+                      {showPopoverForSelected && (
+                        <rect x="-84" y="317" width="168" height="22" rx="7" fill="none" stroke="rgba(234,179,8,0.65)" strokeWidth="1.8" />
+                      )}
+                    </g>
+                  )}
                   {(isTargetHighlight || isHoverTarget) && (
                     <rect
                       x="-72"
@@ -1318,6 +1354,16 @@ export function ChemBenchStage({
                   }}
                   className="cursor-pointer"
                 >
+                  {/* Spill Tray under primary Beaker */}
+                  {entity.hasSpillTray && (
+                    <g>
+                      <rect x="-70" y="324" width="140" height="10" rx="4" fill="#cbd5e1" stroke="#94a3b8" strokeWidth="1" />
+                      <rect x="-66" y="326" width="132" height="4" rx="2" fill="#f1f5f9" />
+                      {showPopoverForSelected && (
+                        <rect x="-76" y="317" width="152" height="22" rx="7" fill="none" stroke="rgba(234,179,8,0.65)" strokeWidth="1.8" />
+                      )}
+                    </g>
+                  )}
                   {(isTargetHighlight || isHoverTarget) && (
                     <rect
                       x="-64"
@@ -1720,13 +1766,13 @@ export function ChemBenchStage({
             )
           })}
 
-          {/* Foreground Bench Items: Horizontal Thermometer (between vessels, zero label overlap) */}
+          {/* Foreground Bench Items: Horizontal Thermometer (below vessel labels, zero overlap across all 59 experiments) */}
           {!effectiveThermometerVesselId && (
             <g
               transform={
                 dragState?.entityId === 'bench_thermometer' && dragState.moved
                   ? `translate(${dragState.currentX}, ${dragState.currentY - 350})`
-                  : 'translate(292, 356)'
+                  : 'translate(292, 378)'
               }
               onClick={(e) => {
                 e.stopPropagation()
@@ -1749,8 +1795,12 @@ export function ChemBenchStage({
               }}
               className="cursor-grab active:cursor-grabbing"
             >
-              {selectedId === 'bench_thermometer' && (
+              {selectedId === 'bench_thermometer' ? (
                 <rect x="-86" y="-12" width="172" height="24" rx="7" fill="none" stroke="rgba(248,250,252,0.82)" strokeWidth="1.6" strokeDasharray="5 4" />
+              ) : (
+                showPopoverForSelected && (
+                  <rect x="-86" y="-12" width="172" height="24" rx="7" fill="none" stroke="rgba(234,179,8,0.65)" strokeWidth="1.8" />
+                )
               )}
               <rect x="-78" y="-4.5" width="156" height="9" rx="4.5" fill="rgba(226,232,240,0.22)" stroke="#94a3b8" strokeWidth="1.1" />
               <circle cx="-71" cy="0" r="5.5" fill="#ef4444" />
@@ -1762,7 +1812,7 @@ export function ChemBenchStage({
           )}
 
           {/* Horizontal Wooden Splint / Glass Stirring Rod on Right Foreground Bench */}
-          <g transform="translate(565, 356)">
+          <g transform="translate(565, 378)">
             <rect x="-64" y="-2.2" width="128" height="4.4" rx="2.2" fill="#c29b61" stroke="rgba(255,255,255,0.2)" strokeWidth="0.6" />
           </g>
 

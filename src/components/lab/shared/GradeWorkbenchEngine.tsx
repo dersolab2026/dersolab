@@ -92,8 +92,11 @@ export function GradeWorkbenchEngine({ config }: GradeWorkbenchEngineProps) {
   const [undoStack, setUndoStack] = useState<Snapshot[]>([])
 
   // Interactive Popover & Tool Selection
-  const [selectedTool, setSelectedTool] = useState<WorkbenchToolDef | null>(null)
-  const [selectedDose, setSelectedDose] = useState<number>(1)
+  const [selectedTool, setSelectedTool] = useState<WorkbenchToolDef | null>(
+    () => config.simulations[0].tools[0] || null
+  )
+  const [selectedDose, setSelectedDose] = useState<number>(5)
+  const [actionAnim, setActionAnim] = useState<{ toolId: string; colorHex: string } | null>(null)
 
   // Controls & Toggles
   const [isAutoPlaying, setIsAutoPlaying] = useState(false)
@@ -259,6 +262,21 @@ export function GradeWorkbenchEngine({ config }: GradeWorkbenchEngineProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAutoPlaying, currentStepIndex, isCompleted, fastForward, activeAssignmentId])
 
+  // Auto-select the active step's tool on load and step advance so studio popover + target glows show across all 144 simulations
+  useEffect(() => {
+    if (isCompleted) {
+      setSelectedTool(null)
+      return
+    }
+    const stepToolId = currentSim.steps[currentStepIndex]?.toolId
+    const matched = currentSim.tools.find((t) => t.id === stepToolId) || currentSim.tools[0] || null
+    setSelectedTool(matched)
+    if (matched?.doseOptions && matched.doseOptions.length > 0) setSelectedDose(matched.doseOptions[0])
+    else if (matched?.kind === 'weight') setSelectedDose(100)
+    else if (matched?.kind === 'bottle') setSelectedDose(5)
+    else setSelectedDose(1)
+  }, [currentSim.id, currentSim.steps, currentSim.tools, currentStepIndex, isCompleted])
+
   const handleUndo = () => {
     if (undoStack.length === 0) return
     playGlassClink()
@@ -283,15 +301,9 @@ export function GradeWorkbenchEngine({ config }: GradeWorkbenchEngineProps) {
 
   const handleApplyToolToTarget = () => {
     if (!selectedTool) return
-    const active = currentSim.steps[currentStepIndex]
-    if (!active) return
-    if (!active.toolId || active.toolId === selectedTool.id) {
-      executeStep(false)
-      setSelectedTool(null)
-    } else {
-      executeStep(false)
-      setSelectedTool(null)
-    }
+    setActionAnim({ toolId: selectedTool.id, colorHex: selectedTool.colorHex })
+    setTimeout(() => setActionAnim(null), 650)
+    executeStep(false)
   }
 
   const handleShare = (copyText?: string) => {
@@ -726,57 +738,63 @@ export function GradeWorkbenchEngine({ config }: GradeWorkbenchEngineProps) {
 
             {/* Interactive Vector Stage with Top-Left Floating Popover */}
             <div className="relative w-full">
-              {selectedTool && (
-                <div className="absolute top-3 left-3 z-20 w-[264px] max-w-[calc(100%-24px)] rounded-2xl bg-[#090d16]/95 backdrop-blur-md border border-slate-700/80 p-3 shadow-2xl space-y-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <span className="text-slate-400 font-semibold">
-                        {selectedTool.doseOptions ? 'Değer:' : 'Araç:'}
-                      </span>
-                      {selectedTool.doseOptions ? (
-                        selectedTool.doseOptions.map((d) => (
+              {selectedTool && (() => {
+                const effDoseOptions =
+                  selectedTool.doseOptions && selectedTool.doseOptions.length > 0
+                    ? selectedTool.doseOptions
+                    : selectedTool.kind === 'bottle'
+                    ? [5, 10]
+                    : selectedTool.kind === 'weight'
+                    ? [100, 200]
+                    : [1, 2]
+                const effDoseUnit =
+                  selectedTool.doseUnit ||
+                  (selectedTool.kind === 'bottle' ? 'mL' : selectedTool.kind === 'weight' ? 'g' : '×')
+                const doseHeading = selectedTool.kind === 'bottle' ? 'Miktar:' : 'Kademe:'
+                return (
+                  <div className="absolute top-3 left-3 z-20 w-[268px] max-w-[calc(100%-24px)] rounded-2xl bg-[#090d16]/95 backdrop-blur-md border border-slate-700/80 p-3 shadow-2xl space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 text-xs flex-wrap">
+                        <span className="text-slate-400 font-semibold">{doseHeading}</span>
+                        {effDoseOptions.map((d) => (
                           <button
                             key={d}
                             type="button"
                             onClick={() => setSelectedDose(d)}
-                            className={`px-2 py-0.5 rounded-full font-bold text-[11px] border cursor-pointer ${
+                            className={`px-2 py-0.5 rounded-full font-bold text-[11px] border cursor-pointer transition-all ${
                               selectedDose === d
                                 ? 'bg-rose-500/20 border-rose-400 text-rose-200'
-                                : 'bg-slate-900 border-slate-700 text-slate-300'
+                                : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
                             }`}
                           >
-                            {d} {selectedTool.doseUnit || ''}
+                            {d} {effDoseUnit}
                           </button>
-                        ))
-                      ) : (
-                        <span className="font-bold text-white">{selectedTool.label}</span>
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedTool(null)}
-                      aria-label="Kapat"
-                      className="p-0.5 rounded-md text-slate-400 hover:text-white cursor-pointer"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <div className="space-y-1.5">
-                    {currentSim.targetLabels.map((tgt) => (
+                        ))}
+                      </div>
                       <button
-                        key={tgt}
                         type="button"
-                        onClick={handleApplyToolToTarget}
-                        className="w-full px-3.5 py-2 rounded-xl bg-[#dc2626] hover:bg-[#ef4444] text-white text-xs font-extrabold text-left shadow-md cursor-pointer"
+                        onClick={() => setSelectedTool(null)}
+                        aria-label="Kapat"
+                        className="p-0.5 rounded-md text-slate-400 hover:text-white cursor-pointer"
                       >
-                        {selectedTool.doseOptions
-                          ? `${selectedDose} ${selectedTool.doseUnit || ''} · Uygula → ${tgt}`
-                          : `Uygula → ${tgt}`}
+                        <X className="w-3.5 h-3.5" />
                       </button>
-                    ))}
+                    </div>
+                    <div className="space-y-1.5">
+                      {currentSim.targetLabels.map((tgt) => (
+                        <button
+                          key={tgt}
+                          type="button"
+                          onClick={handleApplyToolToTarget}
+                          className="w-full px-3.5 py-2 rounded-xl bg-[#dc2626] hover:bg-[#ef4444] text-white text-xs font-extrabold text-left shadow-md cursor-pointer transition-all"
+                        >
+                          {`${selectedDose} ${effDoseUnit} · Uygula → ${tgt}`}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )
+              })()}
 
               <SubjectStageRenderer
                 sim={currentSim}
@@ -787,6 +805,7 @@ export function GradeWorkbenchEngine({ config }: GradeWorkbenchEngineProps) {
                 selectedToolId={selectedTool?.id || null}
                 showTargetHighlight={Boolean(selectedTool)}
                 fastForward={fastForward}
+                actionAnim={actionAnim}
                 onSelectTool={handleSelectTool}
                 onTargetClick={() => (selectedTool ? handleApplyToolToTarget() : executeStep(false))}
                 onClearSelection={() => setSelectedTool(null)}
