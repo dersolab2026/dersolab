@@ -715,6 +715,15 @@ export function SubjectStageRenderer({
           <text x="58" y="182" fill="#38bdf8" fontSize="10.4" fontWeight="800" fontFamily={SVG_FONT}>
             {sim.scenePayload?.displayTitle || sim.title}
           </text>
+          {sim.scene === 'sos_history_strategy' && (
+            <g transform="translate(362, 170)">
+              <rect x="0" y="0" width="122" height="16" rx="6" fill="rgba(245,158,11,0.16)" stroke="rgba(245,158,11,0.5)" strokeWidth="0.9" />
+              <circle cx="9" cy="8" r="2.6" fill="#fbbf24" />
+              <text x="16" y="11" fill="#fde047" fontSize="7.4" fontWeight="800" fontFamily={SVG_FONT}>
+                Taktik Harita Modu Aktif
+              </text>
+            </g>
+          )}
 
           {sim.scenePayload?.tokens && (
             <g transform="translate(58, 196)">

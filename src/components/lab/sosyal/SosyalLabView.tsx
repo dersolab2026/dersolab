@@ -12,16 +12,18 @@ import {
   Users,
   School,
   GraduationCap,
+  Swords,
 } from 'lucide-react'
 import { GeoAtlas } from './GeoAtlas'
 import { HistoryTimeline } from './HistoryTimeline'
 import { SeasonsOrbitModule } from './SeasonsOrbitModule'
 import { PopulationPyramidModule } from './PopulationPyramidModule'
+import { BattleSimulatorModule } from './BattleSimulatorModule'
 import { BranchNavHeader } from '../BranchNavHeader'
 import { GradeWorkbenchEngine } from '../shared/GradeWorkbenchEngine'
 import { SOSYAL_WORKBENCH_CONFIG } from './sosyalTezgahData'
 
-export type SosyalTabType = 'workbench' | 'geo' | 'seasons' | 'pyramids' | 'history'
+export type SosyalTabType = 'workbench' | 'battles' | 'geo' | 'seasons' | 'pyramids' | 'history'
 type GradeLevelFilter = 'all' | 'ortaokul' | 'lise'
 
 export function SosyalLabView() {
@@ -38,6 +40,16 @@ export function SosyalLabView() {
       badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
       activeBorder: 'border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.25)] ring-1 ring-rose-500/20',
       desc: '5–12. sınıf iklim rüzgârları, izohips, ilk Türkler, Osmanlı tımarı, Kurtuluş Savaşı ve jeopolitik',
+    },
+    {
+      id: 'battles' as SosyalTabType,
+      label: 'Tarih Savaş & Taktik Simülatörü',
+      level: 'all' as const,
+      gradeBadge: '6–12. Sınıf & LGS/YKS',
+      icon: Swords,
+      badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+      activeBorder: 'border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/20',
+      desc: 'Malazgirt, 1453 İstanbul, Preveze, Çanakkale, Sakarya ve Büyük Taarruz hareketli taktik haritaları',
     },
     // ── Ortaokul & Temel Sosyal Bilgiler (5 - 8. Sınıf) ──
     {
@@ -122,7 +134,7 @@ export function SosyalLabView() {
             {/* Quick Stats Pill */}
             <div className="grid grid-cols-3 gap-3 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-md self-start md:self-auto">
               <div className="px-3 py-1 text-center">
-                <div className="text-lg font-bold text-rose-400">4</div>
+                <div className="text-lg font-bold text-rose-400">6</div>
                 <div className="text-[11px] text-slate-400">Sanal Modül</div>
               </div>
               <div className="px-3 py-1 text-center border-x border-slate-800">
@@ -172,7 +184,7 @@ export function SosyalLabView() {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Tümü (4)
+                Tümü (6)
               </button>
             </div>
           </div>
@@ -218,6 +230,18 @@ export function SosyalLabView() {
               transition={{ duration: 0.2 }}
             >
               <GradeWorkbenchEngine config={SOSYAL_WORKBENCH_CONFIG} />
+            </motion.div>
+          )}
+
+          {activeTab === 'battles' && (
+            <motion.div
+              key="battles"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+            >
+              <BattleSimulatorModule />
             </motion.div>
           )}
 
